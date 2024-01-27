@@ -45,6 +45,8 @@ jobs:
           echo PUBLIC_URL=$PUBLIC_URL > .env
 
       - name: Build
+        env:
+          REACT_APP_BASEURL: /studyroom-reservation
         run: |
           yarn build
           cp ./build/index.html ./build/404.html
