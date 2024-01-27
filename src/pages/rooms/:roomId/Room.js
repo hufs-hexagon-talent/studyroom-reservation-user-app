@@ -1,7 +1,6 @@
 import { useParams } from "react-router-dom";
 
-const Room = (a) => {
-
+const Room = () => {
     const {roomId} = useParams()
     return (<>
         <div>roomId: {roomId}</div>

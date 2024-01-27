@@ -12,13 +12,9 @@ const Router = () => {
         <Route path="/login" element={<Login />} /> {/* 로그인 페이지 */}
         <Route path="/rooms" element={<Rooms />} /> {/* Room 목록 */}
         <Route path="/rooms/:roomId/" element={<Room />} /> {/* 특정 Room */}
-
       </Routes>
     </BrowserRouter>
   );
 };
 
 export default Router;
-
-
-// /
