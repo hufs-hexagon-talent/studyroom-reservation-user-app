@@ -6,8 +6,8 @@ import Room from "./pages/rooms/:roomId/Room";
 
 const Router = () => {
   return (
-    <BrowserRouter>
-      <Routes basename={process.env.REACT_APP_BASEURL || '/'}>
+    <BrowserRouter basename={process.env.REACT_APP_BASEURL || '/'}>
+      <Routes>
         <Route path="/" element={<App />} /> {/* 소개 페이지 */}
         <Route path="/login" element={<Login />} /> {/* 로그인 페이지 */}
         <Route path="/rooms" element={<Rooms />} /> {/* Room 목록 */}
