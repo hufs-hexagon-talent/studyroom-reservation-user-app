@@ -5,8 +5,7 @@ name: Deploy
 
 on:
   push:
-    branches: ['step1']
-
+    branches: ['main']
   workflow_dispatch:
 
 jobs:
