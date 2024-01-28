@@ -1,9 +1,10 @@
-import Button from '../components/Button'
+import Button from '../components/Button';
 import React from 'react';
 
 const App = () => (
   <div>
-    <div>Hello World</div>
+    <div>컴퓨터공학부 스터디룸 예약 시스템</div>
+    <br/>
     <Button text="hi" onClick={() => {
       console.log("hi")
     }} />
