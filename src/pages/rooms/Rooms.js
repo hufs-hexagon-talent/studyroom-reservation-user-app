@@ -5,36 +5,41 @@ const Rooms = () => {
   const navigate = useNavigate();
 
   return (
-    <div class="container">
-      <div>Select room</div>
-      <br />
-      <div class="outside-room-select">
-        <div class="container">
+    <>
+      <div>
+        <p
+          style={{
+            backgroundColor: "#262424",
+            color: "white",
+            marginBottom: "50px",
+            marginTop: "50px",
+            textAlign: "center",
+          }}
+        >
+          호실을<br></br> 선택하세요.<p></p>
+          <br></br>
           <Button
-            class="button-insied"
             text="306호"
             onClick={() => {
               console.log("select 306");
               navigate("/rooms/306");
             }}
           />
-        </div>
-      </div>
-      <br />
-      <br />
-      <div class="outside-room-select">
-        <div class="container">
+          <br />
+          <br />
           <Button
-            class="button-inside"
             text="428호"
             onClick={() => {
               console.log("select 428");
               navigate("/rooms/428");
             }}
           />
-        </div>
+          <br />
+          <br />
+        </p>
       </div>
-    </div>
+      <br />
+    </>
   );
 };
 
