@@ -1,7 +1,7 @@
 import Button from "../../components/Button";
 import { useNavigate } from "react-router-dom";
 
-const Rooms = () => {
+const SelectRoom = () => {
   const navigate = useNavigate();
 
   return (
@@ -43,4 +43,4 @@ const Rooms = () => {
   );
 };
 
-export default Rooms;
+export default SelectRoom;
