@@ -2219,16 +2219,6 @@
     "@mui/utils" "^5.15.6"
     prop-types "^15.8.1"
 
-"@mui/styled-engine-sc@^6.0.0-alpha.13":
-  version "6.0.0-alpha.13"
-  resolved "https://registry.yarnpkg.com/@mui/styled-engine-sc/-/styled-engine-sc-6.0.0-alpha.13.tgz#1dded74e014578a2a64afb304cdcb6f501f67806"
-  integrity sha512-QOv9oEZL3J/DYUJaQ6QFE7fTMxy/6J9mKKsdmQgHpgeESddiiCS0MCYoPsKoPcj6RABfzG12uqnq6o5s1seRLg==
-  dependencies:
-    "@babel/runtime" "^7.23.8"
-    csstype "^3.1.2"
-    hoist-non-react-statics "^3.3.2"
-    prop-types "^15.8.1"
-
 "@mui/styled-engine@^5.15.6":
   version "5.15.6"
   resolved "https://registry.yarnpkg.com/@mui/styled-engine/-/styled-engine-5.15.6.tgz#3f4a8804de6ddeee17cb52ec92225686f423398a"
@@ -5818,7 +5808,7 @@ he@^1.2.0:
   resolved "https://registry.yarnpkg.com/he/-/he-1.2.0.tgz#84ae65fa7eafb165fddb61566ae14baf05664f0f"
   integrity sha512-F/1DnUGPopORZi0ni+CvrCgHQ5FyEAHRLSApuYWMmrbSwoN2Mn/7k+Gl38gJnR7yyDZk6WLXwiGod1JOWNDKGw==
 
-hoist-non-react-statics@^3.3.1, hoist-non-react-statics@^3.3.2:
+hoist-non-react-statics@^3.3.1:
   version "3.3.2"
   resolved "https://registry.yarnpkg.com/hoist-non-react-statics/-/hoist-non-react-statics-3.3.2.tgz#ece0acaf71d62c2969c2ec59feff42a4b1a85b45"
   integrity sha512-/gGivxi8JPKWNm/W0jSmzcMPpfpPLc3dY/6GxhX2hQ9iGj3aDfklV4ET7NjKpSinLpJ5vafa9iiGIEZg10SfBw==
