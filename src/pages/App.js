@@ -1,9 +1,13 @@
+import { useState } from "react";
 import React from "react";
+import Navbar from "../components/Navbar/Navbar";
 
-const App = () => (
-  <div>
-    <div>컴퓨터공학부 스터디룸 예약 시스템</div>
-  </div>
-);
+const App = () => {
+  return (
+    <div className="container">
+      <Navbar />
+    </div>
+  );
+};
 
 export default App;
