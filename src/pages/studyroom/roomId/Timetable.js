@@ -8,10 +8,6 @@ import {
   TableRow,
   Typography,
   TableBody,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   Button as MuiButton,
 } from "@mui/material";
 import Button from "../../../components/Button";
@@ -25,39 +21,27 @@ const Room = () => {
 
   const navigate = useNavigate();
   const [selectedCells, setSelectedCells] = useState({});
-  const [openDialog, setOpenDialog] = useState(false);
-  const [selectedRoom, setSelectedRoom] = useState(null);
-  const [selectedHour, setSelectedHour] = useState(null);
-
-  // 예약 확인 대화상자 열기
-  const handleOpenDialog = (room, hour) => {
-    setSelectedRoom(room);
-    setSelectedHour(hour);
-    setOpenDialog(true);
-  };
-
-  // 예약 확인 대화상자 닫기
-  const handleCloseDialog = () => {
-    setOpenDialog(false);
-  };
 
   // 셀을 클릭할 때 해당 셀의 선택 여부를 업데이트하는 함수 추가
   const handleCellClick = (room, hour) => {
-    handleOpenDialog(room, hour);
-  };
-
-  // 예약을 확정할 때 호출되는 함수
-  const handleConfirmReservation = () => {
-    setSelectedCells((prevSelectedCells) => ({
-      ...prevSelectedCells,
-      [`${selectedRoom}-${selectedHour}`]: true,
-    }));
-    handleCloseDialog();
+    // 이미 선택된 셀이라면 색을 초기값으로 변경하여 선택 해제
+    if (selectedCells[`${room}-${hour}`]) {
+      setSelectedCells((prevSelectedCells) => {
+        const updatedCells = { ...prevSelectedCells };
+        delete updatedCells[`${room}-${hour}`]; // 선택 취소
+        return updatedCells;
+      });
+    } else {
+      // 아직 선택되지 않은 셀이라면 색을 변경하여 선택
+      setSelectedCells((prevSelectedCells) => ({
+        ...prevSelectedCells,
+        [`${room}-${hour}`]: true,
+      }));
+    }
   };
 
   return (
     <>
-      <div>예약하기</div>
       <TableContainer
         sx={{
           width: "90%",
@@ -99,7 +83,7 @@ const Room = () => {
                       sx={{
                         borderLeft: "1px solid #ccc",
                         backgroundColor: selectedCells[`${room}-${hour}`]
-                          ? "blue"
+                          ? "#4B89DC"
                           : "transparent", // 선택된 셀에 따라 색상 변경
                         cursor: "pointer", // 클릭 가능한 커서 스타일 추가
                       }}
@@ -113,29 +97,9 @@ const Room = () => {
         </Table>
       </TableContainer>
 
-      {/* 예약 확인 대화상자 */}
-      <Dialog open={openDialog} onClose={handleCloseDialog}>
-        <DialogTitle>예약 확인</DialogTitle>
-        <DialogContent>
-          {selectedRoom && selectedHour && (
-            <Typography>
-              {selectedRoom} 스터디룸을 {selectedHour}:00에 예약하시겠습니까?
-            </Typography>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <MuiButton onClick={handleCloseDialog} color="primary">
-            취소
-          </MuiButton>
-          <MuiButton onClick={handleConfirmReservation} color="primary">
-            확인
-          </MuiButton>
-        </DialogActions>
-      </Dialog>
-
       <br />
       <Button
-        text="다음"
+        text="예약하기"
         onClick={() => {
           navigate("/reservation");
         }}
