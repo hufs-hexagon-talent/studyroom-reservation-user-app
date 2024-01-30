@@ -2,13 +2,13 @@ import React from "react";
 
 import "./Navbar.css";
 
-import cse_logo from "../../assets/hufs_cse_logo.jpg";
+import logo from "../../assets/logo.png";
 
 const Navbar = () => {
   return (
     <div>
       <div className="navbar">
-        <img src={cse_logo} alt="" className="logo" />
+        <img src={logo} alt="" className="logo" />
         <div className="titleName">컴퓨터공학부 스터디룸 예약 시스템</div>
         <ul>
           <li>
