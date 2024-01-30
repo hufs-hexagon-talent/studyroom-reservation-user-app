@@ -1,16 +1,16 @@
 {
   "files": {
     "main.css": "/studyroom-reservation/static/css/main.2e62b011.css",
-    "main.js": "/studyroom-reservation/static/js/main.ecce123c.js",
+    "main.js": "/studyroom-reservation/static/js/main.af7abc2b.js",
     "static/js/787.e7d9f3e9.chunk.js": "/studyroom-reservation/static/js/787.e7d9f3e9.chunk.js",
-    "static/media/hufs_cse_logo.jpg": "/studyroom-reservation/static/media/hufs_cse_logo.c2494315b8cfed8267e7.jpg",
+    "static/media/logo.png": "/studyroom-reservation/static/media/logo.7215aa654ffb3b68e3db.png",
     "index.html": "/studyroom-reservation/index.html",
     "main.2e62b011.css.map": "/studyroom-reservation/static/css/main.2e62b011.css.map",
-    "main.ecce123c.js.map": "/studyroom-reservation/static/js/main.ecce123c.js.map",
+    "main.af7abc2b.js.map": "/studyroom-reservation/static/js/main.af7abc2b.js.map",
     "787.e7d9f3e9.chunk.js.map": "/studyroom-reservation/static/js/787.e7d9f3e9.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.2e62b011.css",
-    "static/js/main.ecce123c.js"
+    "static/js/main.af7abc2b.js"
   ]
 }
