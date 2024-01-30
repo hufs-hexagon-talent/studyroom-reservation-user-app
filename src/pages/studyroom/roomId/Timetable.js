@@ -8,7 +8,6 @@ import {
   TableRow,
   Typography,
   TableBody,
-  Button as MuiButton,
 } from "@mui/material";
 import Button from "../../../components/Button";
 
