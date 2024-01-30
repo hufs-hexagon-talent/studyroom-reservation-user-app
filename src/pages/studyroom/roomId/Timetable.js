@@ -12,8 +12,6 @@ import {
 
 import Button from '../../../components/Button';
 
-import Button from '../../../components/Button';
-
 const Room = () => {
   const today = new Date();
 
