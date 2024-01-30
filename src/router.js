@@ -3,11 +3,12 @@ import App from "./pages/App";
 import SelectRoom from "./pages/studyroom/SelectRoom";
 import Login from "./pages/login/Login";
 import Room from "./pages/studyroom/roomId/Timetable";
-
+import Navbar from "./components/Navbar/Navbar";
 
 const Router = () => {
   return (
     <BrowserRouter basename={process.env.REACT_APP_BASEURL || "/"}>
+      <Navbar />
       <Routes>
         <Route path="/" element={<App />} /> {/* 소개 페이지 */}
         <Route path="/login" element={<Login />} /> {/* 로그인 페이지 */}
@@ -18,4 +19,4 @@ const Router = () => {
   );
 };
 
-export default Router;  
+export default Router;
