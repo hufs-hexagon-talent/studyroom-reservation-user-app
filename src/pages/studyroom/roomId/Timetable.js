@@ -8,9 +8,9 @@ import {
   TableHead,
   TableRow,
   Typography,
-  TableBody,
-} from "@mui/material";
-import Button from "../../../components/Button";
+} from '@mui/material';
+
+import Button from '../../../components/Button';
 
 import Button from '../../../components/Button';
 
