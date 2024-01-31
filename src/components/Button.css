@@ -1,5 +1,5 @@
 .boxSize{
-    width: 30%;
+    width: 20%;
     margin:auto;
 }
 
@@ -17,5 +17,5 @@
 }
 
 .btn:hover{
-    background: darked;
+    background: rgb(85, 83, 83);
 }

@@ -7,8 +7,9 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Typography,
 } from '@mui/material';
+
+import './Timetable.css';
 
 import Button from '../../../components/Button';
 
@@ -49,10 +50,7 @@ const Timetable = () => {
   return (
     <>
       <TableContainer>
-        <Typography variant="h5" fontWeight={10} component="div" align="center">
-          예약하기
-        </Typography>
-        <div>
+        <div className="dayText">
           {year}년 {month}월 {day}일
         </div>
         <Table>
