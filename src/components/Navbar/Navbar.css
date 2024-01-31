@@ -34,3 +34,9 @@ ul li {
   font-size: 18px;
   cursor: pointer;
 }
+
+a:link,
+a:visited {
+  color: inherit; /* 링크 색상을 부모 엘리먼트의 color 값으로 상속 */
+  text-decoration: none; /* 밑줄 제거 */
+}

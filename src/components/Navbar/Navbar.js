@@ -15,10 +15,10 @@ const Navbar = () => {
             <a href="/">예약 현황</a>
           </li>
           <li>
-            <a href="/">예약하러 가기</a>
+            <a href="/rooms">예약하러 가기</a>
           </li>
           <li>
-            <a href="/">Login</a>
+            <a href="/login">Login</a>
           </li>
           <li>
             <a href="/">Register</a>

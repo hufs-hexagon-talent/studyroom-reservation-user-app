@@ -16,7 +16,8 @@ const SelectRoom = () => {
             marginBottom: '50px',
             marginTop: '50px',
             textAlign: 'center',
-          }}>
+          }}
+        >
           호실을<br></br> 선택하세요.<p></p>
           <br></br>
           <Button
