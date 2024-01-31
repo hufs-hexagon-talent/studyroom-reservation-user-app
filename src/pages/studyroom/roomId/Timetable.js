@@ -46,9 +46,26 @@ const Timetable = () => {
       });
     }
   };
-
+/*<Typography variant="h5" fontWeight={10} component="div" align="center">
+          예약하기
+        </Typography>*/
   return (
     <>
+      <div className='reserve'>
+        <h1>예약하기</h1>
+      </div>
+      <div>
+          {year}년 {month}월 {day}일
+      </div>
+      <TableContainer
+        sx={{
+          width: '90%',
+          minWidth: '650px',
+          marginLeft: 'auto',
+          marginRight: 'auto',
+          marginTop: '50px',
+        }}
+      >
       <TableContainer>
         <div className="dayText">
           <span className='textStyle'>
