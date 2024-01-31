@@ -1,0 +1,10 @@
+.reserve {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* 화면 전체 높이에 따라 가운데 정렬됩니다. */
+  }
+  
+  .reserve h1 {
+    text-align: center;
+  }

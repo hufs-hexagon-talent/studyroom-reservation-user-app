@@ -7,7 +7,6 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Typography,
 } from '@mui/material';
 
 import Button from '../../../components/Button';
@@ -45,9 +44,17 @@ const Timetable = () => {
       });
     }
   };
-
+/*<Typography variant="h5" fontWeight={10} component="div" align="center">
+          예약하기
+        </Typography>*/
   return (
     <>
+      <div className='reserve'>
+        <h1>예약하기</h1>
+      </div>
+      <div>
+          {year}년 {month}월 {day}일
+      </div>
       <TableContainer
         sx={{
           width: '90%',
@@ -57,12 +64,6 @@ const Timetable = () => {
           marginTop: '50px',
         }}
       >
-        <Typography variant="h5" fontWeight={10} component="div" align="center">
-          예약하기
-        </Typography>
-        <div>
-          {year}년 {month}월 {day}일
-        </div>
         <Table>
           <TableHead>
             <TableRow>
