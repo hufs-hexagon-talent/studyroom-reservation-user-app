@@ -4,11 +4,13 @@ import '../components/Button.css';
 
 const Button = ({ text, onClick }) => {
   return (
-    <p className="btn"
-    onClick={onClick}
-    >
-      {text}
-    </p>
+    <div className='boxSize'>
+      <p className="btn"
+      onClick={onClick}
+      >
+        {text}
+      </p>
+    </div>
   );
 };
 

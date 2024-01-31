@@ -9,17 +9,8 @@ const SelectRoom = () => {
   return (
     <>
       <div>
-        <p
-          style={{
-            backgroundColor: '#262424',
-            color: 'white',
-            marginBottom: '50px',
-            marginTop: '50px',
-            textAlign: 'center',
-          }}
-        >
-          호실을<br></br> 선택하세요.<p></p>
-          <br></br>
+        <p>
+          호실을 선택하세요.
           <Button
             text="306호"
             onClick={() => {
@@ -27,8 +18,6 @@ const SelectRoom = () => {
               navigate('/rooms/306');
             }}
           />
-          <br />
-          <br />
           <Button
             text="428호"
             onClick={() => {

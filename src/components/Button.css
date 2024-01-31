@@ -1,5 +1,9 @@
+.boxSize{
+    width: 30%;
+    margin:auto;
+}
+
 .btn {
-    width:100%;
     font-size: 1.2rem;
     padding-inline: 1em;
     padding-block: 0.5em;
@@ -9,6 +13,7 @@
     color: #fff;
     background: #ffca1a;
     cursor: pointer;
+    text-align: center;
 }
 
 .btn:hover{
