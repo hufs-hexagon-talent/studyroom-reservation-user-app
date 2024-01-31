@@ -51,7 +51,9 @@ const Timetable = () => {
     <>
       <TableContainer>
         <div className="dayText">
+          <span className='textStyle'>
           {year}년 {month}월 {day}일
+          </span>
         </div>
         <Table>
           <TableHead>
