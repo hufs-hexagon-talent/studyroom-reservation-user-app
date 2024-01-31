@@ -7,8 +7,9 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Typography,
 } from '@mui/material';
+
+import './Timetable.css';
 
 import Button from '../../../components/Button';
 
@@ -48,20 +49,11 @@ const Timetable = () => {
 
   return (
     <>
-      <TableContainer
-        sx={{
-          width: '90%',
-          minWidth: '650px',
-          marginLeft: 'auto',
-          marginRight: 'auto',
-          marginTop: '50px',
-        }}
-      >
-        <Typography variant="h5" fontWeight={10} component="div" align="center">
-          예약하기
-        </Typography>
-        <div>
+      <TableContainer>
+        <div className="dayText">
+          <span className='textStyle'>
           {year}년 {month}월 {day}일
+          </span>
         </div>
         <Table>
           <TableHead>
@@ -85,14 +77,7 @@ const Timetable = () => {
                 {[8, 8.5, 9, 9.5, 10, 10.5, 11, 11.5, 12, 12.5, 13, 13.5, 14, 14.5, 15, 15.5, 16, 16.5, 17, 17.5, 18, 18.5, 19, 19.5, 20, 20.5, 21, 21.5, 22].map(
                   hour => (
                     <TableCell
-                      key={`${room}-${hour}`} // 방이랑 시간 조합해서 키 값 생성
-                      sx={{
-                        borderLeft: '1px solid #ccc',
-                        backgroundColor: selectedCells[`${room}-${hour}`]
-                          ? '#4B89DC'
-                          : 'transparent', // 선택된 셀에 따라 색상 변경
-                        cursor: 'pointer', // 클릭 가능한 커서 스타일 추가
-                      }}
+                      key={`${room}-${hour}`} // 방이랑 시간 조합해서 키 값 생성\
                       onClick={() => handleCellClick(room, hour)} // 클릭 이벤트 추가
                     />
                   ),
