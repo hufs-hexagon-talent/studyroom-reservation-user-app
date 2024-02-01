@@ -11,6 +11,8 @@ import {
 } from '@mui/material';
 import { addMinutes, format } from 'date-fns';
 
+import './Timetable.css'
+
 import Button from '../../../components/Button';
 
 /* 

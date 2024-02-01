@@ -1,8 +1,9 @@
-import React from "react";
+import React from 'react';
+import { Link } from 'react-router-dom';
 
-import "./Navbar.css";
+import './Navbar.css';
 
-import logo from "../../assets/logo.png";
+import logo from '../../assets/logo.png';
 
 const Navbar = () => {
   return (
@@ -12,16 +13,16 @@ const Navbar = () => {
         <div className="titleName">컴퓨터공학부 스터디룸 예약 시스템</div>
         <ul className="navLinks">
           <li>
-            <a href="/">예약 현황</a>
+            <Link to="./">예약 현황</Link>
           </li>
           <li>
-            <a href="/rooms">예약하러 가기</a>
+            <Link to="./rooms">예약하러 가기</Link>
           </li>
           <li>
-            <a href="/login">Login</a>
+            <Link to="./login">Login</Link>
           </li>
           <li>
-            <a href="/">Register</a>
+            <Link to="./">Register</Link>
           </li>
         </ul>
       </div>
