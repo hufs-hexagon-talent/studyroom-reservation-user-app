@@ -57,6 +57,7 @@ const Timetable = () => {
           {year}년 {month}월 {day}일
           </span>
         </div>
+        <br/>
         <Table>
           <TableHead>
             <TableRow>

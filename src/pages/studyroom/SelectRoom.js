@@ -18,6 +18,7 @@ const SelectRoom = () => {
               navigate('/rooms/306');
             }}
           />
+          <br/>
           <Button
             text="428호"
             onClick={() => {
