@@ -2,6 +2,6 @@
     "editor.codeActionsOnSave": {
         "source.fixAll.eslint": "explicit"
     },
-    "editor.formatOnSave": false,
+    "editor.formatOnSave": true,
     "files.autoSave": "off"
 }

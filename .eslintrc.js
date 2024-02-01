@@ -40,6 +40,7 @@ module.exports = {
         ],
       },
     ],
+    'no-unused-vars': 'warn'
   },
   globals: {
     process: 'readonly',

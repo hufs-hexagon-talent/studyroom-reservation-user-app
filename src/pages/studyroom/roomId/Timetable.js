@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Table,
@@ -9,6 +9,7 @@ import {
   TableRow,
   Typography,
 } from '@mui/material';
+import { addMinutes, format } from 'date-fns';
 
 import Button from '../../../components/Button';
 
@@ -16,6 +17,45 @@ import Button from '../../../components/Button';
 2시간 제한 막는 로직이 필요함 
 클릭 하면 배열에 넣음 -> hour 최대최소 구하기 -> if(최대-최소 > 2):alert
 */
+
+const timeTableConfig = {
+  startTime: {
+    hour: 8,
+    minute: 30,
+  },
+  endTime: {
+    hour: 22,
+    minute: 40,
+  },
+  intervalMinute: 30,
+  maxReservationSlots: 4,
+};
+
+function createTimeTable(config) {
+  const { startTime, endTime, intervalMinute } = config;
+  const start = new Date();
+  start.setHours(startTime.hour, startTime.minute, 0, 0);
+
+  const end = new Date();
+  end.setHours(endTime.hour, endTime.minute, 0, 0);
+
+  const timeTable = [];
+
+  let currentTime = start;
+  while (currentTime <= end) {
+    timeTable.push(format(currentTime, 'HH:mm'));
+    currentTime = addMinutes(currentTime, intervalMinute);
+  }
+
+  // 마지막 시간이 endTime과 다를 경우 endTime으로 대체
+  if (timeTable[timeTable.length - 1] !== format(end, 'HH:mm')) {
+    timeTable[timeTable.length - 1] = format(end, 'HH:mm');
+  }
+
+  return timeTable;
+}
+
+console.log(createTimeTable(timeTableConfig));
 
 const Timetable = () => {
   const today = new Date();
@@ -25,46 +65,92 @@ const Timetable = () => {
   const day = today.getDate();
 
   const navigate = useNavigate();
-  const [selectedCells, setSelectedCells] = useState({});
-  const [clickedArray, setClickedArray] = useState([]);
+  // const [selectedSlots, setSelectedSlots] = useState([]);
+  const [selectedPartition, setSelectedPartition] = useState(null);
+  const [startTimeIndex, setStartTimeIndex] = useState(null);
+  const [endTimeIndex, setEndTimeIndex] = useState(null);
+  console.log({ selectedPartition, startTimeIndex, endTimeIndex });
 
-  const minMaxHour = (clickedArray) => {
-    const hoursArray = clickedArray.map(cell => cell.hour); // hour만 뽑아서 배열로 생성
-    const maxHour = Math.max(...hoursArray); // 최대 시간
-    const minHour = Math.min(...hoursArray); // 최소 시간
-    // 나는 최대-최소가 2가 되면 막게 하려고 함
-    return maxHour-minHour;
-  }
-  
-  // 셀을 클릭할 때 해당 셀의 선택 여부를 업데이트하는 함수 추가
-  const handleCellClick = (room, hour) => {
-    // 클릭한 셀의 정보 출력
-    //console.log(`Clicked cell: Room ${room}, Hour ${hour}`);
-    //console.log(clickedArray);
-    console.log(minMaxHour(clickedArray));
-  
-    if (minMaxHour(clickedArray) > 1) {
-      alert('두시간 이상 예약하실 수 없습니다');
-    } else {
-      // 최대 2시간 이하일 때만 셀을 선택하도록 처리
-      if (selectedCells[`${room}-${hour}`]) {
-        setSelectedCells((prevSelectedCells) => {
-          const updatedCells = { ...prevSelectedCells }; // prevSelectedCells 객체 복사
-          delete updatedCells[`${room}-${hour}`]; // 선택 취소
-          return updatedCells;
-        });
-      } else {
-        setSelectedCells((prevSelectedCells) => {
-          const newClickedArray = [...clickedArray, { room, hour }];
-          setClickedArray(newClickedArray);
-          return {
-            ...prevSelectedCells,
-            [`${room}-${hour}`]: true,
-          };
-        });
+  const times = useMemo(() => createTimeTable(timeTableConfig), []);
+
+  const getSlotSelected = useCallback(
+    (partition, timeIndex) => {
+      if (!startTimeIndex || !endTimeIndex) return false;
+
+      if (selectedPartition !== partition) return false;
+
+      if (!(startTimeIndex <= timeIndex && timeIndex <= endTimeIndex))
+        return false;
+
+      return true;
+    },
+    [startTimeIndex, endTimeIndex, selectedPartition],
+  );
+
+  const toggleSlot = useCallback(
+    (partition, timeIndex) => {
+      const isExist = getSlotSelected(partition, timeIndex);
+      console.log(partition, timeIndex, isExist);
+
+      // 첫 클릭인 경우
+      if (!startTimeIndex && !endTimeIndex) {
+        setSelectedPartition(partition);
+        setStartTimeIndex(timeIndex);
+        setEndTimeIndex(timeIndex);
+        return;
       }
-    }
-  };  
+
+      // 다른 파티션을 누른 경우
+      if (selectedPartition !== partition) {
+        console.log('!!!', selectedPartition, partition);
+        setSelectedPartition(partition);
+        setStartTimeIndex(timeIndex);
+        setEndTimeIndex(timeIndex);
+        return;
+      }
+
+      // 하나만 선택되어있는 경우
+      if (startTimeIndex === endTimeIndex) {
+        if (
+          Math.abs(startTimeIndex - timeIndex) + 1 >
+          timeTableConfig.maxReservationSlots
+        ) {
+          alert(
+            `최대 ${timeTableConfig.maxReservationSlots}자리까지 선택할 수 있습니다.`,
+          );
+          return;
+        }
+        // 동일한 것을 눌렀을 때
+        if (startTimeIndex === timeIndex) {
+          setSelectedPartition(null);
+          setStartTimeIndex(null);
+          setEndTimeIndex(null);
+        }
+        // 이후 시간을 눌렀을 때
+        else if (startTimeIndex < timeIndex) {
+          setEndTimeIndex(timeIndex);
+        }
+        // 이전 시간을 눌렀을 때
+        else {
+          setStartTimeIndex(timeIndex);
+        }
+        return;
+      }
+
+      // 둘다 선택되어있는 경우
+      setSelectedPartition(partition);
+      setStartTimeIndex(timeIndex);
+      setEndTimeIndex(timeIndex);
+    },
+    [getSlotSelected, setStartTimeIndex, setEndTimeIndex, selectedPartition],
+  );
+
+  // 셀을 클릭할 때 해당 셀의 선택 여부를 업데이트하는 함수 추가
+  const handleCellClick = (partition, timeIndex) => {
+    toggleSlot(partition, timeIndex);
+  };
+
+  const partitions = useMemo(() => ['room1', 'room2', 'room3', 'room4'], []);
 
   return (
     <>
@@ -75,8 +161,7 @@ const Timetable = () => {
           marginLeft: 'auto',
           marginRight: 'auto',
           marginTop: '50px',
-        }}
-      >
+        }}>
         <Typography variant="h5" fontWeight={10} component="div" align="center">
           예약하기
         </Typography>
@@ -88,35 +173,40 @@ const Timetable = () => {
             <TableRow>
               <TableCell align="center" width={100} />
               {/* 30분 간격으로 시간을 표시 */}
-              {[8, 8.5, 9, 9.5, 10, 10.5, 11, 11.5, 12, 12.5, 13, 13.5, 14, 14.5, 15, 15.5, 16, 16.5, 17, 17.5, 18, 18.5, 19, 19.5, 20, 20.5, 21, 21.5, 22].map(
-                hour => (
-                  <TableCell key={hour} align="center" width={200}>
-                    {`${Math.floor(hour)}:${(hour % 1) * 60 === 0 ? '00' : '30'}`}
-                  </TableCell>
-                ),
-              )}
+              {times.map((time, timeIndex) => (
+                <TableCell key={timeIndex} align="center" width={200}>
+                  {time}
+                </TableCell>
+              ))}
             </TableRow>
           </TableHead>
           <TableBody>
-            {['room1', 'room2', 'room3', 'room4'].map(room => (
-              <TableRow key={room}>
-                <TableCell>{room}</TableCell>
+            {partitions.map(partition => (
+              <TableRow key={partition}>
+                <TableCell>{partition}</TableCell>
                 {/* 30분 간격으로 셀을 생성 */}
-                {[8, 8.5, 9, 9.5, 10, 10.5, 11, 11.5, 12, 12.5, 13, 13.5, 14, 14.5, 15, 15.5, 16, 16.5, 17, 17.5, 18, 18.5, 19, 19.5, 20, 20.5, 21, 21.5, 22].map(
-                  hour => (
+                {times.map((time, timeIndex) => {
+                  const isSelected = getSlotSelected(partition, timeIndex);
+                  const isSelectable = true;
+
+                  return (
                     <TableCell
-                      key={`${room}-${hour}`} // 방이랑 시간 조합해서 키 값 생성
+                      key={timeIndex} // 방이랑 시간 조합해서 키 값 생성
                       sx={{
                         borderLeft: '1px solid #ccc',
-                        backgroundColor: selectedCells[`${room}-${hour}`]
+                        backgroundColor: isSelected
                           ? '#4B89DC'
-                          : 'transparent', // 선택된 셀에 따라 색상 변경
-                        cursor: 'pointer', // 클릭 가능한 커서 스타일 추가
+                          : !isSelectable
+                            ? '#aaa'
+                            : 'transparent', // 선택된 셀에 따라 색상 변경
+                        cursor: isSelectable ? 'pointer' : 'default', // 클릭 가능한 커서 스타일 추가
                       }}
-                      onClick={() => handleCellClick(room, hour)} // 클릭 이벤트 추가
+                      onClick={() =>
+                        isSelectable && handleCellClick(partition, timeIndex)
+                      } // 클릭 이벤트 추가
                     />
-                  ),
-                )}
+                  );
+                })}
               </TableRow>
             ))}
           </TableBody>
