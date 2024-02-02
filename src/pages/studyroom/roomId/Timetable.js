@@ -39,8 +39,8 @@ const Timetable = () => {
   // 셀을 클릭할 때 해당 셀의 선택 여부를 업데이트하는 함수 추가
   const handleCellClick = (room, hour) => {
     // 클릭한 셀의 정보 출력
-    //console.log(`Clicked cell: Room ${room}, Hour ${hour}`);
-    //console.log(clickedArray);
+    console.log(`Clicked cell: Room ${room}, Hour ${hour}`);
+    console.log(clickedArray);
     console.log(minMaxHour(clickedArray));
   
     if (minMaxHour(clickedArray) > 1) {
