@@ -9,26 +9,24 @@ const SelectRoom = () => {
   return (
     <>
       <div>
-        <p>
-          호실을 선택하세요.
-          <Button
-            text="306호"
-            onClick={() => {
-              console.log('select 306');
-              navigate('/rooms/306');
-            }}
-          />
-          <br/>
-          <Button
-            text="428호"
-            onClick={() => {
-              console.log('select 428');
-              navigate('/rooms/428');
-            }}
-          />
-          <br />
-          <br />
-        </p>
+        <p>호실을 선택하세요.</p>
+        <Button
+          text="306호"
+          onClick={() => {
+            console.log('select 306');
+            navigate('/rooms/306');
+          }}
+        />
+        <br />
+        <Button
+          text="428호"
+          onClick={() => {
+            console.log('select 428');
+            navigate('/rooms/428');
+          }}
+        />
+        <br />
+        <br />
       </div>
       <br />
     </>
