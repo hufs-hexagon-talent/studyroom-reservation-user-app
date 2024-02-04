@@ -15,11 +15,6 @@ import './Timetable.css'
 
 import Button from '../../../components/Button';
 
-/* 
-2시간 제한 막는 로직이 필요함 
-클릭 하면 배열에 넣음 -> hour 최대최소 구하기 -> if(최대-최소 > 2):alert
-*/
-
 const timeTableConfig = {
   startTime: {
     hour: 8,
