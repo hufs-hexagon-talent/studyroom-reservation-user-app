@@ -10,9 +10,11 @@ import {
   Typography,
 } from '@mui/material';
 import { addMinutes, format } from 'date-fns';
+import {addDoc, collection} from 'firebase/firestore';
 
-import './Timetable.css'
+import './Timetable.css';
 
+import {fs} from '../../.././firebase';
 import Button from '../../../components/Button';
 
 const timeTableConfig = {
@@ -64,7 +66,6 @@ const Timetable = () => {
   const minute = today.getMinutes();
 
   const navigate = useNavigate();
-  // const [selectedSlots, setSelectedSlots] = useState([]);
   const [selectedPartition, setSelectedPartition] = useState(null);
   const [startTimeIndex, setStartTimeIndex] = useState(null);
   const [endTimeIndex, setEndTimeIndex] = useState(null);
@@ -165,6 +166,23 @@ const Timetable = () => {
     toggleSlot(partition, timeIndex);
   };
 
+  const handleReservation = async () => {
+    if (startTimeIndex !== null && endTimeIndex !== null) {
+
+      const startHour = times[startTimeIndex].split(':')[0];
+      const startMinute = times[startTimeIndex].split(':')[1];
+      const endHour = times[endTimeIndex].split(':')[0];
+      const endMinute = times[endTimeIndex].split(':')[1];
+  
+      await addDoc(collection(fs, 'roomsEx'), {
+        name: selectedPartition,
+        startTime: [startHour, startMinute],
+        endTime: [endHour, endMinute],
+      });
+    } 
+  };
+  
+
   const partitions = useMemo(() => ['room1', 'room2', 'room3', 'room4'], []);
 
   return (
@@ -231,9 +249,12 @@ const Timetable = () => {
       <br />
       <Button
         text="예약하기"
-        onClick={() => {
-          navigate('/reservation');
-        }}
+        onClick={() => 
+          {
+            navigate('/reservation'),
+            handleReservation()
+          }
+        }
       />
     </>
   );

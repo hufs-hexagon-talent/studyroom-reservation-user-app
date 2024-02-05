@@ -4,6 +4,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Navbar from './components/Navbar/Navbar';
 import App from './pages/App';
 import Login from './pages/login/Login';
+import Reservation from './pages/reservation/Reservation';
 import Timetable306 from './pages/studyroom/roomId/Timetable306';
 import Timetable428 from './pages/studyroom/roomId/Timetable428';
 import SelectRoom from './pages/studyroom/SelectRoom';
@@ -18,6 +19,7 @@ const Router = () => {
         <Route path="/rooms" element={<SelectRoom />} /> {/* Room 목록 */}
         <Route path="/rooms/306/" element={<Timetable306 />} /> {/* 306 Room */}
         <Route path="/rooms/428/" element={<Timetable428 />} /> {/* 428 Room */}
+        <Route path='/reservation' element={<Reservation/>} />
       </Routes>
     </BrowserRouter>
   );
