@@ -10,7 +10,7 @@ import {
   Typography,
 } from '@mui/material';
 import { addMinutes, format } from 'date-fns';
-import {addDoc, collection} from 'firebase/firestore';
+import {addDoc, collection, doc, getDoc} from 'firebase/firestore';
 
 import './Timetable.css';
 
@@ -182,6 +182,16 @@ const Timetable = () => {
     } 
   };
   
+  const example = async ()=>{
+    const docRef = doc(fs, 'roomsEx', 'MWN0RPx1xgjkYIGqLoL0');
+    const docSnap = await getDoc(docRef);
+
+    if(docSnap.exists()){
+      console.log('document data : ',docSnap.data());
+    } else {
+      console.log("no");
+    }
+  }
 
   const partitions = useMemo(() => ['room1', 'room2', 'room3', 'room4'], []);
 
@@ -255,6 +265,13 @@ const Timetable = () => {
             handleReservation()
           }
         }
+      />
+      <br/>
+      <Button
+        text="data"
+        onClick={()=>{
+          example()
+        }}
       />
     </>
   );
