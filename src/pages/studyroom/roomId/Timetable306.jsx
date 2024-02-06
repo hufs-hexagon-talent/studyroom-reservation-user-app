@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect,useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Table,
@@ -10,11 +10,11 @@ import {
   Typography,
 } from '@mui/material';
 import { addMinutes, format } from 'date-fns';
-import {addDoc, collection, doc, getDoc} from 'firebase/firestore';
+import { addDoc, collection, getDocs, query } from 'firebase/firestore';
 
 import './Timetable.css';
 
-import {fs} from '../../.././firebase';
+import { fs } from '../../.././firebase';
 import Button from '../../../components/Button';
 
 const timeTableConfig = {
@@ -33,7 +33,7 @@ const timeTableConfig = {
 function createTimeTable(config) {
   const { startTime, endTime, intervalMinute } = config;
   const start = new Date();
-  start.setHours(startTime.hour, startTime.minute, 0, 0); // 시,분,초,밀리초로 시간 설정
+  start.setHours(startTime.hour, startTime.minute, 0, 0);
 
   const end = new Date();
   end.setHours(endTime.hour, endTime.minute, 0, 0);
@@ -41,24 +41,20 @@ function createTimeTable(config) {
   const timeTable = [];
 
   let currentTime = start;
-  while (currentTime <= end) { // currentTime이 종료시간을 넘어가지 않을 때 까지
-    timeTable.push(format(currentTime, 'HH:mm')); // 배열에 HH:mm 형식으로 추가
-    currentTime = addMinutes(currentTime, intervalMinute); //현재 시간을 interval만큼 증가 -> 시작부터 종료까지 timeTable 배열에 시간이 추가됨
+  while (currentTime <= end) {
+    timeTable.push(format(currentTime, 'HH:mm'));
+    currentTime = addMinutes(currentTime, intervalMinute);
   }
 
-  // 마지막 시간이 endTime과 다를 경우 endTime으로 대체
-  if (timeTable[timeTable.length - 1] !== format(end, 'HH:mm')) { // 마지막에 추가된 시간이 종료시간과 일치하지 않으면
-    timeTable[timeTable.length - 1] = format(end, 'HH:mm'); // 마지막 요소를 종료시간으로 대체
+  if (timeTable[timeTable.length - 1] !== format(end, 'HH:mm')) {
+    timeTable[timeTable.length - 1] = format(end, 'HH:mm');
   }
 
   return timeTable;
 }
 
-console.log(createTimeTable(timeTableConfig));
-
 const Timetable = () => {
   const today = new Date();
-
   const year = today.getFullYear();
   const month = today.getMonth() + 1;
   const day = today.getDate();
@@ -69,17 +65,19 @@ const Timetable = () => {
   const [selectedPartition, setSelectedPartition] = useState(null);
   const [startTimeIndex, setStartTimeIndex] = useState(null);
   const [endTimeIndex, setEndTimeIndex] = useState(null);
-  console.log({ selectedPartition, startTimeIndex, endTimeIndex });
 
   const times = useMemo(() => createTimeTable(timeTableConfig), []);
 
+  const [reservedSlots, setReservedSlots] = useState([]);
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
   const getSlotSelected = useCallback(
     (partition, timeIndex) => {
-      // 시작시간과 종료시간이 모두 있는지
       if (!startTimeIndex || !endTimeIndex) return false;
-      // 파티션이 일치한지
       if (selectedPartition !== partition) return false;
-      // timeIndex가 시작시간과 종료시간 사이에 있는지
       if (!(startTimeIndex <= timeIndex && timeIndex <= endTimeIndex))
         return false;
 
@@ -90,30 +88,24 @@ const Timetable = () => {
 
   const toggleSlot = useCallback(
     (partition, timeIndex) => {
-      const isExist = getSlotSelected(partition, timeIndex); // slot의 선택 여부 확인
+      const isExist = getSlotSelected(partition, timeIndex);
       console.log(partition, timeIndex, isExist);
 
-      // 첫 클릭인 경우
       if (!startTimeIndex && !endTimeIndex) {
-        // 상태 업데이트
         setSelectedPartition(partition);
         setStartTimeIndex(timeIndex);
         setEndTimeIndex(timeIndex);
         return;
       }
 
-      // 다른 파티션을 누른 경우
       if (selectedPartition !== partition) {
-        console.log('!!!', selectedPartition, partition);
         setSelectedPartition(partition);
         setStartTimeIndex(timeIndex);
         setEndTimeIndex(timeIndex);
         return;
       }
 
-      // 하나만 선택되어있는 경우
       if (startTimeIndex === endTimeIndex) {
-        // 슬롯의 개수가 max를 초과하는지 확인
         if (
           Math.abs(startTimeIndex - timeIndex) + 1 >
           timeTableConfig.maxReservationSlots
@@ -123,27 +115,18 @@ const Timetable = () => {
           );
           return;
         }
-        // 동일한 것을 눌렀을 때
         if (startTimeIndex === timeIndex) {
-          // 같은거 누르면 없어지게
           setSelectedPartition(null);
           setStartTimeIndex(null);
           setEndTimeIndex(null);
-        }
-        // 이후 시간을 눌렀을 때
-        else if (startTimeIndex < timeIndex) {
-          // 클릭한 시간을 종료 시간으로 설정
+        } else if (startTimeIndex < timeIndex) {
           setEndTimeIndex(timeIndex);
-        }
-        // 이전 시간을 눌렀을 때
-        else {
-          // 클릭한 시간을 시작 시간으로 설정
+        } else {
           setStartTimeIndex(timeIndex);
         }
         return;
       }
 
-      // 둘다 선택되어있는 경우
       setSelectedPartition(partition);
       setStartTimeIndex(timeIndex);
       setEndTimeIndex(timeIndex);
@@ -151,13 +134,10 @@ const Timetable = () => {
     [getSlotSelected, setStartTimeIndex, setEndTimeIndex, selectedPartition],
   );
 
-  // 셀을 클릭할 때 해당 셀의 선택 여부를 업데이트하는 함수 추가
   const handleCellClick = (partition, timeIndex) => {
-
     const clickedTime = times[timeIndex+1];
     const currentTime = format(today, 'HH:mm');
     
-    // 클릭한 시간이 현재 시간보다 이전인 경우
     if (clickedTime < currentTime) {
       alert('과거의 시간에 예약을 할 수는 없습니다.');
       return;
@@ -168,30 +148,41 @@ const Timetable = () => {
 
   const handleReservation = async () => {
     if (startTimeIndex !== null && endTimeIndex !== null) {
-
       const startHour = times[startTimeIndex].split(':')[0];
       const startMinute = times[startTimeIndex].split(':')[1];
       const endHour = times[endTimeIndex].split(':')[0];
       const endMinute = times[endTimeIndex].split(':')[1];
   
       await addDoc(collection(fs, 'roomsEx'), {
-        name: selectedPartition,
+        name: selectedPartition, // 저장된 값 사용
         startTime: [startHour, startMinute],
         endTime: [endHour, endMinute],
       });
-    } 
+  
+      await fetchData(); // 저장된 partition 값으로 fetchData 호출
+    }
+  };  
+  const fetchData = async () => {
+    try {
+      const q = query(collection(fs, 'roomsEx')); // 쿼리 생성
+      const querySnapshot = await getDocs(q); // 쿼리 실행
+      const reservedSlots = []; // 인덱스 저장할 배열
+      querySnapshot.forEach((doc) => { 
+        const { startTime, endTime } = doc.data(); // 데이터 가져오기
+        const startIdx = times.findIndex(time => time === `${startTime[0]}:${startTime[1]}`); // 시작시간 계산
+        const endIdx = times.findIndex(time => time === `${endTime[0]}:${endTime[1]}`); // 종료 시간 계산
+        for (let i = startIdx; i <= endIdx; i++) {
+          reservedSlots.push(i); // 배열에 넣기
+        }
+      });
+      console.log(reservedSlots);
+      setReservedSlots(reservedSlots);
+    } catch (error) {
+      console.error('Error', error);
+    }
   };
   
-  const example = async ()=>{
-    const docRef = doc(fs, 'roomsEx', 'MWN0RPx1xgjkYIGqLoL0');
-    const docSnap = await getDoc(docRef);
-
-    if(docSnap.exists()){
-      console.log('document data : ',docSnap.data());
-    } else {
-      console.log("no");
-    }
-  }
+  
 
   const partitions = useMemo(() => ['room1', 'room2', 'room3', 'room4'], []);
 
@@ -215,7 +206,6 @@ const Timetable = () => {
           <TableHead>
             <TableRow>
               <TableCell align="center" width={100} />
-              {/* 30분 간격으로 시간을 표시 */}
               {times.map((time, timeIndex) => (
                 <TableCell key={timeIndex} align="center" width={200}>
                   {time}
@@ -227,26 +217,28 @@ const Timetable = () => {
             {partitions.map(partition => (
               <TableRow key={partition}>
                 <TableCell>{partition}</TableCell>
-                {/* 30분 간격으로 셀을 생성 */}
                 {times.map((time, timeIndex) => {
                   const isSelected = getSlotSelected(partition, timeIndex);
                   const isSelectable = true;
+                  const isReserved = reservedSlots.includes(timeIndex);
 
                   return (
                     <TableCell
-                      key={timeIndex} // 방이랑 시간 조합해서 키 값 생성
+                      key={timeIndex}
                       sx={{
                         borderLeft: '1px solid #ccc',
                         backgroundColor: isSelected
                           ? '#4B89DC'
-                          : !isSelectable
-                            ? '#aaa'
-                            : 'transparent', // 선택된 셀에 따라 색상 변경
-                        cursor: isSelectable ? 'pointer' : 'default', // 클릭 가능한 커서 스타일 추가
+                          : isReserved
+                            ? '#C1C1C3'
+                            : !isSelectable
+                              ? '#aaa'
+                              : 'transparent',
+                        cursor: isSelectable ? 'pointer' : 'default',
                       }}
                       onClick={() =>
                         isSelectable && handleCellClick(partition, timeIndex)
-                      } // 클릭 이벤트 추가
+                      }
                     />
                   );
                 })}
@@ -267,12 +259,6 @@ const Timetable = () => {
         }
       />
       <br/>
-      <Button
-        text="data"
-        onClick={()=>{
-          example()
-        }}
-      />
     </>
   );
 };

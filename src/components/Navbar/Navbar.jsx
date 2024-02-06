@@ -19,10 +19,10 @@ const Navbar = () => {
             <Link to="./rooms">예약하러 가기</Link>
           </li>
           <li>
-            <Link to="./login">Login</Link>
+            <Link to="./login">로그인</Link>
           </li>
           <li>
-            <Link to="./">Register</Link>
+            <Link to="./check">확인/취소</Link>
           </li>
         </ul>
       </div>
