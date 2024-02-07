@@ -32,23 +32,19 @@ const Check = () => {
   }
 
   async function deleteData(id){
-    try {
-      await deleteDoc(doc(fs, 'roomsEx', id));
-      // 문서 삭제 후에 데이터를 다시 가져옵니다.
-      fetchData();
-    } catch (error) {
-      console.error('Error deleting document: ', error);
-    }
+    await deleteDoc(doc(fs, 'roomsEx', id));
+    setRooms(prevRooms => prevRooms.filter(room => room.id !== id));
   }
 
   return (
     <div>
       <h1>Room List</h1>
+      <br/>
       <table>
         <thead>
           <tr>
-            <th>ID</th>
-            <th>Name</th>
+            <th>User</th>
+            <th>Room</th>
             <th>Start Time</th>
             <th>End Time</th>
           </tr>
@@ -56,7 +52,7 @@ const Check = () => {
         <tbody>
           {rooms.map((room) => (
             <tr key={room.id}>
-              <td style={{ padding: '15px' }}>{room.id}</td>
+              <td style={{ padding: '15px' }}>{room.userName}</td>
               <td style={{ padding: '15px' }}>{room.name}</td>
               <td style={{ padding: '15px' }}>{room.startTimeFormatted}</td>
               <td style={{ padding: '15px' }}>{room.endTimeFormatted}</td>

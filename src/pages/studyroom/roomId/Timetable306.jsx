@@ -1,12 +1,15 @@
-import React, { useCallback, useEffect,useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
+  Button as MuiButton,
+  Modal,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
+  TextField,
   Typography,
 } from '@mui/material';
 import { addMinutes, format } from 'date-fns';
@@ -65,6 +68,8 @@ const Timetable = () => {
   const [selectedPartition, setSelectedPartition] = useState(null);
   const [startTimeIndex, setStartTimeIndex] = useState(null);
   const [endTimeIndex, setEndTimeIndex] = useState(null);
+  const [name, setName] = useState('');
+  const [isOpen, setIsOpen] = useState(false);
 
   const times = useMemo(() => createTimeTable(timeTableConfig), []);
 
@@ -135,9 +140,9 @@ const Timetable = () => {
   );
 
   const handleCellClick = (partition, timeIndex) => {
-    const clickedTime = times[timeIndex+1];
+    const clickedTime = times[timeIndex + 1];
     const currentTime = format(today, 'HH:mm');
-    
+
     if (clickedTime < currentTime) {
       alert('과거의 시간에 예약을 할 수는 없습니다.');
       return;
@@ -147,27 +152,15 @@ const Timetable = () => {
   };
 
   const handleReservation = async () => {
-    if (startTimeIndex !== null && endTimeIndex !== null) {
-      const startHour = times[startTimeIndex].split(':')[0];
-      const startMinute = times[startTimeIndex].split(':')[1];
-      const endHour = times[endTimeIndex].split(':')[0];
-      const endMinute = times[endTimeIndex].split(':')[1];
-  
-      await addDoc(collection(fs, 'roomsEx'), {
-        name: selectedPartition, // 저장된 값 사용
-        startTime: [startHour, startMinute],
-        endTime: [endHour, endMinute],
-      });
-  
-      await fetchData(); // 저장된 partition 값으로 fetchData 호출
-    }
-  };  
+    setIsOpen(true);
+  };
+
   const fetchData = async () => {
     try {
       const q = query(collection(fs, 'roomsEx')); // 쿼리 생성
       const querySnapshot = await getDocs(q); // 쿼리 실행
       const reservedSlots = []; // 인덱스 저장할 배열
-      querySnapshot.forEach((doc) => { 
+      querySnapshot.forEach((doc) => {
         const { startTime, endTime } = doc.data(); // 데이터 가져오기
         const startIdx = times.findIndex(time => time === `${startTime[0]}:${startTime[1]}`); // 시작시간 계산
         const endIdx = times.findIndex(time => time === `${endTime[0]}:${endTime[1]}`); // 종료 시간 계산
@@ -181,8 +174,25 @@ const Timetable = () => {
       console.error('Error', error);
     }
   };
-  
-  
+
+  const handleConfirmReservation = async () => {
+    if (startTimeIndex !== null && endTimeIndex !== null && name !== '') {
+      const startHour = times[startTimeIndex].split(':')[0];
+      const startMinute = times[startTimeIndex].split(':')[1];
+      const endHour = times[endTimeIndex].split(':')[0];
+      const endMinute = times[endTimeIndex].split(':')[1];
+
+      await addDoc(collection(fs, 'roomsEx'), {
+        name: selectedPartition,
+        startTime: [startHour, startMinute],
+        endTime: [endHour, endMinute],
+        userName: name,
+      });
+
+      await fetchData();
+      setIsOpen(false);
+    }
+  };
 
   const partitions = useMemo(() => ['room1', 'room2', 'room3', 'room4'], []);
 
@@ -251,14 +261,55 @@ const Timetable = () => {
       <br />
       <Button
         text="예약하기"
-        onClick={() => 
-          {
-            navigate('/reservation'),
-            handleReservation()
-          }
+        onClick={
+          handleReservation
         }
       />
-      <br/>
+      <br />
+      <Modal
+        open={isOpen}
+        onClose={() => setIsOpen(false)}
+      >
+        <div style={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          background: 'white',
+          padding: '20px',
+          width: '300px',
+          border: 'none',
+          borderRadius : 20
+        }}>
+          <Typography id="modal-modal-title" variant="h6" component="h2" align="center" gutterBottom>
+            이름을 입력하세요
+          </Typography>
+          <TextField
+            label="Name"
+            variant="outlined"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            fullWidth
+            autoFocus
+          />
+          <div style={{ marginTop: '20px', textAlign: 'center' }}>
+            <MuiButton
+              variant="contained"
+              onClick={handleConfirmReservation}
+              disabled={!name}
+            >
+              확인
+            </MuiButton>
+            <MuiButton
+              variant="contained"
+              onClick={() => setIsOpen(false)}
+              style={{ marginLeft: '10px' }}
+            >
+              취소
+            </MuiButton>
+          </div>
+        </div>
+      </Modal>
     </>
   );
 };

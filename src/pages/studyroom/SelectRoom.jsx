@@ -9,7 +9,7 @@ const SelectRoom = () => {
   return (
     <>
       <div>
-        <p>호실을 선택하세요.</p>
+        <h2>호실을 선택하세요.</h2>
         <Button
           text="306호"
           onClick={() => {
