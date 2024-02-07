@@ -20,8 +20,8 @@ const Router = () => {
         <Route path="/rooms" element={<SelectRoom />} /> {/* Room 목록 */}
         <Route path="/rooms/306/" element={<Timetable306 />} /> {/* 306 Room */}
         <Route path="/rooms/428/" element={<Timetable428 />} /> {/* 428 Room */}
-        <Route path='/reservation' element={<Reservation/>} />
-        <Route path='/check' element={<Check/>}/>
+        <Route path="/reservation" element={<Reservation />} />
+        <Route path="/check" element={<Check />} />
       </Routes>
     </BrowserRouter>
   );
