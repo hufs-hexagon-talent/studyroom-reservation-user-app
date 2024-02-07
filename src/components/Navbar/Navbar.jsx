@@ -1,32 +1,34 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-import './Navbar.css';
-
 import logo from '../../assets/logo.png';
 
 const Navbar = () => {
   return (
-    <div>
-      <div className="bg-800">
-        <img src={logo} alt="" className="logo" />
-        <div className="titleName">컴퓨터공학부 스터디룸 예약 시스템</div>
-        <ul className="navLinks">
-          <li>
-            <Link to="./">예약 현황</Link>
+    <nav className="bg-gray-700"> {/* div -> nav 태그 변경 */}
+      <div className="flex flex-col md:flex-row items-center justify-between p-4"> {/* 반응형 디자인 적용 */}
+        <div className="flex items-center mb-4 md:mb-0">
+          <img src={logo} alt="" className="w-16 h-16 cursor-pointer" /> {/* 로고 크기 수정 */}
+          <h1 className="text-white text-xl font-bold ml-4"> {/* h1 태그 적용 */}
+            컴퓨터공학부 스터디룸 예약 시스템
+          </h1>
+        </div>
+        <ul className="flex flex-col md:flex-row list-none text-center md:text-left"> {/* 반응형 디자인 적용 */}
+          <li className="mb-3 md:mb-0 md:mr-6">
+            <Link to="./" className="text-white hover:text-gray-300">예약 현황</Link>
           </li>
-          <li>
-            <Link to="./rooms">예약하러 가기</Link>
+          <li className="mb-3 md:mb-0 md:mr-6">
+            <Link to="./rooms" className="text-white hover:text-gray-300">예약하러 가기</Link>
           </li>
-          <li>
-            <Link to="./login">로그인</Link>
+          <li className="mb-3 md:mb-0 md:mr-6">
+            <Link to="./login" className="text-white hover:text-gray-300">로그인</Link>
           </li>
-          <li>
-            <Link to="./check">확인/취소</Link>
+          <li className="mb-3 md:mb-0 md:mr-6">
+            <Link to="./check" className="text-white hover:text-gray-300">확인/취소</Link>
           </li>
         </ul>
       </div>
-    </div>
+    </nav>
   );
 };
 
