@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect,useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Table,
@@ -68,7 +68,12 @@ const Timetable = () => {
 
   const times = useMemo(() => createTimeTable(timeTableConfig), []);
 
-  const [reservedSlots, setReservedSlots] = useState([]);
+  const [reservedSlots, setReservedSlots] = useState({
+    room1: [],
+    room2: [],
+    room3: [],
+    room4: [],
+  });
 
   useEffect(() => {
     fetchData();
@@ -110,9 +115,7 @@ const Timetable = () => {
           Math.abs(startTimeIndex - timeIndex) + 1 >
           timeTableConfig.maxReservationSlots
         ) {
-          alert(
-            `최대 2시간 까지 선택할 수 있습니다.`,
-          );
+          alert(`최대 2시간 까지 선택할 수 있습니다.`);
           return;
         }
         if (startTimeIndex === timeIndex) {
@@ -135,9 +138,9 @@ const Timetable = () => {
   );
 
   const handleCellClick = (partition, timeIndex) => {
-    const clickedTime = times[timeIndex+1];
+    const clickedTime = times[timeIndex + 1];
     const currentTime = format(today, 'HH:mm');
-    
+
     if (clickedTime < currentTime) {
       alert('과거의 시간에 예약을 할 수는 없습니다.');
       return;
@@ -152,27 +155,36 @@ const Timetable = () => {
       const startMinute = times[startTimeIndex].split(':')[1];
       const endHour = times[endTimeIndex].split(':')[0];
       const endMinute = times[endTimeIndex].split(':')[1];
-  
+
       await addDoc(collection(fs, 'roomsEx'), {
-        name: selectedPartition, // 저장된 값 사용
+        name: selectedPartition,
         startTime: [startHour, startMinute],
         endTime: [endHour, endMinute],
       });
-  
-      await fetchData(); // 저장된 partition 값으로 fetchData 호출
+
+      await fetchData();
     }
-  };  
+  };
   const fetchData = async () => {
     try {
-      const q = query(collection(fs, 'roomsEx')); // 쿼리 생성
-      const querySnapshot = await getDocs(q); // 쿼리 실행
-      const reservedSlots = []; // 인덱스 저장할 배열
-      querySnapshot.forEach((doc) => { 
-        const { startTime, endTime } = doc.data(); // 데이터 가져오기
-        const startIdx = times.findIndex(time => time === `${startTime[0]}:${startTime[1]}`); // 시작시간 계산
-        const endIdx = times.findIndex(time => time === `${endTime[0]}:${endTime[1]}`); // 종료 시간 계산
+      const q = query(collection(fs, 'roomsEx'));
+      const querySnapshot = await getDocs(q);
+      const reservedSlots = {
+        room1: [],
+        room2: [],
+        room3: [],
+        room4: [],
+      }; // 각 방마다 독립적인 예약 슬롯 배열 초기화
+      querySnapshot.forEach(doc => {
+        const { name, startTime, endTime } = doc.data();
+        const startIdx = times.findIndex(
+          time => time === `${startTime[0]}:${startTime[1]}`,
+        );
+        const endIdx = times.findIndex(
+          time => time === `${endTime[0]}:${endTime[1]}`,
+        );
         for (let i = startIdx; i <= endIdx; i++) {
-          reservedSlots.push(i); // 배열에 넣기
+          reservedSlots[name].push(i); // 해당 방의 예약 슬롯 배열에 추가
         }
       });
       console.log(reservedSlots);
@@ -181,8 +193,6 @@ const Timetable = () => {
       console.error('Error', error);
     }
   };
-  
-  
 
   const partitions = useMemo(() => ['room1', 'room2', 'room3', 'room4'], []);
 
@@ -220,7 +230,8 @@ const Timetable = () => {
                 {times.map((time, timeIndex) => {
                   const isSelected = getSlotSelected(partition, timeIndex);
                   const isSelectable = true;
-                  const isReserved = reservedSlots.includes(timeIndex);
+                  const isReserved =
+                    reservedSlots[partition].includes(timeIndex); // 각 방의 예약 슬롯 상태를 확인
 
                   return (
                     <TableCell
@@ -228,7 +239,7 @@ const Timetable = () => {
                       sx={{
                         borderLeft: '1px solid #ccc',
                         backgroundColor: isSelected
-                          ? '#4B89DC'
+                          ? '#4B89DC' //파란색
                           : isReserved
                             ? '#C1C1C3'
                             : !isSelectable
@@ -251,14 +262,11 @@ const Timetable = () => {
       <br />
       <Button
         text="예약하기"
-        onClick={() => 
-          {
-            navigate('/reservation'),
-            handleReservation()
-          }
-        }
+        onClick={() => {
+          navigate('/reservation'), handleReservation();
+        }}
       />
-      <br/>
+      <br />
     </>
   );
 };
