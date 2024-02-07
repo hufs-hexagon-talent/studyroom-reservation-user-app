@@ -1,12 +1,15 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
+  Button as MuiButton,
+  Modal,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
+  TextField,
   Typography,
 } from '@mui/material';
 import { addMinutes, format } from 'date-fns';
@@ -65,6 +68,8 @@ const Timetable = () => {
   const [selectedPartition, setSelectedPartition] = useState(null);
   const [startTimeIndex, setStartTimeIndex] = useState(null);
   const [endTimeIndex, setEndTimeIndex] = useState(null);
+  const [name, setName] = useState('');
+  const [isOpen, setIsOpen] = useState(false);
 
   const times = useMemo(() => createTimeTable(timeTableConfig), []);
 
@@ -191,6 +196,25 @@ const Timetable = () => {
       setReservedSlots(reservedSlots);
     } catch (error) {
       console.error('Error', error);
+    }
+  };
+
+  const handleConfirmReservation = async () => {
+    if (startTimeIndex !== null && endTimeIndex !== null && name !== '') {
+      const startHour = times[startTimeIndex].split(':')[0];
+      const startMinute = times[startTimeIndex].split(':')[1];
+      const endHour = times[endTimeIndex].split(':')[0];
+      const endMinute = times[endTimeIndex].split(':')[1];
+
+      await addDoc(collection(fs, 'roomsEx'), {
+        name: selectedPartition,
+        startTime: [startHour, startMinute],
+        endTime: [endHour, endMinute],
+        userName: name,
+      });
+
+      await fetchData();
+      setIsOpen(false);
     }
   };
 
