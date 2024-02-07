@@ -155,7 +155,11 @@ const Timetable = () => {
   };
 
   const handleReservation = async () => {
-    if (startTimeIndex !== null && endTimeIndex !== null) {
+    setIsOpen(true);
+  };
+
+  const handleConfirmReservation = async () => {
+    if (startTimeIndex !== null && endTimeIndex !== null && name !== '') {
       const startHour = times[startTimeIndex].split(':')[0];
       const startMinute = times[startTimeIndex].split(':')[1];
       const endHour = times[endTimeIndex].split(':')[0];
@@ -165,11 +169,15 @@ const Timetable = () => {
         name: selectedPartition,
         startTime: [startHour, startMinute],
         endTime: [endHour, endMinute],
+        userName: name,
       });
 
+      setIsOpen(false);
       await fetchData();
+      navigate('/reservation');
     }
   };
+  
   const fetchData = async () => {
     try {
       const q = query(collection(fs, 'roomsEx'));
@@ -196,25 +204,6 @@ const Timetable = () => {
       setReservedSlots(reservedSlots);
     } catch (error) {
       console.error('Error', error);
-    }
-  };
-
-  const handleConfirmReservation = async () => {
-    if (startTimeIndex !== null && endTimeIndex !== null && name !== '') {
-      const startHour = times[startTimeIndex].split(':')[0];
-      const startMinute = times[startTimeIndex].split(':')[1];
-      const endHour = times[endTimeIndex].split(':')[0];
-      const endMinute = times[endTimeIndex].split(':')[1];
-
-      await addDoc(collection(fs, 'roomsEx'), {
-        name: selectedPartition,
-        startTime: [startHour, startMinute],
-        endTime: [endHour, endMinute],
-        userName: name,
-      });
-
-      await fetchData();
-      setIsOpen(false);
     }
   };
 
@@ -287,10 +276,55 @@ const Timetable = () => {
       <Button
         text="예약하기"
         onClick={() => {
-          navigate('/reservation'), handleReservation();
+          handleReservation();
         }}
       />
       <br />
+
+      <Modal
+        open={isOpen}
+        onClose={() => setIsOpen(false)}
+      >
+        <div style={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          background: 'white',
+          padding: '20px',
+          width: '300px',
+          border: 'none',
+          borderRadius : 20
+        }}>
+          <Typography variant="h6" component="h2" align="center" gutterBottom>
+            이름을 입력 해주세요
+          </Typography>
+          <TextField
+            label="Name"
+            variant="standard"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            fullWidth
+            autoFocus
+          />
+          <div style={{ marginTop: '20px', textAlign: 'center' }}>
+            <MuiButton
+              variant="contained"
+              onClick={handleConfirmReservation}
+              disabled={!name}
+            >
+              확인
+            </MuiButton>
+            <MuiButton
+              variant="contained"
+              onClick={() => setIsOpen(false)}
+              style={{ marginLeft: '10px' }}
+            >
+              취소
+            </MuiButton>
+          </div>
+        </div>
+      </Modal>
     </>
   );
 };
