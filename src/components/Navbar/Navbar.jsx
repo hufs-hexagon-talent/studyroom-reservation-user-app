@@ -8,7 +8,7 @@ import logo from '../../assets/logo.png';
 const Navbar = () => {
   return (
     <div>
-      <div className="navbar">
+      <div className="bg-800">
         <img src={logo} alt="" className="logo" />
         <div className="titleName">컴퓨터공학부 스터디룸 예약 시스템</div>
         <ul className="navLinks">

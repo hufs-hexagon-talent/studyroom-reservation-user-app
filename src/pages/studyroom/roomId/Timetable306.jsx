@@ -15,8 +15,6 @@ import {
 import { addMinutes, format } from 'date-fns';
 import { addDoc, collection, getDocs, query } from 'firebase/firestore';
 
-import './Timetable.css';
-
 import { fs } from '../../.././firebase';
 import Button from '../../../components/Button';
 
@@ -177,7 +175,7 @@ const Timetable = () => {
       navigate('/reservation');
     }
   };
-  
+
   const fetchData = async () => {
     try {
       const q = query(collection(fs, 'roomsEx'));
@@ -222,7 +220,7 @@ const Timetable = () => {
         <Typography variant="h5" fontWeight={10} component="div" align="center">
           예약하기
         </Typography>
-        <div>
+        <div className="bg-gray-100 h-25 w-100">
           {year}년 {month}월 {day}일 {hour}시 {minute}분
         </div>
         <Table>
@@ -281,21 +279,19 @@ const Timetable = () => {
       />
       <br />
 
-      <Modal
-        open={isOpen}
-        onClose={() => setIsOpen(false)}
-      >
-        <div style={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          background: 'white',
-          padding: '20px',
-          width: '300px',
-          border: 'none',
-          borderRadius : 20
-        }}>
+      <Modal open={isOpen} onClose={() => setIsOpen(false)}>
+        <div
+          style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            background: 'white',
+            padding: '20px',
+            width: '300px',
+            border: 'none',
+            borderRadius: 20,
+          }}>
           <Typography variant="h6" component="h2" align="center" gutterBottom>
             이름을 입력 해주세요
           </Typography>
@@ -303,7 +299,7 @@ const Timetable = () => {
             label="Name"
             variant="standard"
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={e => setName(e.target.value)}
             fullWidth
             autoFocus
           />
@@ -311,15 +307,13 @@ const Timetable = () => {
             <MuiButton
               variant="contained"
               onClick={handleConfirmReservation}
-              disabled={!name}
-            >
+              disabled={!name}>
               확인
             </MuiButton>
             <MuiButton
               variant="contained"
               onClick={() => setIsOpen(false)}
-              style={{ marginLeft: '10px' }}
-            >
+              style={{ marginLeft: '10px' }}>
               취소
             </MuiButton>
           </div>
