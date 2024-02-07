@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { format } from 'date-fns';
-import { collection, getDocs, query } from 'firebase/firestore';
+import { collection, deleteDoc,doc, getDocs, query } from 'firebase/firestore';
 
 import { fs } from '../../firebase';
 
@@ -31,6 +31,16 @@ const Check = () => {
     }
   }
 
+  async function deleteData(id){
+    try {
+      await deleteDoc(doc(fs, 'roomsEx', id));
+      // 문서 삭제 후에 데이터를 다시 가져옵니다.
+      fetchData();
+    } catch (error) {
+      console.error('Error deleting document: ', error);
+    }
+  }
+
   return (
     <div>
       <h1>Room List</h1>
@@ -50,6 +60,10 @@ const Check = () => {
               <td style={{ padding: '15px' }}>{room.name}</td>
               <td style={{ padding: '15px' }}>{room.startTimeFormatted}</td>
               <td style={{ padding: '15px' }}>{room.endTimeFormatted}</td>
+              <br/>
+              <button onClick={() => deleteData(room.id)}>
+                삭제
+              </button>
             </tr>
           ))}
         </tbody>
