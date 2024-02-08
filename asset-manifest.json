@@ -1,16 +1,16 @@
 {
   "files": {
-    "main.css": "/studyroom-reservation/static/css/main.ebb5328b.css",
-    "main.js": "/studyroom-reservation/static/js/main.d4a64745.js",
+    "main.css": "/studyroom-reservation/static/css/main.09dcf414.css",
+    "main.js": "/studyroom-reservation/static/js/main.772e11df.js",
     "static/js/787.e7d9f3e9.chunk.js": "/studyroom-reservation/static/js/787.e7d9f3e9.chunk.js",
     "static/media/logo.png": "/studyroom-reservation/static/media/logo.7215aa654ffb3b68e3db.png",
     "index.html": "/studyroom-reservation/index.html",
-    "main.ebb5328b.css.map": "/studyroom-reservation/static/css/main.ebb5328b.css.map",
-    "main.d4a64745.js.map": "/studyroom-reservation/static/js/main.d4a64745.js.map",
+    "main.09dcf414.css.map": "/studyroom-reservation/static/css/main.09dcf414.css.map",
+    "main.772e11df.js.map": "/studyroom-reservation/static/js/main.772e11df.js.map",
     "787.e7d9f3e9.chunk.js.map": "/studyroom-reservation/static/js/787.e7d9f3e9.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.ebb5328b.css",
-    "static/js/main.d4a64745.js"
+    "static/css/main.09dcf414.css",
+    "static/js/main.772e11df.js"
   ]
 }
