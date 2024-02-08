@@ -13,7 +13,7 @@ import {
   Typography,
 } from '@mui/material';
 import { addMinutes, format } from 'date-fns';
-import { addDoc, collection, getDocs, query } from 'firebase/firestore';
+import { addDoc, collection, getDocs, query, where } from 'firebase/firestore';
 
 import { fs } from '../../.././firebase';
 import Button from '../../../components/Button';
@@ -164,10 +164,11 @@ const Timetable = () => {
       const endMinute = times[endTimeIndex].split(':')[1];
 
       await addDoc(collection(fs, 'roomsEx'), {
-        name: selectedPartition,
+        partitionName: selectedPartition,
         startTime: [startHour, startMinute],
         endTime: [endHour, endMinute],
         userName: name,
+        roomName : '306'
       });
 
       setIsOpen(false);
@@ -177,32 +178,27 @@ const Timetable = () => {
   };
 
   const fetchData = async () => {
-    try {
-      const q = query(collection(fs, 'roomsEx'));
-      const querySnapshot = await getDocs(q);
-      const reservedSlots = {
-        room1: [],
-        room2: [],
-        room3: [],
-        room4: [],
-      }; // 각 방마다 독립적인 예약 슬롯 배열 초기화
-      querySnapshot.forEach(doc => {
-        const { name, startTime, endTime } = doc.data();
-        const startIdx = times.findIndex(
-          time => time === `${startTime[0]}:${startTime[1]}`,
-        );
-        const endIdx = times.findIndex(
-          time => time === `${endTime[0]}:${endTime[1]}`,
-        );
-        for (let i = startIdx; i <= endIdx; i++) {
-          reservedSlots[name].push(i); // 해당 방의 예약 슬롯 배열에 추가
-        }
-      });
-      console.log(reservedSlots);
-      setReservedSlots(reservedSlots);
-    } catch (error) {
-      console.error('Error', error);
-    }
+    const q = query(collection(fs, 'roomsEx'),where('roomName','==','306'));
+    const querySnapshot = await getDocs(q);
+    const reservedSlots = {
+      room1: [],
+      room2: [],
+      room3: [],
+      room4: [],
+    }; // 각 방마다 독립적인 예약 슬롯 배열 초기화
+    querySnapshot.forEach(doc => {
+      const { name, startTime, endTime } = doc.data();
+      const startIdx = times.findIndex(
+        time => time === `${startTime[0]}:${startTime[1]}`,
+      );
+      const endIdx = times.findIndex(
+        time => time === `${endTime[0]}:${endTime[1]}`,
+      );
+      for (let i = startIdx; i <= endIdx; i++) {
+        reservedSlots[name].push(i); // 해당 방의 예약 슬롯 배열에 추가
+      }
+    });
+    setReservedSlots(reservedSlots);
   };
 
   const partitions = useMemo(() => ['room1', 'room2', 'room3', 'room4'], []);
@@ -254,7 +250,7 @@ const Timetable = () => {
                         backgroundColor: isSelected
                           ? '#4B89DC' //파란색
                           : isReserved
-                            ? '#C1C1C3'
+                            ? '#C1C1C3' // 회색
                             : !isSelectable
                               ? '#aaa'
                               : 'transparent',

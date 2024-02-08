@@ -38,22 +38,24 @@ const Check = () => {
 
   return (
     <div>
-      <h1>Room List</h1>
+      <h1>예약 목록</h1>
       <br/>
       <table>
         <thead>
           <tr>
-            <th>User</th>
-            <th>Room</th>
-            <th>Start Time</th>
-            <th>End Time</th>
+            <th>이름</th>
+            <th>호실</th>
+            <th>방 번호</th>
+            <th>시작 시간</th>
+            <th>종료 시간</th>
           </tr>
         </thead>
         <tbody>
           {rooms.map((room) => (
             <tr key={room.id}>
               <td style={{ padding: '15px' }}>{room.userName}</td>
-              <td style={{ padding: '15px' }}>{room.name}</td>
+              <td style={{padding:'15px'}}>{room.roomName}</td>
+              <td style={{ padding: '15px' }}>{room.partitionName}</td>
               <td style={{ padding: '15px' }}>{room.startTimeFormatted}</td>
               <td style={{ padding: '15px' }}>{room.endTimeFormatted}</td>
               <br/>

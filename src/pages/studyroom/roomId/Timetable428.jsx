@@ -179,10 +179,11 @@ const Timetable = () => {
       const endMinute = times[endTimeIndex].split(':')[1];
 
       await addDoc(collection(fs, 'roomsEx'), {
-        name: selectedPartition,
+        partitionName: selectedPartition,
         startTime: [startHour, startMinute],
         endTime: [endHour, endMinute],
         userName: name,
+        roomName : '428'
       });
 
       setIsOpen(false);
