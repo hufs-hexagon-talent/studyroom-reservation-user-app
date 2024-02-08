@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 import Button from '../../components/Button';
 
-const Reservation = () => {
+const ReservationsPage = () => {
   const navigate = useNavigate();
 
   return (
@@ -12,12 +12,11 @@ const Reservation = () => {
       <Button
         onClick={() => {
           navigate('/status');
-      }}
-      >
+        }}>
         예약 현황 둘러보기
       </Button>
     </>
   );
 };
 
-export default Reservation;
+export default ReservationsPage;

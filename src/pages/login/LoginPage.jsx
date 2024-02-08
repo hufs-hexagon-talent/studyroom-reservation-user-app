@@ -1,13 +1,13 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 
-import "../../firebase.js";
+import '../../firebase.js';
 
 // practice
-const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+const LoginPage = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
@@ -15,13 +15,13 @@ const Login = () => {
     const auth = getAuth();
 
     signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
+      .then(userCredential => {
         const user = userCredential.user;
-        console.log("login");
-        navigate("/rooms");
+        console.log('login');
+        navigate('/rooms');
         return user;
       })
-      .catch((error) => {
+      .catch(error => {
         const errorMessage = error.message;
         setError(errorMessage);
       });
@@ -38,14 +38,14 @@ const Login = () => {
           <input
             type="email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={e => setEmail(e.target.value)}
           />
 
           <label>Password : </label>
           <input
             type="password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={e => setPassword(e.target.value)}
           />
         </form>
         <br />
@@ -53,10 +53,10 @@ const Login = () => {
           Log In
         </button>
 
-        {error && <p style={{ color: "red" }}>{error}</p>}
+        {error && <p style={{ color: 'red' }}>{error}</p>}
       </div>
     </>
   );
 };
 
-export default Login;
+export default LoginPage;

@@ -13,10 +13,10 @@ import {
   Typography,
 } from '@mui/material';
 import { addMinutes, format } from 'date-fns';
-import { addDoc, collection, getDocs, query } from 'firebase/firestore';
+import { addDoc, collection, getDocs, query, where } from 'firebase/firestore';
 
-import { fs } from '../../.././firebase';
 import Button from '../../../components/Button';
+import { fs } from '../../../firebase';
 
 const timeTableConfig = {
   startTime: {
@@ -54,7 +54,7 @@ function createTimeTable(config) {
   return timeTable;
 }
 
-const Timetable = () => {
+const RoomPage = () => {
   const today = new Date();
   const year = today.getFullYear();
   const month = today.getMonth() + 1;
@@ -74,6 +74,8 @@ const Timetable = () => {
   const [reservedSlots, setReservedSlots] = useState({
     room1: [],
     room2: [],
+    room3: [],
+    room4: [],
   });
 
   useEffect(() => {
@@ -94,30 +96,24 @@ const Timetable = () => {
 
   const toggleSlot = useCallback(
     (partition, timeIndex) => {
-      const isExist = getSlotSelected(partition, timeIndex); // slot의 선택 여부 확인
+      const isExist = getSlotSelected(partition, timeIndex);
       console.log(partition, timeIndex, isExist);
 
-      // 첫 클릭인 경우
       if (!startTimeIndex && !endTimeIndex) {
-        // 상태 업데이트
         setSelectedPartition(partition);
         setStartTimeIndex(timeIndex);
         setEndTimeIndex(timeIndex);
         return;
       }
 
-      // 다른 파티션을 누른 경우
       if (selectedPartition !== partition) {
-        console.log('!!!', selectedPartition, partition);
         setSelectedPartition(partition);
         setStartTimeIndex(timeIndex);
         setEndTimeIndex(timeIndex);
         return;
       }
 
-      // 하나만 선택되어있는 경우
       if (startTimeIndex === endTimeIndex) {
-        // 슬롯의 개수가 max를 초과하는지 확인
         if (
           Math.abs(startTimeIndex - timeIndex) + 1 >
           timeTableConfig.maxReservationSlots
@@ -125,27 +121,18 @@ const Timetable = () => {
           alert(`최대 2시간 까지 선택할 수 있습니다.`);
           return;
         }
-        // 동일한 것을 눌렀을 때
         if (startTimeIndex === timeIndex) {
-          // 같은거 누르면 없어지게
           setSelectedPartition(null);
           setStartTimeIndex(null);
           setEndTimeIndex(null);
-        }
-        // 이후 시간을 눌렀을 때
-        else if (startTimeIndex < timeIndex) {
-          // 클릭한 시간을 종료 시간으로 설정
+        } else if (startTimeIndex < timeIndex) {
           setEndTimeIndex(timeIndex);
-        }
-        // 이전 시간을 눌렀을 때
-        else {
-          // 클릭한 시간을 시작 시간으로 설정
+        } else {
           setStartTimeIndex(timeIndex);
         }
         return;
       }
 
-      // 둘다 선택되어있는 경우
       setSelectedPartition(partition);
       setStartTimeIndex(timeIndex);
       setEndTimeIndex(timeIndex);
@@ -153,12 +140,10 @@ const Timetable = () => {
     [getSlotSelected, setStartTimeIndex, setEndTimeIndex, selectedPartition],
   );
 
-  // 셀을 클릭할 때 해당 셀의 선택 여부를 업데이트하는 함수 추가
   const handleCellClick = (partition, timeIndex) => {
     const clickedTime = times[timeIndex + 1];
     const currentTime = format(today, 'HH:mm');
 
-    // 클릭한 시간이 현재 시간보다 이전인 경우
     if (clickedTime < currentTime) {
       alert('과거의 시간에 예약을 할 수는 없습니다.');
       return;
@@ -183,22 +168,27 @@ const Timetable = () => {
         startTime: [startHour, startMinute],
         endTime: [endHour, endMinute],
         userName: name,
-        roomName : '428'
+        roomName: '306',
       });
 
       setIsOpen(false);
       await fetchData();
-      navigate('/reservation');
+      navigate('/reservations');
     }
   };
 
   const fetchData = async () => {
     try {
-      const q = query(collection(fs, 'roomsEx'));
+      const q = query(
+        collection(fs, 'roomsEx'),
+        where('roomName', '==', '306'),
+      );
       const querySnapshot = await getDocs(q);
       const reservedSlots = {
         room1: [],
         room2: [],
+        room3: [],
+        room4: [],
       }; // 각 방마다 독립적인 예약 슬롯 배열 초기화
       querySnapshot.forEach(doc => {
         const { name, startTime, endTime } = doc.data();
@@ -219,7 +209,7 @@ const Timetable = () => {
     }
   };
 
-  const partitions = useMemo(() => ['room1', 'room2'], []);
+  const partitions = useMemo(() => ['room1', 'room2', 'room3', 'room4'], []);
 
   return (
     <>
@@ -234,7 +224,7 @@ const Timetable = () => {
         <Typography variant="h5" fontWeight={10} component="div" align="center">
           예약하기
         </Typography>
-        <div>
+        <div className="bg-gray-100 h-25 w-100">
           {year}년 {month}월 {day}일 {hour}시 {minute}분
         </div>
         <Table>
@@ -266,9 +256,9 @@ const Timetable = () => {
                       sx={{
                         borderLeft: '1px solid #ccc',
                         backgroundColor: isSelected
-                          ? '#4B89DC' // 파란색
+                          ? '#4B89DC' //파란색
                           : isReserved
-                            ? '#C1C1C3'
+                            ? '#C1C1C3' // 회색
                             : !isSelectable
                               ? '#aaa'
                               : 'transparent',
@@ -346,4 +336,4 @@ const Timetable = () => {
   );
 };
 
-export default Timetable;
+export default RoomPage;
