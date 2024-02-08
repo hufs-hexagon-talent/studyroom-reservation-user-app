@@ -1,18 +1,21 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
+  Button as MuiButton,
+  Modal,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
+  TextField,
   Typography,
 } from '@mui/material';
 import { addMinutes, format } from 'date-fns';
+import { addDoc, collection, getDocs, query } from 'firebase/firestore';
 
-import './Timetable.css'
-
+import { fs } from '../../.././firebase';
 import Button from '../../../components/Button';
 
 const timeTableConfig = {
@@ -31,7 +34,7 @@ const timeTableConfig = {
 function createTimeTable(config) {
   const { startTime, endTime, intervalMinute } = config;
   const start = new Date();
-  start.setHours(startTime.hour, startTime.minute, 0, 0); // 시,분,초,밀리초로 시간 설정
+  start.setHours(startTime.hour, startTime.minute, 0, 0);
 
   const end = new Date();
   end.setHours(endTime.hour, endTime.minute, 0, 0);
@@ -39,24 +42,20 @@ function createTimeTable(config) {
   const timeTable = [];
 
   let currentTime = start;
-  while (currentTime <= end) { // currentTime이 종료시간을 넘어가지 않을 때 까지
-    timeTable.push(format(currentTime, 'HH:mm')); // 배열에 HH:mm 형식으로 추가
-    currentTime = addMinutes(currentTime, intervalMinute); //현재 시간을 interval만큼 증가 -> 시작부터 종료까지 timeTable 배열에 시간이 추가됨
+  while (currentTime <= end) {
+    timeTable.push(format(currentTime, 'HH:mm'));
+    currentTime = addMinutes(currentTime, intervalMinute);
   }
 
-  // 마지막 시간이 endTime과 다를 경우 endTime으로 대체
-  if (timeTable[timeTable.length - 1] !== format(end, 'HH:mm')) { // 마지막에 추가된 시간이 종료시간과 일치하지 않으면
-    timeTable[timeTable.length - 1] = format(end, 'HH:mm'); // 마지막 요소를 종료시간으로 대체
+  if (timeTable[timeTable.length - 1] !== format(end, 'HH:mm')) {
+    timeTable[timeTable.length - 1] = format(end, 'HH:mm');
   }
 
   return timeTable;
 }
 
-console.log(createTimeTable(timeTableConfig));
-
 const Timetable = () => {
   const today = new Date();
-
   const year = today.getFullYear();
   const month = today.getMonth() + 1;
   const day = today.getDate();
@@ -64,21 +63,27 @@ const Timetable = () => {
   const minute = today.getMinutes();
 
   const navigate = useNavigate();
-  // const [selectedSlots, setSelectedSlots] = useState([]);
   const [selectedPartition, setSelectedPartition] = useState(null);
   const [startTimeIndex, setStartTimeIndex] = useState(null);
   const [endTimeIndex, setEndTimeIndex] = useState(null);
-  console.log({ selectedPartition, startTimeIndex, endTimeIndex });
+  const [name, setName] = useState('');
+  const [isOpen, setIsOpen] = useState(false);
 
   const times = useMemo(() => createTimeTable(timeTableConfig), []);
 
+  const [reservedSlots, setReservedSlots] = useState({
+    room1: [],
+    room2: [],
+  });
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
   const getSlotSelected = useCallback(
     (partition, timeIndex) => {
-      // 시작시간과 종료시간이 모두 있는지
       if (!startTimeIndex || !endTimeIndex) return false;
-      // 파티션이 일치한지
       if (selectedPartition !== partition) return false;
-      // timeIndex가 시작시간과 종료시간 사이에 있는지
       if (!(startTimeIndex <= timeIndex && timeIndex <= endTimeIndex))
         return false;
 
@@ -117,9 +122,7 @@ const Timetable = () => {
           Math.abs(startTimeIndex - timeIndex) + 1 >
           timeTableConfig.maxReservationSlots
         ) {
-          alert(
-            `최대 2시간 까지 선택할 수 있습니다.`,
-          );
+          alert(`최대 2시간 까지 선택할 수 있습니다.`);
           return;
         }
         // 동일한 것을 눌렀을 때
@@ -152,10 +155,9 @@ const Timetable = () => {
 
   // 셀을 클릭할 때 해당 셀의 선택 여부를 업데이트하는 함수 추가
   const handleCellClick = (partition, timeIndex) => {
-
-    const clickedTime = times[timeIndex+1];
+    const clickedTime = times[timeIndex + 1];
     const currentTime = format(today, 'HH:mm');
-    
+
     // 클릭한 시간이 현재 시간보다 이전인 경우
     if (clickedTime < currentTime) {
       alert('과거의 시간에 예약을 할 수는 없습니다.');
@@ -163,6 +165,57 @@ const Timetable = () => {
     }
 
     toggleSlot(partition, timeIndex);
+  };
+
+  const handleReservation = async () => {
+    setIsOpen(true);
+  };
+
+  const handleConfirmReservation = async () => {
+    if (startTimeIndex !== null && endTimeIndex !== null && name !== '') {
+      const startHour = times[startTimeIndex].split(':')[0];
+      const startMinute = times[startTimeIndex].split(':')[1];
+      const endHour = times[endTimeIndex].split(':')[0];
+      const endMinute = times[endTimeIndex].split(':')[1];
+
+      await addDoc(collection(fs, 'roomsEx'), {
+        name: selectedPartition,
+        startTime: [startHour, startMinute],
+        endTime: [endHour, endMinute],
+        userName: name,
+      });
+
+      setIsOpen(false);
+      await fetchData();
+      navigate('/reservation');
+    }
+  };
+
+  const fetchData = async () => {
+    try {
+      const q = query(collection(fs, 'roomsEx'));
+      const querySnapshot = await getDocs(q);
+      const reservedSlots = {
+        room1: [],
+        room2: [],
+      }; // 각 방마다 독립적인 예약 슬롯 배열 초기화
+      querySnapshot.forEach(doc => {
+        const { name, startTime, endTime } = doc.data();
+        const startIdx = times.findIndex(
+          time => time === `${startTime[0]}:${startTime[1]}`,
+        );
+        const endIdx = times.findIndex(
+          time => time === `${endTime[0]}:${endTime[1]}`,
+        );
+        for (let i = startIdx; i <= endIdx; i++) {
+          reservedSlots[name].push(i); // 해당 방의 예약 슬롯 배열에 추가
+        }
+      });
+      console.log(reservedSlots);
+      setReservedSlots(reservedSlots);
+    } catch (error) {
+      console.error('Error', error);
+    }
   };
 
   const partitions = useMemo(() => ['room1', 'room2'], []);
@@ -203,22 +256,33 @@ const Timetable = () => {
                 {times.map((time, timeIndex) => {
                   const isSelected = getSlotSelected(partition, timeIndex);
                   const isSelectable = true;
+                  const isReserved =
+                    reservedSlots[partition].includes(timeIndex); // 각 방의 예약 슬롯 상태를 확인
 
                   return (
                     <TableCell
-                      key={timeIndex} // 방이랑 시간 조합해서 키 값 생성
+                      key={timeIndex}
                       sx={{
                         borderLeft: '1px solid #ccc',
                         backgroundColor: isSelected
-                          ? '#4B89DC'
-                          : !isSelectable
-                            ? '#aaa'
-                            : 'transparent', // 선택된 셀에 따라 색상 변경
-                        cursor: isSelectable ? 'pointer' : 'default', // 클릭 가능한 커서 스타일 추가
+                          ? '#4B89DC' // 파란색
+                          : isReserved
+                            ? '#C1C1C3'
+                            : !isSelectable
+                              ? '#aaa'
+                              : 'transparent',
+                        cursor: isReserved
+                          ? 'default'
+                          : isSelectable
+                            ? 'pointer'
+                            : 'default', // 예약된 슬롯의 경우 클릭 무시
                       }}
-                      onClick={() =>
-                        isSelectable && handleCellClick(partition, timeIndex)
-                      } // 클릭 이벤트 추가
+                      onClick={
+                        () =>
+                          isSelectable &&
+                          !isReserved &&
+                          handleCellClick(partition, timeIndex) // 예약된 슬롯은 클릭 무시
+                      }
                     />
                   );
                 })}
@@ -232,9 +296,51 @@ const Timetable = () => {
       <Button
         text="예약하기"
         onClick={() => {
-          navigate('/reservation');
+          handleReservation();
         }}
       />
+      <br />
+
+      <Modal open={isOpen} onClose={() => setIsOpen(false)}>
+        <div
+          style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            background: 'white',
+            padding: '20px',
+            width: '300px',
+            border: 'none',
+            borderRadius: 20,
+          }}>
+          <Typography variant="h6" component="h2" align="center" gutterBottom>
+            이름을 입력 해주세요
+          </Typography>
+          <TextField
+            label="Name"
+            variant="standard"
+            value={name}
+            onChange={e => setName(e.target.value)}
+            fullWidth
+            autoFocus
+          />
+          <div style={{ marginTop: '20px', textAlign: 'center' }}>
+            <MuiButton
+              variant="contained"
+              onClick={handleConfirmReservation}
+              disabled={!name}>
+              확인
+            </MuiButton>
+            <MuiButton
+              variant="contained"
+              onClick={() => setIsOpen(false)}
+              style={{ marginLeft: '10px' }}>
+              취소
+            </MuiButton>
+          </div>
+        </div>
+      </Modal>
     </>
   );
 };

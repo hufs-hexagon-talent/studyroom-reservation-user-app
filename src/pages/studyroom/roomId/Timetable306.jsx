@@ -227,6 +227,7 @@ const Timetable = () => {
           <TableHead>
             <TableRow>
               <TableCell align="center" width={100} />
+              {/* 30분 간격으로 시간을 표시 */}
               {times.map((time, timeIndex) => (
                 <TableCell key={timeIndex} align="center" width={200}>
                   {time}
@@ -238,6 +239,7 @@ const Timetable = () => {
             {partitions.map(partition => (
               <TableRow key={partition}>
                 <TableCell>{partition}</TableCell>
+                {/* 30분 간격으로 셀을 생성 */}
                 {times.map((time, timeIndex) => {
                   const isSelected = getSlotSelected(partition, timeIndex);
                   const isSelectable = true;
@@ -256,10 +258,17 @@ const Timetable = () => {
                             : !isSelectable
                               ? '#aaa'
                               : 'transparent',
-                        cursor: isSelectable ? 'pointer' : 'default',
+                        cursor: isReserved
+                          ? 'default'
+                          : isSelectable
+                            ? 'pointer'
+                            : 'default', // 예약된 슬롯의 경우 클릭 무시
                       }}
-                      onClick={() =>
-                        isSelectable && handleCellClick(partition, timeIndex)
+                      onClick={
+                        () =>
+                          isSelectable &&
+                          !isReserved &&
+                          handleCellClick(partition, timeIndex) // 예약된 슬롯은 클릭 무시
                       }
                     />
                   );
