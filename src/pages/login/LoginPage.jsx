@@ -29,25 +29,27 @@ const LoginPage = () => {
 
   return (
     <>
-      <div>
-        <h1>Log In</h1>
-      </div>
-      <div>
+      <div className="w-27 bg-red-200 text-white">
+        <h1 className="w-2.25 text-center">Log In</h1>
         <form>
-          <label>Email : </label>
-          <input
-            type="email"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-          />
-
-          <label>Password : </label>
-          <input
-            type="password"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-          />
+          <div className="relative w-full h-12 mx-0 my-1.75">
+            <label>Email : </label>
+            <input
+              type="email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+            />
+          </div>
+          <div className="relative w-full h-12 mx-0 my-1.75">
+            <label>Password : </label>
+            <input
+              type="password"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+            />
+          </div>
         </form>
+
         <br />
         <button type="button" onClick={handleSignIn}>
           Log In
