@@ -36,7 +36,7 @@ const LoginPage = () => {
             <form className="flex flex-col mt-5 px-5">
               <input
                 placeholder="Email"
-                className="bg-gray-100 shadow-inner focus:outline-none border-2 focus:border-opacity-50 focus:border-green-600 mb-3 py-3 px-5 rounded-lg"
+                className="bg-gray-100 shadow-inner focus:outline-none border-2 focus:border-opacity-50 focus:border-yellow-400 mb-3 py-3 px-5 rounded-lg"
                 type="email"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
@@ -44,7 +44,7 @@ const LoginPage = () => {
 
               <input
                 placeholder="Password"
-                className="bg-gray-100 shadow-inner focus:outline-none border-2 focus:border-opacity-50 focus:border-green-600 mb-3 py-3 px-5 rounded-lg"
+                className="bg-gray-100 shadow-inner focus:outline-none border-2 focus:border-opacity-50 focus:border-yellow-400 mb-3 py-3 px-5 rounded-lg"
                 type="password"
                 value={password}
                 onChange={e => setPassword(e.target.value)}
