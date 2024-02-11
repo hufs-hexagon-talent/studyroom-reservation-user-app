@@ -29,59 +29,37 @@ const LoginPage = () => {
 
   return (
     <>
-      <div className="w-27 bg-red-200 text-white">
-        <h1 className="w-2.25 text-center">Log In</h1>
-        <form>
-          <div className="relative w-full h-12 mx-0 my-1.75 border-2 border-solid border-white border-opacity-20 rounded-3xl w-full h-full bg-transparent border-none outline-none px-4">
-            <input
-              placeholder="Email"
-              type="email"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-            />
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth="1.5"
-              stroke="currentColor"
-              className="w-6 h-6 absolute right-5 top">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+      <div className="h-screen flex items-center justify-center bg-gray-800">
+        <div className="bg-white w-full max-w-lg py-10 rounded-lg text-center">
+          <h3 className="text-3xl text-gray-800">Log In</h3>
+          <div>
+            <form className="flex flex-col mt-5 px-5">
+              <input
+                placeholder="Email"
+                className="bg-gray-100 shadow-inner focus:outline-none border-2 focus:border-opacity-50 focus:border-green-600 mb-3 py-3 px-5 rounded-lg"
+                type="email"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
               />
-            </svg>
-          </div>
-          <div className="relative w-full h-12 mx-0 my-1.75 border-2 border-solid border-white border-opacity-20 rounded-3xl w-full h-full bg-transparent border-none outline-none px-4">
-            <input
-              placeholder="Password"
-              type="password"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-            />
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth="1.5"
-              stroke="currentColor"
-              className="w-6 h-6">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"
+
+              <input
+                placeholder="Password"
+                className="bg-gray-100 shadow-inner focus:outline-none border-2 focus:border-opacity-50 focus:border-green-600 mb-3 py-3 px-5 rounded-lg"
+                type="password"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
               />
-            </svg>
+            </form>
+            <button
+              className="py-3 px-5 bg-gray-800 text-white mt-3 text-lg rounded-lg focus:outline-none hover:opacity-90"
+              type="button"
+              onClick={handleSignIn}>
+              Log In
+            </button>
+
+            {error && <p style={{ color: 'red' }}>{error}</p>}
           </div>
-        </form>
-
-        <br />
-        <button type="button" onClick={handleSignIn}>
-          Log In
-        </button>
-
-        {error && <p style={{ color: 'red' }}>{error}</p>}
+        </div>
       </div>
     </>
   );
