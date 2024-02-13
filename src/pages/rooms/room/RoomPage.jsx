@@ -15,6 +15,8 @@ import {
 import { addMinutes, format } from 'date-fns';
 import { collection, doc,getDocs, query, updateDoc } from 'firebase/firestore';
 
+import '/Users/yiseo/Documents/studyroom-reservation/src/pages/rooms/room/Roompage.css'
+
 import Button from '../../../components/Button';
 import { fs } from '../../../firebase';
 
@@ -247,6 +249,16 @@ const RoomPage = () => {
 
   return (
     <>
+      <div style={{ marginBottom: '50px' }}>
+        <br/>
+        <Typography variant="h5" fontWeight={10} component="div" align="center">
+          예약하기
+        </Typography>
+        <br></br>
+        <div className="bg-gray-100 h-50 inline-block" style={{marginLeft:'10px'}}>
+          {year}년 {month}월 {day}일 {hour}시 {minute}분
+        </div>
+      </div>
       <TableContainer
         sx={{
           width: '90%',
@@ -255,24 +267,10 @@ const RoomPage = () => {
           marginRight: 'auto',
           marginTop: '50px',
         }}>
-        <Typography
-          variant="h5"
-          fontWeight={10}
-          component="div"
-          marginLeft={'400px'}
-          align="center"
-          style={{ position: 'fixed'}}>
-          예약하기
-        </Typography>
-        <div className="bg-gray-100 h-25 w-100" style={{ position: 'fixed' }}>
-          {year}년 {month}월 {day}일 {hour}시 {minute}분
-        </div>
-        <br/>
         <Table>
           <TableHead>
             <TableRow>
               <TableCell align="center" width={100} />
-              {/* 30분 간격으로 시간을 표시 */}
               {times.map((time, timeIndex) => (
                 <TableCell key={timeIndex} align="center" width={200}>
                   {time}
@@ -284,22 +282,21 @@ const RoomPage = () => {
             {partitions.map(partition => (
               <TableRow key={partition}>
                 <TableCell>{partition}</TableCell>
-                {/* 30분 간격으로 셀을 생성 */}
                 {times.map((time, timeIndex) => {
                   const isSelected = getSlotSelected(partition, timeIndex);
                   const isSelectable = true;
                   const isReserved =
-                    reservedSlots[partition].includes(timeIndex); // 각 방의 예약 슬롯 상태를 확인
-                  
+                    reservedSlots[partition].includes(timeIndex);
+
                   return (
                     <TableCell
                       key={timeIndex}
                       sx={{
                         borderLeft: '1px solid #ccc',
                         backgroundColor: isSelected
-                          ? '#4B89DC' //파란색
+                          ? '#4B89DC'
                           : isReserved
-                            ? '#C1C1C3' // 회색
+                            ? '#C1C1C3'
                             : !isSelectable
                               ? '#aaa'
                               : 'transparent',
@@ -307,13 +304,12 @@ const RoomPage = () => {
                           ? 'default'
                           : isSelectable
                             ? 'pointer'
-                            : 'default', // 예약된 슬롯의 경우 클릭 무시
+                            : 'default',
                       }}
-                      onClick={
-                        () =>
-                          isSelectable &&
-                          !isReserved &&
-                          handleCellClick(partition, timeIndex) // 예약된 슬롯은 클릭 무시
+                      onClick={() =>
+                        isSelectable &&
+                        !isReserved &&
+                        handleCellClick(partition, timeIndex)
                       }
                     />
                   );

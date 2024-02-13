@@ -47,8 +47,8 @@ const Check = () => {
     }
   }
 
-  async function deleteData(id) {
-    await deleteDoc(doc(fs, 'Rooms/306/Days/306/Reservations', id));
+  async function deleteData(id, roomName) {
+    await deleteDoc(doc(fs, `Rooms/${roomName}/Days/${roomName}/Reservations`, id));
     setRooms(prevRooms => prevRooms.filter(room => room.id !== id));
   }
 
@@ -77,7 +77,7 @@ const Check = () => {
               <br />
               <button
                 style={{ marginLeft: '15px', marginBottom: '23px' }}
-                onClick={() => deleteData(room.id)}>
+                onClick={() => deleteData(room.id, room.roomName)}>
                 삭제
               </button>
             </tr>
