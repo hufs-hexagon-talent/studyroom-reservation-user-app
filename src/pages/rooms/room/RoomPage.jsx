@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { useNavigate, useParams} from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import {
   Button as MuiButton,
   Modal,
@@ -13,7 +13,7 @@ import {
   Typography,
 } from '@mui/material';
 import { addMinutes, format } from 'date-fns';
-import { collection, doc,getDocs, query, updateDoc } from 'firebase/firestore';
+import { collection, doc, getDocs, query, updateDoc } from 'firebase/firestore';
 
 import Button from '../../../components/Button';
 import { fs } from '../../../firebase';
@@ -57,7 +57,7 @@ function createTimeTable(config) {
 }
 
 const RoomPage = () => {
-  // 현재 시간 
+  // 현재 시간
   const today = new Date();
   const year = today.getFullYear();
   const month = today.getMonth() + 1;
@@ -71,7 +71,7 @@ const RoomPage = () => {
   const [endTimeIndex, setEndTimeIndex] = useState(null);
   const [userName, setUserName] = useState('');
   const [isOpen, setIsOpen] = useState(false);
-  const {roomName, roomId} = useParams();
+  const { roomName, roomId } = useParams();
 
   const times = useMemo(() => createTimeTable(timeTableConfig), []);
 
@@ -98,7 +98,7 @@ const RoomPage = () => {
     },
     [startTimeIndex, endTimeIndex, selectedPartition],
   );
-  
+
   // 슬롯의 상태 토글하는 함수
   const toggleSlot = useCallback(
     (partition, timeIndex) => {
@@ -124,7 +124,7 @@ const RoomPage = () => {
           Math.abs(startTimeIndex - timeIndex) + 1 >
           timeTableConfig.maxReservationSlots
         ) {
-          alert("최대 2시간 까지 선택할 수 있습니다.");
+          alert('최대 2시간 까지 선택할 수 있습니다.');
           return;
         }
         if (startTimeIndex === timeIndex) {
@@ -145,7 +145,7 @@ const RoomPage = () => {
     },
     [getSlotSelected, setStartTimeIndex, setEndTimeIndex, selectedPartition],
   );
-  
+
   // 최대 예약 시간에 부합하는지 계산하는 함수
   const handleCellClick = (partition, timeIndex) => {
     const clickedTime = times[timeIndex + 1];
@@ -170,8 +170,11 @@ const RoomPage = () => {
       const startMinute = times[startTimeIndex].split(':')[1];
       const endHour = times[endTimeIndex].split(':')[0];
       const endMinute = times[endTimeIndex].split(':')[1];
-  
-      const docRef = doc(fs, `Rooms/${roomName}/Days/${roomName}/Reservations/${roomId}`);
+
+      const docRef = doc(
+        fs,
+        `Rooms/${roomName}/Days/${roomName}/Reservations/${roomId}`,
+      );
 
       const dataToUpdate = {
         partitionName: selectedPartition,
@@ -191,12 +194,13 @@ const RoomPage = () => {
       navigate('/reservations');
     }
   };
-  
 
   // 데이터를 불러오는 함수
   const fetchData = async () => {
     try {
-      const q = query(collection(fs, `Rooms/${roomName}/Days/${roomName}/Reservations`));
+      const q = query(
+        collection(fs, `Rooms/${roomName}/Days/${roomName}/Reservations`),
+      );
       const querySnapshot = await getDocs(q);
 
       // 수정해야함 미완성코드
@@ -243,12 +247,20 @@ const RoomPage = () => {
           marginRight: 'auto',
           marginTop: '50px',
         }}>
-        <Typography variant="h5" fontWeight={10} component="div" align="center">
+        <Typography
+          variant="h5"
+          fontWeight={10}
+          component="div"
+          marginLeft={'400px'}
+          align="center"
+          style={{ position: 'fixed' }}>
           예약하기
         </Typography>
-        <div className="bg-gray-100 h-25 w-100">
+        <br></br>
+        <div className="bg-gray-100 h-25 w-100" style={{ position: 'fixed' }}>
           {year}년 {month}월 {day}일 {hour}시 {minute}분
         </div>
+        <br></br>
         <Table>
           <TableHead>
             <TableRow>
@@ -271,7 +283,7 @@ const RoomPage = () => {
                   const isSelectable = true;
                   const isReserved =
                     reservedSlots[partition].includes(timeIndex); // 각 방의 예약 슬롯 상태를 확인
-                  
+
                   return (
                     <TableCell
                       key={timeIndex}
