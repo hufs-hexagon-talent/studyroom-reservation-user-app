@@ -14,32 +14,38 @@ const Check = () => {
   async function fetchData() {
     try {
       const roomsData = [];
-  
-      const roomIds = [306, 428];
+
+      const roomIds = ['306', '428'];
       for (let i = 0; i < roomIds.length; i++) {
         const q = query(collection(fs, `Rooms/${roomIds[i]}/Days/${roomIds[i]}/Reservations`));
         const querySnapshot = await getDocs(q);
-  
+
         querySnapshot.forEach((doc) => {
           const reservationData = doc.data();
           const roomName = reservationData.name;
           const startTime = reservationData.startTime;
           const endTime = reservationData.endTime;
-  
+
           const startTimeFormatted = format(new Date().setHours(startTime[0], startTime[1]), 'HH:mm');
           const endTimeFormatted = format(new Date().setHours(endTime[0], endTime[1]), 'HH:mm');
-  
+
           const id = doc.id;
-          roomsData.push({ id, ...reservationData, roomName, startTimeFormatted, endTimeFormatted, roomId: roomIds[i] }); 
+          roomsData.push({ id, ...reservationData, roomName, startTimeFormatted, endTimeFormatted, roomId: roomIds[i] });
         });
       }
-  
+      
+      // 시작 시간이 빠른 순으로 정렬 
+      roomsData.sort((a, b) => {
+        const startTimeA = new Date(`2000-01-01T${a.startTimeFormatted}`);
+        const startTimeB = new Date(`2000-01-01T${b.startTimeFormatted}`);
+        return startTimeA - startTimeB;
+      });
+
       setRooms(roomsData);
     } catch (error) {
       console.error('Error', error);
     }
   }
-  
 
   async function deleteData(id) {
     await deleteDoc(doc(fs, 'Rooms/306/Days/306/Reservations', id));
@@ -48,7 +54,7 @@ const Check = () => {
 
   return (
     <div>
-      <h1>예약 리스트</h1>
+      <h1>예약 목록</h1>
       <br />
       <table>
         <thead>
@@ -69,8 +75,8 @@ const Check = () => {
               <td style={{ padding: '15px' }}>{room.startTimeFormatted}</td>
               <td style={{ padding: '15px' }}>{room.endTimeFormatted}</td>
               <br />
-              <button 
-                style={{ marginLeft: '15px' , marginBottom:'23px'}}
+              <button
+                style={{ marginLeft: '15px', marginBottom: '23px' }}
                 onClick={() => deleteData(room.id)}>
                 삭제
               </button>

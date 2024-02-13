@@ -191,7 +191,6 @@ const RoomPage = () => {
       navigate('/reservations');
     }
   };
-  
 
   // 데이터를 불러오는 함수
   const fetchData = async () => {
@@ -262,7 +261,7 @@ const RoomPage = () => {
           component="div"
           marginLeft={'400px'}
           align="center"
-          style={{ position: 'fixed' }}>
+          style={{ position: 'fixed'}}>
           예약하기
         </Typography>
         <div className="bg-gray-100 h-25 w-100" style={{ position: 'fixed' }}>
