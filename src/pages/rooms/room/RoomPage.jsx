@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams} from 'react-router-dom';
 import {
   Button as MuiButton,
   Modal,
@@ -13,11 +13,12 @@ import {
   Typography,
 } from '@mui/material';
 import { addMinutes, format } from 'date-fns';
-import { addDoc, collection, getDocs, query, where } from 'firebase/firestore';
+import { collection, doc,getDocs, query, updateDoc } from 'firebase/firestore';
 
 import Button from '../../../components/Button';
 import { fs } from '../../../firebase';
 
+//시간 데이터
 const timeTableConfig = {
   startTime: {
     hour: 8,
@@ -25,12 +26,13 @@ const timeTableConfig = {
   },
   endTime: {
     hour: 22,
-    minute: 40,
+    minute: 30,
   },
   intervalMinute: 30,
   maxReservationSlots: 4,
 };
 
+// table 만드는 함수
 function createTimeTable(config) {
   const { startTime, endTime, intervalMinute } = config;
   const start = new Date();
@@ -55,6 +57,7 @@ function createTimeTable(config) {
 }
 
 const RoomPage = () => {
+  // 현재 시간 
   const today = new Date();
   const year = today.getFullYear();
   const month = today.getMonth() + 1;
@@ -66,8 +69,9 @@ const RoomPage = () => {
   const [selectedPartition, setSelectedPartition] = useState(null);
   const [startTimeIndex, setStartTimeIndex] = useState(null);
   const [endTimeIndex, setEndTimeIndex] = useState(null);
-  const [name, setName] = useState('');
+  const [userName, setUserName] = useState('');
   const [isOpen, setIsOpen] = useState(false);
+  const {roomName, roomId} = useParams();
 
   const times = useMemo(() => createTimeTable(timeTableConfig), []);
 
@@ -82,6 +86,7 @@ const RoomPage = () => {
     fetchData();
   }, []);
 
+  // 슬롯이 선택되었는지 확인하는 함수
   const getSlotSelected = useCallback(
     (partition, timeIndex) => {
       if (!startTimeIndex || !endTimeIndex) return false;
@@ -93,7 +98,8 @@ const RoomPage = () => {
     },
     [startTimeIndex, endTimeIndex, selectedPartition],
   );
-
+  
+  // 슬롯의 상태 토글하는 함수
   const toggleSlot = useCallback(
     (partition, timeIndex) => {
       const isExist = getSlotSelected(partition, timeIndex);
@@ -118,7 +124,7 @@ const RoomPage = () => {
           Math.abs(startTimeIndex - timeIndex) + 1 >
           timeTableConfig.maxReservationSlots
         ) {
-          alert(`최대 2시간 까지 선택할 수 있습니다.`);
+          alert("최대 2시간 까지 선택할 수 있습니다.");
           return;
         }
         if (startTimeIndex === timeIndex) {
@@ -139,7 +145,8 @@ const RoomPage = () => {
     },
     [getSlotSelected, setStartTimeIndex, setEndTimeIndex, selectedPartition],
   );
-
+  
+  // 최대 예약 시간에 부합하는지 계산하는 함수
   const handleCellClick = (partition, timeIndex) => {
     const clickedTime = times[timeIndex + 1];
     const currentTime = format(today, 'HH:mm');
@@ -156,53 +163,68 @@ const RoomPage = () => {
     setIsOpen(true);
   };
 
+  // 데이터를 수정하는 함수
   const handleConfirmReservation = async () => {
-    if (startTimeIndex !== null && endTimeIndex !== null && name !== '') {
+    if (startTimeIndex !== null && endTimeIndex !== null && userName !== '') {
       const startHour = times[startTimeIndex].split(':')[0];
       const startMinute = times[startTimeIndex].split(':')[1];
       const endHour = times[endTimeIndex].split(':')[0];
       const endMinute = times[endTimeIndex].split(':')[1];
+  
+      const docRef = doc(fs, `Rooms/${roomName}/Days/${roomName}/Reservations/${roomId}`);
 
-      await addDoc(collection(fs, 'roomsEx'), {
+      const dataToUpdate = {
         partitionName: selectedPartition,
         startTime: [startHour, startMinute],
         endTime: [endHour, endMinute],
-        userName: name,
-        roomName: '306',
-      });
+        userName: userName,
+      };
+
+      try {
+        await updateDoc(docRef, dataToUpdate);
+      } catch (error) {
+        console.error(error);
+      }
 
       setIsOpen(false);
       await fetchData();
       navigate('/reservations');
     }
   };
+  
 
+  // 데이터를 불러오는 함수
   const fetchData = async () => {
     try {
-      const q = query(
-        collection(fs, 'roomsEx'),
-        where('roomName', '==', '306'),
-      );
+      const q = query(collection(fs, `Rooms/${roomName}/Days/${roomName}/Reservations`));
       const querySnapshot = await getDocs(q);
+
+      // 수정해야함 미완성코드
+      const p = fs.collection('Rooms').doc(roomName);
+      const partitions = doc.data().partitions.length;
+      console.log(partitions);
+
       const reservedSlots = {
         room1: [],
         room2: [],
         room3: [],
         room4: [],
-      }; // 각 방마다 독립적인 예약 슬롯 배열 초기화
+      };
+
       querySnapshot.forEach(doc => {
-        const { name, startTime, endTime } = doc.data();
+        const { userName, startTime, endTime } = doc.data();
+        // 시작 시간
         const startIdx = times.findIndex(
           time => time === `${startTime[0]}:${startTime[1]}`,
         );
+        // 종료 시간
         const endIdx = times.findIndex(
           time => time === `${endTime[0]}:${endTime[1]}`,
         );
         for (let i = startIdx; i <= endIdx; i++) {
-          reservedSlots[name].push(i); // 해당 방의 예약 슬롯 배열에 추가
+          reservedSlots[userName].push(i); // 해당 방의 예약 슬롯 배열에 추가
         }
       });
-      console.log(reservedSlots);
       setReservedSlots(reservedSlots);
     } catch (error) {
       console.error('Error', error);
@@ -249,7 +271,7 @@ const RoomPage = () => {
                   const isSelectable = true;
                   const isReserved =
                     reservedSlots[partition].includes(timeIndex); // 각 방의 예약 슬롯 상태를 확인
-
+                  
                   return (
                     <TableCell
                       key={timeIndex}
@@ -309,25 +331,25 @@ const RoomPage = () => {
             이름을 입력 해주세요
           </Typography>
           <TextField
-            label="Name"
+            label="userName"
             variant="standard"
-            value={name}
-            onChange={e => setName(e.target.value)}
+            value={userName}
+            onChange={e => setUserName(e.target.value)}
             fullWidth
             autoFocus
           />
           <div style={{ marginTop: '20px', textAlign: 'center' }}>
             <MuiButton
               variant="contained"
-              onClick={handleConfirmReservation}
-              disabled={!name}>
-              확인
-            </MuiButton>
-            <MuiButton
-              variant="contained"
               onClick={() => setIsOpen(false)}
               style={{ marginLeft: '10px' }}>
               취소
+            </MuiButton>
+            <MuiButton
+              variant="contained"
+              onClick={handleConfirmReservation}
+              disabled={!userName}>
+              확인
             </MuiButton>
           </div>
         </div>

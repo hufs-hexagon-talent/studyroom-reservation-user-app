@@ -10,10 +10,10 @@ const ReservationsPage = () => {
     <>
       <h1>Reserved!</h1>
       <Button
+        text={'예약 현황 둘러보기'}
         onClick={() => {
           navigate('/status');
         }}>
-        예약 현황 둘러보기
       </Button>
     </>
   );

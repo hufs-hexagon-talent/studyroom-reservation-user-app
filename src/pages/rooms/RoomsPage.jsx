@@ -1,12 +1,13 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { collection, getDocs, query } from 'firebase/firestore';
+import { addDoc, collection, getDocs, query } from 'firebase/firestore';
 
 import Button from '../../components/Button';
 import { fs } from '../../firebase';
 
+
 const fetchRoomsData = async () => {
-  const q = query(collection(fs, 'Rooms')); // import 해줘
+  const q = query(collection(fs, 'Rooms'));
 
   const querySnapshot = await getDocs(q);
 
@@ -17,6 +18,7 @@ const RoomsPage = () => {
   const navigate = useNavigate();
 
   const [rooms, setRooms] = useState([]); // {id:{name:"123"}} -> [[id,{name:"asdf"}], [id,{name:"123"}]]
+  
   const fetch = useCallback(async () => {
     setRooms(await fetchRoomsData());
   }, [setRooms]);
@@ -24,6 +26,18 @@ const RoomsPage = () => {
   useEffect(() => {
     fetch();
   }, [fetch]);
+
+  const handleButtonClick=async(roomId, roomName)=>{
+    try{
+      const docAddress = collection(fs, `Rooms/${roomId}/Days/${roomId}/Reservations`);
+      const docRef = await addDoc(docAddress, {
+        name: roomName
+      });
+      navigate(`/rooms/${roomId}/${docRef.id}`)
+    } catch(error){
+      console.log('error');
+    }
+  }
 
   return (
     <>
@@ -33,29 +47,18 @@ const RoomsPage = () => {
           return (
             <>
               <Button
+                key={room.id}
                 text={room.data.name}
-                onClick={() => {
-                  navigate(`/rooms/${room.id}`);
-                }}
+                onClick={() => 
+                  {
+                    handleButtonClick(room.id, room.data.name)
+                  }
+                }
               />
+              <br/>
             </>
           );
         })}
-        {/* <Button
-          text="306호"
-          onClick={() => {
-            console.log('select 306');
-            navigate('/rooms/306');
-          }}
-        />
-        <br />
-        <Button
-          text="428호"
-          onClick={() => {
-            console.log('select 428');
-            navigate('/rooms/428');
-          }}
-        /> */}
         <br />
         <br />
       </div>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { format } from 'date-fns';
-import { collection, deleteDoc,doc, getDocs, query } from 'firebase/firestore';
+import { collection, deleteDoc, doc, getDocs, query } from 'firebase/firestore';
 
 import { fs } from '../../firebase';
 
@@ -13,7 +13,7 @@ const Check = () => {
 
   async function fetchData() {
     try {
-      const q = query(collection(fs, 'roomsEx'));
+      const q = query(collection(fs, 'Rooms/306/Days/306/Reservation'));
       const querySnapshot = await getDocs(q);
 
       const roomsData = [];
@@ -26,13 +26,14 @@ const Check = () => {
       });
 
       setRooms(roomsData);
+      console.log(roomsData);
     } catch (error) {
       console.error('Error', error);
     }
   }
 
   async function deleteData(id){
-    await deleteDoc(doc(fs, 'roomsEx', id));
+    await deleteDoc(doc(fs,  'Rooms/306/Days/306/Reservation', id)); // 삭제할 문서의 경로
     setRooms(prevRooms => prevRooms.filter(room => room.id !== id));
   }
 
