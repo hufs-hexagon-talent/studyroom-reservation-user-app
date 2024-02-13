@@ -13,34 +13,43 @@ const Check = () => {
 
   async function fetchData() {
     try {
-      const q = query(collection(fs, 'Rooms/306/Days/306/Reservation'));
-      const querySnapshot = await getDocs(q);
-
       const roomsData = [];
-
-      querySnapshot.forEach((doc) => {
-        const roomData = doc.data();
-        roomData.startTimeFormatted = format(new Date().setHours(roomData.startTime[0], roomData.startTime[1]), 'HH:mm');
-        roomData.endTimeFormatted = format(new Date().setHours(roomData.endTime[0], roomData.endTime[1]), 'HH:mm');
-        roomsData.push({ id: doc.id, ...roomData });
-      });
-
+  
+      const roomIds = [306, 428];
+      for (let i = 0; i < roomIds.length; i++) {
+        const q = query(collection(fs, `Rooms/${roomIds[i]}/Days/${roomIds[i]}/Reservations`));
+        const querySnapshot = await getDocs(q);
+  
+        querySnapshot.forEach((doc) => {
+          const reservationData = doc.data();
+          const roomName = reservationData.name;
+          const startTime = reservationData.startTime;
+          const endTime = reservationData.endTime;
+  
+          const startTimeFormatted = format(new Date().setHours(startTime[0], startTime[1]), 'HH:mm');
+          const endTimeFormatted = format(new Date().setHours(endTime[0], endTime[1]), 'HH:mm');
+  
+          const id = doc.id;
+          roomsData.push({ id, ...reservationData, roomName, startTimeFormatted, endTimeFormatted, roomId: roomIds[i] }); 
+        });
+      }
+  
       setRooms(roomsData);
-      console.log(roomsData);
     } catch (error) {
       console.error('Error', error);
     }
   }
+  
 
-  async function deleteData(id){
-    await deleteDoc(doc(fs,  'Rooms/306/Days/306/Reservation', id)); // 삭제할 문서의 경로
+  async function deleteData(id) {
+    await deleteDoc(doc(fs, 'Rooms/306/Days/306/Reservations', id));
     setRooms(prevRooms => prevRooms.filter(room => room.id !== id));
   }
 
   return (
     <div>
-      <h1>예약 목록</h1>
-      <br/>
+      <h1>예약 리스트</h1>
+      <br />
       <table>
         <thead>
           <tr>
@@ -55,12 +64,14 @@ const Check = () => {
           {rooms.map((room) => (
             <tr key={room.id}>
               <td style={{ padding: '15px' }}>{room.userName}</td>
-              <td style={{padding:'15px'}}>{room.roomName}</td>
+              <td style={{ padding: '15px' }}>{room.roomName}</td>
               <td style={{ padding: '15px' }}>{room.partitionName}</td>
               <td style={{ padding: '15px' }}>{room.startTimeFormatted}</td>
               <td style={{ padding: '15px' }}>{room.endTimeFormatted}</td>
-              <br/>
-              <button onClick={() => deleteData(room.id)}>
+              <br />
+              <button 
+                style={{ marginLeft: '15px' , marginBottom:'23px'}}
+                onClick={() => deleteData(room.id)}>
                 삭제
               </button>
             </tr>
