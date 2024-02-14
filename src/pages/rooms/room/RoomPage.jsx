@@ -244,7 +244,7 @@ const RoomPage = () => {
     <>
       <div className="pt-12">
         <Typography>
-          <div className="text-2xl font-extrabold text-center">예약하기</div>
+          <div className="text-3xl font-extrabold text-center">예약하기</div>
         </Typography>
         <div className="bg-gray-200 h-30 pl-5 pr-5 p-2 ml-16 inline-flex">
           {year}년 {month}월 {day}일 {hour}시 {minute}분
@@ -347,15 +347,15 @@ const RoomPage = () => {
           <div style={{ marginTop: '20px', textAlign: 'center' }}>
             <MuiButton
               variant="contained"
-              onClick={() => setIsOpen(false)}
-              style={{ marginRight: '40px' }}>
-              취소
-            </MuiButton>
-            <MuiButton
-              variant="contained"
               onClick={handleConfirmReservation}
               disabled={!userName}>
               확인
+            </MuiButton>
+            <MuiButton
+              variant="contained"
+              onClick={() => setIsOpen(false)}
+              style={{ marginLeft: '40px' }}>
+              취소
             </MuiButton>
           </div>
         </div>
