@@ -15,6 +15,8 @@ import {
 import { addMinutes, format } from 'date-fns';
 import { collection, doc, getDocs, query, updateDoc } from 'firebase/firestore';
 
+import '/Users/yiseo/Documents/studyroom-reservation/src/pages/rooms/room/Roompage.css';
+
 import Button from '../../../components/Button';
 import { fs } from '../../../firebase';
 
@@ -225,11 +227,15 @@ const RoomPage = () => {
     <>
       <div style={{ marginBottom: '50px' }}>
         {' '}
+        =======
+        <br />
         <Typography variant="h5" fontWeight={10} component="div" align="center">
           예약하기
         </Typography>
         <br></br>
-        <div className="bg-gray-100 h-25 w-100">
+        <div
+          className="bg-gray-100 h-50 inline-block"
+          style={{ marginLeft: '10px' }}>
           {year}년 {month}월 {day}일 {hour}시 {minute}분
         </div>
       </div>

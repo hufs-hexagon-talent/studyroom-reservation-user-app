@@ -15,7 +15,7 @@ const Navbar = () => {
         </div>
         <ul className="flex flex-col md:flex-row list-none text-center md:text-left"> {/* 반응형 디자인 적용 */}
           <li className="mb-3 md:mb-0 md:mr-6">
-            <Link to="./" className="text-white hover:text-gray-300">예약 현황</Link>
+            <Link to="./status" className="text-white hover:text-gray-300">예약 현황</Link>
           </li>
           <li className="mb-3 md:mb-0 md:mr-6">
             <Link to="./rooms" className="text-white hover:text-gray-300">예약하러 가기</Link>

@@ -8,6 +8,7 @@ import LoginPage from './pages/login/LoginPage';
 import ReservationsPage from './pages/reservations/ReservationsPage';
 import RoomPage from './pages/rooms/room/RoomPage';
 import RoomsPage from './pages/rooms/RoomsPage';
+import Status from './pages/status/Status';
 
 const Router = () => {
   return (
@@ -20,6 +21,7 @@ const Router = () => {
         <Route path="/rooms/:roomName/:roomId" element={<RoomPage />} /> {/*Room*/}
         <Route path="/reservations" element={<ReservationsPage />} />
         <Route path="/check" element={<Check />} />
+        <Route path='/status' element={<Status/>}/>
       </Routes>
     </BrowserRouter>
   );
