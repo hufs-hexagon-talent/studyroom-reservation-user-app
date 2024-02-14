@@ -57,7 +57,9 @@ const RoomsPage = () => {
   return (
     <>
       <div>
-        <h2>호실을 선택하세요.</h2>
+        <h2 className="py-8 text-3xl text-center font-bold">
+          호실을 선택하세요.
+        </h2>
         {rooms.map(room => {
           return (
             <>
@@ -68,14 +70,10 @@ const RoomsPage = () => {
                   handleButtonClick(room.id, room.data.name);
                 }}
               />
-              <br />
             </>
           );
         })}
-        <br />
-        <br />
       </div>
-      <br />
     </>
   );
 };
