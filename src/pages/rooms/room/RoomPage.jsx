@@ -198,7 +198,6 @@ const RoomPage = () => {
   };
 
   // 데이터를 불러오는 함수
-  // 데이터를 불러오는 함수
   const fetchData = async () => {
     try {
       const q = query(collection(fs, 'roomsEx'));
@@ -243,15 +242,11 @@ const RoomPage = () => {
 
   return (
     <>
-      <div style={{ marginBottom: '50px' }}>
-        <br />
-        <Typography variant="h5" fontWeight={10} component="div" align="center">
-          예약하기
+      <div className="pt-12">
+        <Typography>
+          <div className="text-2xl font-extrabold text-center">예약하기</div>
         </Typography>
-        <br></br>
-        <div
-          className="bg-gray-100 h-50 inline-block"
-          style={{ marginLeft: '10px' }}>
+        <div className="bg-gray-200 h-30 pl-5 pr-5 p-2 ml-16 inline-flex">
           {year}년 {month}월 {day}일 {hour}시 {minute}분
         </div>
       </div>
