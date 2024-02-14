@@ -15,11 +15,12 @@ import {
 import { addMinutes, format } from 'date-fns';
 import { collection, doc, getDocs, query, updateDoc } from 'firebase/firestore';
 
-import '/Users/yiseo/Documents/studyroom-reservation/src/pages/rooms/room/Roompage.css';
+import './Roompage.css';
 
 import Button from '../../../components/Button';
 import { fs } from '../../../firebase';
 
+//시간 데이터
 const timeTableConfig = {
   startTime: {
     hour: 8,
@@ -33,6 +34,7 @@ const timeTableConfig = {
   maxReservationSlots: 4,
 };
 
+// table 만드는 함수
 function createTimeTable(config) {
   const { startTime, endTime, intervalMinute } = config;
   const start = new Date();
@@ -57,6 +59,7 @@ function createTimeTable(config) {
 }
 
 const RoomPage = () => {
+  // 현재 시간
   const today = new Date();
   const year = today.getFullYear();
   const month = today.getMonth() + 1;
@@ -77,14 +80,15 @@ const RoomPage = () => {
   const [reservedSlots, setReservedSlots] = useState({
     room1: [],
     room2: [],
-    room3: [],
-    room4: [],
+    room3: roomName === '306' ? [] : [],
+    room4: roomName === '306' ? [] : [],
   });
 
   useEffect(() => {
     fetchData();
   }, []);
 
+  // 슬롯이 선택되었는지 확인하는 함수
   const getSlotSelected = useCallback(
     (partition, timeIndex) => {
       if (!startTimeIndex || !endTimeIndex) return false;
@@ -97,9 +101,11 @@ const RoomPage = () => {
     [startTimeIndex, endTimeIndex, selectedPartition],
   );
 
+  // 슬롯의 상태 토글하는 함수
   const toggleSlot = useCallback(
     (partition, timeIndex) => {
       const isExist = getSlotSelected(partition, timeIndex);
+      console.log(partition, timeIndex, isExist);
 
       if (!startTimeIndex && !endTimeIndex) {
         setSelectedPartition(partition);
@@ -142,6 +148,7 @@ const RoomPage = () => {
     [getSlotSelected, setStartTimeIndex, setEndTimeIndex, selectedPartition],
   );
 
+  // 최대 예약 시간에 부합하는지 계산하는 함수
   const handleCellClick = (partition, timeIndex) => {
     const clickedTime = times[timeIndex + 1];
     const currentTime = format(today, 'HH:mm');
@@ -158,6 +165,7 @@ const RoomPage = () => {
     setIsOpen(true);
   };
 
+  // 데이터를 수정하는 함수
   const handleConfirmReservation = async () => {
     if (startTimeIndex !== null && endTimeIndex !== null && userName !== '') {
       const startHour = times[startTimeIndex].split(':')[0];
@@ -189,45 +197,53 @@ const RoomPage = () => {
     }
   };
 
+  // 데이터를 불러오는 함수
+  // 데이터를 불러오는 함수
   const fetchData = async () => {
     try {
-      const q = query(
-        collection(fs, `Rooms/${roomName}/Days/${roomName}/Reservations`),
-      );
+      const q = query(collection(fs, 'roomsEx'));
       const querySnapshot = await getDocs(q);
-
       const reservedSlots = {
         room1: [],
         room2: [],
-        room3: [],
-        room4: [],
+        room3: roomName === '306' ? [] : [],
+        room4: roomName === '306' ? [] : [],
       };
 
       querySnapshot.forEach(doc => {
-        const { userName, startTime, endTime } = doc.data();
+        const { name, startTime, endTime } = doc.data();
         const startIdx = times.findIndex(
           time => time === `${startTime[0]}:${startTime[1]}`,
         );
         const endIdx = times.findIndex(
           time => time === `${endTime[0]}:${endTime[1]}`,
         );
+
+        // 각 방에 따라 예약 슬롯 배열에 추가
         for (let i = startIdx; i <= endIdx; i++) {
-          reservedSlots[userName].push(i);
+          reservedSlots[name].push(i);
         }
       });
+
       setReservedSlots(reservedSlots);
     } catch (error) {
       console.error('Error', error);
     }
   };
 
-  const partitions = useMemo(() => ['room1', 'room2', 'room3', 'room4'], []);
+  const partitions = useMemo(() => {
+    if (roomName === '306') {
+      return ['room1', 'room2', 'room3', 'room4'];
+    } else if (roomName === '428') {
+      return ['room1', 'room2'];
+    } else {
+      return [];
+    }
+  }, [roomName]);
 
   return (
     <>
       <div style={{ marginBottom: '50px' }}>
-        {' '}
-        =======
         <br />
         <Typography variant="h5" fontWeight={10} component="div" align="center">
           예약하기
@@ -274,23 +290,23 @@ const RoomPage = () => {
                       sx={{
                         borderLeft: '1px solid #ccc',
                         backgroundColor: isSelected
-                          ? '#4B89DC'
+                          ? '#4B89DC' // 파란색으로 칠해짐
                           : isReserved
-                            ? '#C1C1C3'
+                            ? '#C1C1C3' // 회색으로 칠해짐
                             : !isSelectable
-                              ? '#aaa'
-                              : 'transparent',
+                              ? '#aaa' // 회색으로 칠해짐
+                              : 'transparent', // 투명한 배경색
                         cursor: isReserved
                           ? 'default'
                           : isSelectable
                             ? 'pointer'
-                            : 'default',
+                            : 'default', // 예약된 슬롯은 마우스 커서를 변경하지 않음
                       }}
                       onClick={() =>
                         isSelectable &&
                         !isReserved &&
                         handleCellClick(partition, timeIndex)
-                      }
+                      } // 예약된 슬롯을 클릭할 수 없도록 설정
                     />
                   );
                 })}
@@ -337,7 +353,7 @@ const RoomPage = () => {
             <MuiButton
               variant="contained"
               onClick={() => setIsOpen(false)}
-              style={{ marginLeft: '10px' }}>
+              style={{ marginRight: '40px' }}>
               취소
             </MuiButton>
             <MuiButton
