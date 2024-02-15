@@ -18,8 +18,8 @@ const Router = () => {
         <Route path="/" element={<App />} /> {/* 소개 페이지 */}
         <Route path="/login" element={<LoginPage />} /> {/* 로그인 페이지 */}
         <Route path="/rooms" element={<RoomsPage />} /> {/* Room 목록 */}
-        <Route path="/rooms/:roomName/:roomId" element={<RoomPage />} /> {/*Room*/}
-        <Route path="/reservations" element={<ReservationsPage />} />
+        <Route path="/rooms/:roomName/roompage" element={<RoomPage />} /> {/*Room*/}
+        <Route path="/:roomNumber/:roomId/reservations" element={<ReservationsPage />} />
         <Route path="/check" element={<Check />} />
         <Route path='/status' element={<Status/>}/>
       </Routes>

@@ -14,7 +14,6 @@ const Check = () => {
   async function fetchData() {
     try {
       const roomsData = [];
-
       const roomIds = ['306', '428'];
       for (let i = 0; i < roomIds.length; i++) {
         const q = query(
@@ -24,9 +23,9 @@ const Check = () => {
 
         querySnapshot.forEach(doc => {
           const reservationData = doc.data();
-          const roomName = reservationData.name;
           const startTime = reservationData.startTime;
           const endTime = reservationData.endTime;
+          const partitionName = reservationData.partitionName;
 
           const startTimeFormatted = format(
             new Date().setHours(startTime[0], startTime[1]),
@@ -41,11 +40,11 @@ const Check = () => {
           roomsData.push({
             id,
             ...reservationData,
-            roomName,
             startTimeFormatted,
             endTimeFormatted,
-            roomId: roomIds[i],
+            partitionName
           });
+          console.log(roomsData);
         });
       }
 
@@ -63,6 +62,7 @@ const Check = () => {
   }
 
   async function deleteData(id, roomName) {
+    console.log(id);
     await deleteDoc(
       doc(fs, `Rooms/${roomName}/Days/${roomName}/Reservations`, id),
     );
