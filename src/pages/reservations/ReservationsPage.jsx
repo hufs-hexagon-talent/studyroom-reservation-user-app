@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { doc, getDoc } from 'firebase/firestore'; 
 
+import boo from '../../assets/boo.jpeg';
 import Button from '../../components/Button';
 import { fs } from "../../firebase";
 
@@ -33,6 +34,12 @@ const ReservationsPage = () => {
         <h1 className="py-10 text-3xl text-center font-bold">
           Reserved!
         </h1>
+        <div className='flex justify-center items-center'>
+          <div className='w-48 h-48'>
+            <img src={boo} alt='boo'/>
+          </div>
+        </div>
+
         <div className="text-center">
           {reservationData && (
             <>
