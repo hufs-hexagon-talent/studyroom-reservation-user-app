@@ -21,8 +21,6 @@ const ReservationsPage = () => {
         const endTimeString = `${endTime[0]}:${endTime[1]}`;
 
         setReservationData({ userName, roomName, partitionName, startTimeString, endTimeString });
-      } else {
-        console.log("No such document!");
       }
     }
 
@@ -35,13 +33,16 @@ const ReservationsPage = () => {
         <h1 className="py-10 text-3xl text-center font-bold">
           Reserved!
         </h1>
-        <div>
+        <div className="text-center">
+          {reservationData && (
             <>
               {reservationData.userName}님 {reservationData.roomName}호 {reservationData.partitionName} {reservationData.startTimeString}시 ~ {reservationData.endTimeString}시 예약되었습니다.
             </>
+          )}
         </div>
       </div>
-      <Button
+      <br/>
+      <Button 
         text={'예약 현황 둘러보기'}
         onClick={() => {
           navigate('/status');
