@@ -13,7 +13,7 @@ import {
   Typography,
 } from '@mui/material';
 import { addMinutes, format } from 'date-fns';
-import { addDoc, collection, getDocs, query } from 'firebase/firestore';
+import { addDoc, collection, doc, getDocs, query, updateDoc } from 'firebase/firestore';
 
 import './Roompage.css';
 
@@ -74,7 +74,6 @@ const RoomPage = () => {
   const [userName, setUserName] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const { roomName } = useParams();
-
   const times = useMemo(() => createTimeTable(timeTableConfig), []);
 
   const [reservedSlots, setReservedSlots] = useState({
@@ -165,39 +164,41 @@ const RoomPage = () => {
     setIsOpen(true);
   };
 
-  // 데이터를 수정하는 함수
+  
+   // 데이터를 수정하는 함수
   const handleConfirmReservation = async () => {
-    const address = `Rooms/${roomName}/Days/${roomName}/Reservations`
+    const address = `Rooms/${roomName}/Days/${roomName}/Reservations`;
+    let docRef;
     if (startTimeIndex !== null && endTimeIndex !== null && userName !== '') {
       const startHour = times[startTimeIndex].split(':')[0];
       const startMinute = times[startTimeIndex].split(':')[1];
       const endHour = times[endTimeIndex].split(':')[0];
       const endMinute = times[endTimeIndex].split(':')[1];
-      
-      try {
-        await addDoc(collection(fs, address),{
-          partitionName: selectedPartition,
-          startTime: [startHour, startMinute],
-          endTime: [endHour, endMinute],
-          userName: userName,
-          roomName : roomName
-        })
-        console.log('yes!');
-      } catch (error) {
-        console.error(error);
-      }
+  
+      docRef = await addDoc(collection(fs, address), {
+        partitionName: selectedPartition,
+        startTime: [startHour, startMinute],
+        endTime: [endHour, endMinute],
+        userName: userName,
+        roomName: roomName,
+      });
 
       setIsOpen(false);
       await fetchData();
-      navigate('/reservations');
     }
+    const reservedId = docRef.id;
+    const ref = doc(fs, `Rooms/${roomName}/Days/${roomName}/Reservations/${reservedId}`);
+    await updateDoc(ref, {
+      roomId : reservedId
+    });
+    navigate(`/${roomName}/${reservedId}/reservations`);
   };
-
+  
   // 새로운 함수를 생성해 중복을 제거
 const pushReservedTime = (querySnapshot, reservedSlots) => {
   querySnapshot.forEach(doc => {
-    const { userName, startTime, endTime, partitionName } = doc.data();
-    console.log(userName, startTime, endTime, partitionName);
+    const { startTime, endTime, partitionName } = doc.data();
+    //console.log(userName, startTime, endTime, partitionName);
     // 시작 시간
     const startIdx = times.findIndex(
       time => time === `${startTime[0]}:${startTime[1]}`,
@@ -206,11 +207,11 @@ const pushReservedTime = (querySnapshot, reservedSlots) => {
     const endIdx = times.findIndex(
       time => time === `${endTime[0]}:${endTime[1]}`,
     );
-    console.log(startIdx, endIdx);
+    //console.log(startIdx, endIdx);
     for (let i = startIdx; i <= endIdx; i++) {
       reservedSlots[partitionName].push(i);
     }
-    console.log(reservedSlots);
+    //console.log(reservedSlots);
     setReservedSlots(reservedSlots);
   });
 };
