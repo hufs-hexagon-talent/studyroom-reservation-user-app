@@ -13,7 +13,7 @@ import {
   Typography,
 } from '@mui/material';
 import { addMinutes, format } from 'date-fns';
-import { collection, doc, getDocs, query, updateDoc } from 'firebase/firestore';
+import { addDoc, collection, getDocs, query } from 'firebase/firestore';
 
 import './Roompage.css';
 
@@ -73,7 +73,7 @@ const RoomPage = () => {
   const [endTimeIndex, setEndTimeIndex] = useState(null);
   const [userName, setUserName] = useState('');
   const [isOpen, setIsOpen] = useState(false);
-  const { roomName, roomId } = useParams();
+  const { roomName } = useParams();
 
   const times = useMemo(() => createTimeTable(timeTableConfig), []);
 
@@ -167,26 +167,22 @@ const RoomPage = () => {
 
   // 데이터를 수정하는 함수
   const handleConfirmReservation = async () => {
+    const address = `Rooms/${roomName}/Days/${roomName}/Reservations`
     if (startTimeIndex !== null && endTimeIndex !== null && userName !== '') {
       const startHour = times[startTimeIndex].split(':')[0];
       const startMinute = times[startTimeIndex].split(':')[1];
       const endHour = times[endTimeIndex].split(':')[0];
       const endMinute = times[endTimeIndex].split(':')[1];
-
-      const docRef = doc(
-        fs,
-        `Rooms/${roomName}/Days/${roomName}/Reservations/${roomId}`,
-      );
-
-      const dataToUpdate = {
-        partitionName: selectedPartition,
-        startTime: [startHour, startMinute],
-        endTime: [endHour, endMinute],
-        userName: userName,
-      };
-
+      
       try {
-        await updateDoc(docRef, dataToUpdate);
+        await addDoc(collection(fs, address),{
+          partitionName: selectedPartition,
+          startTime: [startHour, startMinute],
+          endTime: [endHour, endMinute],
+          userName: userName,
+          roomName : roomName
+        })
+        console.log('yes!');
       } catch (error) {
         console.error(error);
       }
@@ -197,39 +193,56 @@ const RoomPage = () => {
     }
   };
 
-  // 데이터를 불러오는 함수
-  // 데이터를 불러오는 함수
-  const fetchData = async () => {
-    try {
-      const q = query(collection(fs, 'roomsEx'));
-      const querySnapshot = await getDocs(q);
-      const reservedSlots = {
+  // 새로운 함수를 생성해 중복을 제거
+const pushReservedTime = (querySnapshot, reservedSlots) => {
+  querySnapshot.forEach(doc => {
+    const { userName, startTime, endTime, partitionName } = doc.data();
+    console.log(userName, startTime, endTime, partitionName);
+    // 시작 시간
+    const startIdx = times.findIndex(
+      time => time === `${startTime[0]}:${startTime[1]}`,
+    );
+    // 종료 시간
+    const endIdx = times.findIndex(
+      time => time === `${endTime[0]}:${endTime[1]}`,
+    );
+    console.log(startIdx, endIdx);
+    for (let i = startIdx; i <= endIdx; i++) {
+      reservedSlots[partitionName].push(i);
+    }
+    console.log(reservedSlots);
+    setReservedSlots(reservedSlots);
+  });
+};
+
+const fetchData = async () => {
+  var reservedSlots = {};
+  try {
+    const q = query(collection(fs, `Rooms/${roomName}/Days/${roomName}/Reservations`));
+    const querySnapshot = await getDocs(q);
+
+    if(roomName === '306'){
+      reservedSlots = {
         room1: [],
         room2: [],
-        room3: roomName === '306' ? [] : [],
-        room4: roomName === '306' ? [] : [],
+        room3: [],
+        room4: [],
       };
-
-      querySnapshot.forEach(doc => {
-        const { name, startTime, endTime } = doc.data();
-        const startIdx = times.findIndex(
-          time => time === `${startTime[0]}:${startTime[1]}`,
-        );
-        const endIdx = times.findIndex(
-          time => time === `${endTime[0]}:${endTime[1]}`,
-        );
-
-        // 각 방에 따라 예약 슬롯 배열에 추가
-        for (let i = startIdx; i <= endIdx; i++) {
-          reservedSlots[name].push(i);
-        }
-      });
-
-      setReservedSlots(reservedSlots);
-    } catch (error) {
-      console.error('Error', error);
+      pushReservedTime(querySnapshot, reservedSlots);
+    } else if(roomName === '428'){
+      reservedSlots = {
+        room1: [],
+        room2: [],
+      };
+      pushReservedTime(querySnapshot, reservedSlots);
     }
-  };
+
+  } catch (error) {
+    console.error('Error', error);
+  }
+};
+
+
 
   const partitions = useMemo(() => {
     if (roomName === '306') {

@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { addDoc, collection, getDocs, query } from 'firebase/firestore';
+import { collection, getDocs, query } from 'firebase/firestore';
 
 import Button from '../../components/Button';
 import { fs } from '../../firebase';
@@ -26,34 +26,15 @@ const RoomsPage = () => {
     fetch();
   }, [fetch]);
 
-  const handleButtonClick = async (roomId, roomName) => {
+  const handleButtonClick = async (roomId) => {
     try {
-      const docAddress = collection(
-        fs,
-        `Rooms/${roomId}/Days/${roomId}/Reservations`,
-      );
-      const docRef = await addDoc(docAddress, {
-        name: roomName,
-      });
-      navigate(`/rooms/${roomId}/${docRef.id}`);
+      const docAddress = collection(fs, `Rooms/${roomId}/Days/${roomId}/Reservations`);
+      console.log(docAddress);
+      navigate(`/rooms/${roomId}/roompage`);
     } catch (error) {
       console.log('error');
     }
   };
-  // const isSlotReserved = async (roomId, slotIndex) => {
-  //   try {
-  //     const q = query(
-  //       collection(fs, `Rooms/${roomId}/Days/${roomId}/Reservations`),
-  //       where('slotIndex', '==', slotIndex), // 예약된 슬롯의 인덱스와 일치하는 예약 문서를 찾습니다.
-  //     );
-  //     const querySnapshot = await getDocs(q);
-  //     return !querySnapshot.empty; // 예약된 슬롯이 존재하면 true를 반환합니다.
-  //   } catch (error) {
-  //     console.error('Error checking reservation:', error);
-  //     return false; // 예외 발생 시 기본적으로 예약되지 않은 것으로 처리합니다.
-  //   }
-  // };
-
   return (
     <>
       <div>
@@ -67,7 +48,7 @@ const RoomsPage = () => {
                 key={room.id}
                 text={room.data.name}
                 onClick={() => {
-                  handleButtonClick(room.id, room.data.name);
+                  handleButtonClick(room.data.name);
                 }}
               />
             </>
