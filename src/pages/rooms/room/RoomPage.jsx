@@ -198,6 +198,7 @@ const RoomPage = () => {
   };
 
   // 데이터를 불러오는 함수
+  // 데이터를 불러오는 함수
   const fetchData = async () => {
     try {
       const q = query(collection(fs, 'roomsEx'));
@@ -242,11 +243,15 @@ const RoomPage = () => {
 
   return (
     <>
-      <div className="pt-12">
-        <Typography>
-          <div className="text-3xl font-extrabold text-center">예약하기</div>
+      <div style={{ marginBottom: '50px' }}>
+        <br />
+        <Typography variant="h5" fontWeight={10} component="div" align="center">
+          예약하기
         </Typography>
-        <div className="bg-gray-200 h-30 pl-5 pr-5 p-2 ml-16 inline-flex">
+        <br></br>
+        <div
+          className="bg-gray-100 h-50 inline-block"
+          style={{ marginLeft: '10px' }}>
           {year}년 {month}월 {day}일 {hour}시 {minute}분
         </div>
       </div>
@@ -290,12 +295,12 @@ const RoomPage = () => {
                             ? '#C1C1C3' // 회색으로 칠해짐
                             : !isSelectable
                               ? '#aaa' // 회색으로 칠해짐
-                              : 'transparent', // 투명한 배경색
+                              : 'transparent',
                         cursor: isReserved
                           ? 'default'
                           : isSelectable
                             ? 'pointer'
-                            : 'default', // 예약된 슬롯은 마우스 커서를 변경하지 않음
+                            : 'default',
                       }}
                       onClick={() =>
                         isSelectable &&
@@ -347,15 +352,15 @@ const RoomPage = () => {
           <div style={{ marginTop: '20px', textAlign: 'center' }}>
             <MuiButton
               variant="contained"
-              onClick={handleConfirmReservation}
-              disabled={!userName}>
-              확인
+              onClick={() => setIsOpen(false)}
+              style={{ marginRight: '40px' }}>
+              취소
             </MuiButton>
             <MuiButton
               variant="contained"
-              onClick={() => setIsOpen(false)}
-              style={{ marginLeft: '40px' }}>
-              취소
+              onClick={handleConfirmReservation}
+              disabled={!userName}>
+              확인
             </MuiButton>
           </div>
         </div>
