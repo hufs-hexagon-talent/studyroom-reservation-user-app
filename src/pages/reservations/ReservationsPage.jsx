@@ -31,13 +31,15 @@ const ReservationsPage = () => {
 
   return (
     <>
-      <h1>Reserved!</h1>
       <div>
-        {reservationData && (
-          <>
-            {reservationData.userName}님 {reservationData.roomName}호 {reservationData.partitionName} {reservationData.startTimeString}시 ~ {reservationData.endTimeString}시 예약되었습니다.
-          </>
-        )}
+        <h1 className="py-10 text-3xl text-center font-bold">
+          Reserved!
+        </h1>
+        <div>
+            <>
+              {reservationData.userName}님 {reservationData.roomName}호 {reservationData.partitionName} {reservationData.startTimeString}시 ~ {reservationData.endTimeString}시 예약되었습니다.
+            </>
+        </div>
       </div>
       <Button
         text={'예약 현황 둘러보기'}
