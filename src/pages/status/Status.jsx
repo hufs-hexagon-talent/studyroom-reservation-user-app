@@ -181,7 +181,7 @@ const Status = () => {
   return (
     <>
       <Typography variant="h5" fontWeight={10} component="div" align="center">
-        예약 현황
+        예약 현황 보기
       </Typography>
       <div
         className="bg-gray-100 h-50 inline-block"
