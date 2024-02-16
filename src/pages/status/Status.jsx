@@ -1,6 +1,6 @@
-import React from "react";
+import React from 'react';
 
-const Status =()=>{
+const Status = () => {
   return (
     <>
       <div>status</div>
