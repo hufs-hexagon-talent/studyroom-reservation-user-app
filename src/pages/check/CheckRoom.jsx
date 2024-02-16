@@ -70,69 +70,29 @@ const Check = () => {
   }
 
   return (
-    <div>
-      <h1>예약 목록</h1>
-      <br />
-      <table>
-        <thead>
-          <tr>
-            <th>이름 </th>
-            <th>호실</th>
-            <th>방 번호</th>
-            <th>시작 시간</th>
-            <th>종료 시간</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rooms.map(room => (
-            <tr key={room.id}>
-              <td
-                style={{
-                  padding: '15px',
-                  backgroundColor: room.isReserved ? '#ccc' : 'transparent',
-                }}>
-                {room.userName}
-              </td>
-              <td
-                style={{
-                  padding: '15px',
-                  backgroundColor: room.isReserved ? '#ccc' : 'transparent',
-                }}>
-                {room.roomName}
-              </td>
-              <td
-                style={{
-                  padding: '15px',
-                  backgroundColor: room.isReserved ? '#ccc' : 'transparent',
-                }}>
-                {room.partitionName}
-              </td>
-              <td
-                style={{
-                  padding: '15px',
-                  backgroundColor: room.isReserved ? '#ccc' : 'transparent',
-                }}>
-                {room.startTimeFormatted}
-              </td>
-              <td
-                style={{
-                  padding: '15px',
-                  backgroundColor: room.isReserved ? '#ccc' : 'transparent',
-                }}>
-                {room.endTimeFormatted}
-              </td>
-              <br />
-              <button
-                style={{ marginLeft: '15px', marginBottom: '23px' }}
-                onClick={() => deleteData(room.id, room.roomName)}>
-                삭제
-              </button>
-            </tr>
+      <div>
+        <h1 className="ml-10 mt-10 text-5xl text-left font-bold">
+          예약 목록
+        </h1>
+        <div className='mt-10 text-center flex flex-col justify-left h-screen'>
+          {rooms.map((room) => (
+            <div key={room.id} className="flex justify-center items-center mb-4">
+              <div className="bg-gray-200 w-full py-6 rounded-lg text-left ml-10 mr-10">
+                <p className='ml-10 text-xl'>
+                  이름: {room.userName}<br/>
+                  호실: {room.roomName}호 {room.partitionName}<br/>
+                  시간: {room.startTimeFormatted} - {room.endTimeFormatted}
+                </p>
+                <button className='float-right bg-gray-300 ml-auto mr-10 text-xl rounded-lg p-2'
+                  onClick={() => deleteData(room.id, room.roomName)}>
+                  삭제
+                </button>
+              </div>
+            </div>
           ))}
-        </tbody>
-      </table>
-    </div>
-  );
+        </div>
+      </div>
+    );
 };
 
 export default Check;
