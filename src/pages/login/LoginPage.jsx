@@ -27,20 +27,17 @@ const LoginPage = () => {
   };
 
   return (
-    <div>
-      {' '}
-      {/**container flex */}
-      <div>
-        {' '}
-        {/** */}
-        <div>
-          {' '}
-          {/** */}
+    <div className="m-0 p-0 box-border flex items-center pt-0 pb-4 min-h-screen justify-center bg-gray-100">
+      <div className="justify-between max-w-5xl w-full">
+        <div className="mb-2.5">
           <h1>LOGIN</h1>
-          <p>이용하시기 전에 먼저 로그인해주세요</p>
+          <p className="text-lg whitespace-nowrap">
+            이용하시기 전에 먼저 로그인해주세요
+          </p>
         </div>
-        <form>
+        <form className="flex flex-col bg-white rounded-lg p-5 max-w-sm w-full focus:outline-none bg-blue-500">
           <input
+            className="text-gray-400 text-base"
             placeholder="Email"
             type="email"
             value={email}
@@ -52,6 +49,12 @@ const LoginPage = () => {
             value={password}
             onChange={e => setPassword(e.target.value)}
           />
+          <div>
+            <button type="button" onClick={handleSignIn}>
+              Login
+            </button>
+          </div>
+          <hr />
         </form>
       </div>
     </div>
