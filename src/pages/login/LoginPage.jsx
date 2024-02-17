@@ -27,25 +27,25 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="m-0 p-0 box-border">
-      <div className="flex items-center py-0 px-4 min-h-screen justify-center bg-gray-100">
-        <div className="justify-between max-w-5xl w-full">
-          <div className="mb-2.5">
-            <h1>LOGIN</h1>
-            <p className="text-lg whitespace-nowrap">
-              이용하시기 전에 먼저 로그인해주세요
-            </p>
-          </div>
-          <form className="flex flex-col bg-white rounded-lg p-5 max-w-sm w-full focus:outline-none bg-blue-500">
+    <div className="flex items-center py-0 px-4 min-h-screen justify-center bg-gray-200">
+      <div className="flex items-center max-w-5xl w-full">
+        <div className="mb-2.5 text-center w-1/2 p-5">
+          <h1 className="text-2xl font-semibold">LOGIN</h1>
+          <p className="text-lg whitespace-nowrap">
+            이용하시기 전에 먼저 로그인해주세요
+          </p>
+        </div>
+        <div className="w-1/2 p-5">
+          <form className="flex flex-col rounded-lg p-10 max-w-sm w-full focus:outline-none bg-gray-800">
             <input
-              className="text-gray-400 text-base"
+              className="text-gray-400 text-xl mb-5 h-10"
               placeholder="Email"
               type="email"
               value={email}
               onChange={e => setEmail(e.target.value)}
             />
             <input
-              className="text-gray-400 text-base"
+              className="text-gray-400 text-xl mb-5 h-10"
               placeholder="Password"
               type="password"
               value={password}
@@ -53,7 +53,7 @@ const LoginPage = () => {
             />
             <div className="flex flex-col text-center gap-4">
               <button
-                className="border-none outline-none cursor-pointer bg-green-400 py-4 px-0 rounded-md text-white text-lg font-semibold hover:opacity-90"
+                className="border-none outline-none cursor-pointer bg-blue-200 py-4 px-0 rounded-md text-white text-lg font-semibold hover:opacity-90"
                 type="button"
                 onClick={handleSignIn}>
                 Login
