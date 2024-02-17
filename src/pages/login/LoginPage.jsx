@@ -4,6 +4,8 @@ import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 
 import '../../firebase.js';
 
+import login_boo from '../../assets/login_boo.jpg';
+
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -27,15 +29,12 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="flex items-center py-0 px-4 min-h-screen justify-center bg-gray-200">
-      <div className="flex items-center max-w-5xl w-full">
-        <div className="mb-2.5 text-center w-1/2 p-5">
-          <h1 className="text-2xl font-semibold">LOGIN</h1>
-          <p className="text-lg whitespace-nowrap">
-            이용하시기 전에 먼저 로그인해주세요
-          </p>
+    <div className="flex p-0 bg-gray-200">
+      <div className="flex max-w-5xl w-full">
+        <div className="ml-0 w-full h-full">
+          <img src={login_boo} alt="boo" />
         </div>
-        <div className="w-1/2 p-5">
+        <div className="w-1/2 p-5 items-center">
           <form className="flex flex-col rounded-lg p-10 max-w-sm w-full focus:outline-none bg-gray-800">
             <input
               className="text-gray-400 text-xl mb-5 h-10"
