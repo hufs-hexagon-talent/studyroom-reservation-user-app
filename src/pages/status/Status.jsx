@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
   Table,
   TableBody,
@@ -178,7 +177,7 @@ const SecondTable = ({
   </TableContainer>
 );
 
-const LeftUpTable = ({ times, partitionsBottom }) => (
+const LeftUpTable = () => (
   <TableContainer
     sx={{
       minWidth: '80px', // 최소 가로 크기 변경
@@ -222,7 +221,7 @@ const LeftUpTable = ({ times, partitionsBottom }) => (
   </TableContainer>
 );
 
-const LeftDownTable = ({ times, partitionsBottom }) => (
+const LeftDownTable = () => (
   <TableContainer
     sx={{
       minWidth: '80px', // 최소 가로 크기 변경
@@ -273,12 +272,9 @@ const Status = () => {
   const hour = today.getHours();
   const minute = today.getMinutes();
 
-  const navigate = useNavigate();
-  const [selectedPartition, setSelectedPartition] = useState(null);
-  const [startTimeIndex, setStartTimeIndex] = useState(null);
-  const [endTimeIndex, setEndTimeIndex] = useState(null);
-  const [name, setName] = useState('');
-  const [isOpen, setIsOpen] = useState(false);
+  const [selectedPartition] = useState(null);
+  const [startTimeIndex] = useState(null);
+  const [endTimeIndex] = useState(null);
 
   const times = useMemo(() => createTimeTable(timeTableConfig), []);
 
@@ -307,31 +303,31 @@ const Status = () => {
     [startTimeIndex, endTimeIndex, selectedPartition],
   );
 
-  const toggleSlot = useCallback(
-    (partition, timeIndex) => {
-      const isExist = getSlotSelected(partition, timeIndex);
-      console.log(partition, timeIndex, isExist);
+  // const toggleSlot = useCallback(
+  //   (partition, timeIndex) => {
+  //     const isExist = getSlotSelected(partition, timeIndex);
+  //     console.log(partition, timeIndex, isExist);
 
-      if (!startTimeIndex && !endTimeIndex) {
-        setSelectedPartition(partition);
-        setStartTimeIndex(timeIndex);
-        setEndTimeIndex(timeIndex);
-        return;
-      }
+  //     if (!startTimeIndex && !endTimeIndex) {
+  //       setSelectedPartition(partition);
+  //       setStartTimeIndex(timeIndex);
+  //       setEndTimeIndex(timeIndex);
+  //       return;
+  //     }
 
-      if (selectedPartition !== partition) {
-        setSelectedPartition(partition);
-        setStartTimeIndex(timeIndex);
-        setEndTimeIndex(timeIndex);
-        return;
-      }
+  //     if (selectedPartition !== partition) {
+  //       setSelectedPartition(partition);
+  //       setStartTimeIndex(timeIndex);
+  //       setEndTimeIndex(timeIndex);
+  //       return;
+  //     }
 
-      setSelectedPartition(partition);
-      setStartTimeIndex(timeIndex);
-      setEndTimeIndex(timeIndex);
-    },
-    [getSlotSelected, setStartTimeIndex, setEndTimeIndex, selectedPartition],
-  );
+  //     setSelectedPartition(partition);
+  //     setStartTimeIndex(timeIndex);
+  //     setEndTimeIndex(timeIndex);
+  //   },
+  //   [getSlotSelected, setStartTimeIndex, setEndTimeIndex, selectedPartition],
+  // );
 
   const fetchData = async () => {
     try {
