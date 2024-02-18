@@ -1,14 +1,12 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Modal,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  TextField,
   Typography,
 } from '@mui/material';
 import { addMinutes, format } from 'date-fns';
@@ -51,6 +49,221 @@ function createTimeTable(config) {
 
   return timeTable;
 }
+
+const FirstTable = ({
+  times,
+  partitionsTop,
+  getSlotSelected,
+  reservedSlots,
+}) => (
+  <TableContainer
+    sx={{
+      width: '90%',
+      height: '100%',
+      minWidth: '650px',
+      marginLeft: '10%',
+      marginRight: 'auto',
+      marginTop: '20px',
+    }}>
+    <Table>
+      <TableHead className="fixedPartitions">
+        <TableRow>
+          {times.map((time, timeIndex) => (
+            <TableCell
+              key={timeIndex}
+              align="center"
+              width={200}
+              className="fixedPartitions"
+              sx={{ height: 60 }} // 슬롯 한 칸의 세로 길이를 50px로 설정
+            >
+              {time}
+            </TableCell>
+          ))}
+        </TableRow>
+      </TableHead>
+
+      <TableBody>
+        {partitionsTop.map(partition => (
+          <TableRow key={partition}>
+            {times.map((time, timeIndex) => {
+              const isSelected = getSlotSelected(partition, timeIndex);
+              const isSelectable = true;
+              const isReserved = reservedSlots[partition].includes(timeIndex);
+
+              return (
+                <TableCell
+                  key={timeIndex}
+                  sx={{
+                    borderLeft: '1px solid #ccc',
+                    backgroundColor: isSelected
+                      ? '#4B89DC'
+                      : isReserved
+                        ? '#C1C1C3'
+                        : !isSelectable
+                          ? '#aaa'
+                          : 'transparent',
+                    height: 52, // 슬롯 한 칸의 세로 길이를 50px로 설정
+                  }}
+                />
+              );
+            })}
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  </TableContainer>
+);
+
+const SecondTable = ({
+  times,
+  partitionsBottom,
+  getSlotSelected,
+  reservedSlots,
+}) => (
+  <TableContainer
+    sx={{
+      width: '90%',
+      height: '100%',
+      minWidth: '650px',
+      marginLeft: '10%',
+      marginRight: 'auto',
+      marginTop: '20px',
+    }}>
+    <Table>
+      <TableHead className="fixedPartitions">
+        <TableRow>
+          {times.map((time, timeIndex) => (
+            <TableCell
+              key={timeIndex}
+              align="center"
+              width={200}
+              className="fixedPartitions"
+              sx={{ height: 60 }} // 슬롯 한 칸의 세로 길이를 50px로 설정
+            >
+              {time}
+            </TableCell>
+          ))}
+        </TableRow>
+      </TableHead>
+
+      <TableBody>
+        {partitionsBottom.map(partition => (
+          <TableRow key={partition}>
+            {times.map((time, timeIndex) => {
+              const isSelected = getSlotSelected(partition, timeIndex);
+              const isSelectable = true;
+              const isReserved = reservedSlots[partition].includes(timeIndex);
+
+              return (
+                <TableCell
+                  key={timeIndex}
+                  sx={{
+                    borderLeft: '1px solid #ccc',
+                    backgroundColor: isSelected
+                      ? '#4B89DC'
+                      : isReserved
+                        ? '#C1C1C3'
+                        : !isSelectable
+                          ? '#aaa'
+                          : 'transparent',
+                    height: 50,
+                  }}
+                />
+              );
+            })}
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  </TableContainer>
+);
+
+const LeftUpTable = ({ times, partitionsBottom }) => (
+  <TableContainer
+    sx={{
+      minWidth: '80px', // 최소 가로 크기 변경
+      marginLeft: '5%', // 왼쪽 여백 변경
+      marginRight: '5%', // 오른쪽 여백 변경
+      marginTop: '20px',
+      maxWidth: '250px', // 최대 가로 크기 설정
+    }}>
+    <Table sx={{ tableLayout: 'fixed', width: '100%' }}>
+      <TableHead className="fixedPartitions">
+        <TableRow>
+          {/* 각 방의 텍스트 표시 */}
+          <TableCell
+            align="center"
+            width={40}
+            className="fixedPartitions"
+            sx={{ textAlign: 'center' }}>
+            {`306호`}
+          </TableCell>
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {/* 세로 4칸 표시 */}
+        {[1, 2, 3, 4].map(roomnumber => (
+          <TableRow key={roomnumber}>
+            {/* 각 슬롯에 방 번호 표시 */}
+            <TableCell
+              sx={{
+                borderLeft: '1px solid #ccc',
+                borderBottom: '1px solid #ccc', // 아래쪽 테두리 추가
+                borderRight: '1px solid #ccc',
+                backgroundColor: 'transparent', // 배경색 변경
+                textAlign: 'center', // 가운데 정렬
+              }}>
+              {`room${roomnumber}`}
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  </TableContainer>
+);
+
+const LeftDownTable = ({ times, partitionsBottom }) => (
+  <TableContainer
+    sx={{
+      minWidth: '80px', // 최소 가로 크기 변경
+      marginLeft: '5%', // 왼쪽 여백 변경
+      marginRight: '5%', // 오른쪽 여백 변경
+      marginTop: '20px',
+      maxWidth: '250px', // 최대 가로 크기 설정
+    }}>
+    <Table sx={{ tableLayout: 'fixed', width: '100%' }}>
+      <TableHead className="fixedPartitions">
+        <TableRow>
+          {/* 가로 1칸만 표시 */}
+          <TableCell
+            align="center"
+            width={40}
+            className="fixedPartitions"
+            sx={{ textAlign: 'center' }}>
+            {`428호`}
+          </TableCell>
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {/* 세로 2칸 표시 */}
+        {[1, 2].map(roomnumber => (
+          <TableRow key={roomnumber}>
+            <TableCell
+              sx={{
+                borderLeft: '1px solid #ccc',
+                borderBottom: '1px solid #ccc', // 아래쪽 테두리 추가
+                borderRight: '1px solid #ccc',
+                backgroundColor: 'transparent', // 배경색 변경
+                textAlign: 'center', // 가운데 정렬
+              }}>
+              {`room${roomnumber}`}
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  </TableContainer>
+);
 
 const Status = () => {
   const today = new Date();
@@ -113,26 +326,6 @@ const Status = () => {
         return;
       }
 
-      if (startTimeIndex === endTimeIndex) {
-        if (
-          Math.abs(startTimeIndex - timeIndex) + 1 >
-          timeTableConfig.maxReservationSlots
-        ) {
-          alert(`최대 2시간 까지 선택할 수 있습니다.`);
-          return;
-        }
-        if (startTimeIndex === timeIndex) {
-          setSelectedPartition(null);
-          setStartTimeIndex(null);
-          setEndTimeIndex(null);
-        } else if (startTimeIndex < timeIndex) {
-          setEndTimeIndex(timeIndex);
-        } else {
-          setStartTimeIndex(timeIndex);
-        }
-        return;
-      }
-
       setSelectedPartition(partition);
       setStartTimeIndex(timeIndex);
       setEndTimeIndex(timeIndex);
@@ -189,179 +382,35 @@ const Status = () => {
         {year}년 {month}월 {day}일 {hour}시 {minute}분
       </div>
 
-      <TableContainer
-        sx={{
-          width: '90%',
-          minWidth: '650px',
-          marginLeft: '20%',
-          marginRight: 'auto',
-          marginTop: '20px',
-        }}>
-        <Table>
-          <TableHead className="fixedPartitions">
-            <TableRow>
-              <TableCell align="center" width={100}>
-                <Typography style={{ position: 'fixed', left: '100px' }}>
-                  방 번호
-                </Typography>
-              </TableCell>
-              {/* 30분 간격으로 시간을 표시 */}
-              {times.map((time, timeIndex) => (
-                <TableCell
-                  key={timeIndex}
-                  align="center"
-                  width={200}
-                  className="fixedPartitions">
-                  {time}
-                </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {partitionsTop.map(partition => (
-              <TableRow key={partition}>
-                <TableCell>
-                  <Typography style={{ position: 'fixed', left: '100px' }}>
-                    {partition}
-                  </Typography>
-                </TableCell>
-                {/* 30분 간격으로 셀을 생성 */}
-                {times.map((time, timeIndex) => {
-                  const isSelected = getSlotSelected(partition, timeIndex);
-                  const isSelectable = true;
-                  const isReserved =
-                    reservedSlots[partition].includes(timeIndex); // 각 방의 예약 슬롯 상태를 확인
+      <div style={{ display: 'flex', flexDirection: 'row' }}>
+        <LeftUpTable
+          times={times}
+          partitionsBottm={partitionsTop}
+          getSlotSelected={getSlotSelected}
+          reservedSlots={reservedSlots}
+        />
+        <FirstTable
+          times={times}
+          partitionsTop={partitionsTop}
+          getSlotSelected={getSlotSelected}
+          reservedSlots={reservedSlots}
+        />
+      </div>
 
-                  return (
-                    <TableCell
-                      key={timeIndex}
-                      sx={{
-                        borderLeft: '1px solid #ccc',
-                        backgroundColor: isSelected
-                          ? '#4B89DC' //파란색
-                          : isReserved
-                            ? '#C1C1C3'
-                            : !isSelectable
-                              ? '#aaa'
-                              : 'transparent',
-                      }}
-                      // onClick={() =>
-                      //   isSelectable && handleCellClick(partition, timeIndex)
-                      // }
-                    />
-                  );
-                })}
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-
-      <TableContainer
-        sx={{
-          width: '90%',
-          minWidth: '650px',
-          marginLeft: '20%',
-          marginRight: 'auto',
-          marginTop: '20px',
-        }}>
-        <Table>
-          <TableHead className="fixedPartitions">
-            <TableRow>
-              <TableCell align="center" width={100}>
-                <Typography style={{ position: 'fixed', left: '100px' }}>
-                  방 번호
-                </Typography>
-              </TableCell>
-              {/* 30분 간격으로 시간을 표시 */}
-              {times.map((time, timeIndex) => (
-                <TableCell
-                  key={timeIndex}
-                  align="center"
-                  width={200}
-                  className="fixedPartitions">
-                  {time}
-                </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {partitionsBottom.map(partition => (
-              <TableRow key={partition}>
-                <TableCell>
-                  <Typography style={{ position: 'fixed', left: '100px' }}>
-                    {partition}
-                  </Typography>
-                </TableCell>
-                {/* 30분 간격으로 셀을 생성 */}
-                {times.map((time, timeIndex) => {
-                  const isSelected = getSlotSelected(partition, timeIndex);
-                  const isSelectable = true;
-                  const isReserved =
-                    reservedSlots[partition].includes(timeIndex); // 각 방의 예약 슬롯 상태를 확인할거임
-
-                  return (
-                    <TableCell
-                      key={timeIndex}
-                      sx={{
-                        borderLeft: '1px solid #ccc',
-                        backgroundColor: isSelected
-                          ? '#4B89DC' //파란색
-                          : isReserved
-                            ? '#C1C1C3'
-                            : !isSelectable
-                              ? '#aaa'
-                              : 'transparent',
-                      }}
-                      // onClick={() =>
-                      //   isSelectable && handleCellClick(partition, timeIndex)
-                      // }
-                    />
-                  );
-                })}
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-
-      <Modal open={isOpen} onClose={() => setIsOpen(false)}>
-        <div
-          style={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            background: 'white',
-            padding: '20px',
-            width: '300px',
-            border: 'none',
-            borderRadius: 20,
-          }}>
-          <TextField
-            label="Name"
-            variant="standard"
-            value={name}
-            onChange={e => setName(e.target.value)}
-            fullWidth
-            autoFocus
-          />
-          <div style={{ marginTop: '20px', textAlign: 'center' }}>
-            {/* <MuiButton
-              variant="contained"
-              onClick={handleConfirmReservation}
-              disabled={!name}>
-              확인
-            </MuiButton>
-            <MuiButton
-              variant="contained"
-              onClick={() => setIsOpen(false)}
-              style={{ marginLeft: '10px' }}>
-              취소
-            </MuiButton> */}
-          </div>
-        </div>
-      </Modal>
+      <div style={{ display: 'flex', flexDirection: 'row' }}>
+        <LeftDownTable
+          times={times}
+          partitionsBottom={partitionsBottom}
+          getSlotSelected={getSlotSelected}
+          reservedSlots={reservedSlots}
+        />
+        <SecondTable
+          times={times}
+          partitionsBottom={partitionsBottom}
+          getSlotSelected={getSlotSelected}
+          reservedSlots={reservedSlots}
+        />
+      </div>
     </>
   );
 };

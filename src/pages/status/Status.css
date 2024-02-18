@@ -1,0 +1,27 @@
+.reserve {
+    display: flex;
+    justify-content: space-between; /* 양쪽에 정렬되도록 설정합니다. */
+    align-items: flex-start; /* 세로 방향 정렬을 위해 flex-start로 설정합니다. */
+    height: 100vh;
+  }
+  
+  .tableContainer {
+    width: calc(50% - 30px); /* 부모 요소의 너비의 절반에서 여백을 뺍니다. */
+    overflow-x: auto; /* 가로 스크롤을 추가하여 너비를 초과하는 경우 스크롤을 생성합니다. */
+  }
+  
+  .dayText {
+    width: 150px;
+    height: 40px;
+    margin-top: 30px;
+    background-color: lightgray;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .textStyle {
+    font-size: 15px;
+    text-align: center;
+  }
+  
