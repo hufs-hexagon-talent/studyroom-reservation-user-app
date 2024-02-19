@@ -8,6 +8,7 @@ import {
   TableRow,
   Typography,
 } from '@mui/material';
+import { Box } from '@mui/material';
 import { addMinutes, format } from 'date-fns';
 import { collection, getDocs, query } from 'firebase/firestore';
 
@@ -60,9 +61,9 @@ const FirstTable = ({
       width: '90%',
       height: '100%',
       minWidth: '650px',
-      marginLeft: '10%',
+      marginLeft: '1%',
       marginRight: 'auto',
-      marginTop: '20px',
+      marginTop: '30px',
     }}>
     <Table>
       <TableHead className="fixedPartitions">
@@ -80,7 +81,6 @@ const FirstTable = ({
           ))}
         </TableRow>
       </TableHead>
-
       <TableBody>
         {partitionsTop.map(partition => (
           <TableRow key={partition}>
@@ -101,7 +101,7 @@ const FirstTable = ({
                         : !isSelectable
                           ? '#aaa'
                           : 'transparent',
-                    height: 52, // 슬롯 한 칸의 세로 길이를 50px로 설정
+                    height: 70, // 슬롯 한 칸의 세로 길이를 50px로 설정
                   }}
                 />
               );
@@ -124,9 +124,9 @@ const SecondTable = ({
       width: '90%',
       height: '100%',
       minWidth: '650px',
-      marginLeft: '10%',
+      marginLeft: '1%',
       marginRight: 'auto',
-      marginTop: '20px',
+      marginTop: '30px',
     }}>
     <Table>
       <TableHead className="fixedPartitions">
@@ -165,7 +165,7 @@ const SecondTable = ({
                         : !isSelectable
                           ? '#aaa'
                           : 'transparent',
-                    height: 50,
+                    height: 70,
                   }}
                 />
               );
@@ -177,92 +177,37 @@ const SecondTable = ({
   </TableContainer>
 );
 
-const LeftUpTable = () => (
-  <TableContainer
-    sx={{
-      minWidth: '80px', // 최소 가로 크기 변경
-      marginLeft: '5%', // 왼쪽 여백 변경
-      marginRight: '5%', // 오른쪽 여백 변경
-      marginTop: '20px',
-      maxWidth: '250px', // 최대 가로 크기 설정
-    }}>
-    <Table sx={{ tableLayout: 'fixed', width: '100%' }}>
-      <TableHead className="fixedPartitions">
-        <TableRow>
-          {/* 각 방의 텍스트 표시 */}
-          <TableCell
-            align="center"
-            width={40}
-            className="fixedPartitions"
-            sx={{ textAlign: 'center' }}>
-            {`306호`}
-          </TableCell>
-        </TableRow>
-      </TableHead>
-      <TableBody>
-        {/* 세로 4칸 표시 */}
-        {[1, 2, 3, 4].map(roomnumber => (
-          <TableRow key={roomnumber}>
-            {/* 각 슬롯에 방 번호 표시 */}
-            <TableCell
-              sx={{
-                borderLeft: '1px solid #ccc',
-                borderBottom: '1px solid #ccc', // 아래쪽 테두리 추가
-                borderRight: '1px solid #ccc',
-                backgroundColor: 'transparent', // 배경색 변경
-                textAlign: 'center', // 가운데 정렬
-              }}>
-              {`room${roomnumber}`}
-            </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
-  </TableContainer>
-);
-
-const LeftDownTable = () => (
-  <TableContainer
-    sx={{
-      minWidth: '80px', // 최소 가로 크기 변경
-      marginLeft: '5%', // 왼쪽 여백 변경
-      marginRight: '5%', // 오른쪽 여백 변경
-      marginTop: '20px',
-      maxWidth: '250px', // 최대 가로 크기 설정
-    }}>
-    <Table sx={{ tableLayout: 'fixed', width: '100%' }}>
-      <TableHead className="fixedPartitions">
-        <TableRow>
-          {/* 가로 1칸만 표시 */}
-          <TableCell
-            align="center"
-            width={40}
-            className="fixedPartitions"
-            sx={{ textAlign: 'center' }}>
-            {`428호`}
-          </TableCell>
-        </TableRow>
-      </TableHead>
-      <TableBody>
-        {/* 세로 2칸 표시 */}
-        {[1, 2].map(roomnumber => (
-          <TableRow key={roomnumber}>
-            <TableCell
-              sx={{
-                borderLeft: '1px solid #ccc',
-                borderBottom: '1px solid #ccc', // 아래쪽 테두리 추가
-                borderRight: '1px solid #ccc',
-                backgroundColor: 'transparent', // 배경색 변경
-                textAlign: 'center', // 가운데 정렬
-              }}>
-              {`room${roomnumber}`}
-            </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
-  </TableContainer>
-);
+// const LeftDownTable = () => (
+//   <Box marginLeft={'30px'} marginTop={'100px'}>
+//     <div>room1</div>
+//     <br></br>
+//     <br></br>
+//     <div>room2</div>
+//   </Box>
+// );
+// const LeftDownTable = () => (
+//   <Box
+//     display="flex"
+//     flexDirection="column"
+//     marginLeft={'30px'}
+//     marginTop={'100px'}>
+//     <Button
+//       key={1}
+//       variant="contained"
+//       color="primary"
+//       sx={{ marginBotton: '8px' }}>
+//       {`room${1}`}
+//     </Button>
+//     <br></br>
+//     <Button
+//       key={2}
+//       variant="contained"
+//       color="primary"
+//       sx={{ marginBotton: '8px' }}>
+//       {`room${2}`}
+//     </Button>
+//   </Box>
+// );
 
 const Status = () => {
   const today = new Date();
@@ -379,12 +324,25 @@ const Status = () => {
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'row' }}>
-        <LeftUpTable
-          times={times}
-          partitionsBottm={partitionsTop}
-          getSlotSelected={getSlotSelected}
-          reservedSlots={reservedSlots}
-        />
+        <Box marginRight="16px">
+          {' '}
+          {/* 오른쪽에 간격 추가 */}
+          <Box marginLeft={'30px'} marginTop={'40px'}>
+            <div>306호</div>
+            <br></br>
+            <br></br>
+            <div>room1</div>
+            <br></br>
+            <br></br>
+            <div>room2</div>
+            <br></br>
+            <br></br>
+            <div>room3</div>
+            <br></br>
+            <br></br>
+            <div>room4</div>
+          </Box>
+        </Box>
         <FirstTable
           times={times}
           partitionsTop={partitionsTop}
@@ -394,17 +352,25 @@ const Status = () => {
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'row' }}>
-        <LeftDownTable
-          times={times}
-          partitionsBottom={partitionsBottom}
-          getSlotSelected={getSlotSelected}
-          reservedSlots={reservedSlots}
-        />
+        <Box marginRight="16px">
+          {' '}
+          {/* 오른쪽에 간격 추가 */}
+          <Box marginLeft={'30px'} marginTop={'40px'}>
+            <div>428호</div>
+            <br></br>
+            <br></br>
+            <div>room1</div>
+            <br></br>
+            <br></br>
+            <div>room2</div>
+          </Box>
+        </Box>
         <SecondTable
           times={times}
           partitionsBottom={partitionsBottom}
           getSlotSelected={getSlotSelected}
           reservedSlots={reservedSlots}
+          sx={{ marginTop: '16px' }}
         />
       </div>
     </>
