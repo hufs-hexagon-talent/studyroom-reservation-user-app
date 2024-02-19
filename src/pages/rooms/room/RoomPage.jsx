@@ -13,7 +13,7 @@ import {
   Typography,
 } from '@mui/material';
 import { addMinutes, format } from 'date-fns';
-import { addDoc, collection, doc, getDocs, query, updateDoc } from 'firebase/firestore';
+import { addDoc, collection, doc, getDoc, updateDoc } from 'firebase/firestore';
 
 import './Roompage.css';
 
@@ -66,6 +66,11 @@ const RoomPage = () => {
   const day = today.getDate();
   const hour = today.getHours();
   const minute = today.getMinutes();
+  
+  let monthFormatted = month < 10 ? `0${month}` : month;
+  let dayFormatted = day < 10 ? `0${day}` : day;
+
+  const currentDay = `${year}.${monthFormatted}.${dayFormatted}`;
 
   const navigate = useNavigate();
   const [selectedPartition, setSelectedPartition] = useState(null);
@@ -167,7 +172,7 @@ const RoomPage = () => {
   
    // 데이터를 수정하는 함수
   const handleConfirmReservation = async () => {
-    const address = `Rooms/${roomName}/Days/${roomName}/Reservations`;
+    const address = `Rooms/${roomName}/Days/${currentDay}/Reservations`;
     let docRef;
     if (startTimeIndex !== null && endTimeIndex !== null && userName !== '') {
       const startHour = times[startTimeIndex].split(':')[0];
@@ -187,7 +192,7 @@ const RoomPage = () => {
       await fetchData();
     }
     const reservedId = docRef.id;
-    const ref = doc(fs, `Rooms/${roomName}/Days/${roomName}/Reservations/${reservedId}`);
+    const ref = doc(fs, `Rooms/${roomName}/Days/${currentDay}/Reservations/${reservedId}`);
     await updateDoc(ref, {
       roomId : reservedId
     });
@@ -198,7 +203,6 @@ const RoomPage = () => {
 const pushReservedTime = (querySnapshot, reservedSlots) => {
   querySnapshot.forEach(doc => {
     const { startTime, endTime, partitionName } = doc.data();
-    //console.log(userName, startTime, endTime, partitionName);
     // 시작 시간
     const startIdx = times.findIndex(
       time => time === `${startTime[0]}:${startTime[1]}`,
@@ -211,49 +215,31 @@ const pushReservedTime = (querySnapshot, reservedSlots) => {
     for (let i = startIdx; i <= endIdx; i++) {
       reservedSlots[partitionName].push(i);
     }
-    //console.log(reservedSlots);
+    console.log(reservedSlots);
     setReservedSlots(reservedSlots);
   });
 };
+const [slotsArr, setSlotsArr] = useState([]);
 
 const fetchData = async () => {
-  var reservedSlots = {};
   try {
-    const q = query(collection(fs, `Rooms/${roomName}/Days/${roomName}/Reservations`));
-    const querySnapshot = await getDocs(q);
+    const docRef = doc(fs, `Rooms/${roomName}`);
+    const docSnap = await getDoc(docRef);
+    const len = docSnap.data().partitions.length;
 
-    if(roomName === '306'){
-      reservedSlots = {
-        room1: [],
-        room2: [],
-        room3: [],
-        room4: [],
-      };
-      pushReservedTime(querySnapshot, reservedSlots);
-    } else if(roomName === '428'){
-      reservedSlots = {
-        room1: [],
-        room2: [],
-      };
-      pushReservedTime(querySnapshot, reservedSlots);
+    const reservedSlots = {};
+    const slotsArray = [];
+    for (let i = 1; i <= len; i++) {
+      reservedSlots[`room${i}`] = [];
+      slotsArray.push(`room${i}`);
     }
+    setSlotsArr(slotsArray);
+    pushReservedTime(docSnap, reservedSlots);
 
   } catch (error) {
     console.error('Error', error);
   }
 };
-
-
-
-  const partitions = useMemo(() => {
-    if (roomName === '306') {
-      return ['room1', 'room2', 'room3', 'room4'];
-    } else if (roomName === '428') {
-      return ['room1', 'room2'];
-    } else {
-      return [];
-    }
-  }, [roomName]);
 
   return (
     <>
@@ -289,7 +275,7 @@ const fetchData = async () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {partitions.map(partition => (
+            {slotsArr.map(partition => (
               <TableRow key={partition}>
                 <TableCell>{partition}</TableCell>
                 {times.map((time, timeIndex) => {

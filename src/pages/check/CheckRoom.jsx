@@ -7,6 +7,16 @@ import { fs } from '../../firebase';
 const Check = () => {
   const [rooms, setRooms] = useState([]);
 
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = today.getMonth() + 1;
+  const day = today.getDate();
+  
+  let monthFormatted = month < 10 ? `0${month}` : month;
+  let dayFormatted = day < 10 ? `0${day}` : day;
+
+  const currentDay = `${year}.${monthFormatted}.${dayFormatted}`;
+
   useEffect(() => {
     fetchData();
   }, []);
@@ -17,7 +27,7 @@ const Check = () => {
       const roomIds = ['306', '428'];
       for (let i = 0; i < roomIds.length; i++) {
         const q = query(
-          collection(fs, `Rooms/${roomIds[i]}/Days/${roomIds[i]}/Reservations`),
+          collection(fs, `Rooms/${roomIds[i]}/Days/${currentDay}/Reservations`),
         );
         const querySnapshot = await getDocs(q);
 
@@ -64,7 +74,7 @@ const Check = () => {
   async function deleteData(id, roomName) {
     console.log(id);
     await deleteDoc(
-      doc(fs, `Rooms/${roomName}/Days/${roomName}/Reservations`, id),
+      doc(fs, `Rooms/${roomName}/Days/${currentDay}/Reservations`, id),
     );
     setRooms(prevRooms => prevRooms.filter(room => room.id !== id));
   }
