@@ -58,7 +58,7 @@ const FirstTable = ({
 }) => (
   <TableContainer
     sx={{
-      width: '90%',
+      width: '100%',
       height: '100%',
       minWidth: '650px',
       marginLeft: '1%',
@@ -66,24 +66,26 @@ const FirstTable = ({
       marginTop: '30px',
     }}>
     <Table>
-      <TableHead className="fixedPartitions">
-        <TableRow>
-          {times.map((time, timeIndex) => (
-            <TableCell
-              key={timeIndex}
-              align="center"
-              width={200}
-              className="fixedPartitions"
-              sx={{ height: 60 }} // 슬롯 한 칸의 세로 길이를 50px로 설정
-            >
-              {time}
-            </TableCell>
-          ))}
-        </TableRow>
-      </TableHead>
+    <TableHead className="fixedPartitions" sx={{ borderBottom: 'none' }}>
+      <TableRow>
+        {times.map((time, timeIndex) => (
+          <TableCell
+            key={timeIndex}
+            align="center"
+            className="fixedPartitions relative"
+            sx={{ borderLeft: 'none' }}
+          >
+            <div style={{ width: 20, height: 30 }}>
+              <span className="absolute top-1/2 left-0 transform -translate-x-1/2 -translate-y-1/2 bg-white px-2">{time}</span>
+            </div>
+          </TableCell>
+        ))}
+      </TableRow>
+    </TableHead>
+
       <TableBody>
-        {partitionsTop.map(partition => (
-          <TableRow key={partition}>
+        {partitionsTop.map((partition) => (
+          <TableRow key={partition} sx={{ height: 30 }}> {/* TableRow에 높이 설정 */}
             {times.map((time, timeIndex) => {
               const isSelected = getSlotSelected(partition, timeIndex);
               const isSelectable = true;
@@ -92,8 +94,8 @@ const FirstTable = ({
               return (
                 <TableCell
                   key={timeIndex}
-                  sx={{
-                    borderLeft: '1px solid #ccc',
+                  className="border-l border-gray-300" // tailwind border 클래스 적용
+                  sx={{ 
                     backgroundColor: isSelected
                       ? '#4B89DC'
                       : isReserved
@@ -101,9 +103,13 @@ const FirstTable = ({
                         : !isSelectable
                           ? '#aaa'
                           : 'transparent',
-                    height: 70, // 슬롯 한 칸의 세로 길이를 50px로 설정
                   }}
-                />
+                >
+                  <div style={{ 
+                    height: 30, // 슬롯 한 칸의 세로 길이를 50px로 설정
+                    width: 20, // 슬롯 한 칸의 가로 길이를 200px로 설정
+                  }} />
+                </TableCell>
               );
             })}
           </TableRow>
@@ -111,6 +117,8 @@ const FirstTable = ({
       </TableBody>
     </Table>
   </TableContainer>
+
+
 );
 
 const SecondTable = ({
@@ -127,19 +135,21 @@ const SecondTable = ({
       marginLeft: '1%',
       marginRight: 'auto',
       marginTop: '30px',
+      marginBottom:'30px'
     }}>
     <Table>
-      <TableHead className="fixedPartitions">
+      <TableHead className="fixedPartitions" sx={{ borderBottom: 'none' }}>
         <TableRow>
           {times.map((time, timeIndex) => (
             <TableCell
               key={timeIndex}
               align="center"
-              width={200}
-              className="fixedPartitions"
-              sx={{ height: 60 }} // 슬롯 한 칸의 세로 길이를 50px로 설정
+              className="fixedPartitions relative"
+              sx={{ borderLeft: 'none' }}
             >
-              {time}
+              <div style={{ width: 20, height: 30 }}>
+                <span className="absolute top-1/2 left-0 transform -translate-x-1/2 -translate-y-1/2 bg-white px-2">{time}</span>
+              </div>
             </TableCell>
           ))}
         </TableRow>
@@ -176,38 +186,6 @@ const SecondTable = ({
     </Table>
   </TableContainer>
 );
-
-// const LeftDownTable = () => (
-//   <Box marginLeft={'30px'} marginTop={'100px'}>
-//     <div>room1</div>
-//     <br></br>
-//     <br></br>
-//     <div>room2</div>
-//   </Box>
-// );
-// const LeftDownTable = () => (
-//   <Box
-//     display="flex"
-//     flexDirection="column"
-//     marginLeft={'30px'}
-//     marginTop={'100px'}>
-//     <Button
-//       key={1}
-//       variant="contained"
-//       color="primary"
-//       sx={{ marginBotton: '8px' }}>
-//       {`room${1}`}
-//     </Button>
-//     <br></br>
-//     <Button
-//       key={2}
-//       variant="contained"
-//       color="primary"
-//       sx={{ marginBotton: '8px' }}>
-//       {`room${2}`}
-//     </Button>
-//   </Box>
-// );
 
 const Status = () => {
   const today = new Date();
@@ -247,32 +225,6 @@ const Status = () => {
     },
     [startTimeIndex, endTimeIndex, selectedPartition],
   );
-
-  // const toggleSlot = useCallback(
-  //   (partition, timeIndex) => {
-  //     const isExist = getSlotSelected(partition, timeIndex);
-  //     console.log(partition, timeIndex, isExist);
-
-  //     if (!startTimeIndex && !endTimeIndex) {
-  //       setSelectedPartition(partition);
-  //       setStartTimeIndex(timeIndex);
-  //       setEndTimeIndex(timeIndex);
-  //       return;
-  //     }
-
-  //     if (selectedPartition !== partition) {
-  //       setSelectedPartition(partition);
-  //       setStartTimeIndex(timeIndex);
-  //       setEndTimeIndex(timeIndex);
-  //       return;
-  //     }
-
-  //     setSelectedPartition(partition);
-  //     setStartTimeIndex(timeIndex);
-  //     setEndTimeIndex(timeIndex);
-  //   },
-  //   [getSlotSelected, setStartTimeIndex, setEndTimeIndex, selectedPartition],
-  // );
 
   const fetchData = async () => {
     try {
@@ -314,7 +266,7 @@ const Status = () => {
 
   return (
     <>
-      <Typography variant="h5" fontWeight={10} component="div" align="center">
+      <Typography style={{marginTop:'20px'}}variant="h5" fontWeight={10} component="div" align="center">
         예약 현황
       </Typography>
       <div

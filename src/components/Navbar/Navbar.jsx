@@ -36,13 +36,13 @@ const Navbar = () => {
             </Link>
           </li>
           <li className="mb-3 md:mb-0 md:mr-6">
-            <Link to="./login" className="text-white hover:text-gray-300">
-              로그인
+            <Link to="./check" className="text-white hover:text-gray-300">
+              확인/취소
             </Link>
           </li>
           <li className="mb-3 md:mb-0 md:mr-6">
-            <Link to="./check" className="text-white hover:text-gray-300">
-              확인/취소
+            <Link to="./login" className="text-white hover:text-gray-300">
+              로그인
             </Link>
           </li>
         </ul>

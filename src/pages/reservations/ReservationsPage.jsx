@@ -10,12 +10,22 @@ const ReservationsPage = () => {
   const navigate = useNavigate();
   const { roomId, roomNumber } = useParams();
   const [reservationData, setReservationData] = useState(null);
+  
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = today.getMonth() + 1;
+  const day = today.getDate();
+  
+  let monthFormatted = month < 10 ? `0${month}` : month;
+  let dayFormatted = day < 10 ? `0${day}` : day;
+
+  const currentDay = `${year}.${monthFormatted}.${dayFormatted}`;
 
   useEffect(() => {
     const fetchData = async () => {
       const docRef = doc(
         fs,
-        `Rooms/${roomNumber}/Days/${roomNumber}/Reservations`,
+        `Rooms/${roomNumber}/Days/${currentDay}/Reservations`,
         roomId,
       );
       const docSnap = await getDoc(docRef);
