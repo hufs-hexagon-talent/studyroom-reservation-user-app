@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Table,
   TableBody,
@@ -8,8 +8,9 @@ import {
   TableRow,
   Typography,
 } from '@mui/material';
+import { Box } from '@mui/material';
 import { addMinutes, format } from 'date-fns';
-import { collection, doc, getDoc,getDocs,query } from 'firebase/firestore';
+import { collection, getDocs, query } from 'firebase/firestore';
 
 import { fs } from '../../firebase';
 
@@ -49,166 +50,116 @@ function createTimeTable(config) {
   return timeTable;
 }
 
-const Status = () => {
-  const today = new Date();
-  const year = today.getFullYear();
-  const month = today.getMonth() + 1;
-  const day = today.getDate();
-  const hour = today.getHours();
-  const minute = today.getMinutes();
-
-  let monthFormatted = month < 10 ? `0${month}` : month;
-  let dayFormatted = day < 10 ? `0${day}` : day;
-
-  const currentDay = `${year}.${monthFormatted}.${dayFormatted}`;
-
-  const times = useMemo(() => createTimeTable(timeTableConfig), []);
-
-  const [slotsArr, setSlotsArr] = useState([]);
-
-  useEffect(() => {
-    fetchData();
-  }, []);
-  
-  const [reservedSlots, setReservedSlots] = useState({
-    room1: [],
-    room2: [],
-    room3: [],
-    room4: [],
-  });
-
-  const fetchData = async () => {
-    try {
-      const slotsArray=[];
-      // 문서 내의 방 번호를 받아와서 [306, 428]을 만들음
-      const roomsquery = query(collection(fs, 'Rooms'));
-      const roomQuerySnap = await getDocs(roomsquery);
-      const roomsIds = roomQuerySnap.docs.map(doc => doc.id);
-      console.log(roomsIds); // roomsIds 배열에 Rooms 콜렉션 안에 있는 문서들의 아이디가 저장됩니다.        
-
-      for (let i = 0; i < roomsIds.length; i++) {
-        // 예약 정보 가져오기
-        console.log(roomsIds[i]);
-        const q = query(collection(fs, `Rooms/${roomsIds[i]}/Days/${currentDay}/Reservations`));
-        const querySnapshot = await getDocs(q);
-        
-        // 호실 별 partition 개수 가져올라고 불러옴
-        const docRef = doc(fs, `Rooms/${roomsIds[i]}`);
-        const docSnap = await getDoc(docRef);
-
-        reservedSlots[roomsIds[i]] = {};
-        slotsArray[roomsIds[i]]=[];
-        
-        querySnapshot.forEach(doc => {
-          const { startTime, endTime, partitionName } = doc.data();
-          console.log(startTime, endTime, partitionName);
-
-          // partitions 배열의 길이만큼 reservedSlots 객체 초기화
-          for (let j = 1; j <= docSnap.data().partitions.length; j++) {
-              const roomName = `room${j}`;
-              if (!reservedSlots[roomsIds[i]][roomName]) {
-                  reservedSlots[roomsIds[i]][roomName] = [];
-                  slotsArray[roomsIds[i]].push(roomName);
-              }
-              console.log(slotsArray);
-          }
-          setSlotsArr(slotsArray);
-          console.log(slotsArr);
-          // 시작 시간
-          const startIdx = times.findIndex(
-              time => time === `${startTime[0]}:${startTime[1]}`,
-          );
-          // 종료 시간
-          const endIdx = times.findIndex(
-              time => time === `${endTime[0]}:${endTime[1]}`,
-          );
-
-          // 해당 partition의 예약 슬롯에 인덱스 추가
-          for (let k = startIdx; k <= endIdx; k++) {
-              reservedSlots[roomsIds[i]][partitionName].push(k);
-          }
-        });
-      }
-      setReservedSlots(reservedSlots);
-      console.log(reservedSlots);
-    } catch (error) {
-        console.error('Error', error);
-    } 
-  };
-
-  const partitionsTop = useMemo(() => ['room1', 'room2', 'room3', 'room4'],[],);
-
-  const partitionsBottom = useMemo(() => ['room1', 'room2'], []);
-
-  return (
-    <>
-      <div className='mt-10'>
-        <Typography variant="h5" fontWeight={10} component="div" align="center">
-          예약 현황
-        </Typography>
-      </div>
-      <div
-        className="bg-gray-100 h-50 inline-block"
-        style={{ marginLeft: '10px' }}>
-        {year}년 {month}월 {day}일 {hour}시 {minute}분
-      </div>
-
-      <div style={{ display: 'flex', flexDirection: 'row' }}>
-        <FirstTable
-          times={times}
-          partitionsTop={partitionsTop}
-          reservedSlots={reservedSlots}
-          slotsArr={slotsArr}
-        />
-      </div>
-
-      <div style={{ display: 'flex', flexDirection: 'row' }}>
-        <FirstTable
-          times={times}
-          partitionsBottom={partitionsBottom}
-          reservedSlots={reservedSlots}
-          slotsArr={slotsArr}
-        />
-      </div>
-    </>
-  );
-};
-
-// FirstTable 컴포넌트를 여기서 정의합니다.
 const FirstTable = ({
   times,
+  partitionsTop,
+  getSlotSelected,
   reservedSlots,
-  slotsArr
 }) => (
   <TableContainer
     sx={{
+      width: '100%',
       height: '100%',
       minWidth: '650px',
-      marginLeft: '5%',
-      marginRight: '5%',
-      marginTop: '20px',
+      marginLeft: '1%',
+      marginRight: 'auto',
+      marginTop: '30px',
     }}>
-      <pre>
-        {JSON.stringify({
-          times,
-          reservedSlots,
-          slotsArr
-        }, null, 2)}
-      </pre>
     <Table>
-      <TableHead>
+    <TableHead className="fixedPartitions" sx={{ borderBottom: 'none' }}>
+      <TableRow>
+        {times.map((time, timeIndex) => (
+          <TableCell
+            key={timeIndex}
+            align="center"
+            className="fixedPartitions relative"
+            sx={{ borderLeft: 'none' }}
+          >
+            <div style={{ width: 20, height: 30 }}>
+              <span className="absolute top-1/2 left-0 transform -translate-x-1/2 -translate-y-1/2 bg-white px-2">{time}</span>
+            </div>
+          </TableCell>
+        ))}
+      </TableRow>
+    </TableHead>
+
+      <TableBody>
+        {partitionsTop.map((partition) => (
+          <TableRow key={partition} sx={{ height: 30 }}> {/* TableRow에 높이 설정 */}
+            {times.map((time, timeIndex) => {
+              const isSelected = getSlotSelected(partition, timeIndex);
+              const isSelectable = true;
+              const isReserved = reservedSlots[partition].includes(timeIndex);
+
+              return (
+                <TableCell
+                  key={timeIndex}
+                  className="border-l border-gray-300" // tailwind border 클래스 적용
+                  sx={{ 
+                    backgroundColor: isSelected
+                      ? '#4B89DC'
+                      : isReserved
+                        ? '#C1C1C3'
+                        : !isSelectable
+                          ? '#aaa'
+                          : 'transparent',
+                  }}
+                >
+                  <div style={{ 
+                    height: 30, // 슬롯 한 칸의 세로 길이를 50px로 설정
+                    width: 20, // 슬롯 한 칸의 가로 길이를 200px로 설정
+                  }} />
+                </TableCell>
+              );
+            })}
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  </TableContainer>
+
+
+);
+
+const SecondTable = ({
+  times,
+  partitionsBottom,
+  getSlotSelected,
+  reservedSlots,
+}) => (
+  <TableContainer
+    sx={{
+      width: '90%',
+      height: '100%',
+      minWidth: '650px',
+      marginLeft: '1%',
+      marginRight: 'auto',
+      marginTop: '30px',
+      marginBottom:'30px'
+    }}>
+    <Table>
+      <TableHead className="fixedPartitions" sx={{ borderBottom: 'none' }}>
         <TableRow>
           {times.map((time, timeIndex) => (
-            <TableCell key={timeIndex}>
-              {time}
+            <TableCell
+              key={timeIndex}
+              align="center"
+              className="fixedPartitions relative"
+              sx={{ borderLeft: 'none' }}
+            >
+              <div style={{ width: 20, height: 30 }}>
+                <span className="absolute top-1/2 left-0 transform -translate-x-1/2 -translate-y-1/2 bg-white px-2">{time}</span>
+              </div>
             </TableCell>
           ))}
         </TableRow>
       </TableHead>
+
       <TableBody>
-        {slotsArr.map(partition => (
+        {partitionsBottom.map(partition => (
           <TableRow key={partition}>
             {times.map((time, timeIndex) => {
+              const isSelected = getSlotSelected(partition, timeIndex);
               const isSelectable = true;
               const isReserved = reservedSlots[partition].includes(timeIndex);
 
@@ -217,12 +168,14 @@ const FirstTable = ({
                   key={timeIndex}
                   sx={{
                     borderLeft: '1px solid #ccc',
-                    backgroundColor: isReserved
-                      ? '#C1C1C3'
-                      : !isSelectable
-                      ? '#aaa'
-                      : 'transparent',
-                    height: 70, // 슬롯 한 칸의 세로 길이를 50px로 설정
+                    backgroundColor: isSelected
+                      ? '#4B89DC'
+                      : isReserved
+                        ? '#C1C1C3'
+                        : !isSelectable
+                          ? '#aaa'
+                          : 'transparent',
+                    height: 70,
                   }}
                 />
               );
@@ -233,5 +186,147 @@ const FirstTable = ({
     </Table>
   </TableContainer>
 );
+
+const Status = () => {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = today.getMonth() + 1;
+  const day = today.getDate();
+  const hour = today.getHours();
+  const minute = today.getMinutes();
+
+  const [selectedPartition] = useState(null);
+  const [startTimeIndex] = useState(null);
+  const [endTimeIndex] = useState(null);
+
+  const times = useMemo(() => createTimeTable(timeTableConfig), []);
+
+  const [reservedSlots, setReservedSlots] = useState({
+    room1_306: [],
+    room2_306: [],
+    room3_306: [],
+    room4_306: [],
+    room1_428: [],
+    room2_428: [],
+  });
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const getSlotSelected = useCallback(
+    (partition, timeIndex) => {
+      if (!startTimeIndex || !endTimeIndex) return false;
+      if (selectedPartition !== partition) return false;
+      if (!(startTimeIndex <= timeIndex && timeIndex <= endTimeIndex))
+        return false;
+
+      return true;
+    },
+    [startTimeIndex, endTimeIndex, selectedPartition],
+  );
+
+  const fetchData = async () => {
+    try {
+      const q = query(collection(fs, 'roomsEx'));
+      const querySnapshot = await getDocs(q);
+      const reservedSlots = {
+        room1_306: [],
+        room2_306: [],
+        room3_306: [],
+        room4_306: [],
+        room1_428: [],
+        room2_428: [],
+      }; // 각 방마다 독립적인 예약 슬롯 배열 초기화
+      querySnapshot.forEach(doc => {
+        const { name, startTime, endTime } = doc.data();
+        const startIdx = times.findIndex(
+          time => time === `${startTime[0]}:${startTime[1]}`,
+        );
+        const endIdx = times.findIndex(
+          time => time === `${endTime[0]}:${endTime[1]}`,
+        );
+        for (let i = startIdx; i <= endIdx; i++) {
+          reservedSlots[name].push(i); // 해당 방의 예약 슬롯 배열에 추가
+        }
+      });
+      console.log(reservedSlots);
+      setReservedSlots(reservedSlots);
+    } catch (error) {
+      console.error('Error', error);
+    }
+  };
+
+  const partitionsTop = useMemo(
+    () => ['room1_306', 'room2_306', 'room3_306', 'room4_306'],
+    [],
+  );
+
+  const partitionsBottom = useMemo(() => ['room1_428', 'room2_428'], []);
+
+  return (
+    <>
+      <Typography style={{marginTop:'20px'}}variant="h5" fontWeight={10} component="div" align="center">
+        예약 현황
+      </Typography>
+      <div
+        className="bg-gray-100 h-50 inline-block"
+        style={{ marginLeft: '10px' }}>
+        {year}년 {month}월 {day}일 {hour}시 {minute}분
+      </div>
+
+      <div style={{ display: 'flex', flexDirection: 'row' }}>
+        <Box marginRight="16px">
+          {' '}
+          {/* 오른쪽에 간격 추가 */}
+          <Box marginLeft={'30px'} marginTop={'40px'}>
+            <div>306호</div>
+            <br></br>
+            <br></br>
+            <div>room1</div>
+            <br></br>
+            <br></br>
+            <div>room2</div>
+            <br></br>
+            <br></br>
+            <div>room3</div>
+            <br></br>
+            <br></br>
+            <div>room4</div>
+          </Box>
+        </Box>
+        <FirstTable
+          times={times}
+          partitionsTop={partitionsTop}
+          getSlotSelected={getSlotSelected}
+          reservedSlots={reservedSlots}
+        />
+      </div>
+
+      <div style={{ display: 'flex', flexDirection: 'row' }}>
+        <Box marginRight="16px">
+          {' '}
+          {/* 오른쪽에 간격 추가 */}
+          <Box marginLeft={'30px'} marginTop={'40px'}>
+            <div>428호</div>
+            <br></br>
+            <br></br>
+            <div>room1</div>
+            <br></br>
+            <br></br>
+            <div>room2</div>
+          </Box>
+        </Box>
+        <SecondTable
+          times={times}
+          partitionsBottom={partitionsBottom}
+          getSlotSelected={getSlotSelected}
+          reservedSlots={reservedSlots}
+          sx={{ marginTop: '16px' }}
+        />
+      </div>
+    </>
+  );
+};
 
 export default Status;
