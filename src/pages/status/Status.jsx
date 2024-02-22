@@ -62,7 +62,7 @@ const FirstTable = ({
       height: '100%',
       minWidth: '650px',
       marginLeft: '1%',
-      marginRight: 'auto',
+      marginRight: '20px',
       marginTop: '30px',
     }}>
     <Table>

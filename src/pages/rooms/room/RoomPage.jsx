@@ -264,12 +264,19 @@ const fetchData = async () => {
           marginTop: '50px',
         }}>
         <Table>
-          <TableHead>
+          <TableHead className="fixedPartitions" sx={{ borderBottom: 'none' }}>
             <TableRow>
               <TableCell align="center" width={100} />
               {times.map((time, timeIndex) => (
-                <TableCell key={timeIndex} align="center" width={200}>
-                  {time}
+                <TableCell 
+                  key={timeIndex} 
+                  align="center"
+                  width={200} 
+                  className='fixedPartitions relative'
+                >
+                  <div style={{ width: 20, height: 30 }}>
+                    <span className="absolute top-1/2 left-0 transform -translate-x-1/2 -translate-y-1/2 bg-white px-2">{time}</span>
+                  </div>
                 </TableCell>
               ))}
             </TableRow>
@@ -315,7 +322,6 @@ const fetchData = async () => {
           </TableBody>
         </Table>
       </TableContainer>
-
       <br />
       <Button
         text="예약하기"
