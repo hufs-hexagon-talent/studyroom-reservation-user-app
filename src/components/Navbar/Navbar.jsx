@@ -12,7 +12,7 @@ const Navbar = () => {
         {' '}
         {/* 반응형 디자인 적용 */}
         <div className="flex items-center mb-4 md:mb-0">
-          <Link to="./status">
+          <Link to="./rooms">
             <img src={logo} alt="" className="w-16 h-16 cursor-pointer" />{' '}
             {/* 로고 크기 수정 */}
           </Link>

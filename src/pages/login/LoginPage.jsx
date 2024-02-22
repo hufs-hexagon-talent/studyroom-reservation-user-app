@@ -4,7 +4,7 @@ import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 
 import '../../firebase.js';
 
-import login_boo from '../../assets/login_boo.jpg';
+import login_boo from '../../assets/login_boo.jpg'
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');

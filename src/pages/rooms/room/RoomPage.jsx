@@ -13,7 +13,7 @@ import {
   Typography,
 } from '@mui/material';
 import { addMinutes, format } from 'date-fns';
-import { addDoc, collection, doc, getDoc, updateDoc } from 'firebase/firestore';
+import { addDoc, collection, doc, getDoc, getDocs, query, updateDoc } from 'firebase/firestore';
 
 import './Roompage.css';
 
@@ -200,8 +200,8 @@ const RoomPage = () => {
   };
   
   // 새로운 함수를 생성해 중복을 제거
-const pushReservedTime = (querySnapshot, reservedSlots) => {
-  querySnapshot.forEach(doc => {
+const pushReservedTime = (docSnap, reservedSlots) => {
+  docSnap.forEach(doc => {
     const { startTime, endTime, partitionName } = doc.data();
     // 시작 시간
     const startIdx = times.findIndex(
@@ -211,11 +211,11 @@ const pushReservedTime = (querySnapshot, reservedSlots) => {
     const endIdx = times.findIndex(
       time => time === `${endTime[0]}:${endTime[1]}`,
     );
-    //console.log(startIdx, endIdx);
+
     for (let i = startIdx; i <= endIdx; i++) {
       reservedSlots[partitionName].push(i);
     }
-    console.log(reservedSlots);
+    
     setReservedSlots(reservedSlots);
   });
 };
@@ -223,9 +223,13 @@ const [slotsArr, setSlotsArr] = useState([]);
 
 const fetchData = async () => {
   try {
+    console.log(roomName);
     const docRef = doc(fs, `Rooms/${roomName}`);
     const docSnap = await getDoc(docRef);
     const len = docSnap.data().partitions.length;
+
+    const q = query(collection(fs, `Rooms/${roomName}/Days/${currentDay}/Reservations`));
+    const querySnap = await getDocs(q);
 
     const reservedSlots = {};
     const slotsArray = [];
@@ -234,7 +238,7 @@ const fetchData = async () => {
       slotsArray.push(`room${i}`);
     }
     setSlotsArr(slotsArray);
-    pushReservedTime(docSnap, reservedSlots);
+    pushReservedTime(querySnap, reservedSlots);
 
   } catch (error) {
     console.error('Error', error);
@@ -264,12 +268,19 @@ const fetchData = async () => {
           marginTop: '50px',
         }}>
         <Table>
-          <TableHead>
+          <TableHead className="fixedPartitions" sx={{ borderBottom: 'none' }}>
             <TableRow>
               <TableCell align="center" width={100} />
               {times.map((time, timeIndex) => (
-                <TableCell key={timeIndex} align="center" width={200}>
-                  {time}
+                <TableCell 
+                  key={timeIndex} 
+                  align="center"
+                  width={200} 
+                  className='fixedPartitions relative'
+                >
+                  <div style={{ width: 20, height: 30 }}>
+                    <span className="absolute top-1/2 left-0 transform -translate-x-1/2 -translate-y-1/2 bg-white px-2">{time}</span>
+                  </div>
                 </TableCell>
               ))}
             </TableRow>
@@ -315,7 +326,6 @@ const fetchData = async () => {
           </TableBody>
         </Table>
       </TableContainer>
-
       <br />
       <Button
         text="예약하기"

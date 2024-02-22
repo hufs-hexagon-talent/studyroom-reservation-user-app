@@ -10,7 +10,7 @@ import {
 } from '@mui/material';
 import { Box } from '@mui/material';
 import { addMinutes, format } from 'date-fns';
-import { collection, getDocs, query } from 'firebase/firestore';
+import { collection,getDocs, query } from 'firebase/firestore';
 
 import { fs } from '../../firebase';
 
@@ -62,7 +62,7 @@ const FirstTable = ({
       height: '100%',
       minWidth: '650px',
       marginLeft: '1%',
-      marginRight: 'auto',
+      marginRight: '20px',
       marginTop: '30px',
     }}>
     <Table>
@@ -192,8 +192,11 @@ const Status = () => {
   const year = today.getFullYear();
   const month = today.getMonth() + 1;
   const day = today.getDate();
-  const hour = today.getHours();
-  const minute = today.getMinutes();
+
+  let monthFormatted = month < 10 ? `0${month}` : month;
+  let dayFormatted = day < 10 ? `0${day}` : day;
+
+  const currentDay = `${year}.${monthFormatted}.${dayFormatted}`;
 
   const [selectedPartition] = useState(null);
   const [startTimeIndex] = useState(null);
@@ -228,8 +231,24 @@ const Status = () => {
 
   const fetchData = async () => {
     try {
-      const q = query(collection(fs, 'roomsEx'));
-      const querySnapshot = await getDocs(q);
+      const roomNumber = [306,428];
+      for(let i=0; i<roomNumber.length; i++){
+        const q = query(collection(fs,`Rooms/${roomNumber[i]}/Days/${currentDay}/Reservations`));
+        const querySnapshot=await getDocs(q);
+
+        querySnapshot.forEach(doc => {
+          const { name, startTime, endTime } = doc.data();
+          const startIdx = times.findIndex(
+            time => time === `${startTime[0]}:${startTime[1]}`,
+          );
+          const endIdx = times.findIndex(
+            time => time === `${endTime[0]}:${endTime[1]}`,
+          );
+          for (let i = startIdx; i <= endIdx; i++) {
+            reservedSlots[name].push(i); // 해당 방의 예약 슬롯 배열에 추가
+          }
+        });
+      }
       const reservedSlots = {
         room1_306: [],
         room2_306: [],
@@ -237,19 +256,8 @@ const Status = () => {
         room4_306: [],
         room1_428: [],
         room2_428: [],
-      }; // 각 방마다 독립적인 예약 슬롯 배열 초기화
-      querySnapshot.forEach(doc => {
-        const { name, startTime, endTime } = doc.data();
-        const startIdx = times.findIndex(
-          time => time === `${startTime[0]}:${startTime[1]}`,
-        );
-        const endIdx = times.findIndex(
-          time => time === `${endTime[0]}:${endTime[1]}`,
-        );
-        for (let i = startIdx; i <= endIdx; i++) {
-          reservedSlots[name].push(i); // 해당 방의 예약 슬롯 배열에 추가
-        }
-      });
+      }; 
+      
       console.log(reservedSlots);
       setReservedSlots(reservedSlots);
     } catch (error) {
@@ -272,7 +280,7 @@ const Status = () => {
       <div
         className="bg-gray-100 h-50 inline-block"
         style={{ marginLeft: '10px' }}>
-        {year}년 {month}월 {day}일 {hour}시 {minute}분
+        {year}년 {month}월 {day}일
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'row' }}>
