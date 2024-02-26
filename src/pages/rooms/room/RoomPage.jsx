@@ -64,8 +64,6 @@ const RoomPage = () => {
   const year = today.getFullYear();
   const month = today.getMonth() + 1;
   const day = today.getDate();
-  const hour = today.getHours();
-  const minute = today.getMinutes();
   
   let monthFormatted = month < 10 ? `0${month}` : month;
   let dayFormatted = day < 10 ? `0${day}` : day;
@@ -249,14 +247,27 @@ const fetchData = async () => {
     <>
       <div style={{ marginBottom: '50px' }}>
         <br />
-        <Typography variant="h5" fontWeight={10} component="div" align="center">
-          예약하기
+        <Typography marginTop='10px' variant="h5" fontWeight={30} component="div" align="center">
+          세미나실 예약하기
         </Typography>
-        <br></br>
-        <div
-          className="bg-gray-100 h-50 inline-block"
-          style={{ marginLeft: '10px' }}>
-          {year}년 {month}월 {day}일 {hour}시 {minute}분
+        <div className="mt-5 mb-10 flex justify-center" style={{ color : '#9D9FA2' }}>
+        아래 예약 현황의 예약가능 시간을 선택하시면 해당 세미나실을 대관할 수 있습니다.
+        </div>
+        <div className='ml-8'>
+          <input style={{marginRight : '30px'}}type='month' value={'2024-02'}/>
+          <input type="text" list="rooms" /><br />
+          <datalist id="rooms">
+            <option value="306호" />
+            <option value="428호" />
+          </datalist>
+        </div>
+        <div className='flex'>
+          <div className="w-6 h-6 mt-10 ml-10" style={{ backgroundColor: '#F1EEE9' }}></div>
+          <div className='mt-10 ml-2'>예약 가능</div>
+          <div className="w-6 h-6 mt-10 ml-10" style={{ backgroundColor: '#7599BA' }}></div>
+          <div className='mt-10 ml-2'>예약 선택</div>
+          <div className="w-6 h-6 mt-10 ml-10" style={{ backgroundColor: '#002D56' }}></div>
+          <div className='mt-10 ml-2'>예약 완료</div>
         </div>
       </div>
       <TableContainer
@@ -299,14 +310,16 @@ const fetchData = async () => {
                     <TableCell
                       key={timeIndex}
                       sx={{
-                        borderLeft: '1px solid #ccc',
+                        borderLeft: '2px solid #e5ded4',
+                        borderBottom : '2px solid #e5ded4',
+                        borderTop : '2px solid #e5ded4',
                         backgroundColor: isSelected
-                          ? '#4B89DC' // 파란색으로 칠해짐
+                          ? '#7599BA' // 밝은 남색으로 칠해짐
                           : isReserved
-                            ? '#C1C1C3' // 회색으로 칠해짐
+                            ? '#002D56' // 남색으로 칠해짐
                             : !isSelectable
-                              ? '#aaa' // 회색으로 칠해짐
-                              : 'transparent',
+                              ? '#aaa'
+                              : '#F1EEE9',
                         cursor: isReserved
                           ? 'default'
                           : isSelectable
