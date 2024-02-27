@@ -81,7 +81,7 @@ const ReservationsPage = () => {
           <Button
             text={'완료'}
             onClick={() => {
-              navigate('/');
+              navigate('');
             }}
           />
           <br />
