@@ -26,11 +26,14 @@ const LoginPage = () => {
       });
   };
 
+  // 취소를 누르면 데이터 삭제되는 함수 구현해야함
+  // 확인 누르면 Reservation.jsx로 가야함 데이터랑 같이 !!!
+
   return (
     <>
       <h1 className="text-3xl text-center mt-10">예약자 정보 기입</h1>
       <div className="flex justify-center min-h-screen">
-        <div className="items-center mt-10 w-3/4">
+        <div className="items-center mt-10 w-1/2">
           <div>
               <form style={{border:'1px solid #666666'}} className="flex flex-col p-10 w-50 focus:outline-none">
                 <div className='mb-3'>
@@ -59,8 +62,7 @@ const LoginPage = () => {
                   <button
                       style={{backgroundColor:'#D9D9D9'}}
                       className="w-24 h-10 mr-3 cursor-pointer text-black text-lg hover:opacity-90 flex items-center justify-center"
-                      type="button"
-                      onClick={handleSignIn}>
+                      type="button">
                       취소
                   </button>
                   <button

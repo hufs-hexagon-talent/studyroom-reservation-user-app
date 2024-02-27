@@ -26,18 +26,13 @@ const Navbar = () => {
           {' '}
           {/* 반응형 디자인 적용 */}
           <li className="mb-3 md:mb-0 md:mr-6">
-            <Link to="./status" className="text-white hover:text-gray-300">
-              예약 현황
-            </Link>
-          </li>
-          <li className="mb-3 md:mb-0 md:mr-6">
             <Link to="./rooms" className="text-white hover:text-gray-300">
-              예약하러 가기
+              세미나실 예약하기
             </Link>
           </li>
           <li className="mb-3 md:mb-0 md:mr-6">
             <Link to="./check" className="text-white hover:text-gray-300">
-              확인/취소
+              내 신청 현황
             </Link>
           </li>
           <li className="mb-3 md:mb-0 md:mr-6">
