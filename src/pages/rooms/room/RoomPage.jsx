@@ -9,7 +9,6 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  TextField,
   Typography,
 } from '@mui/material';
 import { addMinutes, format } from 'date-fns';
@@ -357,33 +356,51 @@ const fetchData = async () => {
             transform: 'translate(-50%, -50%)',
             background: 'white',
             padding: '20px',
-            width: '300px',
+            width: '500px',
+            height : '300px',
             border: 'none',
-            borderRadius: 20,
+            borderRadius:'5px',
           }}>
-          <Typography variant="h6" component="h2" align="center" gutterBottom>
-            이름을 입력 해주세요
-          </Typography>
-          <TextField
-            label="userName"
-            variant="standard"
-            value={userName}
-            onChange={e => setUserName(e.target.value)}
-            fullWidth
-            autoFocus
-          />
+          <div className='mb-5 text-xl font-bold'>
+            컴퓨터공학부 세미나실 예약
+          </div>
+          <div>
+            <section style={{ marginBottom: '10px' }}>
+                <div>
+                    <table style={{ borderCollapse: 'collapse', width: '100%' }}>
+                        <tbody>
+                            <tr>
+                                <th style={{ border: '1px solid #ccc', borderTopWidth:'3px', padding: '8px', paddingLeft: '5px', textAlign: 'left' }}>선택 일자</th>
+                                <td style={{ border: '1px solid #ccc', borderTopWidth:'3px', padding: '8px', paddingLeft: '5px' }}>{currentDay}</td> {/*이건 고쳐야됨*/}
+                            </tr>
+                            <tr>
+                                <th style={{ border: '1px solid #ccc', padding: '8px', paddingLeft: '5px', textAlign: 'left' }}>선택 시간</th>
+                                <td style={{ border: '1px solid #ccc', padding: '8px', paddingLeft: '5px' }}>{times[startTimeIndex]} - {times[endTimeIndex+1]}</td>
+                            </tr>
+                            <tr>
+                                <th style={{ border: '1px solid #ccc', borderBottomWidth:'3px', padding: '8px', paddingLeft: '5px', textAlign: 'left' }}>선택 호실</th>
+                                <td style={{ border: '1px solid #ccc', borderBottomWidth:'3px', padding: '8px', paddingLeft: '5px' }}>{roomName}호 {selectedPartition}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+
+
           <div style={{ marginTop: '20px', textAlign: 'center' }}>
             <MuiButton
               variant="contained"
               onClick={() => setIsOpen(false)}
-              style={{ marginRight: '40px' }}>
+              style={{ marginRight: '40px', backgroundColor:'#D9D9D9', color:'black'}}>
               취소
             </MuiButton>
             <MuiButton
               variant="contained"
               onClick={handleConfirmReservation}
+              style={{backgroundColor:'#002D56', color:'white'}}
               disabled={!userName}>
-              확인
+              예약 하기
             </MuiButton>
           </div>
         </div>
@@ -393,3 +410,6 @@ const fetchData = async () => {
 };
 
 export default RoomPage;
+
+
+ 
