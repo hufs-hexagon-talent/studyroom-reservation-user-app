@@ -73,7 +73,6 @@ const RoomPage = () => {
   const [selectedPartition, setSelectedPartition] = useState(null);
   const [startTimeIndex, setStartTimeIndex] = useState(null);
   const [endTimeIndex, setEndTimeIndex] = useState(null);
-  const [userName, setUserName] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const { roomName } = useParams();
   const times = useMemo(() => createTimeTable(timeTableConfig), []);
@@ -170,8 +169,9 @@ const RoomPage = () => {
    // 데이터를 수정하는 함수
   const handleConfirmReservation = async () => {
     const address = `Rooms/${roomName}/Days/${currentDay}/Reservations`;
+
     let docRef;
-    if (startTimeIndex !== null && endTimeIndex !== null && userName !== '') {
+    if (startTimeIndex !== null && endTimeIndex !== null) {
       const startHour = times[startTimeIndex].split(':')[0];
       const startMinute = times[startTimeIndex].split(':')[1];
       const endHour = times[endTimeIndex].split(':')[0];
@@ -181,20 +181,20 @@ const RoomPage = () => {
         partitionName: selectedPartition,
         startTime: [startHour, startMinute],
         endTime: [endHour, endMinute],
-        userName: userName,
         roomName: roomName,
       });
 
       setIsOpen(false);
       await fetchData();
-    }
-    const reservedId = docRef.id;
-    const ref = doc(fs, `Rooms/${roomName}/Days/${currentDay}/Reservations/${reservedId}`);
-    await updateDoc(ref, {
-      roomId : reservedId
-    });
-    navigate(`/${roomName}/${reservedId}/reservations`);
+
+      const reservedId = docRef.id;
+      const ref = doc(fs, `Rooms/${roomName}/Days/${currentDay}/Reservations/${reservedId}`);
+      await updateDoc(ref, {
+        roomId : reservedId
+      });
+    } 
   };
+  
   
   // 새로운 함수를 생성해 중복을 제거
 const pushReservedTime = (docSnap, reservedSlots) => {
@@ -369,24 +369,23 @@ const fetchData = async () => {
                 <div>
                     <table style={{ borderCollapse: 'collapse', width: '100%' }}>
                         <tbody>
-                            <tr>
-                                <th style={{ border: '1px solid #ccc', borderTopWidth:'3px', padding: '8px', paddingLeft: '5px', textAlign: 'left' }}>선택 일자</th>
-                                <td style={{ border: '1px solid #ccc', borderTopWidth:'3px', padding: '8px', paddingLeft: '5px' }}>{currentDay}</td> {/*이건 고쳐야됨*/}
-                            </tr>
-                            <tr>
-                                <th style={{ border: '1px solid #ccc', padding: '8px', paddingLeft: '5px', textAlign: 'left' }}>선택 시간</th>
-                                <td style={{ border: '1px solid #ccc', padding: '8px', paddingLeft: '5px' }}>{times[startTimeIndex]} - {times[endTimeIndex+1]}</td>
-                            </tr>
-                            <tr>
-                                <th style={{ border: '1px solid #ccc', borderBottomWidth:'3px', padding: '8px', paddingLeft: '5px', textAlign: 'left' }}>선택 호실</th>
-                                <td style={{ border: '1px solid #ccc', borderBottomWidth:'3px', padding: '8px', paddingLeft: '5px' }}>{roomName}호 {selectedPartition}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-        </div>
-
+                          <tr>
+                            <th style={{ border: '1px solid #ccc', borderTopWidth:'3px', padding: '8px', paddingLeft: '5px', textAlign: 'left' }}>선택 일자</th>
+                            <td style={{ border: '1px solid #ccc', borderTopWidth:'3px', padding: '8px', paddingLeft: '5px' }}>{currentDay}</td> {/*이건 고쳐야됨*/}
+                          </tr>
+                          <tr>
+                            <th style={{ border: '1px solid #ccc', padding: '8px', paddingLeft: '5px', textAlign: 'left' }}>선택 시간</th>
+                            <td style={{ border: '1px solid #ccc', padding: '8px', paddingLeft: '5px' }}>{times[startTimeIndex]} - {times[endTimeIndex+1]}</td>
+                          </tr>
+                          <tr>
+                            <th style={{ border: '1px solid #ccc', borderBottomWidth:'3px', padding: '8px', paddingLeft: '5px', textAlign: 'left' }}>선택 호실</th>
+                            <td style={{ border: '1px solid #ccc', borderBottomWidth:'3px', padding: '8px', paddingLeft: '5px' }}>{roomName}호 {selectedPartition}</td>
+                          </tr>
+                      </tbody>
+                  </table>
+              </div>
+          </section>
+      </div>
 
           <div style={{ marginTop: '20px', textAlign: 'center' }}>
             <MuiButton
@@ -397,9 +396,12 @@ const fetchData = async () => {
             </MuiButton>
             <MuiButton
               variant="contained"
-              onClick={handleConfirmReservation}
+              onClick={()=>{
+                handleConfirmReservation();
+                navigate('/login');
+              }}
               style={{backgroundColor:'#002D56', color:'white'}}
-              disabled={!userName}>
+            >
               예약 하기
             </MuiButton>
           </div>
