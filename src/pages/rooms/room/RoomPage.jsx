@@ -11,6 +11,9 @@ import {
   TableRow,
   Typography,
 } from '@mui/material';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { DatePicker } from '@mui/x-date-pickers';
+import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
 import { addMinutes, format } from 'date-fns';
 import { addDoc, collection, doc, getDoc, getDocs, query, updateDoc } from 'firebase/firestore';
 
@@ -245,15 +248,16 @@ const fetchData = async () => {
   return (
     <>
       <div style={{ marginBottom: '50px' }}>
-        <br />
-        <Typography marginTop='10px' variant="h5" fontWeight={30} component="div" align="center">
+        <Typography marginTop='50px' variant="h5" fontWeight={600} component="div" align="center">
           세미나실 예약하기
         </Typography>
         <div className="mt-5 mb-10 flex justify-center" style={{ color : '#9D9FA2' }}>
         아래 예약 현황의 예약가능 시간을 선택하시면 해당 세미나실을 대관할 수 있습니다.
         </div>
         <div className='ml-8'>
-          <input style={{marginRight : '30px'}}type='month' value={'2024-02'}/>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DatePicker label="예약 날짜 선택"/>
+          </LocalizationProvider>
           <input type="text" list="rooms" /><br />
           <datalist id="rooms">
             <option value="306호" />
@@ -282,7 +286,7 @@ const fetchData = async () => {
             <TableRow>
               <TableCell align="center" width={100} />
               {times.map((time, timeIndex) => (
-                <TableCell 
+                <TableCell
                   key={timeIndex} 
                   align="center"
                   width={200} 
@@ -366,26 +370,26 @@ const fetchData = async () => {
           </div>
           <div>
             <section style={{ marginBottom: '10px' }}>
-                <div>
-                    <table style={{ borderCollapse: 'collapse', width: '100%' }}>
-                        <tbody>
-                          <tr>
-                            <th style={{ border: '1px solid #ccc', borderTopWidth:'3px', padding: '8px', paddingLeft: '5px', textAlign: 'left' }}>선택 일자</th>
-                            <td style={{ border: '1px solid #ccc', borderTopWidth:'3px', padding: '8px', paddingLeft: '5px' }}>{currentDay}</td> {/*이건 고쳐야됨*/}
-                          </tr>
-                          <tr>
-                            <th style={{ border: '1px solid #ccc', padding: '8px', paddingLeft: '5px', textAlign: 'left' }}>선택 시간</th>
-                            <td style={{ border: '1px solid #ccc', padding: '8px', paddingLeft: '5px' }}>{times[startTimeIndex]} - {times[endTimeIndex+1]}</td>
-                          </tr>
-                          <tr>
-                            <th style={{ border: '1px solid #ccc', borderBottomWidth:'3px', padding: '8px', paddingLeft: '5px', textAlign: 'left' }}>선택 호실</th>
-                            <td style={{ border: '1px solid #ccc', borderBottomWidth:'3px', padding: '8px', paddingLeft: '5px' }}>{roomName}호 {selectedPartition}</td>
-                          </tr>
-                      </tbody>
-                  </table>
+              <div>
+                <table style={{ borderCollapse: 'collapse', width: '100%' }}>
+                  <tbody>
+                    <tr>
+                      <th style={{ border: '1px solid #ccc', borderTopWidth:'3px', padding: '8px', paddingLeft: '5px', textAlign: 'left' }}>선택 일자</th>
+                      <td style={{ border: '1px solid #ccc', borderTopWidth:'3px', padding: '8px', paddingLeft: '5px' }}>{currentDay}</td> {/*이건 고쳐야됨*/}
+                    </tr>
+                    <tr>
+                      <th style={{ border: '1px solid #ccc', padding: '8px', paddingLeft: '5px', textAlign: 'left' }}>선택 시간</th>
+                      <td style={{ border: '1px solid #ccc', padding: '8px', paddingLeft: '5px' }}>{times[startTimeIndex]} - {times[endTimeIndex+1]}</td>
+                    </tr>
+                    <tr>
+                      <th style={{ border: '1px solid #ccc', borderBottomWidth:'3px', padding: '8px', paddingLeft: '5px', textAlign: 'left' }}>선택 호실</th>
+                      <td style={{ border: '1px solid #ccc', borderBottomWidth:'3px', padding: '8px', paddingLeft: '5px' }}>{roomName}호 {selectedPartition}</td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
-          </section>
-      </div>
+            </section>
+          </div>
 
           <div style={{ marginTop: '20px', textAlign: 'center' }}>
             <MuiButton
