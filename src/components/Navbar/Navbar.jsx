@@ -19,7 +19,7 @@ const Navbar = () => {
           <h1 className="text-white text-xl font-bold ml-4">
             {' '}
             {/* h1 태그 적용 */}
-            컴퓨터공학부 스터디룸 예약 시스템
+            컴퓨터공학부 세미나실 예약 시스템
           </h1>
         </div>
         <ul className="flex flex-col md:flex-row list-none text-center md:text-left">
@@ -33,6 +33,11 @@ const Navbar = () => {
           <li className="mb-3 md:mb-0 md:mr-6">
             <Link to="./check" className="text-white hover:text-gray-300">
               내 신청 현황
+            </Link>
+          </li>
+          <li className="mb-3 md:mb-0 md:mr-6">
+            <Link to="./notice" className="text-white hover:text-gray-300">
+              이용 규칙
             </Link>
           </li>
           <li className="mb-3 md:mb-0 md:mr-6">

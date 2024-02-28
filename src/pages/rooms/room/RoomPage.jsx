@@ -282,7 +282,7 @@ const fetchData = async () => {
             <TableRow>
               <TableCell align="center" width={100} />
               {times.map((time, timeIndex) => (
-                <TableCell 
+                <TableCell
                   key={timeIndex} 
                   align="center"
                   width={200} 
@@ -366,26 +366,26 @@ const fetchData = async () => {
           </div>
           <div>
             <section style={{ marginBottom: '10px' }}>
-                <div>
-                    <table style={{ borderCollapse: 'collapse', width: '100%' }}>
-                        <tbody>
-                          <tr>
-                            <th style={{ border: '1px solid #ccc', borderTopWidth:'3px', padding: '8px', paddingLeft: '5px', textAlign: 'left' }}>선택 일자</th>
-                            <td style={{ border: '1px solid #ccc', borderTopWidth:'3px', padding: '8px', paddingLeft: '5px' }}>{currentDay}</td> {/*이건 고쳐야됨*/}
-                          </tr>
-                          <tr>
-                            <th style={{ border: '1px solid #ccc', padding: '8px', paddingLeft: '5px', textAlign: 'left' }}>선택 시간</th>
-                            <td style={{ border: '1px solid #ccc', padding: '8px', paddingLeft: '5px' }}>{times[startTimeIndex]} - {times[endTimeIndex+1]}</td>
-                          </tr>
-                          <tr>
-                            <th style={{ border: '1px solid #ccc', borderBottomWidth:'3px', padding: '8px', paddingLeft: '5px', textAlign: 'left' }}>선택 호실</th>
-                            <td style={{ border: '1px solid #ccc', borderBottomWidth:'3px', padding: '8px', paddingLeft: '5px' }}>{roomName}호 {selectedPartition}</td>
-                          </tr>
-                      </tbody>
-                  </table>
+              <div>
+                <table style={{ borderCollapse: 'collapse', width: '100%' }}>
+                  <tbody>
+                    <tr>
+                      <th style={{ border: '1px solid #ccc', borderTopWidth:'3px', padding: '8px', paddingLeft: '5px', textAlign: 'left' }}>선택 일자</th>
+                      <td style={{ border: '1px solid #ccc', borderTopWidth:'3px', padding: '8px', paddingLeft: '5px' }}>{currentDay}</td> {/*이건 고쳐야됨*/}
+                    </tr>
+                    <tr>
+                      <th style={{ border: '1px solid #ccc', padding: '8px', paddingLeft: '5px', textAlign: 'left' }}>선택 시간</th>
+                      <td style={{ border: '1px solid #ccc', padding: '8px', paddingLeft: '5px' }}>{times[startTimeIndex]} - {times[endTimeIndex+1]}</td>
+                    </tr>
+                    <tr>
+                      <th style={{ border: '1px solid #ccc', borderBottomWidth:'3px', padding: '8px', paddingLeft: '5px', textAlign: 'left' }}>선택 호실</th>
+                      <td style={{ border: '1px solid #ccc', borderBottomWidth:'3px', padding: '8px', paddingLeft: '5px' }}>{roomName}호 {selectedPartition}</td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
-          </section>
-      </div>
+            </section>
+          </div>
 
           <div style={{ marginTop: '20px', textAlign: 'center' }}>
             <MuiButton
