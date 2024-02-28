@@ -11,6 +11,9 @@ import {
   TableRow,
   Typography,
 } from '@mui/material';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { DatePicker } from '@mui/x-date-pickers';
+import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
 import { addMinutes, format } from 'date-fns';
 import { addDoc, collection, doc, getDoc, getDocs, query, updateDoc } from 'firebase/firestore';
 
@@ -245,15 +248,16 @@ const fetchData = async () => {
   return (
     <>
       <div style={{ marginBottom: '50px' }}>
-        <br />
-        <Typography marginTop='10px' variant="h5" fontWeight={30} component="div" align="center">
+        <Typography marginTop='50px' variant="h5" fontWeight={600} component="div" align="center">
           세미나실 예약하기
         </Typography>
         <div className="mt-5 mb-10 flex justify-center" style={{ color : '#9D9FA2' }}>
         아래 예약 현황의 예약가능 시간을 선택하시면 해당 세미나실을 대관할 수 있습니다.
         </div>
         <div className='ml-8'>
-          <input style={{marginRight : '30px'}}type='month' value={'2024-02'}/>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DatePicker label="예약 날짜 선택"/>
+          </LocalizationProvider>
           <input type="text" list="rooms" /><br />
           <datalist id="rooms">
             <option value="306호" />
