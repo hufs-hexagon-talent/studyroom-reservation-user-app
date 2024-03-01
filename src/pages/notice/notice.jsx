@@ -3,14 +3,14 @@ import React from "react";
 const Notice=()=>{
   
   return(
-    <div>
+    <div className="ml-10 mr-10">
       <div className="font-bold mt-10 text-2xl text-center">
         컴퓨터공학부 세미나실 이용 규칙 및 예약 주의 사항
       </div>
-      <div className="font-bold mt-10 ml-5 text-xl">
+      <div className="font-bold mt-10 text-xl">
         이용 규칙 : 
       </div>
-      <div className="mt-8 ml-10">
+      <div className="mt-8 ml-5">
         <div>
           1. 운영시간은 오전 8시부터 밤 10시까지 입니다. 퇴실 시간을 정확히 지켜주시기 바랍니다.
         </div>
@@ -21,10 +21,10 @@ const Notice=()=>{
           3. 함께 사용하는 공간 이므로 깨끗하게 사용해주시고 공공 에티켓을 지켜 주시기 바랍니다. 그렇지 않은 경우에는 이후 학부 공간 사용을 제한할 수도 있습니다.
         </div>
       </div>
-      <div className="font-bold mt-10 ml-5 text-xl">
+      <div className="font-bold mt-10 text-xl">
         주의 사항 : 
       </div>
-      <div className="mt-8 ml-10 ">
+      <div className="mt-8 ml-5">
         <div>
           1. 세미나실을 예약 가능한 시간은 2시간으로 제한됩니다.
         </div>

@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { doc, getDoc } from 'firebase/firestore';
 
-import boo from '../../assets/boo.jpeg';
 import Button from '../../components/Button';
 import { fs } from '../../firebase';
 
@@ -57,11 +56,6 @@ const ReservationsPage = () => {
             <div className="text-xl">{reservationData.userName}님,</div>
             <div className="text-2xl">예약 되었습니다!</div>
           </h1>
-          <div className="flex justify-center items-center">
-            <div className="w-48 h-48">
-              <img src={boo} alt="boo" />
-            </div>
-          </div>
           <div className="flex justify-center items-center">
             <div className="bg-blue-200 w-full max-w-lg py-10 rounded-lg text-center shadow-lg">
               <p className="text-2xl font-semibold">예약 내역</p>
