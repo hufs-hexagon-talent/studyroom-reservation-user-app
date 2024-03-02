@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef,useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import bars from '../../assets/bars icon.png';
@@ -6,21 +6,42 @@ import logo from '../../assets/logo.png';
 
 const Navbar = () => {
   const [isMobile, setIsMobile] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const sidebarRef = useRef(null);
 
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth <= 850);
     };
 
-    // 초기 로딩 시와 리사이즈 이벤트 발생 시 handleResize 함수 호출
     handleResize();
     window.addEventListener('resize', handleResize);
 
-    // 컴포넌트가 unmount 될 때 resize 이벤트 리스너 제거
     return () => {
       window.removeEventListener('resize', handleResize);
     };
   }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  const handleSidebar = () => {
+    setIsOpen(!isOpen);
+  }
+
+  const handleSidebarClick = (event) => {
+    event.stopPropagation();
+  }
 
   return (
     <nav className="bg-white border border-2">
@@ -35,9 +56,37 @@ const Navbar = () => {
             </h1>
           </div>
 
-          <div className="md:hidden mr-3">
+          <div className="md:hidden mr-3" onClick={handleSidebar}>
             <img src={bars} alt="Menu" className="w-6 h-6 cursor-pointer" />
           </div>
+        </div>
+
+        <div ref={sidebarRef} onClick={handleSidebarClick} 
+          className={`text-white fixed right-0 w-64 h-full transform transition-transform duration-300 ease-out ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}
+          style={{backgroundColor:'#002D56'}}
+        >
+          <ul className="relative top-5 w-full px-5 box-border">
+            <li className='mb-3'>
+              <Link to="./rooms">
+                세미나실 예약하기
+              </Link>
+            </li>
+            <li className='mb-3'>
+              <Link to="./check">
+                내 신청 현황
+              </Link>
+            </li>
+            <li className='mb-3'>
+              <Link to="./notice">
+                이용 규칙
+              </Link>
+            </li>
+            <li>
+              <Link to="./login">
+                로그인
+              </Link>
+            </li>
+          </ul>
         </div>
 
         <ul
