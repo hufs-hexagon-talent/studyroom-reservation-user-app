@@ -45,22 +45,22 @@ const Navbar = () => {
         <ul
           className={`flex flex-col mt-5 md:flex-row list-none text-center md:text-left mt- ${isMobile ? 'hidden' : 'block'}`}>
           <li className="mb-3 md:mb-0 md:mr-6">
-            <Link to="./rooms" className="hover:text-gray-300">
+            <Link to="./rooms" className="hover:opacity-50">
               세미나실 예약하기
             </Link>
           </li>
           <li className="mb-3 md:mb-0 md:mr-6">
-            <Link to="./check" className="hover:text-gray-300">
+            <Link to="./check" className="hover:opacity-50">
               내 신청 현황
             </Link>
           </li>
           <li className="mb-3 md:mb-0 md:mr-6">
-            <Link to="./notice" className="hover:text-gray-300">
+            <Link to="./notice" className="hover:opacity-50">
               이용 규칙
             </Link>
           </li>
           <li className="mb-3 md:mb-0 md:mr-6">
-            <Link to="./login" className="hover:text-gray-300">
+            <Link to="./login" className="hover:opacity-50">
               로그인
             </Link>
           </li>
