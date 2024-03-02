@@ -31,7 +31,7 @@ const Navbar = () => {
               <img src={logo} alt="" className="w-16 h-16 cursor-pointer" />
             </Link>
             <h1 className="text-xl font-bold ml-4" style={{ color: '#002D56' }}>
-              컴퓨터공학부 세미나실 예약 시스템
+              컴퓨터공학부 세미나실 예약 시스템!
             </h1>
           </div>
 
