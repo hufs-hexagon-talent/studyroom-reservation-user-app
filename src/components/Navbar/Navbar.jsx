@@ -23,7 +23,7 @@ const Navbar = () => {
   }, []);
 
   return (
-    <nav className="bg-white border border-2">
+    <nav className="bg-white border-2">
       <div className="flex flex-col md:flex-row justify-between p-4">
         <div className="flex justify-between items-center mb-4 md:mb-0">
           <div className="flex items-center">
@@ -35,7 +35,9 @@ const Navbar = () => {
             </h1>
           </div>
 
-          <div className="md:hidden mr-3">
+          <div
+            className="md:hidden mr-3"
+            onClick={() => setIsMobile(!isMobile)}>
             <img src={bars} alt="Menu" className="w-6 h-6 cursor-pointer" />
           </div>
         </div>
@@ -43,22 +45,22 @@ const Navbar = () => {
         <ul
           className={`flex flex-col mt-5 md:flex-row list-none text-center md:text-left mt- ${isMobile ? 'hidden' : 'block'}`}>
           <li className="mb-3 md:mb-0 md:mr-6">
-            <Link to="./rooms" className="hover:text-gray-300">
+            <Link to="./rooms" className="hover:opacity-50">
               세미나실 예약하기
             </Link>
           </li>
           <li className="mb-3 md:mb-0 md:mr-6">
-            <Link to="./check" className="hover:text-gray-300">
+            <Link to="./check" className="hover:opacity-50">
               내 신청 현황
             </Link>
           </li>
           <li className="mb-3 md:mb-0 md:mr-6">
-            <Link to="./notice" className="hover:text-gray-300">
+            <Link to="./notice" className="hover:opacity-50">
               이용 규칙
             </Link>
           </li>
           <li className="mb-3 md:mb-0 md:mr-6">
-            <Link to="./login" className="hover:text-gray-300">
+            <Link to="./login" className="hover:opacity-50">
               로그인
             </Link>
           </li>
