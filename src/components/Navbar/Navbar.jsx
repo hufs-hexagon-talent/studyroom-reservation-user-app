@@ -1,4 +1,4 @@
-import React, { useEffect,useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import bars from '../../assets/bars icon.png';
@@ -31,7 +31,7 @@ const Navbar = () => {
               <img src={logo} alt="" className="w-16 h-16 cursor-pointer" />
             </Link>
             <h1 className="text-xl font-bold ml-4" style={{ color: '#002D56' }}>
-              컴퓨터공학부 세미나실 예약 시스템!
+              컴퓨터공학부 세미나실 예약 시스템
             </h1>
           </div>
 
@@ -40,7 +40,8 @@ const Navbar = () => {
           </div>
         </div>
 
-        <ul className={`flex flex-col mt-5 md:flex-row list-none text-center md:text-left mt- ${isMobile ? 'hidden' : 'block'}`}>
+        <ul
+          className={`flex flex-col mt-5 md:flex-row list-none text-center md:text-left mt- ${isMobile ? 'hidden' : 'block'}`}>
           <li className="mb-3 md:mb-0 md:mr-6">
             <Link to="./rooms" className="hover:text-gray-300">
               세미나실 예약하기
