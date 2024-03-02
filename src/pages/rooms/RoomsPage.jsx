@@ -15,8 +15,16 @@ const fetchRoomsData = async () => {
 
 const RoomsPage = () => {
   const navigate = useNavigate();
-
   const [rooms, setRooms] = useState([]); // {id:{name:"123"}} -> [[id,{name:"asdf"}], [id,{name:"123"}]]
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = today.getMonth() + 1;
+  const day = today.getDate();
+  
+  let monthFormatted = month < 10 ? `0${month}` : month;
+  let dayFormatted = day < 10 ? `0${day}` : day;
+
+  const currentDay = `${year}.${monthFormatted}.${dayFormatted}`;
 
   const fetch = useCallback(async () => {
     setRooms(await fetchRoomsData());
@@ -28,7 +36,7 @@ const RoomsPage = () => {
 
   const handleButtonClick = async (roomId) => {
     try {
-      const docAddress = collection(fs, `Rooms/${roomId}/Days/${roomId}/Reservations`);
+      const docAddress = collection(fs, `Rooms/${roomId}/Days/${currentDay}/Reservations`);
       console.log(docAddress);
       navigate(`/rooms/${roomId}/roompage`);
     } catch (error) {

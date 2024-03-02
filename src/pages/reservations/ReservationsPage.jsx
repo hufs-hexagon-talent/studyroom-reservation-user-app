@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { doc, getDoc } from 'firebase/firestore';
 
-import boo from '../../assets/boo.jpeg';
 import Button from '../../components/Button';
 import { fs } from '../../firebase';
 
@@ -10,12 +9,22 @@ const ReservationsPage = () => {
   const navigate = useNavigate();
   const { roomId, roomNumber } = useParams();
   const [reservationData, setReservationData] = useState(null);
+  
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = today.getMonth() + 1;
+  const day = today.getDate();
+  
+  let monthFormatted = month < 10 ? `0${month}` : month;
+  let dayFormatted = day < 10 ? `0${day}` : day;
+
+  const currentDay = `${year}.${monthFormatted}.${dayFormatted}`;
 
   useEffect(() => {
     const fetchData = async () => {
       const docRef = doc(
         fs,
-        `Rooms/${roomNumber}/Days/${roomNumber}/Reservations`,
+        `Rooms/${roomNumber}/Days/${currentDay}/Reservations`,
         roomId,
       );
       const docSnap = await getDoc(docRef);
@@ -48,11 +57,6 @@ const ReservationsPage = () => {
             <div className="text-2xl">예약 되었습니다!</div>
           </h1>
           <div className="flex justify-center items-center">
-            <div className="w-48 h-48">
-              <img src={boo} alt="boo" />
-            </div>
-          </div>
-          <div className="flex justify-center items-center">
             <div className="bg-blue-200 w-full max-w-lg py-10 rounded-lg text-center shadow-lg">
               <p className="text-2xl font-semibold">예약 내역</p>
               <br />
@@ -71,7 +75,7 @@ const ReservationsPage = () => {
           <Button
             text={'완료'}
             onClick={() => {
-              navigate('/');
+              navigate('');
             }}
           />
           <br />
