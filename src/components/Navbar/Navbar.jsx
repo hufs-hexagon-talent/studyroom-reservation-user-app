@@ -23,7 +23,7 @@ const Navbar = () => {
   }, []);
 
   return (
-    <nav className="bg-white border border-2">
+    <nav className="bg-white border-2">
       <div className="flex flex-col md:flex-row justify-between p-4">
         <div className="flex justify-between items-center mb-4 md:mb-0">
           <div className="flex items-center">
@@ -35,7 +35,9 @@ const Navbar = () => {
             </h1>
           </div>
 
-          <div className="md:hidden mr-3">
+          <div
+            className="md:hidden mr-3"
+            onClick={() => setIsMobile(!isMobile)}>
             <img src={bars} alt="Menu" className="w-6 h-6 cursor-pointer" />
           </div>
         </div>
