@@ -67,22 +67,22 @@ const Navbar = () => {
         >
           <ul className="relative top-5 w-full px-5 box-border">
             <li className='mb-3'>
-              <Link to="./rooms">
+              <Link to="./rooms" onClick={handleSidebar}>
                 세미나실 예약하기
               </Link>
             </li>
             <li className='mb-3'>
-              <Link to="./check">
+              <Link to="./check" onClick={handleSidebar}>
                 내 신청 현황
               </Link>
             </li>
             <li className='mb-3'>
-              <Link to="./notice">
+              <Link to="./notice" onClick={handleSidebar}>
                 이용 규칙
               </Link>
             </li>
             <li>
-              <Link to="./login">
+              <Link to="./login" onClick={handleSidebar}>
                 로그인
               </Link>
             </li>
