@@ -44,24 +44,8 @@ const Navbar = () => {
   }
 
   return (
-    <nav className="bg-white border border-2">
-      <div className="flex flex-col md:flex-row justify-between p-4">
-        <div className="flex justify-between items-center mb-4 md:mb-0">
-          <div className="flex items-center">
-            <Link to="./rooms">
-              <img src={logo} alt="" className="w-16 h-16 cursor-pointer" />
-            </Link>
-            <h1 className="text-xl font-bold ml-4" style={{ color: '#002D56' }}>
-              컴퓨터공학부 세미나실 예약 시스템
-            </h1>
-          </div>
-
-          <div className="md:hidden mr-3" onClick={handleSidebar}>
-            <img src={bars} alt="Menu" className="w-6 h-6 cursor-pointer" />
-          </div>
-        </div>
-
-        <div ref={sidebarRef} onClick={handleSidebarClick} 
+    <nav className="bg-white border-2" style={{borderBottomColor:'#002D56', borderTop:'none'}}>
+      <div ref={sidebarRef} onClick={handleSidebarClick} 
           className={`text-white fixed right-0 w-64 h-full transform transition-transform duration-300 ease-out ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}
           style={{backgroundColor:'#002D56'}}
         >
@@ -89,6 +73,22 @@ const Navbar = () => {
           </ul>
         </div>
 
+      <div className="flex flex-col md:flex-row justify-between p-4">
+        <div className="flex justify-between items-center mb-4 md:mb-0">
+          <div className="flex items-center">
+            <Link to="./rooms">
+              <img src={logo} alt="" className="w-16 h-16 cursor-pointer" />
+            </Link>
+            <h1 className="text-xl font-bold ml-4" style={{ color: '#002D56' }}>
+              컴퓨터공학부 세미나실 예약 시스템
+            </h1>
+          </div>
+
+          <div className="md:hidden mr-3" onClick={handleSidebar}>
+            <img src={bars} alt="Menu" className="w-6 h-6 cursor-pointer" />
+          </div>
+        </div>
+
         <ul
           className={`flex flex-col mt-5 md:flex-row list-none text-center md:text-left mt- ${isMobile ? 'hidden' : 'block'}`}>
           <li className="mb-3 md:mb-0 md:mr-6">
@@ -114,6 +114,7 @@ const Navbar = () => {
         </ul>
       </div>
     </nav>
+    
   );
 };
 
