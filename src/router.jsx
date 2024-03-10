@@ -13,21 +13,16 @@ import RoomsPage from './pages/rooms/RoomsPage';
 const Router = () => {
   return (
     <BrowserRouter basename={process.env.REACT_APP_BASEURL || '/'}>
-      {/* <Navbar /> */}
       <div className="flex">
-        <SideBar />
+        <SideBar /> {/* 사이드 바*/}
         <Routes>
           <Route path="/" element={<App />} /> {/* 소개 페이지 */}
           <Route path="/login" element={<LoginPage />} /> {/* 로그인 페이지 */}
           <Route path="/rooms" element={<RoomsPage />} /> {/* Room 목록 */}
-          <Route path="/rooms/:roomName/roompage" element={<RoomPage />} />{' '}
-          {/*Room*/}
-          <Route
-            path="/:roomNumber/:roomId/reservations"
-            element={<ReservationsPage />}
-          />
-          <Route path="/check" element={<Check />} />
-          <Route path="/notice" element={<Notice />} />
+          <Route path="/rooms/:roomName/roompage" element={<RoomPage />} /> {/* Room 예약 */}
+          <Route path="/:roomNumber/:roomId/reservations" element={<ReservationsPage />}/> {/* 예약완료 창 */}
+          <Route path="/check" element={<Check />} /> {/* 내 예약 현황 확인 페이지 */}
+          <Route path="/notice" element={<Notice />} /> {/* 이용 규칙 */}
         </Routes>
       </div>
     </BrowserRouter>

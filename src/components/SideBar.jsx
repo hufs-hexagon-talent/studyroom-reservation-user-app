@@ -7,7 +7,7 @@ const SideBar = () => {
   return (
     <Sidebar aria-label="Default sidebar example" className="flex h-screen">
       <Sidebar.Logo href="/" img="/img/logo.png" imgAlt="Logo" style={{height: '50px'}}>
-        컴퓨터공학부 세미나실 예약 시스템
+        세미나실 예약 시스템
       </Sidebar.Logo>
       <Sidebar.Items>
         <Sidebar.ItemGroup>
