@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { doc, getDoc } from 'firebase/firestore';
 
-import Button from '../../components/Button';
+import Button from '../../components/button/Button';
 import { fs } from '../../firebase';
 
 const ReservationsPage = () => {

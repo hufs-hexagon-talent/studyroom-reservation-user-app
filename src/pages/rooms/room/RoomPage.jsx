@@ -17,9 +17,7 @@ import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
 import { addMinutes, format } from 'date-fns';
 import { addDoc, collection, doc, getDoc, getDocs, query, updateDoc } from 'firebase/firestore';
 
-import './Roompage.css';
-
-import Button from '../../../components/Button';
+import Button from '../../../components/button/Button';
 import { fs } from '../../../firebase';
 
 //시간 데이터

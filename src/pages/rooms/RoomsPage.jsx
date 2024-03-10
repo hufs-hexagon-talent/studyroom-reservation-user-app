@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { collection, getDocs, query } from 'firebase/firestore';
 
-import Button from '../../components/Button';
+import Button from '../../components/button/Button';
 import { fs } from '../../firebase';
 
 const fetchRoomsData = async () => {
