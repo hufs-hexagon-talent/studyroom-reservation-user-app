@@ -1,15 +1,20 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 import './index.css';
 
 import reportWebVitals from './reportWebVitals';
 import Router from './router';
 
+const queryClient = new QueryClient();
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <Router />
+    <QueryClientProvider client={queryClient}>
+      <Router />
+    </QueryClientProvider>
   </React.StrictMode>,
 );
 
