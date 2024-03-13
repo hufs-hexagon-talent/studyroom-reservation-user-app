@@ -69,7 +69,7 @@ const LoginPage = () => {
             />
           </div>
         </form>
-        <div className="flex mt-5 gap-4 justify-center">
+        <div className="flex mt-5 mb-5 gap-4 justify-center">
           <Button
             className="w-24 h-10 mr-2 ml-3 cursor-pointer text-black text-lg hover:opacity-90 flex items-center justify-center"
             color="gray">

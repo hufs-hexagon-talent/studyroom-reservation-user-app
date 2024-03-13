@@ -1,5 +1,6 @@
 'use client';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { HiInformationCircle } from 'react-icons/hi';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   Button as MuiButton,
@@ -26,6 +27,7 @@ import {
   updateDoc,
 } from 'firebase/firestore';
 import { Dropdown } from 'flowbite-react';
+import { Alert } from 'flowbite-react';
 
 import Button from '../../../components/button/Button';
 import { fs } from '../../../firebase';
@@ -137,8 +139,12 @@ const RoomPage = () => {
           Math.abs(startTimeIndex - timeIndex) + 1 >
           timeTableConfig.maxReservationSlots
         ) {
-          alert('최대 2시간 까지 선택할 수 있습니다.');
-          return;
+          return (
+            <Alert color="failure" icon={HiInformationCircle}>
+              <span className="font-medium">경고!</span> 예약은 최대 두시간
+              까지만 가능합니다.
+            </Alert>
+          );
         }
         if (startTimeIndex === timeIndex) {
           setSelectedPartition(null);
