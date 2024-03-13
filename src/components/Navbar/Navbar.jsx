@@ -1,4 +1,4 @@
-import React, { useEffect, useRef,useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import bars from '../../assets/bars icon.png';
@@ -23,11 +23,11 @@ const Navbar = () => {
   }, []);
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
+    const handleClickOutside = event => {
       if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
         setIsOpen(false);
       }
-    }
+    };
     document.addEventListener('mousedown', handleClickOutside);
 
     return () => {
@@ -37,41 +37,44 @@ const Navbar = () => {
 
   const handleSidebar = () => {
     setIsOpen(!isOpen);
-  }
+  };
 
-  const handleSidebarClick = (event) => {
+  const handleSidebarClick = event => {
     event.stopPropagation();
-  }
+  };
 
   return (
-    <nav className="bg-white border-2" style={{borderBottomColor:'#002D56', borderTop:'none'}}>
-      <div ref={sidebarRef} onClick={handleSidebarClick} 
-          className={`text-white fixed right-0 w-64 h-full transform transition-transform duration-300 ease-out ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}
-          style={{backgroundColor:'#002D56'}}
-        >
-          <ul className="relative top-5 w-full px-5 box-border">
-            <li className='mb-3'>
-              <Link to="./rooms" onClick={handleSidebar}>
-                세미나실 예약하기
-              </Link>
-            </li>
-            <li className='mb-3'>
-              <Link to="./check" onClick={handleSidebar}>
-                내 신청 현황
-              </Link>
-            </li>
-            <li className='mb-3'>
-              <Link to="./notice" onClick={handleSidebar}>
-                이용 규칙
-              </Link>
-            </li>
-            <li>
-              <Link to="./login" onClick={handleSidebar}>
-                로그인
-              </Link>
-            </li>
-          </ul>
-        </div>
+    <nav
+      className="bg-white border-2"
+      style={{ borderBottomColor: '#002D56', borderTop: 'none' }}>
+      <div
+        ref={sidebarRef}
+        onClick={handleSidebarClick}
+        className={`text-white fixed right-0 w-64 h-full transform transition-transform duration-300 ease-out ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}
+        style={{ backgroundColor: '#002D56' }}>
+        <ul className="relative top-5 w-full px-5 box-border">
+          <li className="mb-3">
+            <Link to="./rooms" onClick={handleSidebar}>
+              세미나실 예약하기
+            </Link>
+          </li>
+          <li className="mb-3">
+            <Link to="./check" onClick={handleSidebar}>
+              내 신청 현황
+            </Link>
+          </li>
+          <li className="mb-3">
+            <Link to="./notice" onClick={handleSidebar}>
+              이용 규칙
+            </Link>
+          </li>
+          <li>
+            <Link to="./login" onClick={handleSidebar}>
+              로그인
+            </Link>
+          </li>
+        </ul>
+      </div>
 
       <div className="flex flex-col md:flex-row justify-between p-4">
         <div className="flex justify-between items-center mb-4 md:mb-0">
@@ -114,7 +117,6 @@ const Navbar = () => {
         </ul>
       </div>
     </nav>
-    
   );
 };
 

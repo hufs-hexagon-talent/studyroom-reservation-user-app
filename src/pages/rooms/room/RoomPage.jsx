@@ -14,7 +14,6 @@ import {
   Typography,
 } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers';
-import { DatePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { addMinutes, format } from 'date-fns';
 import {
@@ -26,8 +25,7 @@ import {
   query,
   updateDoc,
 } from 'firebase/firestore';
-import { Dropdown } from 'flowbite-react';
-import { Alert } from 'flowbite-react';
+import { Alert, Datepicker, Dropdown } from 'flowbite-react';
 
 import Button from '../../../components/button/Button';
 import { fs } from '../../../firebase';
@@ -280,7 +278,11 @@ const RoomPage = () => {
         </div>
         <div className="flex ml-8">
           <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <DatePicker label="예약 날짜 선택" />
+            <Datepicker
+              label="예약 날짜 선택"
+              minDate={new Date(2024, 2, 13)}
+              maxDate={new Date(2024, 2, 19)}
+            />
           </LocalizationProvider>
           <div className="ml-4"></div>
           <Dropdown color="gray" label="호실 선택" dismissOnClick={false}>
