@@ -34,21 +34,23 @@ const LoginPage = () => {
 
   return (
     <>
-      <div className="justify-center w-screen">
-        <h1 className='text-3xl font-bold text-center mt-10'>예약자 정보 기입</h1>
+      <div>
+        <h1 className="text-3xl font-bold text-center mt-10 mb-5">
+          예약자 정보 기입
+        </h1>
       </div>
-      <div className='border'>
+      <div className="border">
         <form>
           <div>
             <div className="mb-2 ml-3 mt-3 block">
               <Label htmlFor="studentId" value="학번" />
             </div>
-            <TextInput 
-              className='ml-3 mr-3 mb-5'
-              id="studentId" 
+            <TextInput
+              className="ml-3 mr-3 mb-5"
+              id="studentId"
               placeholder="ex) 2022xxxxx"
               value={studentId}
-              onChange={e=>setStudentId(e.target.value)}
+              onChange={e => setStudentId(e.target.value)}
               required
             />
           </div>
@@ -56,33 +58,31 @@ const LoginPage = () => {
             <div className="mb-2 ml-3 block">
               <Label htmlFor="name" value="이름" />
             </div>
-            <TextInput 
-              className='ml-3 mr-3'
-              id="name" 
-              type="name" 
-              placeholder='ex) 홍길동' 
+            <TextInput
+              className="ml-3 mr-3"
+              id="name"
+              type="name"
+              placeholder="ex) 홍길동"
               value={userName}
-              onChange={e=>setUserName(e.target.value)}
-              required />
+              onChange={e => setUserName(e.target.value)}
+              required
+            />
           </div>
         </form>
         <div className="flex mt-5 gap-4 justify-center">
-          <Button 
-            className="w-24 h-10 mr-2 ml-3 cursor-pointer text-black text-lg hover:opacity-90 flex items-center justify-center" 
-            color='gray'
-          >
+          <Button
+            className="w-24 h-10 mr-2 ml-3 cursor-pointer text-black text-lg hover:opacity-90 flex items-center justify-center"
+            color="gray">
             취소
           </Button>
-          <Button 
+          <Button
             className="w-24 h-10 ml-2 mr-3 cursor-pointer text-white text-lg hover:opacity-90 flex items-center justify-center"
-            color='dark'
-            onClick={handleSignIn}
-          >
+            color="dark"
+            onClick={handleSignIn}>
             확인
           </Button>
         </div>
       </div>
-      
     </>
   );
 };

@@ -1,3 +1,4 @@
+'use client';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
@@ -13,9 +14,18 @@ import {
 } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { DatePicker } from '@mui/x-date-pickers';
-import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { addMinutes, format } from 'date-fns';
-import { addDoc, collection, doc, getDoc, getDocs, query, updateDoc } from 'firebase/firestore';
+import {
+  addDoc,
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  updateDoc,
+} from 'firebase/firestore';
+import { Dropdown } from 'flowbite-react';
 
 import Button from '../../../components/button/Button';
 import { fs } from '../../../firebase';
@@ -64,7 +74,7 @@ const RoomPage = () => {
   const year = today.getFullYear();
   const month = today.getMonth() + 1;
   const day = today.getDate();
-  
+
   let monthFormatted = month < 10 ? `0${month}` : month;
   let dayFormatted = day < 10 ? `0${day}` : day;
 
@@ -166,8 +176,7 @@ const RoomPage = () => {
     setIsOpen(true);
   };
 
-  
-   // 데이터를 수정하는 함수
+  // 데이터를 수정하는 함수
   const handleConfirmReservation = async () => {
     const address = `Rooms/${roomName}/Days/${currentDay}/Reservations`;
 
@@ -177,7 +186,7 @@ const RoomPage = () => {
       const startMinute = times[startTimeIndex].split(':')[1];
       const endHour = times[endTimeIndex].split(':')[0];
       const endMinute = times[endTimeIndex].split(':')[1];
-  
+
       docRef = await addDoc(collection(fs, address), {
         partitionName: selectedPartition,
         startTime: [startHour, startMinute],
@@ -189,86 +198,104 @@ const RoomPage = () => {
       await fetchData();
 
       const reservedId = docRef.id;
-      const ref = doc(fs, `Rooms/${roomName}/Days/${currentDay}/Reservations/${reservedId}`);
+      const ref = doc(
+        fs,
+        `Rooms/${roomName}/Days/${currentDay}/Reservations/${reservedId}`,
+      );
       await updateDoc(ref, {
-        roomId : reservedId
+        roomId: reservedId,
       });
-    } 
+    }
   };
-  
-  
+
   // 새로운 함수를 생성해 중복을 제거
-const pushReservedTime = (docSnap, reservedSlots) => {
-  docSnap.forEach(doc => {
-    const { startTime, endTime, partitionName } = doc.data();
-    // 시작 시간
-    const startIdx = times.findIndex(
-      time => time === `${startTime[0]}:${startTime[1]}`,
-    );
-    // 종료 시간
-    const endIdx = times.findIndex(
-      time => time === `${endTime[0]}:${endTime[1]}`,
-    );
+  const pushReservedTime = (docSnap, reservedSlots) => {
+    docSnap.forEach(doc => {
+      const { startTime, endTime, partitionName } = doc.data();
+      // 시작 시간
+      const startIdx = times.findIndex(
+        time => time === `${startTime[0]}:${startTime[1]}`,
+      );
+      // 종료 시간
+      const endIdx = times.findIndex(
+        time => time === `${endTime[0]}:${endTime[1]}`,
+      );
 
-    for (let i = startIdx; i <= endIdx; i++) {
-      reservedSlots[partitionName].push(i);
+      for (let i = startIdx; i <= endIdx; i++) {
+        reservedSlots[partitionName].push(i);
+      }
+
+      setReservedSlots(reservedSlots);
+    });
+  };
+  const [slotsArr, setSlotsArr] = useState([]);
+
+  const fetchData = async () => {
+    try {
+      console.log(roomName);
+      const docRef = doc(fs, `Rooms/${roomName}`);
+      const docSnap = await getDoc(docRef);
+      const len = docSnap.data().partitions.length;
+
+      const q = query(
+        collection(fs, `Rooms/${roomName}/Days/${currentDay}/Reservations`),
+      );
+      const querySnap = await getDocs(q);
+
+      const reservedSlots = {};
+      const slotsArray = [];
+      for (let i = 1; i <= len; i++) {
+        reservedSlots[`room${i}`] = [];
+        slotsArray.push(`room${i}`);
+      }
+      setSlotsArr(slotsArray);
+      pushReservedTime(querySnap, reservedSlots);
+    } catch (error) {
+      console.error('Error', error);
     }
-    
-    setReservedSlots(reservedSlots);
-  });
-};
-const [slotsArr, setSlotsArr] = useState([]);
-
-const fetchData = async () => {
-  try {
-    console.log(roomName);
-    const docRef = doc(fs, `Rooms/${roomName}`);
-    const docSnap = await getDoc(docRef);
-    const len = docSnap.data().partitions.length;
-
-    const q = query(collection(fs, `Rooms/${roomName}/Days/${currentDay}/Reservations`));
-    const querySnap = await getDocs(q);
-
-    const reservedSlots = {};
-    const slotsArray = [];
-    for (let i = 1; i <= len; i++) {
-      reservedSlots[`room${i}`] = [];
-      slotsArray.push(`room${i}`);
-    }
-    setSlotsArr(slotsArray);
-    pushReservedTime(querySnap, reservedSlots);
-
-  } catch (error) {
-    console.error('Error', error);
-  }
-};
+  };
 
   return (
     <>
       <div style={{ marginBottom: '50px' }}>
-        <Typography marginTop='50px' variant="h5" fontWeight={600} component="div" align="center">
+        <Typography
+          marginTop="50px"
+          variant="h5"
+          fontWeight={600}
+          component="div"
+          align="center">
           세미나실 예약하기
         </Typography>
-        <div className="mt-5 mb-10 flex justify-center" style={{ color : '#9D9FA2' }}>
-        아래 예약 현황의 예약가능 시간을 선택하시면 해당 세미나실을 대관할 수 있습니다.
+        <div
+          className="mt-5 mb-10 flex justify-center"
+          style={{ color: '#9D9FA2' }}>
+          아래 예약 현황의 예약가능 시간을 선택하시면 해당 세미나실을 대관할 수
+          있습니다.
         </div>
-        <div className='ml-8'>
+        <div className="flex ml-8">
           <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <DatePicker label="예약 날짜 선택"/>
+            <DatePicker label="예약 날짜 선택" />
           </LocalizationProvider>
-          <input type="text" list="rooms" /><br />
-          <datalist id="rooms">
-            <option value="306호" />
-            <option value="428호" />
-          </datalist>
+          <div className="ml-4"></div>
+          <Dropdown color="gray" label="호실 선택" dismissOnClick={false}>
+            <Dropdown.Item>306호</Dropdown.Item>
+            <Dropdown.Item>428호</Dropdown.Item>
+          </Dropdown>
         </div>
-        <div className='flex'>
-          <div className="w-6 h-6 mt-10 ml-10" style={{ backgroundColor: '#F1EEE9' }}></div>
-          <div className='mt-10 ml-2'>예약 가능</div>
-          <div className="w-6 h-6 mt-10 ml-10" style={{ backgroundColor: '#7599BA' }}></div>
-          <div className='mt-10 ml-2'>예약 선택</div>
-          <div className="w-6 h-6 mt-10 ml-10" style={{ backgroundColor: '#002D56' }}></div>
-          <div className='mt-10 ml-2'>예약 완료</div>
+
+        <div className="flex">
+          <div
+            className="w-6 h-6 mt-10 ml-10"
+            style={{ backgroundColor: '#F1EEE9' }}></div>
+          <div className="mt-10 ml-2">예약 가능</div>
+          <div
+            className="w-6 h-6 mt-10 ml-10"
+            style={{ backgroundColor: '#7599BA' }}></div>
+          <div className="mt-10 ml-2">예약 선택</div>
+          <div
+            className="w-6 h-6 mt-10 ml-10"
+            style={{ backgroundColor: '#002D56' }}></div>
+          <div className="mt-10 ml-2">예약 완료</div>
         </div>
       </div>
       <TableContainer
@@ -285,13 +312,14 @@ const fetchData = async () => {
               <TableCell align="center" width={100} />
               {times.map((time, timeIndex) => (
                 <TableCell
-                  key={timeIndex} 
+                  key={timeIndex}
                   align="center"
-                  width={200} 
-                  className='fixedPartitions relative'
-                >
+                  width={200}
+                  className="fixedPartitions relative">
                   <div style={{ width: 20, height: 30 }}>
-                    <span className="absolute top-1/2 left-0 transform -translate-x-1/2 -translate-y-1/2 bg-white px-2">{time}</span>
+                    <span className="absolute top-1/2 left-0 transform -translate-x-1/2 -translate-y-1/2 bg-white px-2">
+                      {time}
+                    </span>
                   </div>
                 </TableCell>
               ))}
@@ -312,8 +340,8 @@ const fetchData = async () => {
                       key={timeIndex}
                       sx={{
                         borderLeft: '2px solid #e5ded4',
-                        borderBottom : '2px solid #e5ded4',
-                        borderTop : '2px solid #e5ded4',
+                        borderBottom: '2px solid #e5ded4',
+                        borderTop: '2px solid #e5ded4',
                         backgroundColor: isSelected
                           ? '#7599BA' // 밝은 남색으로 칠해짐
                           : isReserved
@@ -359,11 +387,11 @@ const fetchData = async () => {
             background: 'white',
             padding: '20px',
             width: '500px',
-            height : '300px',
+            height: '300px',
             border: 'none',
-            borderRadius:'5px',
+            borderRadius: '5px',
           }}>
-          <div className='mb-5 text-xl font-bold'>
+          <div className="mb-5 text-xl font-bold">
             컴퓨터공학부 세미나실 예약
           </div>
           <div>
@@ -372,16 +400,66 @@ const fetchData = async () => {
                 <table style={{ borderCollapse: 'collapse', width: '100%' }}>
                   <tbody>
                     <tr>
-                      <th style={{ border: '1px solid #ccc', borderTopWidth:'3px', padding: '8px', paddingLeft: '5px', textAlign: 'left' }}>선택 일자</th>
-                      <td style={{ border: '1px solid #ccc', borderTopWidth:'3px', padding: '8px', paddingLeft: '5px' }}>{currentDay}</td> {/*이건 고쳐야됨*/}
+                      <th
+                        style={{
+                          border: '1px solid #ccc',
+                          borderTopWidth: '3px',
+                          padding: '8px',
+                          paddingLeft: '5px',
+                          textAlign: 'left',
+                        }}>
+                        선택 일자
+                      </th>
+                      <td
+                        style={{
+                          border: '1px solid #ccc',
+                          borderTopWidth: '3px',
+                          padding: '8px',
+                          paddingLeft: '5px',
+                        }}>
+                        {currentDay}
+                      </td>{' '}
+                      {/*이건 고쳐야됨*/}
                     </tr>
                     <tr>
-                      <th style={{ border: '1px solid #ccc', padding: '8px', paddingLeft: '5px', textAlign: 'left' }}>선택 시간</th>
-                      <td style={{ border: '1px solid #ccc', padding: '8px', paddingLeft: '5px' }}>{times[startTimeIndex]} - {times[endTimeIndex+1]}</td>
+                      <th
+                        style={{
+                          border: '1px solid #ccc',
+                          padding: '8px',
+                          paddingLeft: '5px',
+                          textAlign: 'left',
+                        }}>
+                        선택 시간
+                      </th>
+                      <td
+                        style={{
+                          border: '1px solid #ccc',
+                          padding: '8px',
+                          paddingLeft: '5px',
+                        }}>
+                        {times[startTimeIndex]} - {times[endTimeIndex + 1]}
+                      </td>
                     </tr>
                     <tr>
-                      <th style={{ border: '1px solid #ccc', borderBottomWidth:'3px', padding: '8px', paddingLeft: '5px', textAlign: 'left' }}>선택 호실</th>
-                      <td style={{ border: '1px solid #ccc', borderBottomWidth:'3px', padding: '8px', paddingLeft: '5px' }}>{roomName}호 {selectedPartition}</td>
+                      <th
+                        style={{
+                          border: '1px solid #ccc',
+                          borderBottomWidth: '3px',
+                          padding: '8px',
+                          paddingLeft: '5px',
+                          textAlign: 'left',
+                        }}>
+                        선택 호실
+                      </th>
+                      <td
+                        style={{
+                          border: '1px solid #ccc',
+                          borderBottomWidth: '3px',
+                          padding: '8px',
+                          paddingLeft: '5px',
+                        }}>
+                        {roomName}호 {selectedPartition}
+                      </td>
                     </tr>
                   </tbody>
                 </table>
@@ -393,17 +471,20 @@ const fetchData = async () => {
             <MuiButton
               variant="contained"
               onClick={() => setIsOpen(false)}
-              style={{ marginRight: '40px', backgroundColor:'#D9D9D9', color:'black'}}>
+              style={{
+                marginRight: '40px',
+                backgroundColor: '#D9D9D9',
+                color: 'black',
+              }}>
               취소
             </MuiButton>
             <MuiButton
               variant="contained"
-              onClick={()=>{
+              onClick={() => {
                 handleConfirmReservation();
                 navigate('/login');
               }}
-              style={{backgroundColor:'#002D56', color:'white'}}
-            >
+              style={{ backgroundColor: '#002D56', color: 'white' }}>
               예약 하기
             </MuiButton>
           </div>
@@ -414,6 +495,3 @@ const fetchData = async () => {
 };
 
 export default RoomPage;
-
-
- 

@@ -5,7 +5,7 @@ import { Sidebar } from 'flowbite-react';
 
 const SideBar = () => {
   return (
-    <Sidebar aria-label="Default sidebar example" className="flex h-screen">
+    <Sidebar aria-label="Default sidebar example" className="h-screen">
       <Sidebar.Logo href="/" img="/img/logo.png" imgAlt="Logo" style={{height: '50px'}}>
         세미나실 예약 시스템
       </Sidebar.Logo>
