@@ -19,10 +19,7 @@ const Router = () => {
             <Route path="/rooms" element={<RoomsPage />} /> {/* Room 목록 */}
             <Route path="/rooms/:roomName/roompage" element={<RoomPage />} />
             {/* Room 예약 */}
-            <Route
-              path="/:roomNumber/:roomId/reservations"
-              element={<ReservationsPage />}
-            />
+            <Route path="/reservations" element={<ReservationsPage />} />
             {/* 예약완료 창 */}
             <Route path="/check" element={<Check />} />
             {/* 내 예약 현황 확인 페이지 */}
