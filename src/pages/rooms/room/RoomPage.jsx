@@ -281,27 +281,17 @@ const RoomPage = () => {
           있습니다.
         </div>
 
-        <div>
+        <div className="flex ml-8 justify-center items-center h-full">
           <DatePicker
-            className="flex ml-8 justify-center items-center h-full"
             id="datepicker"
             selected={startDate}
             minDate={subDays(new Date(), 0)}
             maxDate={subDays(new Date(), -7)}
             onChange={date => setStartDate(date)}
             dateFormat="yyyy년 MM월 dd일"
+            showIcon
           />
         </div>
-
-        {/*<div className="flex ml-8 justify-center items-center h-full">
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <Datepicker
-              label="예약 날짜 선택"
-              minDate={new Date(2024, 2, 13)}
-              maxDate={new Date(2024, 2, 19)}
-            />
-          </LocalizationProvider>
-        </div>*/}
 
         <div className="flex">
           <div
