@@ -1,6 +1,6 @@
 'use client';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import DatePicker from 'react-datepicker';
+import DatePicker, { registerLocale } from 'react-datepicker';
 import { HiInformationCircle } from 'react-icons/hi';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
@@ -14,7 +14,8 @@ import {
   TableRow,
   Typography,
 } from '@mui/material';
-import { addMinutes, format, subDays } from 'date-fns';
+import { addMinutes, format, getDay, subDays } from 'date-fns';
+import ko from 'date-fns/locale/ko';
 import {
   addDoc,
   collection,
@@ -260,7 +261,13 @@ const RoomPage = () => {
     }
   };
 
+  // date-picker 부분
   const [startDate, setStartDate] = useState(new Date());
+  const isWeekday = date => {
+    const day = getDay(date);
+    return day !== 0 && day !== 6;
+  };
+  registerLocale('ko', ko);
 
   return (
     <>
@@ -284,9 +291,11 @@ const RoomPage = () => {
           <DatePicker
             id="datepicker"
             selected={startDate}
+            locale={ko}
             minDate={subDays(new Date(), 0)}
             maxDate={subDays(new Date(), -7)}
             onChange={date => setStartDate(date)}
+            filterDate={isWeekday}
             dateFormat="yyyy년 MM월 dd일"
             showIcon
           />
