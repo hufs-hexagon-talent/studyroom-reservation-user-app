@@ -27,7 +27,6 @@ import {
 import { Alert } from 'flowbite-react';
 
 import 'react-datepicker/dist/react-datepicker.css';
-import './DatePicker.css';
 
 import Button from '../../../components/button/Button';
 import { fs } from '../../../firebase';
@@ -432,8 +431,7 @@ const RoomPage = () => {
                           paddingLeft: '5px',
                         }}>
                         {currentDay}
-                      </td>{' '}
-                      {/*이건 고쳐야됨*/}
+                      </td>
                     </tr>
                     <tr>
                       <th
