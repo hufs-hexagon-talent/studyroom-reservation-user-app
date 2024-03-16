@@ -33,9 +33,9 @@ const LoginPage = () => {
   // 확인 누르면 Reservation.jsx로 가야함 데이터랑 같이 !!!
 
   return (
-    <>
+    <div>
       <div>
-        <h1 className="text-3xl font-bold text-center mt-10 mb-5">
+        <h1 className="flex justify-center w-screen text-3xl font-bold text-center mt-10 mb-5">
           예약자 정보 기입
         </h1>
       </div>
@@ -83,7 +83,7 @@ const LoginPage = () => {
           </Button>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

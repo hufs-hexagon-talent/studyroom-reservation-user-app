@@ -1,5 +1,6 @@
 'use client';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import DatePicker, { registerLocale } from 'react-datepicker';
 import { HiInformationCircle } from 'react-icons/hi';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
@@ -13,9 +14,8 @@ import {
   TableRow,
   Typography,
 } from '@mui/material';
-import { LocalizationProvider } from '@mui/x-date-pickers';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { addMinutes, format } from 'date-fns';
+import { addMinutes, format, getDay, subDays } from 'date-fns';
+import ko from 'date-fns/locale/ko';
 import {
   addDoc,
   collection,
@@ -25,7 +25,9 @@ import {
   query,
   updateDoc,
 } from 'firebase/firestore';
-import { Alert, Datepicker, Dropdown } from 'flowbite-react';
+import { Alert } from 'flowbite-react';
+
+import 'react-datepicker/dist/react-datepicker.css';
 
 import Button from '../../../components/button/Button';
 import { fs } from '../../../firebase';
@@ -259,6 +261,14 @@ const RoomPage = () => {
     }
   };
 
+  // date-picker 부분
+  const [startDate, setStartDate] = useState(new Date());
+  const isWeekday = date => {
+    const day = getDay(date);
+    return day !== 0 && day !== 6;
+  };
+  registerLocale('ko', ko);
+
   return (
     <>
       <div style={{ marginBottom: '50px' }}>
@@ -268,7 +278,7 @@ const RoomPage = () => {
           fontWeight={600}
           component="div"
           align="center">
-          세미나실 예약하기
+          일자별 세미나실 예약 현황
         </Typography>
         <div
           className="mt-5 mb-10 flex justify-center"
@@ -276,19 +286,19 @@ const RoomPage = () => {
           아래 예약 현황의 예약가능 시간을 선택하시면 해당 세미나실을 대관할 수
           있습니다.
         </div>
-        <div className="flex ml-8">
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <Datepicker
-              label="예약 날짜 선택"
-              minDate={new Date(2024, 2, 13)}
-              maxDate={new Date(2024, 2, 19)}
-            />
-          </LocalizationProvider>
-          <div className="ml-4"></div>
-          <Dropdown color="gray" label="호실 선택" dismissOnClick={false}>
-            <Dropdown.Item>306호</Dropdown.Item>
-            <Dropdown.Item>428호</Dropdown.Item>
-          </Dropdown>
+
+        <div className="flex ml-8 justify-center items-center h-full">
+          <DatePicker
+            id="datepicker"
+            selected={startDate}
+            locale={ko}
+            minDate={subDays(new Date(), 0)}
+            maxDate={subDays(new Date(), -7)}
+            onChange={date => setStartDate(date)}
+            filterDate={isWeekday}
+            dateFormat="yyyy년 MM월 dd일"
+            showIcon
+          />
         </div>
 
         <div className="flex">
@@ -308,11 +318,15 @@ const RoomPage = () => {
       </div>
       <TableContainer
         sx={{
-          width: '90%',
-          minWidth: '650px',
+          overflowX: 'auto', // 기본적으로 가로 스크롤이 생깁니다.
+          width: '90%', // 테이블 너비
+          minWidth: '650px', // 최소 너비
           marginLeft: 'auto',
           marginRight: 'auto',
           marginTop: '50px',
+          '@media (min-width: 960px)': {
+            overflowX: 'visible', // 화면이 큰 경우 스크롤이 필요 없도록 합니다.
+          },
         }}>
         <Table>
           <TableHead className="fixedPartitions" sx={{ borderBottom: 'none' }}>
@@ -426,8 +440,7 @@ const RoomPage = () => {
                           paddingLeft: '5px',
                         }}>
                         {currentDay}
-                      </td>{' '}
-                      {/*이건 고쳐야됨*/}
+                      </td>
                     </tr>
                     <tr>
                       <th
