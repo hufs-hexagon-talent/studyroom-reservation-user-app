@@ -6,11 +6,11 @@ import { Button } from 'flowbite-react';
 const ReservationsPage = () => {
   const navigate = useNavigate();
   return (
-    <>
+    <div id="container" style={{ margin: 0, padding: '70px 0 0 0' }}>
       <div className="mt-10 flex justify-center w-screen font-bold text-2xl">
         예약 되었습니다!
       </div>
-      <div className="flex justify-center">
+      <div className="flex justify-center w-screen">
         <div
           style={{
             backgroundColor: '#D9D9D9',
@@ -31,7 +31,7 @@ const ReservationsPage = () => {
           확인
         </Button>
       </div>
-    </>
+    </div>
   );
 };
 
