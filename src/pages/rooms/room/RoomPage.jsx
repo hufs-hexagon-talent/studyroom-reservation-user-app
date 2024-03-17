@@ -3,7 +3,15 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import { HiInformationCircle } from 'react-icons/hi';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Typography } from '@mui/material';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography,
+} from '@mui/material';
 import { addMinutes, format, getDay, subDays } from 'date-fns';
 import ko from 'date-fns/locale/ko';
 import {
@@ -309,7 +317,83 @@ const RoomPage = () => {
           <div className="mt-10 ml-2">예약 완료</div>
         </div>
 
-        <div className="mt-10">
+        <div>
+          <TableContainer
+            sx={{
+              overflowX: 'auto',
+              width: '100%',
+              marginTop: '20px',
+              '@media (max-width : 1300px)': {
+                overflowX: 'scroll',
+              },
+            }}>
+            <Table>
+              <TableHead
+                className="fixedPartitions"
+                sx={{ borderBottom: 'none' }}>
+                <TableRow>
+                  <TableCell align="center" width={100} />
+                  {times.map((time, timeIndex) => (
+                    <TableCell
+                      key={timeIndex}
+                      align="center"
+                      width={200}
+                      className="fixedPartitions relative">
+                      <div style={{ width: 20, height: 30 }}>
+                        <span className="absolute top-1/2 left-0 transform -translate-x-1/2 -translate-y-1/2 bg-white px-2">
+                          {time}
+                        </span>
+                      </div>
+                    </TableCell>
+                  ))}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {slotsArr.map(partition => (
+                  <TableRow key={partition}>
+                    <TableCell>{partition}</TableCell>
+                    {times.map((time, timeIndex) => {
+                      const isSelected = getSlotSelected(partition, timeIndex);
+                      const isSelectable = true;
+                      const isReserved =
+                        reservedSlots[partition].includes(timeIndex);
+
+                      return (
+                        <TableCell
+                          key={timeIndex}
+                          sx={{
+                            borderLeft: '2px solid #e5ded4',
+                            borderBottom: '2px solid #e5ded4',
+                            borderTop: '2px solid #e5ded4',
+                            backgroundColor: isSelected
+                              ? '#7599BA' // 밝은 남색으로 칠해짐
+                              : isReserved
+                                ? '#002D56' // 남색으로 칠해짐
+                                : !isSelectable
+                                  ? '#aaa'
+                                  : '#F1EEE9',
+                            cursor: isReserved
+                              ? 'default'
+                              : isSelectable
+                                ? 'pointer'
+                                : 'default',
+                          }}
+                          onClick={() =>
+                            isSelectable &&
+                            !isReserved &&
+                            handleCellClick(partition, timeIndex)
+                          } // 예약된 슬롯을 클릭할 수 없도록 설정
+                        />
+                      );
+                    })}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </div>
+
+        <div className="mt-10 pb-5 flex justify-end">
           <Button
             text="예약하기"
             onClick={() => {
