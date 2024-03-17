@@ -1,0 +1,12 @@
+#form{
+    width: 100vw;
+    height: auto;
+}
+
+@media (min-width: 768px) {
+    #form {
+      padding: 50px;
+      max-width: 80%; /* 화면의 80%만 사용 */
+      margin: 0 auto;
+    }
+}
