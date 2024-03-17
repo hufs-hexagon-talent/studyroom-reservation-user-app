@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 import { Button, Label, TextInput } from 'flowbite-react';
 
+import './LoginPage.css';
 import '../../firebase.js';
 
 const LoginPage = () => {
@@ -36,13 +37,13 @@ const LoginPage = () => {
     <div>
       <div>
         <h1 className="flex justify-center w-screen text-3xl font-bold text-center mt-10 mb-5">
-          예약자 정보 기입
+          로그인
         </h1>
       </div>
-      <div className="border">
-        <form>
+      <div>
+        <form id="form" className="border pt-3 pb-10">
           <div>
-            <div className="mb-2 ml-3 mt-3 block">
+            <div className="mb-2 ml-3 block">
               <Label htmlFor="studentId" value="학번" />
             </div>
             <TextInput
@@ -69,17 +70,13 @@ const LoginPage = () => {
             />
           </div>
         </form>
-        <div className="flex mt-5 mb-5 gap-4 justify-center">
+        <div className="flex mt-10 justify-center">
           <Button
-            className="w-24 h-10 mr-2 ml-3 cursor-pointer text-black text-lg hover:opacity-90 flex items-center justify-center"
-            color="gray">
-            취소
-          </Button>
-          <Button
-            className="w-24 h-10 ml-2 mr-3 cursor-pointer text-white text-lg hover:opacity-90 flex items-center justify-center"
+            id="btn"
+            className="w-auto h-auto cursor-pointer text-white"
             color="dark"
             onClick={handleSignIn}>
-            확인
+            로그인하기
           </Button>
         </div>
       </div>
