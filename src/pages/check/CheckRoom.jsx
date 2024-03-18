@@ -49,6 +49,9 @@ const Check = () => {
             </Table.HeadCell>
             <Table.HeadCell>날짜</Table.HeadCell>
             <Table.HeadCell>시간</Table.HeadCell>
+            <Table.HeadCell>
+              <span className="sr-only">삭제</span>
+            </Table.HeadCell>
           </Table.Head>
           <Table.Body className="divide-y">
             <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800 text-center text-gray-900">
@@ -57,6 +60,13 @@ const Check = () => {
               <Table.Cell>room 3</Table.Cell>
               <Table.Cell>2024-03-12</Table.Cell>
               <Table.Cell>15:00 - 17:00</Table.Cell>
+              <Table.Cell>
+                <a
+                  href="#"
+                  className="font-medium text-cyan-600 hover:underline dark:text-cyan-500">
+                  삭제
+                </a>
+              </Table.Cell>
             </Table.Row>
           </Table.Body>
         </Table>
