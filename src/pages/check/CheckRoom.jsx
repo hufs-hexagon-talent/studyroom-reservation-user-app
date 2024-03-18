@@ -1,108 +1,96 @@
-import React, { useEffect, useState } from 'react';
-import { format } from 'date-fns';
-import { collection, deleteDoc, doc, getDocs, query } from 'firebase/firestore';
+'use client';
 
-import { fs } from '../../firebase';
+import React from 'react';
+import { Button, Popover, Typography } from '@mui/material';
+import { Table } from 'flowbite-react';
+
+import './CheckRoom.css';
 
 const Check = () => {
-  const [rooms, setRooms] = useState([]);
-
   const today = new Date();
   const year = today.getFullYear();
   const month = today.getMonth() + 1;
   const day = today.getDate();
-  
+
   let monthFormatted = month < 10 ? `0${month}` : month;
   let dayFormatted = day < 10 ? `0${day}` : day;
 
   const currentDay = `${year}.${monthFormatted}.${dayFormatted}`;
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  const [anchorEl, setAnchorEl] = React.useState(null);
 
-  async function fetchData() {
-    try {
-      const roomsData = [];
-      const roomIds = ['306', '428'];
-      for (let i = 0; i < roomIds.length; i++) {
-        const q = query(
-          collection(fs, `Rooms/${roomIds[i]}/Days/${currentDay}/Reservations`),
-        );
-        const querySnapshot = await getDocs(q);
+  const handleClick = event => {
+    setAnchorEl(event.currentTarget);
+  };
 
-        querySnapshot.forEach(doc => {
-          const reservationData = doc.data();
-          const startTime = reservationData.startTime;
-          const endTime = reservationData.endTime;
-          const partitionName = reservationData.partitionName;
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
 
-          const startTimeFormatted = format(
-            new Date().setHours(startTime[0], startTime[1]),
-            'HH:mm',
-          );
-          const endTimeFormatted = format(
-            new Date().setHours(endTime[0], endTime[1]),
-            'HH:mm',
-          );
-
-          const id = doc.id;
-          roomsData.push({
-            id,
-            ...reservationData,
-            startTimeFormatted,
-            endTimeFormatted,
-            partitionName
-          });
-          console.log(roomsData);
-        });
-      }
-
-      // 시작 시간이 빠른 순으로 정렬
-      roomsData.sort((a, b) => {
-        const startTimeA = new Date(`2000-01-01T${a.startTimeFormatted}`);
-        const startTimeB = new Date(`2000-01-01T${b.startTimeFormatted}`);
-        return startTimeA - startTimeB;
-      });
-
-      setRooms(roomsData);
-    } catch (error) {
-      console.error('Error', error);
-    }
-  }
-
-  async function deleteData(id, roomName) {
-    console.log(id);
-    await deleteDoc(
-      doc(fs, `Rooms/${roomName}/Days/${currentDay}/Reservations`, id),
-    );
-    setRooms(prevRooms => prevRooms.filter(room => room.id !== id));
-  }
+  const open = Boolean(anchorEl);
+  const id = open ? 'simple-popover' : undefined;
 
   return (
-      <div>
-        <h1 className="ml-10 mt-10 text-5xl text-left font-bold">
-          예약 목록
-        </h1>
-        <div className='mt-10 text-center flex flex-col justify-left h-screen'>
-          {rooms.map((room) => (
-            <div key={room.id} className="flex justify-center items-center mb-4">
-              <div className="bg-gray-200 w-full py-6 rounded-lg text-left ml-10 mr-10">
-                <p className='ml-10 text-xl'>
-                  이름: {room.userName}<br/>
-                  호실: {room.roomName}호 {room.partitionName}<br/>
-                  시간: {room.startTimeFormatted} - {room.endTimeFormatted}
-                </p>
-                <button className='float-right bg-gray-300 ml-auto mr-10 text-xl rounded-lg p-2'
-                  onClick={() => deleteData(room.id, room.roomName)}>
-                  삭제
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
+    <div>
+      <div className="felx text-center font-bold text-3xl mt-20">
+        내 신청 현황
       </div>
-    );
+
+      <div id="table" className="overflow-x-auto mt-10 p-2">
+        <Table className="border">
+          <Table.Head
+            style={{ fontSize: 15 }}
+            className="text-black text-center">
+            <Table.HeadCell>예약자</Table.HeadCell>
+            <Table.HeadCell>호실</Table.HeadCell>
+            <Table.HeadCell>
+              방 <br />
+              번호
+            </Table.HeadCell>
+            <Table.HeadCell>날짜</Table.HeadCell>
+            <Table.HeadCell>시간</Table.HeadCell>
+          </Table.Head>
+          <Table.Body className="divide-y">
+            <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800 text-center text-gray-900">
+              <Table.Cell>이서연</Table.Cell>
+              <Table.Cell>306호</Table.Cell>
+              <Table.Cell>room 3</Table.Cell>
+              <Table.Cell>2024-03-12</Table.Cell>
+              <Table.Cell>15:00 - 17:00</Table.Cell>
+            </Table.Row>
+          </Table.Body>
+        </Table>
+      </div>
+      <div id="popover">
+        <Button
+          style={{
+            backgroundColor: '#002D56',
+            marginLeft: 15,
+            marginTop: 20,
+          }}
+          aria-describedby={id}
+          variant="contained"
+          onClick={handleClick}>
+          노쇼 현황
+        </Button>
+        <Popover
+          id={id}
+          open={open}
+          anchorEl={anchorEl}
+          onClose={handleClose}
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'left',
+          }}>
+          <Typography sx={{ p: 2 }}>
+            * 현재 예약 취소 없이 세미나실을 방문하지 않은 횟수는 n번 입니다.
+            <br />
+            (3회 초과 시 세미나실 예약이 제한 됩니다)
+          </Typography>
+        </Popover>
+      </div>
+    </div>
+  );
 };
 
 export default Check;

@@ -5,7 +5,8 @@
 
 @media (min-width: 768px) {
     #form {
-      padding: 50px;
+      padding-left: 20%;
+      padding-right: 20%;
       max-width: 80%; /* 화면의 80%만 사용 */
       margin: 0 auto;
     }

@@ -41,7 +41,7 @@ const LoginPage = () => {
         </h1>
       </div>
       <div>
-        <form id="form" className="border pt-3 pb-10">
+        <form id="form" className="pt-3 pb-10 pl-10 pr-10">
           <div>
             <div className="mb-2 ml-3 block">
               <Label htmlFor="studentId" value="학번" />
