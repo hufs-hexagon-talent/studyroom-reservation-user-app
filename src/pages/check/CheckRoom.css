@@ -1,0 +1,9 @@
+@media (min-width : 766px){
+    #table{
+        padding-left: 20%;
+        padding-right: 20%;
+    }
+    #popover{
+        padding-left: 20%;
+    }
+}
