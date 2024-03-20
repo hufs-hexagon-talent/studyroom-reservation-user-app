@@ -478,9 +478,10 @@ const Footer = () => {
             </div>
           </div>
         </div>
-        <div className="bottom-sns ml-auto">
-          <ul className="flex items-center">
-            <li className="mr-4">
+
+        <div className="pt-1">
+          <ul className="block list-disc space-y-4 ml-0 pl-10">
+            <li className="float-left ml-2.5 list-none list-item text-match-parent">
               <a
                 href="https://www.facebook.com/hufsces"
                 target="_blank"
@@ -488,7 +489,7 @@ const Footer = () => {
                 <img src="/facebook-logo.png" alt="페이스북 로고" />
               </a>
             </li>
-            <li>
+            <li className="float-left ml-2.5 list-none list-item text-match-parent">
               <a
                 href="https://www.instagram.com/hufs_cse"
                 target="_blank"
@@ -499,30 +500,35 @@ const Footer = () => {
           </ul>
         </div>
       </div>
-      <div className="box-footer w-full">
+
+      <div className="py-10 px-2.7">
         <div className="footer-logo">
           <img
-            src="/sites/computer/masterSkin/computer_JW_MS_K2WT001_M/images/logo_footer.svg"
+            src="https://computer.hufs.ac.kr/sites/computer/masterSkin/computer_JW_MS_K2WT001_M/images/logo_footer.svg"
             alt="한국외국어대학교"
           />
         </div>
-        <div className="footer-address mt-4">
-          <p>
-            <span>
-              <b>글로벌캠퍼스</b>
+        <div className="mt-9 leading-8 text-footertextcolor">
+          <p className="block my-4 mx-0 mt-9 leading-2">
+            <span className="inline-block text-base font-normal">
+              <b className="font-bormal text-footertextbrown">글로벌캠퍼스</b>
               17035 경기도 용인시 처인구 모현읍 외대로 81 한국외국어대학교
               글로벌캠퍼스 (공학관 205호)
             </span>
           </p>
-          <p>
-            <span>
-              <b>TEL.</b>
+          <p className="block my-4 mx-0 mt-9 leading-2">
+            <span className="inline-block text-base font-normal">
+              <b className="font-bormal text-footertextbrown">TEL.</b>
               031-330-4268
             </span>
             <span>
-              <b>Email.</b>
+              <b className="font-bormal text-footertextbrown">Email.</b>
               <a href="mailto:ces@hufs.ac.kr">ces@hufs.ac.kr</a>
             </span>
+          </p>
+          <p className="text-sm font-light block my-4 mx-0">
+            Copyright ⓒ Hankuk University of Foreign Studies. All Rights
+            Reserved.
           </p>
         </div>
       </div>
