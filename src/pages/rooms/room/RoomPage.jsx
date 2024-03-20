@@ -2,7 +2,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import { HiInformationCircle } from 'react-icons/hi';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import {
   Table,
   TableBody,
@@ -81,7 +81,6 @@ const RoomPage = () => {
 
   const currentDay = `${year}.${monthFormatted}.${dayFormatted}`;
 
-  const navigate = useNavigate();
   const [selectedPartition, setSelectedPartition] = useState(null);
   const [startTimeIndex, setStartTimeIndex] = useState(null);
   const [endTimeIndex, setEndTimeIndex] = useState(null);
@@ -262,6 +261,7 @@ const RoomPage = () => {
 
   // date-picker 부분
   const [startDate, setStartDate] = useState(new Date());
+  const [selectedDay, setSelectedDay] = useState(currentDay);
   const isWeekday = date => {
     const day = getDay(date);
     return day !== 0 && day !== 6;
