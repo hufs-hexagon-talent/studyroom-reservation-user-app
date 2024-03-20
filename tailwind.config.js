@@ -6,6 +6,12 @@ module.exports = {
   ],
   theme: {
     extend: {},
+    colors: {
+      footermainbg: '#24262a',
+      footerboxbg: '#395776',
+      footertextcolor: '#cecece',
+      footertextbrown: '#9f7c52',
+    },
   },
   plugins: [require('flowbite/plugin')],
 };
