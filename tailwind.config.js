@@ -8,9 +8,10 @@ module.exports = {
     extend: {},
     colors: {
       footermainbg: '#24262a',
-      footerboxbg: '#395776',
-      footertextcolor: '#cecece',
+      footerboxbg: '#2f333e',
+      footertextcolor: '#d5d6d8',
       footertextbrown: '#9f7c52',
+      footerinnerborder: '#434548',
     },
   },
   plugins: [require('flowbite/plugin')],
