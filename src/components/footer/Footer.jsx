@@ -1,9 +1,11 @@
 import React from 'react';
 
+import './Footer.css';
+
 const Footer = () => {
   return (
-    <footer className="bg-footermainbg relative m-0 p-0 block">
-      <div className="py-6 px-2.7 ml-5">
+    <footer className="bg-footermainbg relative mt-10 p-0 block">
+      <div id="footer" className="py-6 px-2.7 ml-5">
         <div className="footer-logo">
           <img
             className="w-50 h-10"
@@ -25,7 +27,7 @@ const Footer = () => {
               031-330-4268
             </span>
             <span>
-              <b className="font-bormal text-footertextbrown"> Email.</b>
+              <b className="font-bormal text-footertextbrown"> Email. </b>
               <a href="mailto:ces@hufs.ac.kr">ces@hufs.ac.kr</a>
             </span>
           </p>

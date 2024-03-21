@@ -393,7 +393,7 @@ const RoomPage = () => {
           </TableContainer>
         </div>
 
-        <div className="mt-10 pb-5 flex justify-end">
+        <div className="mt-10 flex justify-end">
           <Button
             text="예약하기"
             onClick={() => {
