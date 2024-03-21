@@ -4,8 +4,8 @@ import './Footer.css';
 
 const Footer = () => {
   return (
-    <footer className="bg-footermainbg relative mt-10 p-0 block">
-      <div id="footer" className="py-6 px-2.7 ml-5">
+    <footer id="footer" className="bg-footermainbg relative p-0 block">
+      <div className="py-6 px-2.7 ml-5">
         <div className="footer-logo">
           <img
             className="w-50 h-10"
@@ -21,7 +21,7 @@ const Footer = () => {
               글로벌캠퍼스 (공학관 205호)
             </span>
           </p>
-          <p className="block my-4 mx-0 mt-5 leading-2">
+          <p className="block my-2 mx-0 leading-2">
             <span className="inline-block text-base font-normal">
               <b className="font-bormal text-footertextbrown">TEL. </b>
               031-330-4268
