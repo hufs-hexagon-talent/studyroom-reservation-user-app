@@ -1,0 +1,9 @@
+@media (max-width : 766px){
+    #footer {
+      text-align: center;
+    }
+    #footer img{
+        display: block;
+        margin: 0 auto;
+    }
+}

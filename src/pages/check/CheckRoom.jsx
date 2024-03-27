@@ -71,17 +71,18 @@ const Check = () => {
           </Table.Body>
         </Table>
       </div>
-      <div id="popover">
+      <div id="popover" className="mt-6">
         <Button
           style={{
             backgroundColor: '#002D56',
             marginLeft: 15,
             marginTop: 20,
+            marginBottom: 40,
           }}
           aria-describedby={id}
           variant="contained"
           onClick={handleClick}>
-          노쇼 현황
+          내 노쇼 현황
         </Button>
         <Popover
           id={id}

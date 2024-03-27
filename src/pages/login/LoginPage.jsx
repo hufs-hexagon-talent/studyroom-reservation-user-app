@@ -56,7 +56,7 @@ const LoginPage = () => {
             />
           </div>
           <div>
-            <div className="mb-2 ml-3 block">
+            <div className="ml-3 block">
               <Label htmlFor="name" value="이름" />
             </div>
             <TextInput
@@ -70,7 +70,7 @@ const LoginPage = () => {
             />
           </div>
         </form>
-        <div className="flex mt-10 justify-center">
+        <div className="flex pb-20 justify-center">
           <Button
             id="btn"
             className="w-auto h-auto cursor-pointer text-white"
