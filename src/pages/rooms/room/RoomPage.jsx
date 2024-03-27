@@ -261,7 +261,6 @@ const RoomPage = () => {
 
   // date-picker 부분
   const [startDate, setStartDate] = useState(new Date());
-  const [selectedDay, setSelectedDay] = useState(currentDay);
   const isWeekday = date => {
     const day = getDay(date);
     return day !== 0 && day !== 6;
