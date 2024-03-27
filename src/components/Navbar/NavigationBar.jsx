@@ -6,7 +6,7 @@ import Logo from '../../assets/logo.png';
 
 const NavigationBar = () => {
   return (
-    <Navbar fluid rounded className="border-b border-b-2">
+    <Navbar fluid rounded className="border-b-2">
       <Navbar.Brand href="/">
         <img src={Logo} className="mr-3 h-6 sm:h-9" alt="cse logo" />
         <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white">
