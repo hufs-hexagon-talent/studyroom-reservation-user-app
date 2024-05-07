@@ -1,9 +1,16 @@
-@media (max-width : 766px){
-    #footer {
-      text-align: center;
-    }
-    #footer img{
-        display: block;
-        margin: 0 auto;
-    }
+#footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+}
+
+@media (max-width: 766px) {
+  #footer {
+    text-align: center;
+  }
+  #footer img {
+    display: block;
+    margin: 0 auto;
+  }
 }
