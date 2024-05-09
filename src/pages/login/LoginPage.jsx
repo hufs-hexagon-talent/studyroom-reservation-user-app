@@ -4,11 +4,11 @@ import axios from 'axios';
 import { Button, Label, TextInput } from 'flowbite-react';
 
 import './LoginPage.css';
-import '../../firebase.js';
 
 const LoginPage = () => {
   const [studentId, setStudentId] = useState('');
   const [userName, setUserName] = useState('');
+  const [isLogin, setIsLogin] = useState(false);
   const navigate = useNavigate();
 
   const registerUser = async (username, password) => {
@@ -21,7 +21,9 @@ const LoginPage = () => {
         },
       );
       console.log('회원가입 성공', response.data);
-      localStorage.setItem('user', JSON.stringify(response));
+      localStorage.setItem('user', username);
+      setIsLogin(true);
+      navigate('/');
     } catch (error) {
       if (error.response.status === 409) {
         console.error('회원가입 실패 : ', error.response.data.message);

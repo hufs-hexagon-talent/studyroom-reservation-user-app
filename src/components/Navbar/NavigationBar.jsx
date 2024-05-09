@@ -2,9 +2,11 @@
 import React from 'react';
 import { Navbar } from 'flowbite-react';
 
+import '../../pages/login/LoginPage';
+
 import Logo from '../../assets/logo.png';
 
-const NavigationBar = () => {
+const NavigationBar = ({ isLogin }) => {
   return (
     <Navbar fluid rounded className="border-b-2">
       <Navbar.Brand href="/">
@@ -18,7 +20,11 @@ const NavigationBar = () => {
         <Navbar.Link href="/rooms/306/roompage">세미나실 예약</Navbar.Link>
         <Navbar.Link href="/check">내 신청 현황</Navbar.Link>
         <Navbar.Link href="/">이용 규칙</Navbar.Link>
-        <Navbar.Link href="/login">로그인</Navbar.Link>
+        {isLogin ? (
+          <Navbar.Link>로그아웃</Navbar.Link>
+        ) : (
+          <Navbar.Link href="/login">로그인</Navbar.Link>
+        )}
       </Navbar.Collapse>
     </Navbar>
   );
