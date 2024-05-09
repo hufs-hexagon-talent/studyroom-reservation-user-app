@@ -1,8 +1,6 @@
-'use client';
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
+import axios from 'axios';
 import { Button, Label, TextInput } from 'flowbite-react';
 
 import './LoginPage.css';
@@ -11,27 +9,31 @@ import '../../firebase.js';
 const LoginPage = () => {
   const [studentId, setStudentId] = useState('');
   const [userName, setUserName] = useState('');
-  const [setError] = useState(null);
   const navigate = useNavigate();
 
-  const handleSignIn = () => {
-    const auth = getAuth();
-
-    signInWithEmailAndPassword(auth, studentId, userName)
-      .then(userCredential => {
-        const user = userCredential.user;
-        console.log('login');
-        navigate('/rooms');
-        return user;
-      })
-      .catch(error => {
-        const errorMessage = error.message;
-        setError(errorMessage);
-      });
+  const registerUser = async (username, password) => {
+    try {
+      const response = await axios.post(
+        'https://api.user.connect.alpaon.dev/user/register',
+        {
+          username: username,
+          password: password,
+        },
+      );
+      console.log('회원가입 성공', response.data);
+      localStorage.setItem('user', JSON.stringify(response));
+    } catch (error) {
+      if (error.response.status === 409) {
+        console.error('회원가입 실패 : ', error.response.data.message);
+      } else {
+        console.error('오류 발생 : ', error.message);
+      }
+    }
   };
 
-  // 취소를 누르면 데이터 삭제되는 함수 구현해야함
-  // 확인 누르면 Reservation.jsx로 가야함 데이터랑 같이 !!!
+  const handleRegisterClick = () => {
+    registerUser(userName, studentId);
+  };
 
   return (
     <div>
@@ -52,7 +54,6 @@ const LoginPage = () => {
               placeholder="ex) 2022xxxxx"
               value={studentId}
               onChange={e => setStudentId(e.target.value)}
-              required
             />
           </div>
           <div>
@@ -66,7 +67,6 @@ const LoginPage = () => {
               placeholder="ex) 홍길동"
               value={userName}
               onChange={e => setUserName(e.target.value)}
-              required
             />
           </div>
         </form>
@@ -75,7 +75,7 @@ const LoginPage = () => {
             id="btn"
             className="w-auto h-auto cursor-pointer text-white"
             color="dark"
-            onClick={handleSignIn}>
+            onClick={() => handleRegisterClick(userName, studentId)}>
             로그인하기
           </Button>
         </div>
