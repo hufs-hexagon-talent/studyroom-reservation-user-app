@@ -20,7 +20,7 @@ const NavigationBar = ({ isLogin }) => {
         <Navbar.Link href="/rooms/306/roompage">세미나실 예약</Navbar.Link>
         <Navbar.Link href="/check">내 신청 현황</Navbar.Link>
         <Navbar.Link href="/">이용 규칙</Navbar.Link>
-        {isLogin ? (
+        {isLogin === true ? (
           <Navbar.Link>로그아웃</Navbar.Link>
         ) : (
           <Navbar.Link href="/login">로그인</Navbar.Link>

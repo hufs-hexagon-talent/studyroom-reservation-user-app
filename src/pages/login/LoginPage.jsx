@@ -8,33 +8,23 @@ import './LoginPage.css';
 const LoginPage = () => {
   const [studentId, setStudentId] = useState('');
   const [userName, setUserName] = useState('');
-  const [isLogin, setIsLogin] = useState(false);
   const navigate = useNavigate();
 
-  const registerUser = async (username, password) => {
+  const apiUrl = 'http://api.studyroom.jisub.kim/admin/users/';
+
+  const getUser = async userId => {
     try {
-      const response = await axios.post(
-        'https://api.user.connect.alpaon.dev/user/register',
-        {
-          username: username,
-          password: password,
-        },
-      );
-      console.log('회원가입 성공', response.data);
-      localStorage.setItem('user', username);
-      setIsLogin(true);
-      navigate('/');
-    } catch (error) {
-      if (error.response.status === 409) {
-        console.error('회원가입 실패 : ', error.response.data.message);
-      } else {
-        console.error('오류 발생 : ', error.message);
-      }
+      const response = await axios.get(apiUrl + userId);
+      console.log(response.data);
+      console.log('id : ', response.data.loginId);
+      console.log('이름 : ', response.data.userName);
+    } catch (errror) {
+      console.log(errror);
     }
   };
 
   const handleRegisterClick = () => {
-    registerUser(userName, studentId);
+    getUser(studentId);
   };
 
   return (
@@ -75,9 +65,9 @@ const LoginPage = () => {
         <div className="flex pb-20 justify-center">
           <Button
             id="btn"
-            className="w-auto h-auto cursor-pointer text-white"
+            className="w-64 h-auto cursor-pointer text-white"
             color="dark"
-            onClick={() => handleRegisterClick(userName, studentId)}>
+            onClick={handleRegisterClick}>
             로그인하기
           </Button>
         </div>
