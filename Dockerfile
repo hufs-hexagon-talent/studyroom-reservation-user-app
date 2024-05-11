@@ -16,7 +16,7 @@ FROM nginx:stable-alpine as production-stage
 COPY --from=build-stage /app/build /usr/share/nginx/html
 
 # 기본 Nginx 설정을 사용하거나 커스텀 설정 파일을 복사
-# COPY nginx.conf /etc/nginx/nginx.conf
+COPY nginx.conf /etc/nginx/nginx.conf
 
 # Nginx 시작
 EXPOSE 80
