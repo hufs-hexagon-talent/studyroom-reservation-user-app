@@ -6,7 +6,7 @@ import { Table } from 'flowbite-react';
 
 import './CheckRoom.css';
 
-const Check = () => {
+const Check = userName => {
   const today = new Date();
   const year = today.getFullYear();
   const month = today.getMonth() + 1;
@@ -55,7 +55,7 @@ const Check = () => {
           </Table.Head>
           <Table.Body className="divide-y">
             <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800 text-center text-gray-900">
-              <Table.Cell>이서연</Table.Cell>
+              <Table.Cell>{localStorage.getItem('user')}</Table.Cell>
               <Table.Cell>306호</Table.Cell>
               <Table.Cell>room 3</Table.Cell>
               <Table.Cell>2024-03-12</Table.Cell>
