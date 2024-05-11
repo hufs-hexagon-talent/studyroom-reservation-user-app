@@ -1,40 +1,32 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Button, Label, TextInput } from 'flowbite-react';
 
 import './LoginPage.css';
 
 const LoginPage = () => {
-  const [studentId, setStudentId] = useState('');
+  //const [studentId, setStudentId] = useState('');
+  const [password, setPassword] = useState('');
   const [userName, setUserName] = useState('');
   const [isLogin, setIsLogin] = useState(false);
-  const navigate = useNavigate();
 
-  const registerUser = async (username, password) => {
+  const handleLogin = async () => {
     try {
       const response = await axios.post(
-        'https://api.user.connect.alpaon.dev/user/register',
+        'https://api.user.connect.alpaon.dev/user/auth/login',
         {
-          username: username,
+          username: userName,
           password: password,
         },
       );
-      console.log('회원가입 성공', response.data);
-      localStorage.setItem('user', username);
+      const { accessToken, refreshToken } = response.data;
+      localStorage.setItem('accessToken', accessToken);
+      localStorage.setItem('refreshToken', refreshToken);
+      console.log(accessToken, refreshToken);
       setIsLogin(true);
-      navigate('/');
     } catch (error) {
-      if (error.response.status === 409) {
-        console.error('회원가입 실패 : ', error.response.data.message);
-      } else {
-        console.error('오류 발생 : ', error.message);
-      }
+      console.error('로그인 오류 : ', error.response.data);
     }
-  };
-
-  const handleRegisterClick = () => {
-    registerUser(userName, studentId);
   };
 
   return (
@@ -54,8 +46,7 @@ const LoginPage = () => {
               className="ml-3 mr-3 mb-5"
               id="studentId"
               placeholder="ex) 2022xxxxx"
-              value={studentId}
-              onChange={e => setStudentId(e.target.value)}
+              onChange={e => setPassword(e.target.value)}
             />
           </div>
           <div>
@@ -67,7 +58,6 @@ const LoginPage = () => {
               id="name"
               type="name"
               placeholder="ex) 홍길동"
-              value={userName}
               onChange={e => setUserName(e.target.value)}
             />
           </div>
@@ -77,7 +67,7 @@ const LoginPage = () => {
             id="btn"
             className="w-auto h-auto cursor-pointer text-white"
             color="dark"
-            onClick={() => handleRegisterClick(userName, studentId)}>
+            onClick={handleLogin}>
             로그인하기
           </Button>
         </div>
