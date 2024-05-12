@@ -22,8 +22,11 @@ const LoginPage = () => {
       const { accessToken, refreshToken } = response.data;
       localStorage.setItem('accessToken', accessToken);
       localStorage.setItem('refreshToken', refreshToken);
+      localStorage.setItem('username', userName);
+      localStorage.setItem('studentId', password);
       console.log(accessToken, refreshToken);
       setIsLogin(true);
+      console.log(isLogin);
     } catch (error) {
       console.error('로그인 오류 : ', error.response.data);
     }
