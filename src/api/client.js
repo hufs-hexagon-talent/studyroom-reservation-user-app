@@ -6,6 +6,19 @@ export const apiClient = axios.create({
   },
 });
 
+apiClient.interceptors.request.use(
+  (config) => {
+    const accessToken = localStorage.getItem('accessToken');
+    if (accessToken) {
+      config.headers.Authorization = `Bearer ${accessToken}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
 apiClient.interceptors.response.use(
   (response) => {
     return response;
@@ -23,8 +36,9 @@ apiClient.interceptors.response.use(
 
       try {
         // 리프레시 토큰으로 액세스 토큰 와서 헤더 업데이트 하고 새 액세스 토큰으로 재요청하기
-        const response = await axios.post('https://api.user.connect.alpaon.dev/user/auth/login', { refreshToken });
-        apiClient.defaults.headers.common['Authorization'] = `Bearer ${response.data.accessToken}`;
+        const response = await axios.post('https://api.user.connect.alpaon.dev/user/auth/refresh', { refreshToken });
+        const accessToken = response.data.accessToken
+        localStorage.setItem('accessToken', accessToken);
         return apiClient(error.config);
       } catch (refreshError) {
         // 토큰 갱신 실패하면 로그아웃
