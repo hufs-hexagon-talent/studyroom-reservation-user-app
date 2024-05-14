@@ -7,7 +7,6 @@ import Check from './pages/check/CheckRoom';
 import LoginPage from './pages/login/LoginPage';
 import Notice from './pages/notice/notice';
 import ReservationsPage from './pages/reservations/ReservationsPage';
-import Responsive from './pages/Responsive';
 import RoomPage from './pages/rooms/room/RoomPage';
 
 const Router = () => {
@@ -22,7 +21,6 @@ const Router = () => {
             <Route path="/reservations" element={<ReservationsPage />} />
             <Route path="/check" element={<Check />} />
             <Route path="/" element={<Notice />} />
-            <Route path="/responsive" element={<Responsive />} />
           </Routes>
         </div>
         <Footer />
