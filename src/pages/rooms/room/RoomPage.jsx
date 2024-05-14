@@ -1,4 +1,3 @@
-'use client';
 import React, { useCallback, useMemo, useState } from 'react';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import { HiInformationCircle } from 'react-icons/hi';
@@ -11,6 +10,7 @@ import {
   TableRow,
   Typography,
 } from '@mui/material';
+import axios from 'axios';
 import { addMinutes, format, getDay, subDays } from 'date-fns';
 import ko from 'date-fns/locale/ko';
 import { Alert } from 'flowbite-react';
@@ -167,12 +167,28 @@ const RoomPage = () => {
   };
   registerLocale('ko', ko);
 
+  // 예약 정보 가져오기
+  const fetchReservation = async reservationId => {
+    try {
+      const response = await axios.get(
+        `http://api.studyroom.jisub.kim/admin/reservations/${reservationId}`,
+      );
+      console.log('done');
+      console.log(response.data);
+    } catch (error) {
+      console.error('fetch error : ', error.message);
+    }
+  };
+
   const handleDateChange = date => {
     setStartDate(date);
     console.log(format(date, 'yyyy-MM-dd'));
+    const reservationId =
+      (date.getMonth() + 1).toString().padStart(2, '0') + date.getDate();
+    fetchReservation(reservationId);
   };
 
-  // date-picker에 해당하는 날짜에 대한 예약 조회
+  // 해당하는 날짜에 대한 예약 조회
 
   return (
     <>

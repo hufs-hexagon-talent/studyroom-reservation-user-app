@@ -5,6 +5,8 @@ import { Table } from 'flowbite-react';
 import '../login/LoginPage';
 import './CheckRoom.css';
 
+import { useMe } from '../../api/user.api';
+
 const Check = ({ userName }) => {
   const today = new Date();
   const year = today.getFullYear();
@@ -17,6 +19,7 @@ const Check = ({ userName }) => {
   const currentDay = `${year}.${monthFormatted}.${dayFormatted}`;
 
   const [anchorEl, setAnchorEl] = React.useState(null);
+  const { data: user } = useMe();
 
   const handleClick = event => {
     setAnchorEl(event.currentTarget);
@@ -54,7 +57,7 @@ const Check = ({ userName }) => {
           </Table.Head>
           <Table.Body className="divide-y">
             <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800 text-center text-gray-900">
-              <Table.Cell>{localStorage.getItem('username')}</Table.Cell>
+              <Table.Cell>{user?.username || '-'}</Table.Cell>
               <Table.Cell>306호</Table.Cell>
               <Table.Cell>room 3</Table.Cell>
               <Table.Cell>2024-03-12</Table.Cell>

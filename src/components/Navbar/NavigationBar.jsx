@@ -28,7 +28,7 @@ const NavigationBar = ({ isLogin, setIsLogin }) => {
       </Navbar.Brand>
       <Navbar.Toggle />
       <Navbar.Collapse>
-        <Navbar.Link href="/rooms/306/roompage">세미나실 예약</Navbar.Link>
+        <Navbar.Link href="/roompage">세미나실 예약</Navbar.Link>
         <Navbar.Link href="/check">내 신청 현황</Navbar.Link>
         <Navbar.Link href="/">이용 규칙</Navbar.Link>
         <Navbar.Link onClick={handleDelete} href="/login">
