@@ -7,7 +7,7 @@ import './CheckRoom.css';
 
 import { useMe } from '../../api/user.api';
 
-const Check = ({ userName }) => {
+const Check = () => {
   const today = new Date();
   const year = today.getFullYear();
   const month = today.getMonth() + 1;

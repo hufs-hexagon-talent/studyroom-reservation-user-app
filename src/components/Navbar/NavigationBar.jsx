@@ -1,22 +1,11 @@
 import React from 'react';
-import axios from 'axios';
 import { Navbar } from 'flowbite-react';
 
 import Logo from '../../assets/logo.png';
+import useAuth from '../../hooks/useAuth';
 
-const NavigationBar = ({ isLogin, setIsLogin }) => {
-  const handleDelete = async () => {
-    axios
-      .delete('https://api.user.connect.alpaon.dev/user/auth/login')
-      .then(response => {
-        console.log(response);
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
-      })
-      .catch(error => {
-        console.error(error);
-      });
-  };
+const NavigationBar = () => {
+  const { loggedIn, logout } = useAuth();
 
   return (
     <Navbar fluid rounded className="border-b-2">
@@ -31,11 +20,9 @@ const NavigationBar = ({ isLogin, setIsLogin }) => {
         <Navbar.Link href="/roompage">세미나실 예약</Navbar.Link>
         <Navbar.Link href="/check">내 신청 현황</Navbar.Link>
         <Navbar.Link href="/">이용 규칙</Navbar.Link>
-        <Navbar.Link onClick={handleDelete} href="/login">
-          로그아웃
-        </Navbar.Link>
-        {isLogin === true ? (
-          <Navbar.Link href="/" onClick={() => setIsLogin(false)}>
+
+        {loggedIn ? (
+          <Navbar.Link href="/" onClick={logout}>
             로그아웃
           </Navbar.Link>
         ) : (

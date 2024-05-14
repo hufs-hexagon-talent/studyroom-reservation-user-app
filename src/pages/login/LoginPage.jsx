@@ -1,30 +1,27 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button, Label, TextInput } from 'flowbite-react';
 
 import './LoginPage.css';
+
+import useAuth from '../../hooks/useAuth';
 
 const LoginPage = () => {
   //const [studentId, setStudentId] = useState('');
   const [password, setPassword] = useState('');
   const [userName, setUserName] = useState('');
-  const [isLogin, setIsLogin] = useState(false);
+
+  const { login, loggedIn } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (loggedIn) navigate('/');
+  }, [loggedIn, navigate]);
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post(
-        'https://api.user.connect.alpaon.dev/user/auth/login',
-        {
-          username: userName,
-          password: password,
-        },
-      );
-      const { accessToken, refreshToken } = response.data;
-      localStorage.setItem('accessToken', accessToken);
-      localStorage.setItem('refreshToken', refreshToken);
-      console.log(accessToken, refreshToken);
-      setIsLogin(true);
-      console.log(isLogin);
+      await login({ id: userName, password });
+      location.reload();
     } catch (error) {
       console.error('로그인 오류 : ', error.response.data);
     }
