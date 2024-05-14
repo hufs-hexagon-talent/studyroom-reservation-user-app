@@ -1,12 +1,12 @@
-'use client';
 import React from 'react';
 import { Navbar } from 'flowbite-react';
 
-import '../../pages/login/LoginPage';
-
 import Logo from '../../assets/logo.png';
+import useAuth from '../../hooks/useAuth';
 
-const NavigationBar = ({ isLogin }) => {
+const NavigationBar = () => {
+  const { loggedIn, logout } = useAuth();
+
   return (
     <Navbar fluid rounded className="border-b-2">
       <Navbar.Brand href="/">
@@ -17,11 +17,14 @@ const NavigationBar = ({ isLogin }) => {
       </Navbar.Brand>
       <Navbar.Toggle />
       <Navbar.Collapse>
-        <Navbar.Link href="/rooms/306/roompage">세미나실 예약</Navbar.Link>
+        <Navbar.Link href="/roompage">세미나실 예약</Navbar.Link>
         <Navbar.Link href="/check">내 신청 현황</Navbar.Link>
         <Navbar.Link href="/">이용 규칙</Navbar.Link>
-        {isLogin === true ? (
-          <Navbar.Link>로그아웃</Navbar.Link>
+
+        {loggedIn ? (
+          <Navbar.Link href="/" onClick={logout}>
+            로그아웃
+          </Navbar.Link>
         ) : (
           <Navbar.Link href="/login">로그인</Navbar.Link>
         )}

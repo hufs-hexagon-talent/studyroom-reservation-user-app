@@ -1,8 +1,6 @@
-'use client';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import { HiInformationCircle } from 'react-icons/hi';
-import { useParams } from 'react-router-dom';
 import {
   Table,
   TableBody,
@@ -12,24 +10,15 @@ import {
   TableRow,
   Typography,
 } from '@mui/material';
+import axios from 'axios';
 import { addMinutes, format, getDay, subDays } from 'date-fns';
 import ko from 'date-fns/locale/ko';
-import {
-  addDoc,
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-  query,
-  updateDoc,
-} from 'firebase/firestore';
 import { Alert } from 'flowbite-react';
 
 import 'react-datepicker/dist/react-datepicker.css';
 import './RoomPage.css';
 
 import Button from '../../../components/button/Button';
-import { fs } from '../../../firebase';
 
 //시간 데이터
 const timeTableConfig = {
@@ -76,6 +65,7 @@ const RoomPage = () => {
   const month = today.getMonth() + 1;
   const day = today.getDate();
 
+  // 포맷한 시간
   let monthFormatted = month < 10 ? `0${month}` : month;
   let dayFormatted = day < 10 ? `0${day}` : day;
 
@@ -84,20 +74,13 @@ const RoomPage = () => {
   const [selectedPartition, setSelectedPartition] = useState(null);
   const [startTimeIndex, setStartTimeIndex] = useState(null);
   const [endTimeIndex, setEndTimeIndex] = useState(null);
-  const [isOpen, setIsOpen] = useState(false);
-  const { roomName } = useParams();
+  const [slotsArr, setSlotsArr] = useState([]);
   const times = useMemo(() => createTimeTable(timeTableConfig), []);
 
   const [reservedSlots, setReservedSlots] = useState({
     room1: [],
     room2: [],
-    room3: roomName === '306' ? [] : [],
-    room4: roomName === '306' ? [] : [],
   });
-
-  useEffect(() => {
-    fetchData();
-  }, []);
 
   // 슬롯이 선택되었는지 확인하는 함수
   const getSlotSelected = useCallback(
@@ -176,89 +159,6 @@ const RoomPage = () => {
     toggleSlot(partition, timeIndex);
   };
 
-  const handleReservation = async () => {
-    setIsOpen(true);
-  };
-
-  // 데이터를 수정하는 함수
-  const handleConfirmReservation = async () => {
-    const address = `Rooms/${roomName}/Days/${currentDay}/Reservations`;
-
-    let docRef;
-    if (startTimeIndex !== null && endTimeIndex !== null) {
-      const startHour = times[startTimeIndex].split(':')[0];
-      const startMinute = times[startTimeIndex].split(':')[1];
-      const endHour = times[endTimeIndex].split(':')[0];
-      const endMinute = times[endTimeIndex].split(':')[1];
-
-      docRef = await addDoc(collection(fs, address), {
-        partitionName: selectedPartition,
-        startTime: [startHour, startMinute],
-        endTime: [endHour, endMinute],
-        roomName: roomName,
-      });
-
-      setIsOpen(false);
-      await fetchData();
-
-      const reservedId = docRef.id;
-      const ref = doc(
-        fs,
-        `Rooms/${roomName}/Days/${currentDay}/Reservations/${reservedId}`,
-      );
-      await updateDoc(ref, {
-        roomId: reservedId,
-      });
-    }
-  };
-
-  // 새로운 함수를 생성해 중복을 제거
-  const pushReservedTime = (docSnap, reservedSlots) => {
-    docSnap.forEach(doc => {
-      const { startTime, endTime, partitionName } = doc.data();
-      // 시작 시간
-      const startIdx = times.findIndex(
-        time => time === `${startTime[0]}:${startTime[1]}`,
-      );
-      // 종료 시간
-      const endIdx = times.findIndex(
-        time => time === `${endTime[0]}:${endTime[1]}`,
-      );
-
-      for (let i = startIdx; i <= endIdx; i++) {
-        reservedSlots[partitionName].push(i);
-      }
-
-      setReservedSlots(reservedSlots);
-    });
-  };
-  const [slotsArr, setSlotsArr] = useState([]);
-
-  const fetchData = async () => {
-    try {
-      console.log(roomName);
-      const docRef = doc(fs, `Rooms/${roomName}`);
-      const docSnap = await getDoc(docRef);
-      const len = docSnap.data().partitions.length;
-
-      const q = query(
-        collection(fs, `Rooms/${roomName}/Days/${currentDay}/Reservations`),
-      );
-      const querySnap = await getDocs(q);
-
-      const reservedSlots = {};
-      const slotsArray = [];
-      for (let i = 1; i <= len; i++) {
-        reservedSlots[`room${i}`] = [];
-        slotsArray.push(`room${i}`);
-      }
-      setSlotsArr(slotsArray);
-      pushReservedTime(querySnap, reservedSlots);
-    } catch (error) {
-      console.error('Error', error);
-    }
-  };
-
   // date-picker 부분
   const [startDate, setStartDate] = useState(new Date());
   const isWeekday = date => {
@@ -266,6 +166,29 @@ const RoomPage = () => {
     return day !== 0 && day !== 6;
   };
   registerLocale('ko', ko);
+
+  // 예약 정보 가져오기
+  const fetchReservation = async reservationId => {
+    try {
+      const response = await axios.get(
+        `http://api.studyroom.jisub.kim/admin/reservations/${reservationId}`,
+      );
+      console.log('done');
+      console.log(response.data);
+    } catch (error) {
+      console.error('fetch error : ', error.message);
+    }
+  };
+
+  const handleDateChange = date => {
+    setStartDate(date);
+    console.log(format(date, 'yyyy-MM-dd'));
+    const reservationId =
+      (date.getMonth() + 1).toString().padStart(2, '0') + date.getDate();
+    fetchReservation(reservationId);
+  };
+
+  // 해당하는 날짜에 대한 예약 조회
 
   return (
     <>
@@ -293,7 +216,7 @@ const RoomPage = () => {
               locale={ko}
               minDate={subDays(new Date(), 0)}
               maxDate={subDays(new Date(), -7)}
-              onChange={date => setStartDate(date)}
+              onChange={handleDateChange}
               filterDate={isWeekday}
               dateFormat="yyyy년 MM월 dd일"
               showIcon
@@ -315,7 +238,7 @@ const RoomPage = () => {
             style={{ backgroundColor: '#002D56' }}></div>
           <div className="mt-10 ml-2">예약 완료</div>
         </div>
-
+        {/* timeTable 시작 */}
         <div>
           <TableContainer
             sx={{
@@ -393,12 +316,7 @@ const RoomPage = () => {
         </div>
 
         <div className="mt-10 flex justify-end">
-          <Button
-            text="예약하기"
-            onClick={() => {
-              handleReservation();
-            }}
-          />
+          <Button text="예약하기" />
         </div>
       </div>
     </>
