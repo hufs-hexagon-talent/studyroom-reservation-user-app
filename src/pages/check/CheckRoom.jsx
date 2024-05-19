@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Button, Popover, Typography } from '@mui/material';
+import axios from 'axios';
 import { Table } from 'flowbite-react';
 
 import '../login/LoginPage';
@@ -31,6 +32,24 @@ const Check = () => {
 
   const open = Boolean(anchorEl);
   const id = open ? 'simple-popover' : undefined;
+
+  // 자신의 모든 예약 조회
+  const checkReservation = async () => {
+    const data = axios.get(
+      'https://api.studyroom.jisub.kim/users/reservations/user/reservations',
+    );
+    data
+      .then(Response => {
+        console.log(Response.data);
+      })
+      .catch(Error => {
+        console.error(Error);
+      });
+  };
+
+  useEffect(() => {
+    checkReservation();
+  }, []);
 
   return (
     <div>

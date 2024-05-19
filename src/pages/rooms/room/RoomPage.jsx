@@ -188,7 +188,18 @@ const RoomPage = () => {
     fetchReservation(reservationId);
   };
 
-  // 해당하는 날짜에 대한 예약 조회
+  // 자신의 예약 생성
+  const handleReservation = async () => {
+    const res = await axios.post(
+      'https://api.studyroom.jisub.kim/users/reservations/user/reservation',
+      {
+        roomId: selectedPartition,
+        startDateTime: startTimeIndex,
+        endDateTime: endTimeIndex,
+      },
+    );
+    console.log(res.data);
+  };
 
   return (
     <>
@@ -316,7 +327,7 @@ const RoomPage = () => {
         </div>
 
         <div className="mt-10 flex justify-end">
-          <Button text="예약하기" />
+          <Button onClick={handleReservation} text="예약하기" />
         </div>
       </div>
     </>

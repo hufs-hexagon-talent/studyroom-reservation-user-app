@@ -7,7 +7,6 @@ import './LoginPage.css';
 import useAuth from '../../hooks/useAuth';
 
 const LoginPage = () => {
-  //const [studentId, setStudentId] = useState('');
   const [password, setPassword] = useState('');
   const [userName, setUserName] = useState('');
 
@@ -21,7 +20,7 @@ const LoginPage = () => {
   const handleLogin = async () => {
     try {
       await login({ id: userName, password });
-      location.reload();
+      location.reload(); // 페이지 새로고침
     } catch (error) {
       console.error('로그인 오류 : ', error.response.data);
     }

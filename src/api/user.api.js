@@ -4,7 +4,7 @@ import { apiClient } from './client';
 
 const fetchMe = async () => {
   const response = await apiClient.get(
-    'https://api.user.connect.alpaon.dev/user/me',
+    'https://api.studyroom.jisub.kim/users/user',
   );
   return response.data.result.user;
 };

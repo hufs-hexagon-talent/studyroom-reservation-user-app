@@ -3,7 +3,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios'
 
-
 const useAuth = () => {
   const navigate = useNavigate();
 
@@ -28,9 +27,9 @@ const useAuth = () => {
   useEffect(() => fetchTokens(), [fetchTokens]);
 
   useEffect(() => {
-
+    // storage 이벤트 발생할 때마다 fetchTokens 함수 실행
     window.addEventListener('storage', fetchTokens);
-
+    //fetchTokens 함수를 storage 이벤트에 연결했다면 이벤트 제거
     return () => {
       window.removeEventListener('storage', fetchTokens);
     };
@@ -38,7 +37,7 @@ const useAuth = () => {
 
   const login = useCallback(async ({id, password}) => {
     const response = await axios.post(
-      'https://api.user.connect.alpaon.dev/user/auth/login',
+      'https://api.studyroom.jisub.kim/auth/login',
       {
         username: id,
         password: password,
