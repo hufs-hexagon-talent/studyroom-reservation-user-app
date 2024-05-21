@@ -43,9 +43,8 @@ const useAuth = () => {
         password: password,
       },
     );
-    const { accessToken, refreshToken } = response.data;
-    localStorage.setItem('accessToken', accessToken);
-    localStorage.setItem('refreshToken', refreshToken);
+    localStorage.setItem('accessToken', response.data.access_token);
+    localStorage.setItem('refreshToken', response.data.refresh_token);
   }, []);
 
   const logout = useCallback(async () => {
