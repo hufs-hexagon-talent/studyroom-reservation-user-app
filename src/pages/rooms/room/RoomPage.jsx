@@ -17,6 +17,8 @@ import { ko } from 'date-fns/locale';
 
 import 'react-datepicker/dist/react-datepicker.css';
 
+import Button from '../../../components/button/Button';
+
 const timeTableConfig = {
   startTime: {
     hour: 8,
@@ -30,7 +32,8 @@ const timeTableConfig = {
   maxReservationSlots: 4,
 };
 
-function createTimeTable(config) {
+// table 만드는 함수
+const createTimeTable = config => {
   const { startTime, endTime, intervalMinute } = config;
   const start = new Date();
   start.setHours(startTime.hour, startTime.minute, 0, 0);
@@ -51,18 +54,19 @@ function createTimeTable(config) {
   }
 
   return timeTable;
-}
+};
 
 const RoomPage = () => {
+  // 현재 시간
+  const formatDate = date => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   const today = new Date();
-  const year = today.getFullYear();
-  const month = today.getMonth() + 1;
-  const day = today.getDate();
-
-  let monthFormatted = month < 10 ? `0${month}` : month;
-  let dayFormatted = day < 10 ? `0${day}` : day;
-
-  const currentDay = `${year}.${monthFormatted}.${dayFormatted}`;
+  const currentDay = formatDate(today);
 
   const [selectedPartition, setSelectedPartition] = useState(null);
   const [startTimeIndex, setStartTimeIndex] = useState(null);
@@ -75,6 +79,7 @@ const RoomPage = () => {
     room2: [],
   });
 
+  // 슬롯이 선택되었는지 확인하는 함수
   const getSlotSelected = useCallback(
     (partition, timeIndex) => {
       if (!startTimeIndex || !endTimeIndex) return false;
@@ -87,10 +92,10 @@ const RoomPage = () => {
     [startTimeIndex, endTimeIndex, selectedPartition],
   );
 
+  // 슬롯의 상태 토글하는 함수
   const toggleSlot = useCallback(
     (partition, timeIndex) => {
       const isExist = getSlotSelected(partition, timeIndex);
-      console.log(partition, timeIndex, isExist);
 
       if (!startTimeIndex && !endTimeIndex) {
         setSelectedPartition(partition);
@@ -133,10 +138,26 @@ const RoomPage = () => {
       setSelectedPartition(partition);
       setStartTimeIndex(timeIndex);
       setEndTimeIndex(timeIndex);
+      console.log(
+        partition,
+        times[startTimeIndex],
+        times[endTimeIndex],
+        isExist,
+        currentDay,
+      ); // 인덱스 대신 시간 형식을 출력
     },
-    [getSlotSelected, setStartTimeIndex, setEndTimeIndex, selectedPartition],
+    [
+      getSlotSelected,
+      setStartTimeIndex,
+      setEndTimeIndex,
+      selectedPartition,
+      times,
+      startTimeIndex,
+      endTimeIndex,
+    ],
   );
 
+  // 최대 예약 시간에 부합하는지 계산하는 함수
   const handleCellClick = (partition, timeIndex) => {
     const clickedTime = times[timeIndex + 1];
     const currentTime = format(today, 'HH:mm');
@@ -149,6 +170,7 @@ const RoomPage = () => {
     toggleSlot(partition, timeIndex);
   };
 
+  // date-picker 설정
   const [startDate, setStartDate] = useState(new Date());
   const isWeekday = date => {
     const day = getDay(date);
@@ -156,20 +178,7 @@ const RoomPage = () => {
   };
   registerLocale('ko', ko);
 
-  const fetchReservation = async date => {
-    try {
-      const response = await axios.get(
-        `https://api.studyroom.jisub.kim/rooms/policy/by-date?date=${date}`,
-      );
-      const roomNames = response.data.map(room => room.roomName);
-      setSlotsArr(roomNames);
-      console.log('done');
-      console.log(response.data);
-    } catch (error) {
-      console.error('fetch error : ', error);
-    }
-  };
-
+  // date-picker에서 날짜 선택할 때마다 실행되는 함수
   const handleDateChange = date => {
     setStartDate(date);
     const formattedDate = format(date, 'yyyy-MM-dd');
@@ -177,6 +186,66 @@ const RoomPage = () => {
     fetchReservation(formattedDate);
   };
 
+  // 선택 날짜의 모든 룸 예약 상태 확인
+  const fetchReservation = async date => {
+    try {
+      const res = await axios.get(
+        `https://api.studyroom.jisub.kim/reservations/by-date?date=${date}`,
+      );
+      const roomNames = res.data.data.items.map(room => room.roomName);
+      setSlotsArr(roomNames);
+      console.log('done');
+      console.log(res.data);
+    } catch (error) {
+      console.error('fetch error : ', error.message);
+    }
+  };
+
+  // 예약 정보 가져오기
+  // const fetchReservation = async date => {
+  //   try {
+  //     const response = await axios.get(
+  //       `https://api.studyroom.jisub.kim/rooms/policy/by-date?date=${date}`,
+  //     );
+  //     const roomNames = response.data.map(room => room.roomName);
+  //     setSlotsArr(roomNames);
+  //     console.log('done');
+  //     console.log(response.data);
+  //   } catch (error) {
+  //     console.error('fetch error : ', error);
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   const SetPolicy = async () => {
+  //     const dates = Array.from({ length: 8 }, (_, i) => {
+  //       const date = new Date(today);
+  //       date.setDate(date.getDate() + i);
+  //       return formatDate(date);
+  //     });
+
+  //     for (let roomId = 1; roomId <= 6; roomId++) {
+  //       dates.map(d => {
+  //         return axios.post(
+  //           'https://api.studyroom.jisub.kim/schedules/schedule',
+  //           {
+  //             roomId: roomId,
+  //             roomOperationPolicyId: 7,
+  //             policyApplicationDate: d,
+  //           },
+  //           {
+  //             headers: {
+  //               Authorization: localStorage.getItem('accessToken'),
+  //             },
+  //           },
+  //         );
+  //       });
+  //     }
+  //   };
+  //   SetPolicy();
+  // }, []);
+
+  // 자신의 예약 생성
   const handleReservation = async () => {
     const res = await axios.post(
       'https://api.studyroom.jisub.kim/users/reservations/user/reservation',
@@ -301,6 +370,9 @@ const RoomPage = () => {
               </TableBody>
             </Table>
           </TableContainer>
+        </div>
+        <div className="p-10 flex justify-end">
+          <Button onClick={handleReservation} text="예약하기" />
         </div>
       </div>
     </>
