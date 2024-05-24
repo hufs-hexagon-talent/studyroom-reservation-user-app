@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import { HiInformationCircle } from 'react-icons/hi';
 import {
@@ -12,7 +12,7 @@ import {
   Typography,
 } from '@mui/material';
 import axios from 'axios';
-import { addMinutes, format, getDay, subDays } from 'date-fns';
+import { addMinutes, format } from 'date-fns';
 import { ko } from 'date-fns/locale';
 
 import 'react-datepicker/dist/react-datepicker.css';
@@ -160,9 +160,11 @@ const RoomPage = () => {
   // 최대 예약 시간에 부합하는지 계산하는 함수
   const handleCellClick = (partition, timeIndex) => {
     const clickedTime = times[timeIndex + 1];
-    const currentTime = format(today, 'HH:mm');
+    const currentTime = format(today, 'yyyy-MM-dd HH:mm'); // 현재 시간과 날짜를 포함한 문자열
+    const selectedDateTime =
+      format(selectedDate, 'yyyy-MM-dd') + ' ' + clickedTime; // 선택한 날짜와 시간을 포함한 문자열
 
-    if (clickedTime < currentTime) {
+    if (selectedDateTime < currentTime) {
       alert('과거의 시간에 예약을 할 수는 없습니다.');
       return;
     }
@@ -171,80 +173,43 @@ const RoomPage = () => {
   };
 
   // date-picker 설정
-  const [startDate, setStartDate] = useState(new Date());
-  const isWeekday = date => {
-    const day = getDay(date);
-    return day !== 0 && day !== 6;
-  };
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [availableDate, setAvailabelDate] = useState([]);
   registerLocale('ko', ko);
+
+  // 현재로부터 예약 가능한 방들의 날짜 목록 가져오기
+  useEffect(() => {
+    const getDate = async () => {
+      const date_response = await axios.get(
+        'https://api.studyroom.jisub.kim/schedules/available-dates',
+      );
+      setAvailabelDate(date_response.data.data.items);
+    };
+    getDate();
+  }, []);
 
   // date-picker에서 날짜 선택할 때마다 실행되는 함수
   const handleDateChange = date => {
-    setStartDate(date);
+    setSelectedDate(date);
     const formattedDate = format(date, 'yyyy-MM-dd');
     console.log(formattedDate); //2024-05-23
     fetchReservation(formattedDate);
   };
 
-  // 선택 날짜의 모든 룸 예약 상태 확인
+  //예약 정보 가져오기
   const fetchReservation = async date => {
     try {
-      const res = await axios.get(
+      const response = await axios.get(
         `https://api.studyroom.jisub.kim/reservations/by-date?date=${date}`,
       );
-      const roomNames = res.data.data.items.map(room => room.roomName);
+      const roomNames = response.data.data.items.map(item => item.roomName);
+      console.log(roomNames);
       setSlotsArr(roomNames);
       console.log('done');
-      console.log(res.data);
     } catch (error) {
-      console.error('fetch error : ', error.message);
+      console.error('fetch error : ', error);
     }
   };
-
-  // 예약 정보 가져오기
-  // const fetchReservation = async date => {
-  //   try {
-  //     const response = await axios.get(
-  //       `https://api.studyroom.jisub.kim/rooms/policy/by-date?date=${date}`,
-  //     );
-  //     const roomNames = response.data.map(room => room.roomName);
-  //     setSlotsArr(roomNames);
-  //     console.log('done');
-  //     console.log(response.data);
-  //   } catch (error) {
-  //     console.error('fetch error : ', error);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   const SetPolicy = async () => {
-  //     const dates = Array.from({ length: 8 }, (_, i) => {
-  //       const date = new Date(today);
-  //       date.setDate(date.getDate() + i);
-  //       return formatDate(date);
-  //     });
-
-  //     for (let roomId = 1; roomId <= 6; roomId++) {
-  //       dates.map(d => {
-  //         return axios.post(
-  //           'https://api.studyroom.jisub.kim/schedules/schedule',
-  //           {
-  //             roomId: roomId,
-  //             roomOperationPolicyId: 7,
-  //             policyApplicationDate: d,
-  //           },
-  //           {
-  //             headers: {
-  //               Authorization: localStorage.getItem('accessToken'),
-  //             },
-  //           },
-  //         );
-  //       });
-  //     }
-  //   };
-  //   SetPolicy();
-  // }, []);
-
   // 자신의 예약 생성
   const handleReservation = async () => {
     const res = await axios.post(
@@ -277,15 +242,13 @@ const RoomPage = () => {
             수 있습니다.
           </div>
           {/* date-picker 부분 */}
-          <div className="flex justify-center items-center w-full sm:w-3/4 md:w-1/2 lg:w-1/3 xl:w-1/4 mx-auto">
+          <div className="flex justify-center">
             <DatePicker
-              id="datepicker"
-              selected={startDate}
+              selected={selectedDate}
               locale={ko}
-              minDate={subDays(new Date(), 0)}
-              maxDate={subDays(new Date(), -7)}
+              minDate={availableDate[0]}
+              maxDate={availableDate[6]}
               onChange={handleDateChange}
-              filterDate={isWeekday}
               dateFormat="yyyy년 MM월 dd일"
               showIcon
             />
