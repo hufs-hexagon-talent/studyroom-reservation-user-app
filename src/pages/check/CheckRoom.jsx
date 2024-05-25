@@ -55,8 +55,9 @@ const Check = () => {
 
   // ISO 형식으로 되어있는 날짜와 시간을 형식에 맞게 추출하는 함수
   const seperateDateTime = dateTime => {
-    const [date, time] = dateTime.split('T07:');
-    const timeShort = time.slice(0, 5);
+    const [date, time] = dateTime.split('T');
+    console.log(date, time);
+    const timeShort = time.slice(3, 8);
     return { date, time: timeShort };
   };
 
