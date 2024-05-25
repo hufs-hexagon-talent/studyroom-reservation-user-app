@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Popover, Typography } from '@mui/material';
 import axios from 'axios';
 import { Table } from 'flowbite-react';
@@ -9,18 +9,9 @@ import './CheckRoom.css';
 import { useMe } from '../../api/user.api';
 
 const Check = () => {
-  const today = new Date();
-  const year = today.getFullYear();
-  const month = today.getMonth() + 1;
-  const day = today.getDate();
-
-  let monthFormatted = month < 10 ? `0${month}` : month;
-  let dayFormatted = day < 10 ? `0${day}` : day;
-
-  const currentDay = `${year}.${monthFormatted}.${dayFormatted}`;
-
-  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
   const { data: user } = useMe();
+  const [reservations, setReservations] = useState([]);
 
   const handleClick = event => {
     setAnchorEl(event.currentTarget);
@@ -35,16 +26,19 @@ const Check = () => {
 
   // 자신의 모든 예약 조회
   const checkReservation = async () => {
-    const data = axios.get(
-      'https://api.studyroom.jisub.kim/users/reservations/user/reservations',
-    );
-    data
-      .then(Response => {
-        console.log(Response.data);
-      })
-      .catch(Error => {
-        console.error(Error);
-      });
+    try {
+      const response = await axios.get(
+        'https://api.studyroom.jisub.kim/reservations/me',
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+          },
+        },
+      );
+      setReservations(response.data.data.items);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   useEffect(() => {
@@ -57,38 +51,39 @@ const Check = () => {
         내 신청 현황
       </div>
 
-      <div id="table" className="overflow-x-auto mt-10 p-2">
+      <div id="table" className="overflow-x-auto mt-10">
         <Table className="border">
           <Table.Head
             style={{ fontSize: 15 }}
             className="text-black text-center">
             <Table.HeadCell>예약자</Table.HeadCell>
             <Table.HeadCell>호실</Table.HeadCell>
-            <Table.HeadCell>
-              방 <br />
-              번호
-            </Table.HeadCell>
             <Table.HeadCell>날짜</Table.HeadCell>
-            <Table.HeadCell>시간</Table.HeadCell>
+            <Table.HeadCell>시작 시간</Table.HeadCell>
+            <Table.HeadCell>종료 시간</Table.HeadCell>
             <Table.HeadCell>
               <span className="sr-only">삭제</span>
             </Table.HeadCell>
           </Table.Head>
           <Table.Body className="divide-y">
-            <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800 text-center text-gray-900">
-              <Table.Cell>{user?.username || '-'}</Table.Cell>
-              <Table.Cell>306호</Table.Cell>
-              <Table.Cell>room 3</Table.Cell>
-              <Table.Cell>2024-03-12</Table.Cell>
-              <Table.Cell>15:00 - 17:00</Table.Cell>
-              <Table.Cell>
-                <a
-                  href="#"
-                  className="font-medium text-cyan-600 hover:underline dark:text-cyan-500">
-                  삭제
-                </a>
-              </Table.Cell>
-            </Table.Row>
+            {reservations.map((reservation, index) => (
+              <Table.Row
+                key={index}
+                className="bg-white dark:border-gray-700 dark:bg-gray-800 text-center text-gray-900">
+                <Table.Cell>{user ? user.username : '-'}</Table.Cell>
+                <Table.Cell>{reservation.roomName}</Table.Cell>
+                <Table.Cell>-</Table.Cell>
+                <Table.Cell>{reservation.startDateTime}</Table.Cell>
+                <Table.Cell>{reservation.endDateTime}</Table.Cell>
+                <Table.Cell>
+                  <a
+                    href="#"
+                    className="font-medium text-cyan-600 hover:underline dark:text-cyan-500">
+                    삭제
+                  </a>
+                </Table.Cell>
+              </Table.Row>
+            ))}
           </Table.Body>
         </Table>
       </div>

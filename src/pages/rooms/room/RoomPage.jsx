@@ -74,11 +74,6 @@ const RoomPage = () => {
   const [slotsArr, setSlotsArr] = useState([]);
   const times = useMemo(() => createTimeTable(timeTableConfig), []);
 
-  const [reservedSlots, setReservedSlots] = useState({
-    room1: [],
-    room2: [],
-  });
-
   // 슬롯이 선택되었는지 확인하는 함수
   const getSlotSelected = useCallback(
     (partition, timeIndex) => {
@@ -202,6 +197,7 @@ const RoomPage = () => {
     fetchReservation(formattedDate);
   };
 
+  const [reservedSlots, setReservedSlots] = useState({});
   //예약 정보 가져오기
   const fetchReservation = async date => {
     try {
@@ -212,17 +208,33 @@ const RoomPage = () => {
       console.log(roomNames);
       console.log(response.data.data.items.map(item => item.roomId));
       setSlotsArr(roomNames);
+      console.log(response.data);
+
+      const updatedReservedSlots = {};
+
+      response.data.data.items.forEach(item => {
+        const startTimes = item.timeline.map(t => t.startDateTime);
+        const endTimes = item.timeline.map(t => t.endDateTime);
+        console.log(`Room: ${item.roomName}`);
+        console.log('Start Times:', startTimes);
+        console.log('End Times:', endTimes);
+
+        updatedReservedSlots[item.roomName] = { startTimes, endTimes };
+      });
+      setReservedSlots(updatedReservedSlots);
+      console.log(reservedSlots);
       console.log('done');
     } catch (error) {
       console.error('fetch error : ', error);
     }
   };
+
   // 자신의 예약 생성
   const handleReservation = async () => {
     const res = await axios.post(
       'https://api.studyroom.jisub.kim/users/reservations/user/reservation',
       {
-        roomId: selectedPartition,
+        roomId: 1,
         startDateTime: startTimeIndex,
         endDateTime: endTimeIndex,
       },
@@ -315,9 +327,10 @@ const RoomPage = () => {
                     <TableCell>{partition}</TableCell>
                     {times.map((time, timeIndex) => {
                       const isSelected = getSlotSelected(partition, timeIndex);
+                      console.log();
                       const isSelectable = true;
-                      const isReserved =
-                        reservedSlots[partition]?.includes(timeIndex);
+                      // const isReserved =
+                      //   reservedSlots[partition]?.includes(timeIndex);
                       return (
                         <TableCell
                           key={timeIndex}
@@ -325,11 +338,12 @@ const RoomPage = () => {
                           className={isSelected ? 'selected' : ''}
                           style={{
                             padding: 30,
-                            backgroundColor: isReserved
-                              ? '#002D56'
-                              : isSelected
-                                ? '#7599BA'
-                                : '#F1EEE9',
+                            // : isReserved
+                            //? '#002D56' // 남색
+
+                            backgroundColor: isSelected
+                              ? '#7599BA' // 하늘색
+                              : '#F1EEE9', // 베이지 색
                             borderRight: '1px solid #ccc',
                             cursor: isSelectable ? 'pointer' : 'not-allowed',
                           }}></TableCell>
