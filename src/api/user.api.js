@@ -4,9 +4,9 @@ import { apiClient } from './client';
 
 const fetchMe = async () => {
   const response = await apiClient.get(
-    'https://api.studyroom.jisub.kim/users/user',
+    'https://api.studyroom.jisub.kim/users/me',
   );
-  return response.data.result.user;
+  return response.data.data.name;
 };
 
 export const useMe = () => {

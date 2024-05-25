@@ -34,8 +34,13 @@ apiClient.interceptors.response.use(
         return Promise.reject(error);
       }
       // todo : refresh가 401이 떴을 때 새로 refresh 떳을때) 지금 요청하려고 하는 api가 refresh면? 바로 종료
+      // 현재 요청이 리프레시 요청이냐
+      if (error.config.url === 'https://api.studyroom.jisub.kim/auth/refresh') {
+        console.log('리프레시 토큰 갱신 실패. 로그아웃');
+        return Promise.reject(error);
+      }
       try {
-        // 리프레시 토큰으로 액세스 토큰 와서 헤더 업데이트 하고 새 액세스 토큰으로 재요청하기
+        // 리프레시 토큰으로 액세스 토큰 와서 새 액세스 토큰으로 재요청하기
         const response = await axios.post('https://api.studyroom.jisub.kim/auth/refresh', { refreshToken });
         const accessToken = response.data.accessToken
         localStorage.setItem('accessToken', accessToken);
