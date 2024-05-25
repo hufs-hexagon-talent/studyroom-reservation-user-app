@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button, Popover, Typography } from '@mui/material';
 import axios from 'axios';
 import { Table } from 'flowbite-react';
@@ -12,6 +13,7 @@ const Check = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const { data: user } = useMe();
   const [reservations, setReservations] = useState([]);
+  const navigate = useNavigate();
 
   const handleClick = event => {
     setAnchorEl(event.currentTarget);
@@ -43,8 +45,13 @@ const Check = () => {
   };
 
   useEffect(() => {
-    checkReservation();
-  }, []);
+    const accessToken = localStorage.getItem('accessToken');
+    if (!accessToken) {
+      navigate('/login');
+    } else {
+      checkReservation();
+    }
+  }, [navigate]);
 
   // ISO 형식으로 되어있는 날짜와 시간을 형식에 맞게 추출하는 함수
   const seperateDateTime = dateTime => {
