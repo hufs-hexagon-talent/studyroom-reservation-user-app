@@ -36,6 +36,7 @@ const Check = () => {
         },
       );
       setReservations(response.data.data.items);
+      console.log(response.data);
     } catch (error) {
       console.error(error);
     }
@@ -44,6 +45,13 @@ const Check = () => {
   useEffect(() => {
     checkReservation();
   }, []);
+
+  // ISO 형식으로 되어있는 날짜와 시간을 형식에 맞게 추출하는 함수
+  const seperateDateTime = dateTime => {
+    const [date, time] = dateTime.split('T07:');
+    const timeShort = time.slice(0, 5);
+    return { date, time: timeShort };
+  };
 
   return (
     <div>
@@ -66,24 +74,28 @@ const Check = () => {
             </Table.HeadCell>
           </Table.Head>
           <Table.Body className="divide-y">
-            {reservations.map((reservation, index) => (
-              <Table.Row
-                key={index}
-                className="bg-white dark:border-gray-700 dark:bg-gray-800 text-center text-gray-900">
-                <Table.Cell>{user ? user.username : '-'}</Table.Cell>
-                <Table.Cell>{reservation.roomName}</Table.Cell>
-                <Table.Cell>-</Table.Cell>
-                <Table.Cell>{reservation.startDateTime}</Table.Cell>
-                <Table.Cell>{reservation.endDateTime}</Table.Cell>
-                <Table.Cell>
-                  <a
-                    href="#"
-                    className="font-medium text-cyan-600 hover:underline dark:text-cyan-500">
-                    삭제
-                  </a>
-                </Table.Cell>
-              </Table.Row>
-            ))}
+            {reservations.map((reservation, index) => {
+              const start = seperateDateTime(reservation.startDateTime);
+              const end = seperateDateTime(reservation.endDateTime);
+              return (
+                <Table.Row
+                  key={index}
+                  className="bg-white dark:border-gray-700 dark:bg-gray-800 text-center text-gray-900">
+                  <Table.Cell>{user ? user.username : '-'}</Table.Cell>
+                  <Table.Cell>{reservation.roomName}</Table.Cell>
+                  <Table.Cell>{start.date}</Table.Cell>
+                  <Table.Cell>{start.time}</Table.Cell>
+                  <Table.Cell>{end.time}</Table.Cell>
+                  <Table.Cell>
+                    <a
+                      href="#"
+                      className="font-medium text-cyan-600 hover:underline dark:text-cyan-500">
+                      삭제
+                    </a>
+                  </Table.Cell>
+                </Table.Row>
+              );
+            })}
           </Table.Body>
         </Table>
       </div>
