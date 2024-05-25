@@ -131,6 +131,7 @@ const RoomPage = () => {
           setEndTimeIndex(timeIndex);
         } else {
           setStartTimeIndex(timeIndex);
+          setEndTimeIndex(timeIndex);
         }
         return;
       }
@@ -138,13 +139,18 @@ const RoomPage = () => {
       setSelectedPartition(partition);
       setStartTimeIndex(timeIndex);
       setEndTimeIndex(timeIndex);
-      console.log(
+
+      // 시간과 날짜를 포함한 ISO 8601 형식으로 변환
+      const formattedDate = formatDate(new Date(selectedDate));
+      const startDateTime = `${formattedDate}T${times[startTimeIndex]}:00.000Z`;
+      const endDateTime = `${formattedDate}T${times[endTimeIndex]}:00.000Z`;
+      console.log({
         partition,
-        times[startTimeIndex],
-        times[endTimeIndex],
+        startDateTime,
+        endDateTime,
         isExist,
-        currentDay,
-      ); // 인덱스 대신 시간 형식을 출력
+        selectedDate: formattedDate,
+      }); // 인덱스 대신 시간 형식을 출력
     },
     [
       getSlotSelected,
@@ -204,6 +210,7 @@ const RoomPage = () => {
       );
       const roomNames = response.data.data.items.map(item => item.roomName);
       console.log(roomNames);
+      console.log(response.data.data.items.map(item => item.roomId));
       setSlotsArr(roomNames);
       console.log('done');
     } catch (error) {
@@ -247,7 +254,7 @@ const RoomPage = () => {
               selected={selectedDate}
               locale={ko}
               minDate={availableDate[0]}
-              maxDate={availableDate[6]}
+              maxDate={availableDate[availableDate.length - 1]}
               onChange={handleDateChange}
               dateFormat="yyyy년 MM월 dd일"
               showIcon
