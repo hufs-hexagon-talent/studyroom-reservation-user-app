@@ -1,9 +1,8 @@
-'use client';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import { HiInformationCircle } from 'react-icons/hi';
-import { useParams } from 'react-router-dom';
 import {
+  Alert,
   Table,
   TableBody,
   TableCell,
@@ -12,26 +11,14 @@ import {
   TableRow,
   Typography,
 } from '@mui/material';
-import { addMinutes, format, getDay, subDays } from 'date-fns';
-import ko from 'date-fns/locale/ko';
-import {
-  addDoc,
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-  query,
-  updateDoc,
-} from 'firebase/firestore';
-import { Alert } from 'flowbite-react';
+import axios from 'axios';
+import { addMinutes, format } from 'date-fns';
+import { ko } from 'date-fns/locale';
 
 import 'react-datepicker/dist/react-datepicker.css';
-import './RoomPage.css';
 
 import Button from '../../../components/button/Button';
-import { fs } from '../../../firebase';
 
-//시간 데이터
 const timeTableConfig = {
   startTime: {
     hour: 8,
@@ -46,7 +33,7 @@ const timeTableConfig = {
 };
 
 // table 만드는 함수
-function createTimeTable(config) {
+const createTimeTable = config => {
   const { startTime, endTime, intervalMinute } = config;
   const start = new Date();
   start.setHours(startTime.hour, startTime.minute, 0, 0);
@@ -67,37 +54,25 @@ function createTimeTable(config) {
   }
 
   return timeTable;
-}
+};
 
 const RoomPage = () => {
   // 현재 시간
+  const formatDate = date => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   const today = new Date();
-  const year = today.getFullYear();
-  const month = today.getMonth() + 1;
-  const day = today.getDate();
-
-  let monthFormatted = month < 10 ? `0${month}` : month;
-  let dayFormatted = day < 10 ? `0${day}` : day;
-
-  const currentDay = `${year}.${monthFormatted}.${dayFormatted}`;
+  const currentDay = formatDate(today);
 
   const [selectedPartition, setSelectedPartition] = useState(null);
   const [startTimeIndex, setStartTimeIndex] = useState(null);
   const [endTimeIndex, setEndTimeIndex] = useState(null);
-  const [isOpen, setIsOpen] = useState(false);
-  const { roomName } = useParams();
+  const [slotsArr, setSlotsArr] = useState([]);
   const times = useMemo(() => createTimeTable(timeTableConfig), []);
-
-  const [reservedSlots, setReservedSlots] = useState({
-    room1: [],
-    room2: [],
-    room3: roomName === '306' ? [] : [],
-    room4: roomName === '306' ? [] : [],
-  });
-
-  useEffect(() => {
-    fetchData();
-  }, []);
 
   // 슬롯이 선택되었는지 확인하는 함수
   const getSlotSelected = useCallback(
@@ -116,7 +91,6 @@ const RoomPage = () => {
   const toggleSlot = useCallback(
     (partition, timeIndex) => {
       const isExist = getSlotSelected(partition, timeIndex);
-      console.log(partition, timeIndex, isExist);
 
       if (!startTimeIndex && !endTimeIndex) {
         setSelectedPartition(partition);
@@ -152,6 +126,7 @@ const RoomPage = () => {
           setEndTimeIndex(timeIndex);
         } else {
           setStartTimeIndex(timeIndex);
+          setEndTimeIndex(timeIndex);
         }
         return;
       }
@@ -159,16 +134,38 @@ const RoomPage = () => {
       setSelectedPartition(partition);
       setStartTimeIndex(timeIndex);
       setEndTimeIndex(timeIndex);
+
+      // 시간과 날짜를 포함한 ISO 8601 형식으로 변환
+      const formattedDate = formatDate(new Date(selectedDate));
+      const startDateTime = `${formattedDate}T${times[startTimeIndex]}:00.000Z`;
+      const endDateTime = `${formattedDate}T${times[endTimeIndex]}:00.000Z`;
+      console.log({
+        partition,
+        startDateTime,
+        endDateTime,
+        isExist,
+        selectedDate: formattedDate,
+      }); // 인덱스 대신 시간 형식을 출력
     },
-    [getSlotSelected, setStartTimeIndex, setEndTimeIndex, selectedPartition],
+    [
+      getSlotSelected,
+      setStartTimeIndex,
+      setEndTimeIndex,
+      selectedPartition,
+      times,
+      startTimeIndex,
+      endTimeIndex,
+    ],
   );
 
   // 최대 예약 시간에 부합하는지 계산하는 함수
   const handleCellClick = (partition, timeIndex) => {
     const clickedTime = times[timeIndex + 1];
-    const currentTime = format(today, 'HH:mm');
+    const currentTime = format(today, 'yyyy-MM-dd HH:mm'); // 현재 시간과 날짜를 포함한 문자열
+    const selectedDateTime =
+      format(selectedDate, 'yyyy-MM-dd') + ' ' + clickedTime; // 선택한 날짜와 시간을 포함한 문자열
 
-    if (clickedTime < currentTime) {
+    if (selectedDateTime < currentTime) {
       alert('과거의 시간에 예약을 할 수는 없습니다.');
       return;
     }
@@ -176,96 +173,74 @@ const RoomPage = () => {
     toggleSlot(partition, timeIndex);
   };
 
-  const handleReservation = async () => {
-    setIsOpen(true);
-  };
-
-  // 데이터를 수정하는 함수
-  const handleConfirmReservation = async () => {
-    const address = `Rooms/${roomName}/Days/${currentDay}/Reservations`;
-
-    let docRef;
-    if (startTimeIndex !== null && endTimeIndex !== null) {
-      const startHour = times[startTimeIndex].split(':')[0];
-      const startMinute = times[startTimeIndex].split(':')[1];
-      const endHour = times[endTimeIndex].split(':')[0];
-      const endMinute = times[endTimeIndex].split(':')[1];
-
-      docRef = await addDoc(collection(fs, address), {
-        partitionName: selectedPartition,
-        startTime: [startHour, startMinute],
-        endTime: [endHour, endMinute],
-        roomName: roomName,
-      });
-
-      setIsOpen(false);
-      await fetchData();
-
-      const reservedId = docRef.id;
-      const ref = doc(
-        fs,
-        `Rooms/${roomName}/Days/${currentDay}/Reservations/${reservedId}`,
-      );
-      await updateDoc(ref, {
-        roomId: reservedId,
-      });
-    }
-  };
-
-  // 새로운 함수를 생성해 중복을 제거
-  const pushReservedTime = (docSnap, reservedSlots) => {
-    docSnap.forEach(doc => {
-      const { startTime, endTime, partitionName } = doc.data();
-      // 시작 시간
-      const startIdx = times.findIndex(
-        time => time === `${startTime[0]}:${startTime[1]}`,
-      );
-      // 종료 시간
-      const endIdx = times.findIndex(
-        time => time === `${endTime[0]}:${endTime[1]}`,
-      );
-
-      for (let i = startIdx; i <= endIdx; i++) {
-        reservedSlots[partitionName].push(i);
-      }
-
-      setReservedSlots(reservedSlots);
-    });
-  };
-  const [slotsArr, setSlotsArr] = useState([]);
-
-  const fetchData = async () => {
-    try {
-      console.log(roomName);
-      const docRef = doc(fs, `Rooms/${roomName}`);
-      const docSnap = await getDoc(docRef);
-      const len = docSnap.data().partitions.length;
-
-      const q = query(
-        collection(fs, `Rooms/${roomName}/Days/${currentDay}/Reservations`),
-      );
-      const querySnap = await getDocs(q);
-
-      const reservedSlots = {};
-      const slotsArray = [];
-      for (let i = 1; i <= len; i++) {
-        reservedSlots[`room${i}`] = [];
-        slotsArray.push(`room${i}`);
-      }
-      setSlotsArr(slotsArray);
-      pushReservedTime(querySnap, reservedSlots);
-    } catch (error) {
-      console.error('Error', error);
-    }
-  };
-
-  // date-picker 부분
-  const [startDate, setStartDate] = useState(new Date());
-  const isWeekday = date => {
-    const day = getDay(date);
-    return day !== 0 && day !== 6;
-  };
+  // date-picker 설정
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [availableDate, setAvailabelDate] = useState([]);
   registerLocale('ko', ko);
+
+  // 현재로부터 예약 가능한 방들의 날짜 목록 가져오기
+  useEffect(() => {
+    const getDate = async () => {
+      const date_response = await axios.get(
+        'https://api.studyroom.jisub.kim/schedules/available-dates',
+      );
+      setAvailabelDate(date_response.data.data.items);
+    };
+    getDate();
+  }, []);
+
+  // date-picker에서 날짜 선택할 때마다 실행되는 함수
+  const handleDateChange = date => {
+    setSelectedDate(date);
+    const formattedDate = format(date, 'yyyy-MM-dd');
+    console.log(formattedDate); //2024-05-23
+    fetchReservation(formattedDate);
+  };
+
+  const [reservedSlots, setReservedSlots] = useState({});
+  //예약 정보 가져오기
+  const fetchReservation = async date => {
+    try {
+      const response = await axios.get(
+        `https://api.studyroom.jisub.kim/reservations/by-date?date=${date}`,
+      );
+      const roomNames = response.data.data.items.map(item => item.roomName);
+      console.log(roomNames);
+      console.log(response.data.data.items.map(item => item.roomId));
+      setSlotsArr(roomNames);
+      console.log(response.data);
+
+      const updatedReservedSlots = {};
+
+      response.data.data.items.forEach(item => {
+        const startTimes = item.timeline.map(t => t.startDateTime);
+        const endTimes = item.timeline.map(t => t.endDateTime);
+        console.log(`Room: ${item.roomName}`);
+        console.log('Start Times:', startTimes);
+        console.log('End Times:', endTimes);
+
+        updatedReservedSlots[item.roomName] = { startTimes, endTimes };
+      });
+      setReservedSlots(updatedReservedSlots);
+      console.log(reservedSlots);
+      console.log('done');
+    } catch (error) {
+      console.error('fetch error : ', error);
+    }
+  };
+
+  // 자신의 예약 생성
+  const handleReservation = async () => {
+    const res = await axios.post(
+      'https://api.studyroom.jisub.kim/users/reservations/user/reservation',
+      {
+        roomId: 1,
+        startDateTime: startTimeIndex,
+        endDateTime: endTimeIndex,
+      },
+    );
+    console.log(res.data);
+  };
 
   return (
     <>
@@ -285,25 +260,23 @@ const RoomPage = () => {
             아래 예약 현황의 예약가능 시간을 선택하시면 해당 세미나실을 대관할
             수 있습니다.
           </div>
-
-          <div className="flex justify-center items-center w-full sm:w-3/4 md:w-1/2 lg:w-1/3 xl:w-1/4 mx-auto">
+          {/* date-picker 부분 */}
+          <div className="flex justify-center">
             <DatePicker
-              id="datepicker"
-              selected={startDate}
+              selected={selectedDate}
               locale={ko}
-              minDate={subDays(new Date(), 0)}
-              maxDate={subDays(new Date(), -7)}
-              onChange={date => setStartDate(date)}
-              filterDate={isWeekday}
+              minDate={availableDate[0]}
+              maxDate={availableDate[availableDate.length - 1]}
+              onChange={handleDateChange}
               dateFormat="yyyy년 MM월 dd일"
               showIcon
             />
           </div>
         </div>
 
-        <div id="squares" className="flex p-4 ">
+        <div id="squares" className="flex p-4">
           <div
-            className="w-6 h-6 mt-10 "
+            className="w-6 h-6 mt-10"
             style={{ backgroundColor: '#F1EEE9' }}></div>
           <div className="mt-10 ml-2">예약 가능</div>
           <div
@@ -316,6 +289,7 @@ const RoomPage = () => {
           <div className="mt-10 ml-2">예약 완료</div>
         </div>
 
+        {/* timeTable 시작 */}
         <div>
           <TableContainer
             sx={{
@@ -353,36 +327,26 @@ const RoomPage = () => {
                     <TableCell>{partition}</TableCell>
                     {times.map((time, timeIndex) => {
                       const isSelected = getSlotSelected(partition, timeIndex);
+                      console.log();
                       const isSelectable = true;
-                      const isReserved =
-                        reservedSlots[partition].includes(timeIndex);
-
+                      // const isReserved =
+                      //   reservedSlots[partition]?.includes(timeIndex);
                       return (
                         <TableCell
                           key={timeIndex}
-                          sx={{
-                            borderLeft: '2px solid #e5ded4',
-                            borderBottom: '2px solid #e5ded4',
-                            borderTop: '2px solid #e5ded4',
+                          onClick={() => handleCellClick(partition, timeIndex)}
+                          className={isSelected ? 'selected' : ''}
+                          style={{
+                            padding: 30,
+                            // : isReserved
+                            //? '#002D56' // 남색
+
                             backgroundColor: isSelected
-                              ? '#7599BA' // 밝은 남색으로 칠해짐
-                              : isReserved
-                                ? '#002D56' // 남색으로 칠해짐
-                                : !isSelectable
-                                  ? '#aaa'
-                                  : '#F1EEE9',
-                            cursor: isReserved
-                              ? 'default'
-                              : isSelectable
-                                ? 'pointer'
-                                : 'default',
-                          }}
-                          onClick={() =>
-                            isSelectable &&
-                            !isReserved &&
-                            handleCellClick(partition, timeIndex)
-                          } // 예약된 슬롯을 클릭할 수 없도록 설정
-                        />
+                              ? '#7599BA' // 하늘색
+                              : '#F1EEE9', // 베이지 색
+                            borderRight: '1px solid #ccc',
+                            cursor: isSelectable ? 'pointer' : 'not-allowed',
+                          }}></TableCell>
                       );
                     })}
                   </TableRow>
@@ -391,14 +355,8 @@ const RoomPage = () => {
             </Table>
           </TableContainer>
         </div>
-
-        <div className="mt-10 flex justify-end">
-          <Button
-            text="예약하기"
-            onClick={() => {
-              handleReservation();
-            }}
-          />
+        <div className="p-10 flex justify-end">
+          <Button onClick={handleReservation} text="예약하기" />
         </div>
       </div>
     </>

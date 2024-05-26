@@ -1,40 +1,29 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { Button, Label, TextInput } from 'flowbite-react';
 
 import './LoginPage.css';
 
+import useAuth from '../../hooks/useAuth';
+
 const LoginPage = () => {
-  const [studentId, setStudentId] = useState('');
+  const [password, setPassword] = useState('');
   const [userName, setUserName] = useState('');
-  const [isLogin, setIsLogin] = useState(false);
+
+  const { login, loggedIn } = useAuth();
   const navigate = useNavigate();
 
-  const registerUser = async (username, password) => {
-    try {
-      const response = await axios.post(
-        'https://api.user.connect.alpaon.dev/user/register',
-        {
-          username: username,
-          password: password,
-        },
-      );
-      console.log('회원가입 성공', response.data);
-      localStorage.setItem('user', username);
-      setIsLogin(true);
-      navigate('/');
-    } catch (error) {
-      if (error.response.status === 409) {
-        console.error('회원가입 실패 : ', error.response.data.message);
-      } else {
-        console.error('오류 발생 : ', error.message);
-      }
-    }
-  };
+  useEffect(() => {
+    if (loggedIn) navigate('/');
+  }, [loggedIn, navigate]);
 
-  const handleRegisterClick = () => {
-    registerUser(userName, studentId);
+  const handleLogin = async () => {
+    try {
+      await login({ id: userName, password });
+      location.reload(); // 페이지 새로고침
+    } catch (error) {
+      console.error('로그인 오류 : ', error.response.data);
+    }
   };
 
   return (
@@ -54,8 +43,7 @@ const LoginPage = () => {
               className="ml-3 mr-3 mb-5"
               id="studentId"
               placeholder="ex) 2022xxxxx"
-              value={studentId}
-              onChange={e => setStudentId(e.target.value)}
+              onChange={e => setPassword(e.target.value)}
             />
           </div>
           <div>
@@ -67,7 +55,6 @@ const LoginPage = () => {
               id="name"
               type="name"
               placeholder="ex) 홍길동"
-              value={userName}
               onChange={e => setUserName(e.target.value)}
             />
           </div>
@@ -77,7 +64,7 @@ const LoginPage = () => {
             id="btn"
             className="w-auto h-auto cursor-pointer text-white"
             color="dark"
-            onClick={() => handleRegisterClick(userName, studentId)}>
+            onClick={handleLogin}>
             로그인하기
           </Button>
         </div>
