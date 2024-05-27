@@ -4,7 +4,9 @@ import './Footer.css';
 
 const Footer = () => {
   return (
-    <footer id="footer" className="bg-footermainbg relative p-0 block">
+    <footer
+      id="footer"
+      className="bg-footermainbg relative p-0 block break-keep">
       <div className="py-6 px-2.7 ml-5 mr-5">
         <div className="footer-logo">
           <img
