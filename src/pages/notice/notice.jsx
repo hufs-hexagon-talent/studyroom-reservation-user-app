@@ -1,5 +1,8 @@
 import React from 'react';
 
+{
+  /*이용규칙 안내*/
+}
 const Notice = () => {
   return (
     <div className="ml-10 mr-10">
