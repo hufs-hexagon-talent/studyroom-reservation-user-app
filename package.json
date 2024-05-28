@@ -39,7 +39,7 @@
     "eslint-plugin-unused-imports": "^3.0.0",
     "package": "^1.0.1",
     "prettier": "3.2.4",
-    "tailwindcss": "^3.4.1"
+    "tailwindcss": "^3.4.3"
   },
   "scripts": {
     "start": "react-scripts start",

@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 
 import { apiClient } from './client';
 
@@ -15,3 +15,22 @@ export const useMe = () => {
     queryFn: fetchMe,
   });
 };
+
+export const useReserve = () => {
+  return useMutation({
+    mutationFn: async ({
+      roomId, startDateTime, endDateTime
+    }) =>{
+      const res = await apiClient.post(
+        'https://api.studyroom.jisub.kim/reservations',
+        {
+          roomId,
+          startDateTime,
+          endDateTime,
+        },
+      );
+
+      return res.data
+    }
+  })
+}

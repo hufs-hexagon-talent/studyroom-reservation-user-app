@@ -43,8 +43,8 @@ const useAuth = () => {
         password: password,
       },
     );
-    localStorage.setItem('accessToken', response.data.access_token);
-    localStorage.setItem('refreshToken', response.data.refresh_token);
+    localStorage.setItem('accessToken', response.data.data.access_token);
+    localStorage.setItem('refreshToken', response.data.data.refresh_token);
   }, []);
 
   const logout = useCallback(async () => {

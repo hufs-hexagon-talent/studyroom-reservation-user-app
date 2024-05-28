@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Popover, Typography } from '@mui/material';
 import axios from 'axios';
+import { format } from 'date-fns';
 import { Table } from 'flowbite-react';
 
 import '../login/LoginPage';
@@ -83,17 +84,17 @@ const Check = () => {
           </Table.Head>
           <Table.Body className="divide-y">
             {reservations.map((reservation, index) => {
-              const start = seperateDateTime(reservation.startDateTime);
-              const end = seperateDateTime(reservation.endDateTime);
+              const start = new Date(reservation.startDateTime);
+              const end = new Date(reservation.endDateTime);
               return (
                 <Table.Row
                   key={index}
                   className="bg-white dark:border-gray-700 dark:bg-gray-800 text-center text-gray-900">
                   <Table.Cell>{user ? user.username : '-'}</Table.Cell>
                   <Table.Cell>{reservation.roomName}</Table.Cell>
-                  <Table.Cell>{start.date}</Table.Cell>
-                  <Table.Cell>{start.time}</Table.Cell>
-                  <Table.Cell>{end.time}</Table.Cell>
+                  <Table.Cell>{format(start, 'MM-dd')}</Table.Cell>
+                  <Table.Cell>{format(start, 'HH:mm')}</Table.Cell>
+                  <Table.Cell>{format(end, 'HH:mm')}</Table.Cell>
                   <Table.Cell>
                     <a
                       href="#"
