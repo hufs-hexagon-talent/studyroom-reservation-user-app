@@ -16,8 +16,7 @@ import { ko } from 'date-fns/locale';
 
 import 'react-datepicker/dist/react-datepicker.css';
 
-import { apiClient } from '../../../api/client';
-import { fetchDate, useReserve } from '../../../api/user.api';
+import { fetchDate, fetchReservation, useReserve } from '../../../api/user.api';
 import Button from '../../../components/button/Button';
 
 const timeTableConfig = {
@@ -73,6 +72,7 @@ const RoomPage = () => {
   const [startTimeIndex, setStartTimeIndex] = useState(null);
   const [endTimeIndex, setEndTimeIndex] = useState(null);
   const [slotsArr, setSlotsArr] = useState([]);
+  const [reservedSlots, setReservedSlots] = useState({});
   const times = useMemo(() => createTimeTable(timeTableConfig), []);
 
   const { mutate: doReserve } = useReserve();
@@ -195,39 +195,7 @@ const RoomPage = () => {
     setSelectedDate(date);
     const formattedDate = format(date, 'yyyy-MM-dd');
     console.log(formattedDate); //2024-05-23
-    fetchReservation(formattedDate);
-  };
-
-  const [reservedSlots, setReservedSlots] = useState({});
-  //예약 정보 가져오기
-  const fetchReservation = async date => {
-    try {
-      const response = await apiClient.get(
-        `https://api.studyroom.jisub.kim/reservations/by-date?date=${date}`,
-      );
-      const roomNames = response.data.data.items.map(item => item.roomName);
-      console.log(roomNames);
-      console.log(response.data.data.items.map(item => item.roomId));
-      setSlotsArr(roomNames);
-      console.log(response.data);
-
-      const updatedReservedSlots = {};
-
-      response.data.data.items.forEach(item => {
-        const startTimes = item.timeline.map(t => t.startDateTime);
-        const endTimes = item.timeline.map(t => t.endDateTime);
-        console.log(`Room: ${item.roomName}`);
-        console.log('Start Times:', startTimes);
-        console.log('End Times:', endTimes);
-
-        updatedReservedSlots[item.roomName] = { startTimes, endTimes };
-      });
-      setReservedSlots(updatedReservedSlots);
-      console.log(reservedSlots);
-      console.log('done');
-    } catch (error) {
-      console.error('fetch error : ', error);
-    }
+    fetchReservation(formattedDate, setSlotsArr, setReservedSlots);
   };
 
   // 자신의 예약 생성
