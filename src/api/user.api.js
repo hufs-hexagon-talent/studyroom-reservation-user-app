@@ -6,7 +6,7 @@ const fetchMe = async () => {
   const response = await apiClient.get(
     'https://api.studyroom.jisub.kim/users/me',
   );
-  return response.data.data.name;
+  return response.data.name;
 };
 
 export const useMe = () => {
@@ -33,4 +33,12 @@ export const useReserve = () => {
       return res.data
     }
   })
+}
+
+export const fetchDate = async() =>{
+  const date_response = await apiClient.get(
+'https://api.studyroom.jisub.kim/schedules/available-dates'
+  );
+  const dates = date_response.data.data.items.map(date => new Date(date));
+  return dates;
 }

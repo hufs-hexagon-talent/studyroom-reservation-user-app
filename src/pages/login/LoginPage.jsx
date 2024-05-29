@@ -9,7 +9,7 @@ import useAuth from '../../hooks/useAuth';
 const LoginPage = () => {
   const [password, setPassword] = useState('');
   const [userName, setUserName] = useState('');
-
+  const [error, setError] = useState('');
   const { login, loggedIn } = useAuth();
   const navigate = useNavigate();
 
@@ -22,7 +22,7 @@ const LoginPage = () => {
       await login({ id: userName, password });
       location.reload(); // 페이지 새로고침
     } catch (error) {
-      console.error('로그인 오류 : ', error.response.data);
+      setError('로그인 오류 : ', error.message);
     }
   };
 

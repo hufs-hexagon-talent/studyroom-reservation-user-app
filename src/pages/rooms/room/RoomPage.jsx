@@ -17,7 +17,7 @@ import { ko } from 'date-fns/locale';
 import 'react-datepicker/dist/react-datepicker.css';
 
 import { apiClient } from '../../../api/client';
-import { useReserve } from '../../../api/user.api';
+import { fetchDate, useReserve } from '../../../api/user.api';
 import Button from '../../../components/button/Button';
 
 const timeTableConfig = {
@@ -184,14 +184,10 @@ const RoomPage = () => {
   // 현재로부터 예약 가능한 방들의 날짜 목록 가져오기
   useEffect(() => {
     const getDate = async () => {
-      const date_response = await apiClient.get(
-        'https://api.studyroom.jisub.kim/schedules/available-dates',
-      );
-      const dates = date_response.data.data.items.map(date => new Date(date));
+      const dates = await fetchDate();
       setAvailabelDate(dates);
     };
     getDate();
-    console.log(availableDate);
   }, []);
 
   // date-picker에서 날짜 선택할 때마다 실행되는 함수

@@ -52,7 +52,7 @@ const Check = () => {
     } else {
       checkReservation();
     }
-  }, [navigate]);
+  }, []);
 
   // ISO 형식으로 되어있는 날짜와 시간을 형식에 맞게 추출하는 함수
   const seperateDateTime = dateTime => {
