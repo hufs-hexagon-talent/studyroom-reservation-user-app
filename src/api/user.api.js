@@ -30,11 +30,12 @@ export const useReserve = () => {
           endDateTime,
         },
       );
-
-      return res.data
+      console.log(res.data);
+      return res.data; // 명시적으로 반환
     }
-  })
+  });
 }
+
 
 // 현재로부터 예약 가능한 방들의 날짜 목록 가져오기
 export const fetchDate = async() =>{
@@ -45,6 +46,12 @@ export const fetchDate = async() =>{
   return dates;
 }
 
+export let roomDict = {};
+
+export const setRoomDict =(dict) =>{
+  roomDict = dict;
+}
+
 //예약 정보 가져오기
 export const fetchReservation = async (date, setSlotsArr, setReservedSlots) => {
   try {
@@ -53,9 +60,15 @@ export const fetchReservation = async (date, setSlotsArr, setReservedSlots) => {
     );
     const roomNames = response.data.data.items.map(item => item.roomName);
     console.log(roomNames);
-    console.log(response.data.data.items.map(item => item.roomId));
+    const roomIds = response.data.data.items.map(item => item.roomId);
+    console.log(roomIds);
+    // '식별자 : 호실 이름' 형식으로 딕셔너리 생성
+    for (let i=0; i<6; i++){
+      roomDict[roomNames[i]] = roomIds[i];
+    }
+    console.log(roomDict);
+    setRoomDict(roomDict);
     setSlotsArr(roomNames);
-    console.log(response.data);
 
     const updatedReservedSlots = {};
 
