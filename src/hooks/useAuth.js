@@ -13,12 +13,21 @@ const useAuth = () => {
     localStorage.getItem('refreshToken') || null,
   );
 
+  const isTokenValid = (token) =>{
+    return token !== 'undefined' && token !==null;
+  };
+ 
   const loggedIn = useMemo(()=> !!accessToken ,[])
 
   const fetchTokens = useCallback(() => {
     console.log("fetchTokens")
-    const storedAccessToken = localStorage.getItem('accessToken') || null;
-    const storedRefreshToken = localStorage.getItem('refreshToken') || null;
+    const storedAccessToken = localStorage.getItem('accessToken');
+    const storedRefreshToken = localStorage.getItem('refreshToken');
+
+    if(!isTokenValid(storedAccessToken)|| !isTokenValid(storedRefreshToken)){
+      logout();
+      return;
+    }
 
     setAccessToken(storedAccessToken);
     setRefreshToken(storedRefreshToken);
@@ -36,15 +45,28 @@ const useAuth = () => {
   }, []);
 
   const login = useCallback(async ({id, password}) => {
-    const response = await axios.post(
-      'https://api.studyroom.jisub.kim/auth/login',
-      {
-        username: id,
-        password: password,
-      },
-    );
-    localStorage.setItem('accessToken', response.data.access_token);
-    localStorage.setItem('refreshToken', response.data.refresh_token);
+    try{
+      const response = await axios.post(
+        'https://api.studyroom.jisub.kim/auth/login',
+        {
+          username: id,
+          password: password,
+        },
+      );
+      const access_token = response.data.data.access_token;
+      const refresh_token = response.data.data.refresh_token;
+  
+      if(!isTokenValid(access_token)|| !isTokenValid(refresh_token)){
+        throw new Error('유효하지 않는 토큰');
+      }
+  
+      localStorage.setItem('accessToken', access_token);
+      localStorage.setItem('refreshToken', refresh_token);
+    } catch(error){
+      if(error.response && error.response.status === 412){
+        alert('아이디 또는 비밀번호가 틀렸습니다.')
+      }
+    }
   }, []);
 
   const logout = useCallback(async () => {

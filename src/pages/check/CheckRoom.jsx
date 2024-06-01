@@ -1,18 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Popover, Typography } from '@mui/material';
-import axios from 'axios';
+import { Box, Button, Modal, Popover, Typography } from '@mui/material';
+import { format } from 'date-fns';
 import { Table } from 'flowbite-react';
+import QRCode from 'qrcode.react';
 
-import '../login/LoginPage';
 import './CheckRoom.css';
 
-import { useMe } from '../../api/user.api';
+import { getUserReservation } from '../../api/user.api';
 
 const Check = () => {
   const [anchorEl, setAnchorEl] = useState(null);
-  const { data: user } = useMe();
   const [reservations, setReservations] = useState([]);
+  const [openModal, setOpenModal] = useState(false);
+  const [selectedReservationId, setSelectedReservationId] = useState('');
   const navigate = useNavigate();
 
   const handleClick = event => {
@@ -29,14 +30,8 @@ const Check = () => {
   // 자신의 모든 예약 조회
   const checkReservation = async () => {
     try {
-      const response = await axios.get(
-        'https://api.studyroom.jisub.kim/reservations/me',
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-          },
-        },
-      );
+      const response = await getUserReservation(); // getUserReservation 사용
+      console.log(response.data);
       setReservations(response.data.data.items);
       console.log(response.data);
     } catch (error) {
@@ -53,17 +48,19 @@ const Check = () => {
     }
   }, [navigate]);
 
-  // ISO 형식으로 되어있는 날짜와 시간을 형식에 맞게 추출하는 함수
-  const seperateDateTime = dateTime => {
-    const [date, time] = dateTime.split('T');
-    console.log(date, time);
-    const timeShort = time.slice(3, 8);
-    return { date, time: timeShort };
+  const handleQRClick = reservationId => {
+    setSelectedReservationId(reservationId);
+    setOpenModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setOpenModal(false);
+    setSelectedReservationId('');
   };
 
   return (
     <div>
-      <div className="felx text-center font-bold text-3xl mt-20">
+      <div className="flex text-center font-bold text-3xl mt-20">
         내 신청 현황
       </div>
 
@@ -72,7 +69,7 @@ const Check = () => {
           <Table.Head
             style={{ fontSize: 15 }}
             className="text-black text-center">
-            <Table.HeadCell>예약자</Table.HeadCell>
+            <Table.HeadCell>출석 코드 보기</Table.HeadCell>
             <Table.HeadCell>호실</Table.HeadCell>
             <Table.HeadCell>날짜</Table.HeadCell>
             <Table.HeadCell>시작 시간</Table.HeadCell>
@@ -83,17 +80,28 @@ const Check = () => {
           </Table.Head>
           <Table.Body className="divide-y">
             {reservations.map((reservation, index) => {
-              const start = seperateDateTime(reservation.startDateTime);
-              const end = seperateDateTime(reservation.endDateTime);
+              const start = new Date(reservation.startDateTime);
+              const end = new Date(reservation.endDateTime);
+              const startLocal = new Date(
+                start.getTime() + start.getTimezoneOffset() * 60000,
+              );
+              const endLocal = new Date(
+                end.getTime() + end.getTimezoneOffset() * 60000,
+              );
+
               return (
                 <Table.Row
                   key={index}
                   className="bg-white dark:border-gray-700 dark:bg-gray-800 text-center text-gray-900">
-                  <Table.Cell>{user ? user.username : '-'}</Table.Cell>
+                  <Table.Cell>
+                    <Button onClick={() => handleQRClick(reservation.id)}>
+                      QR
+                    </Button>
+                  </Table.Cell>
                   <Table.Cell>{reservation.roomName}</Table.Cell>
-                  <Table.Cell>{start.date}</Table.Cell>
-                  <Table.Cell>{start.time}</Table.Cell>
-                  <Table.Cell>{end.time}</Table.Cell>
+                  <Table.Cell>{format(startLocal, 'MM-dd')}</Table.Cell>
+                  <Table.Cell>{format(startLocal, 'HH:mm')}</Table.Cell>
+                  <Table.Cell>{format(endLocal, 'HH:mm')}</Table.Cell>
                   <Table.Cell>
                     <a
                       href="#"
@@ -136,6 +144,38 @@ const Check = () => {
           </Typography>
         </Popover>
       </div>
+
+      <Modal
+        open={openModal}
+        onClose={handleCloseModal}
+        aria-labelledby="modal-title"
+        aria-describedby="modal-description">
+        <Box
+          sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: 400,
+            bgcolor: 'background.paper',
+            boxShadow: 24,
+            p: 4,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+          }}>
+          <Typography id="modal-title" variant="h6" component="h2">
+            출석 코드
+          </Typography>
+          <QRCode value={selectedReservationId} size={256} />
+          <Button
+            style={{ backgroundColor: '#002D56', marginTop: 20 }}
+            variant="contained"
+            onClick={handleCloseModal}>
+            닫기
+          </Button>
+        </Box>
+      </Modal>
     </div>
   );
 };

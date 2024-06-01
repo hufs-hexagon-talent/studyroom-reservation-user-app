@@ -5,11 +5,11 @@ import React from 'react';
 import { HiOutlineArrowRight } from 'react-icons/hi';
 import { Button } from 'flowbite-react';
 
-const Btn = () => {
+const Btn = ({ text, onClick }) => {
   return (
     <div>
-      <Button className="ml-5" size="sm" color="dark">
-        예약하러 가기
+      <Button className="ml-5" size="sm" color="dark" onClick={onClick}>
+        {text}
         <HiOutlineArrowRight className="ml-2 h-5 w-5" />
       </Button>
     </div>
