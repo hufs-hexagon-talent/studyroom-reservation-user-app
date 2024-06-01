@@ -31,9 +31,8 @@ const Check = () => {
   const checkReservation = async () => {
     try {
       const response = await getUserReservation(); // getUserReservation 사용
-      console.log(response.data);
+
       setReservations(response.data.data.items);
-      console.log(response.data);
     } catch (error) {
       console.error(error);
     }

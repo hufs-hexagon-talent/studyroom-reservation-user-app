@@ -20,7 +20,7 @@ const useAuth = () => {
   const loggedIn = useMemo(()=> !!accessToken ,[])
 
   const fetchTokens = useCallback(() => {
-    console.log("fetchTokens")
+    
     const storedAccessToken = localStorage.getItem('accessToken');
     const storedRefreshToken = localStorage.getItem('refreshToken');
 

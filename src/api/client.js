@@ -30,13 +30,13 @@ apiClient.interceptors.response.use(
 
       if (!refreshToken) {
         // 리프레시 토큰이 없으면 로그아웃 하기
-        console.log('리프레시 토큰 없음. 로그아웃');
+        
         return Promise.reject(error);
       }
       // todo : refresh가 401이 떴을 때 새로 refresh 떳을때) 지금 요청하려고 하는 api가 refresh면? 바로 종료
       // 현재 요청이 리프레시 요청이냐
       if (error.config.url === 'https://api.studyroom.jisub.kim/auth/refresh') {
-        console.log('리프레시 토큰 갱신 실패. 로그아웃');
+        
         return Promise.reject(error);
       }
       try {
@@ -47,7 +47,7 @@ apiClient.interceptors.response.use(
         return apiClient(error.config);
       } catch (refreshError) {
         // 토큰 갱신 실패하면 로그아웃
-        console.log('토큰 갱신 실패. 로그아웃');
+        
         return Promise.reject(error);
       }
     }

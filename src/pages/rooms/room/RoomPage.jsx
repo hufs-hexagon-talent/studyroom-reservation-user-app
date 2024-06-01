@@ -227,7 +227,6 @@ const RoomPage = () => {
         startDateTime: new Date(startDateTime), // todo: date 객체로 넘겨주기
         endDateTime: new Date(endDateTime), //endTimeIndex, // todo: date 객체로 넘겨주기
       });
-      console.log('doReserve res:', res);
     } catch (error) {
       console.error('Reservation error:', error);
     }
@@ -258,7 +257,6 @@ const RoomPage = () => {
       setAvailableDate(dates);
     };
     getDate();
-    console.log(reservedSlots);
   }, []);
 
   return (
@@ -346,8 +344,16 @@ const RoomPage = () => {
                     {times.map((time, timeIndex) => {
                       const isSelected = getSlotSelected(partition, time);
                       const isSelectable = true;
-                      // const isReserved =
-                      //   reservedSlots[partition]?.includes(timeIndex);
+                      console.error(reservedSlots[partition]);
+                      console.error({ reservedSlots, partition, timeIndex });
+                      const isReserved =
+                        reservedSlots[partition]?.includes(timeIndex);
+
+                      const mode = isSelected
+                        ? 'selected'
+                        : isReserved
+                          ? 'reserved'
+                          : 'none';
                       return (
                         <TableCell
                           key={timeIndex}
@@ -355,12 +361,12 @@ const RoomPage = () => {
                           className={isSelected ? 'selected' : ''}
                           style={{
                             padding: 30,
-                            // : isReserved
-                            //? '#002D56' // 남색
 
-                            backgroundColor: isSelected
-                              ? '#7599BA' // 하늘색
-                              : '#F1EEE9', // 베이지 색
+                            backgroundColor: {
+                              selected: '#7599BA',
+                              reserved: '#002D56',
+                              none: '#F1EEE9',
+                            }[mode],
                             borderRight: '1px solid #ccc',
                             cursor: isSelectable ? 'pointer' : 'not-allowed',
                           }}></TableCell>
