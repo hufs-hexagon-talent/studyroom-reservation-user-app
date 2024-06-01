@@ -1,8 +1,10 @@
+const flowbite = require("flowbite-react/tailwind");
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
     './src/**/*.{js,js,ts,tsx}',
-    'node_modules/flowbite-react/lib/esm/**/*.js',
+    flowbite.content(),
   ],
   theme: {
     extend: {},
@@ -14,5 +16,5 @@ module.exports = {
       footerinnerborder: '#434548',
     },
   },
-  plugins: [require('flowbite/plugin')],
+  plugins: [flowbite.plugin()],
 };
