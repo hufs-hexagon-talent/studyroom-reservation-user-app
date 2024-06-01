@@ -258,6 +258,7 @@ const RoomPage = () => {
       setAvailableDate(dates);
     };
     getDate();
+    console.log(reservedSlots);
   }, []);
 
   return (
@@ -344,7 +345,6 @@ const RoomPage = () => {
                     <TableCell>{partition}</TableCell>
                     {times.map((time, timeIndex) => {
                       const isSelected = getSlotSelected(partition, time);
-                      //console.log(timeIndex);
                       const isSelectable = true;
                       // const isReserved =
                       //   reservedSlots[partition]?.includes(timeIndex);

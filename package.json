@@ -20,6 +20,7 @@
     "firebase": "^10.8.0",
     "flowbite-react": "^0.7.2",
     "postcss": "^8.4.35",
+    "qrcode.react": "^3.1.0",
     "react": "^18.2.0",
     "react-calendar": "^4.8.0",
     "react-datepicker": "^6.3.0",

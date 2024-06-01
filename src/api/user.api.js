@@ -88,3 +88,10 @@ export const fetchReservation = async (date, setSlotsArr, setReservedSlots) => {
     console.error('fetch error : ', error);
   }
 };
+
+export const getUserReservation = async()=>{
+  const user_reservation_response = await apiClient.get(
+    'https://api.studyroom.jisub.kim/reservations/me'
+  );
+  return user_reservation_response;
+}
