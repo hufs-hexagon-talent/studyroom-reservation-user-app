@@ -18,8 +18,8 @@ import 'react-datepicker/dist/react-datepicker.css';
 
 import {
   fetchDate,
-  useReserve,
   useReservationsByRooms,
+  useReserve,
 } from '../../../api/user.api';
 import Button from '../../../components/button/Button';
 
@@ -89,28 +89,12 @@ const RoomPage = () => {
   const { data: reservationsByRooms } = useReservationsByRooms({
     date: selectedDate,
   });
-
   // date-picker에서 날짜 선택할 때마다 실행되는 함수
   const handleDateChange = date => {
     const formattedDate = format(date, 'yyyy-MM-dd');
     setSelectedDate(formattedDate);
     // fetchReservation(formattedDate, setSlotsArr, setReservedSlots);
   };
-
-  // 렌더링 될 때마다 table 실행되게
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       const formattedDate = format(selectedDate, 'yyyy-MM-dd');
-  //       const dates = await fetchDate();
-  //       setAvailableDate(dates);
-  //       await fetchReservation(formattedDate, setSlotsArr, setReservedSlots); // setReservedSlots 전달
-  //     } catch (error) {
-  //       console.error('Error fetching data:', error);
-  //     }
-  //   };
-  //   fetchData();
-  // }, [selectedDate]);
 
   // 슬롯이 선택되었는지 확인하는 함수
   const getSlotSelected = useCallback(
@@ -207,6 +191,7 @@ const RoomPage = () => {
         partition,
         start,
         end,
+        selectedPartition,
         isExist,
         startTime,
         endTime,
@@ -227,11 +212,13 @@ const RoomPage = () => {
   // 자신의 예약 생성
   const handleReservation = useCallback(async () => {
     try {
-      // const res = await doReserve({
-      //   roomId: roomDict[selectedPartition], // todo: roomID 동적으로
-      //   startDateTime: new Date(startDateTime), // todo: date 객체로 넘겨주기
-      //   endDateTime: new Date(endDateTime), //endTimeIndex, // todo: date 객체로 넘겨주기
-      // });
+      await doReserve({
+        roomId: selectedPartition.roomId,
+        startDateTime: new Date(startDateTime),
+        endDateTime: new Date(endDateTime),
+      });
+      setReservedSlots([startDateTime, endDateTime]);
+      console.log(reservedSlots);
     } catch (error) {
       console.error('Reservation error:', error);
     }
@@ -348,52 +335,38 @@ const RoomPage = () => {
                     {/* <pre>{JSON.stringify(reservationsByRoom, null, 2)}</pre> */}
                     <TableCell>{reservationsByRoom.roomName}</TableCell>
                     {times.map((time, timeIndex) => {
-                      // const isSelected = getSlotSelected(partition, time);
-                      // const isSelectable = true;
-                      // console.error(reservedSlots[partition]);
-                      // console.error({ reservedSlots, partition, timeIndex });
-                      // const isReserved =
-                      //   reservedSlots[partition]?.includes(timeIndex);
+                      const isSelected = getSlotSelected(
+                        reservationsByRoom,
+                        time,
+                      );
+                      const isSelectable = true;
+                      const isReserved =
+                        reservedSlots[reservationsByRoom]?.includes(timeIndex);
 
-                      // const mode = isSelected
-                      //   ? 'selected'
-                      //   : isReserved
-                      //     ? 'reserved'
-                      //     : 'none';
+                      const mode = isSelected
+                        ? 'selected'
+                        : isReserved
+                          ? 'reserved'
+                          : 'none';
                       return (
                         <TableCell
                           key={timeIndex}
-                          // onClick={() => handleCellClick(partition, timeIndex)}
-                          // className={isSelected ? 'selected' : ''}
+                          onClick={() =>
+                            handleCellClick(reservationsByRoom, timeIndex)
+                          }
+                          className={isSelected ? 'selected' : ''}
                           style={{
                             padding: 30,
 
-                            // backgroundColor: {
-                            //   selected: '#7599BA',
-                            //   reserved: '#002D56',
-                            //   none: '#F1EEE9',
-                            // }[mode],
+                            backgroundColor: {
+                              selected: '#7599BA',
+                              reserved: '#002D56',
+                              none: '#F1EEE9',
+                            }[mode],
                             borderRight: '1px solid #ccc',
-                            // cursor: isSelectable ? 'pointer' : 'not-allowed',
+                            cursor: isSelectable ? 'pointer' : 'not-allowed',
                           }}></TableCell>
                       );
-                      // return (
-                      //   <TableCell
-                      //     key={timeIndex}
-                      //     onClick={() => handleCellClick(partition, timeIndex)}
-                      //     className={isSelected ? 'selected' : ''}
-                      //     style={{
-                      //       padding: 30,
-
-                      //       backgroundColor: {
-                      //         selected: '#7599BA',
-                      //         reserved: '#002D56',
-                      //         none: '#F1EEE9',
-                      //       }[mode],
-                      //       borderRight: '1px solid #ccc',
-                      //       cursor: isSelectable ? 'pointer' : 'not-allowed',
-                      //     }}></TableCell>
-                      // );
                     })}
                   </TableRow>
                 ))}

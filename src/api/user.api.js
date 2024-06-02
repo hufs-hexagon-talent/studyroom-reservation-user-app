@@ -51,37 +51,26 @@ export const fetchReservationsByRooms = async ({ date }) => {
     );
 
     const data = response.data.data.items;
-
     console.log(data);
-
     return data;
-
-    // console.log(data)
-
-    // const roomNames = response.data.data.items.map(item => item.roomName);
-
-    // const roomIds = response.data.data.items.map(item => item.roomId);
-
-    // // '식별자 : 호실 이름' 형식으로 딕셔너리 생성
-    // for (let i=0; i<6; i++){
-    //   roomDict[roomNames[i]] = roomIds[i];
-    // }
-
-    // setRoomDict(roomDict);
-    // setSlotsArr(roomNames);
-
-    // const updatedReservedSlots = {};
-
-    // response.data.data.items.forEach(item => {
-    //   const startTimes = item.timeline.map(t => t.startDateTime);
-    //   const endTimes = item.timeline.map(t => t.endDateTime);
-
-    //   updatedReservedSlots[item.roomName] = { startTimes, endTimes };
-    // });
-    // setReservedSlots(updatedReservedSlots);
   } catch (error) {
     console.error('fetch error : ', error);
   }
+};
+
+export const deleteReservations = async (reservationId) =>{
+  await apiClient.delete(
+    `https://api.studyroom.jisub.kim/reservations/me/${reservationId}`,
+  );
+}
+
+export const useDeleteReservation = () => {
+  return useMutation({
+    mutationFn: async (reservationId) => {
+      const res = await apiClient.delete(`/reservations/me/${reservationId}`);
+      return res.data;
+    },
+  });
 };
 
 export const useReservationsByRooms = ({ date }) =>
@@ -89,6 +78,7 @@ export const useReservationsByRooms = ({ date }) =>
     queryKey: ['reservationsByRooms', date],
     queryFn: () => fetchReservationsByRooms({ date }),
   });
+
 
 export const getUserReservation = async () => {
   const user_reservation_response = await apiClient.get(

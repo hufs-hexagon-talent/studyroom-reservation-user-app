@@ -1,19 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Box, Button, Modal, Popover, Typography } from '@mui/material';
+import { Button, Popover, Typography } from '@mui/material';
 import { format } from 'date-fns';
 import { Table } from 'flowbite-react';
-import QRCode from 'qrcode.react';
 
 import './CheckRoom.css';
 
-import { getUserReservation } from '../../api/user.api';
+import { deleteReservations, getUserReservation } from '../../api/user.api';
 
 const Check = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [reservations, setReservations] = useState([]);
-  const [openModal, setOpenModal] = useState(false);
-  const [selectedReservationId, setSelectedReservationId] = useState('');
   const navigate = useNavigate();
 
   const handleClick = event => {
@@ -33,6 +30,7 @@ const Check = () => {
       const response = await getUserReservation(); // getUserReservation 사용
 
       setReservations(response.data.data.items);
+      console.log(response.data.data);
     } catch (error) {
       console.error(error);
     }
@@ -47,19 +45,20 @@ const Check = () => {
     }
   }, [navigate]);
 
-  const handleQRClick = reservationId => {
-    setSelectedReservationId(reservationId);
-    setOpenModal(true);
-  };
-
-  const handleCloseModal = () => {
-    setOpenModal(false);
-    setSelectedReservationId('');
+  const handleDelete = async reservationId => {
+    try {
+      await deleteReservations(reservationId);
+      setReservations(prev =>
+        prev.filter(reservation => reservation.id !== reservationId),
+      );
+    } catch (error) {
+      console.error('Failed to delete reservation:', error);
+    }
   };
 
   return (
     <div>
-      <div className="flex text-center font-bold text-3xl mt-20">
+      <div className="flex justify-center font-bold text-3xl mt-20">
         내 신청 현황
       </div>
 
@@ -68,7 +67,6 @@ const Check = () => {
           <Table.Head
             style={{ fontSize: 15 }}
             className="text-black text-center">
-            <Table.HeadCell>출석 코드 보기</Table.HeadCell>
             <Table.HeadCell>호실</Table.HeadCell>
             <Table.HeadCell>날짜</Table.HeadCell>
             <Table.HeadCell>시작 시간</Table.HeadCell>
@@ -92,11 +90,6 @@ const Check = () => {
                 <Table.Row
                   key={index}
                   className="bg-white dark:border-gray-700 dark:bg-gray-800 text-center text-gray-900">
-                  <Table.Cell>
-                    <Button onClick={() => handleQRClick(reservation.id)}>
-                      QR
-                    </Button>
-                  </Table.Cell>
                   <Table.Cell>{reservation.roomName}</Table.Cell>
                   <Table.Cell>{format(startLocal, 'MM-dd')}</Table.Cell>
                   <Table.Cell>{format(startLocal, 'HH:mm')}</Table.Cell>
@@ -104,6 +97,7 @@ const Check = () => {
                   <Table.Cell>
                     <a
                       href="#"
+                      onClick={() => handleDelete(reservation.id)}
                       className="font-medium text-cyan-600 hover:underline dark:text-cyan-500">
                       삭제
                     </a>
@@ -143,38 +137,6 @@ const Check = () => {
           </Typography>
         </Popover>
       </div>
-
-      <Modal
-        open={openModal}
-        onClose={handleCloseModal}
-        aria-labelledby="modal-title"
-        aria-describedby="modal-description">
-        <Box
-          sx={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            width: 400,
-            bgcolor: 'background.paper',
-            boxShadow: 24,
-            p: 4,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-          }}>
-          <Typography id="modal-title" variant="h6" component="h2">
-            출석 코드
-          </Typography>
-          <QRCode value={selectedReservationId} size={256} />
-          <Button
-            style={{ backgroundColor: '#002D56', marginTop: 20 }}
-            variant="contained"
-            onClick={handleCloseModal}>
-            닫기
-          </Button>
-        </Box>
-      </Modal>
     </div>
   );
 };

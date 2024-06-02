@@ -19,6 +19,7 @@ const NavigationBar = () => {
       <Navbar.Collapse>
         <Navbar.Link href="/roompage">세미나실 예약</Navbar.Link>
         <Navbar.Link href="/check">내 신청 현황</Navbar.Link>
+        <Navbar.Link href="/myqr">내 QR코드</Navbar.Link>
         <Navbar.Link href="/">이용 규칙</Navbar.Link>
 
         {loggedIn ? (

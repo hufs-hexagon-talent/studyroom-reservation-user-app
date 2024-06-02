@@ -6,7 +6,7 @@ import NavigationBar from './components/Navbar/NavigationBar';
 import Check from './pages/check/CheckRoom';
 import LoginPage from './pages/login/LoginPage';
 import Notice from './pages/notice/notice';
-import ReservationsPage from './pages/reservations/ReservationsPage';
+import Qrcode from './pages/qrcode/qrcodePage';
 import RoomPage from './pages/rooms/room/RoomPage';
 
 const Router = () => {
@@ -18,9 +18,9 @@ const Router = () => {
           <Routes>
             <Route path="/login" element={<LoginPage />} />
             <Route path="/roompage" element={<RoomPage />} />
-            <Route path="/reservations" element={<ReservationsPage />} />
             <Route path="/check" element={<Check />} />
             <Route path="/" element={<Notice />} />
+            <Route path="/otp" element={<Qrcode />} />
           </Routes>
         </div>
         <Footer />
