@@ -44,7 +44,7 @@ const useSlot = (
       if (startTimeIndex === endTimeIndex) {
         if (Math.abs(startTimeIndex - timeIndex) + 1 > timeTableConfig.maxReservationSlots) {
           // 예약 가능한 최대 슬롯 수를 초과한 경우 경고 표시
-          console.log('예약은 최대 두시간까지만 가능합니다.');
+          
           return;
         }
         if (startTimeIndex === timeIndex) {

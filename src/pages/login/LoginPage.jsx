@@ -8,7 +8,7 @@ import useAuth from '../../hooks/useAuth';
 
 const LoginPage = () => {
   const [password, setPassword] = useState('');
-  const [userName, setUserName] = useState('');
+  const [studentId, setStudentId] = useState('');
   const [error, setError] = useState('');
   const { login, loggedIn } = useAuth();
   const navigate = useNavigate();
@@ -19,7 +19,7 @@ const LoginPage = () => {
 
   const handleLogin = async () => {
     try {
-      await login({ id: userName, password });
+      await login({ id: studentId, password });
       location.reload(); // 페이지 새로고침
     } catch (error) {
       setError('로그인 오류 : ', error.message);
@@ -41,21 +41,19 @@ const LoginPage = () => {
             </div>
             <TextInput
               className="ml-3 mr-3 mb-5"
-              id="studentId"
-              placeholder="ex) 2022xxxxx"
-              onChange={e => setPassword(e.target.value)}
+              id="number"
+              onChange={e => setStudentId(e.target.value)}
             />
           </div>
           <div>
             <div className="ml-3 block">
-              <Label htmlFor="name" value="이름" />
+              <Label htmlFor="name" value="비밀번호" />
             </div>
             <TextInput
               className="ml-3 mr-3"
               id="name"
-              type="name"
-              placeholder="ex) 홍길동"
-              onChange={e => setUserName(e.target.value)}
+              type="password"
+              onChange={e => setPassword(e.target.value)}
             />
           </div>
         </form>

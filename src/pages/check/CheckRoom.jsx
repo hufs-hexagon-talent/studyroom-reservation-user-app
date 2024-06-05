@@ -1,19 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Box, Button, Modal, Popover, Typography } from '@mui/material';
+import { Button as MuiButton, Popover, Typography } from '@mui/material';
 import { format } from 'date-fns';
-import { Table } from 'flowbite-react';
-import QRCode from 'qrcode.react';
+import { Button, Modal, Table } from 'flowbite-react';
+import { HiOutlineExclamationCircle } from 'react-icons/hi';
 
 import './CheckRoom.css';
 
-import { getUserReservation } from '../../api/user.api';
+import { deleteReservations, getUserReservation } from '../../api/user.api';
 
 const Check = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [reservations, setReservations] = useState([]);
   const [openModal, setOpenModal] = useState(false);
-  const [selectedReservationId, setSelectedReservationId] = useState('');
+  const [reservationId, setReservationId] = useState(null);
   const navigate = useNavigate();
 
   const handleClick = event => {
@@ -30,10 +30,8 @@ const Check = () => {
   // 자신의 모든 예약 조회
   const checkReservation = async () => {
     try {
-      const response = await getUserReservation(); // getUserReservation 사용
-      console.log(response.data);
+      const response = await getUserReservation();
       setReservations(response.data.data.items);
-      console.log(response.data);
     } catch (error) {
       console.error(error);
     }
@@ -48,19 +46,25 @@ const Check = () => {
     }
   }, [navigate]);
 
-  const handleQRClick = reservationId => {
-    setSelectedReservationId(reservationId);
-    setOpenModal(true);
-  };
-
-  const handleCloseModal = () => {
-    setOpenModal(false);
-    setSelectedReservationId('');
+  // 모달 열기와 예약 삭제를 위한 핸들러
+  const handleDelete = async () => {
+    try {
+      await deleteReservations(reservationId);
+      // 삭제된 예약을 제외한 새로운 예약 배열 설정
+      setReservations(prevReservations =>
+        prevReservations.filter(
+          reservation => reservation.reservationId !== reservationId,
+        ),
+      );
+    } catch (error) {
+      console.error('Failed to delete reservation:', error);
+    }
+    setOpenModal(false); // 모달 닫기
   };
 
   return (
     <div>
-      <div className="flex text-center font-bold text-3xl mt-20">
+      <div className="flex justify-center font-bold text-3xl mt-20">
         내 신청 현황
       </div>
 
@@ -69,7 +73,6 @@ const Check = () => {
           <Table.Head
             style={{ fontSize: 15 }}
             className="text-black text-center">
-            <Table.HeadCell>출석 코드 보기</Table.HeadCell>
             <Table.HeadCell>호실</Table.HeadCell>
             <Table.HeadCell>날짜</Table.HeadCell>
             <Table.HeadCell>시작 시간</Table.HeadCell>
@@ -93,11 +96,6 @@ const Check = () => {
                 <Table.Row
                   key={index}
                   className="bg-white dark:border-gray-700 dark:bg-gray-800 text-center text-gray-900">
-                  <Table.Cell>
-                    <Button onClick={() => handleQRClick(reservation.id)}>
-                      QR
-                    </Button>
-                  </Table.Cell>
                   <Table.Cell>{reservation.roomName}</Table.Cell>
                   <Table.Cell>{format(startLocal, 'MM-dd')}</Table.Cell>
                   <Table.Cell>{format(startLocal, 'HH:mm')}</Table.Cell>
@@ -105,6 +103,10 @@ const Check = () => {
                   <Table.Cell>
                     <a
                       href="#"
+                      onClick={() => {
+                        setReservationId(reservation.reservationId);
+                        setOpenModal(true);
+                      }}
                       className="font-medium text-cyan-600 hover:underline dark:text-cyan-500">
                       삭제
                     </a>
@@ -144,38 +146,32 @@ const Check = () => {
           </Typography>
         </Popover>
       </div>
-
-      <Modal
-        open={openModal}
-        onClose={handleCloseModal}
-        aria-labelledby="modal-title"
-        aria-describedby="modal-description">
-        <Box
-          sx={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            width: 400,
-            bgcolor: 'background.paper',
-            boxShadow: 24,
-            p: 4,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-          }}>
-          <Typography id="modal-title" variant="h6" component="h2">
-            출석 코드
-          </Typography>
-          <QRCode value={selectedReservationId} size={256} />
-          <Button
-            style={{ backgroundColor: '#002D56', marginTop: 20 }}
-            variant="contained"
-            onClick={handleCloseModal}>
-            닫기
-          </Button>
-        </Box>
-      </Modal>
+      <div className="flex justify-center items-center">
+        <Modal
+          className="flex justify-center items-center w-full p-4 sm:p-0"
+          show={openModal}
+          size="md"
+          onClose={() => setOpenModal(false)}
+          popup>
+          <Modal.Header />
+          <Modal.Body>
+            <div className="text-center">
+              <HiOutlineExclamationCircle className="mx-auto mb-4 h-14 w-14 text-gray-400 dark:text-gray-200" />
+              <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
+                이 예약을 삭제하시겠습니까?
+              </h3>
+              <div className="flex justify-center gap-4">
+                <Button color="gray" onClick={() => setOpenModal(false)}>
+                  취소
+                </Button>
+                <Button color="failure" onClick={handleDelete}>
+                  확인
+                </Button>
+              </div>
+            </div>
+          </Modal.Body>
+        </Modal>
+      </div>
     </div>
   );
 };
