@@ -60,7 +60,8 @@ export const fetchReservationsByRooms = async ({ date }) => {
 
 export const deleteReservations = async (reservationId) =>{
   await apiClient.delete(
-    `https://api.studyroom.jisub.kim/reservations/me/${reservationId}`,
+    `https://api.studyroom.jisub.kim/reservations/me/${reservationId}`,{ 
+    }
   );
 }
 
@@ -86,3 +87,15 @@ export const getUserReservation = async () => {
   );
   return user_reservation_response;
 };
+
+export const fetchOtp = async() =>{
+  const otp_response =await apiClient.post('https://api.studyroom.jisub.kim/otp');
+  console.log(otp_response.data);
+  return otp_response.data.data.verificationCode;
+}
+
+export const useOtp = () => 
+  useQuery({
+    queryKey : ['otp'],
+    queryFn: () => fetchOtp()
+  })  

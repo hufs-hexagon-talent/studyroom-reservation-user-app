@@ -42,7 +42,6 @@ const LoginPage = () => {
             <TextInput
               className="ml-3 mr-3 mb-5"
               id="number"
-              placeholder="ex) 2022xxxxx"
               onChange={e => setStudentId(e.target.value)}
             />
           </div>
@@ -54,7 +53,6 @@ const LoginPage = () => {
               className="ml-3 mr-3"
               id="name"
               type="password"
-              placeholder="ex) 홍길동"
               onChange={e => setPassword(e.target.value)}
             />
           </div>

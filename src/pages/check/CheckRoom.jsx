@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Popover, Typography } from '@mui/material';
+import { Button as MuiButton, Popover, Typography } from '@mui/material';
 import { format } from 'date-fns';
-import { Table } from 'flowbite-react';
+import { Button, Modal, Table } from 'flowbite-react';
+import { HiOutlineExclamationCircle } from 'react-icons/hi';
 
 import './CheckRoom.css';
 
@@ -11,6 +12,8 @@ import { deleteReservations, getUserReservation } from '../../api/user.api';
 const Check = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [reservations, setReservations] = useState([]);
+  const [openModal, setOpenModal] = useState(false);
+  const [reservationId, setReservationId] = useState(null);
   const navigate = useNavigate();
 
   const handleClick = event => {
@@ -27,10 +30,8 @@ const Check = () => {
   // 자신의 모든 예약 조회
   const checkReservation = async () => {
     try {
-      const response = await getUserReservation(); // getUserReservation 사용
-
+      const response = await getUserReservation();
       setReservations(response.data.data.items);
-      console.log(response.data.data);
     } catch (error) {
       console.error(error);
     }
@@ -45,15 +46,20 @@ const Check = () => {
     }
   }, [navigate]);
 
-  const handleDelete = async reservationId => {
+  // 모달 열기와 예약 삭제를 위한 핸들러
+  const handleDelete = async () => {
     try {
       await deleteReservations(reservationId);
-      setReservations(prev =>
-        prev.filter(reservation => reservation.id !== reservationId),
+      // 삭제된 예약을 제외한 새로운 예약 배열 설정
+      setReservations(prevReservations =>
+        prevReservations.filter(
+          reservation => reservation.reservationId !== reservationId,
+        ),
       );
     } catch (error) {
       console.error('Failed to delete reservation:', error);
     }
+    setOpenModal(false); // 모달 닫기
   };
 
   return (
@@ -97,7 +103,10 @@ const Check = () => {
                   <Table.Cell>
                     <a
                       href="#"
-                      onClick={() => handleDelete(reservation.id)}
+                      onClick={() => {
+                        setReservationId(reservation.reservationId);
+                        setOpenModal(true);
+                      }}
                       className="font-medium text-cyan-600 hover:underline dark:text-cyan-500">
                       삭제
                     </a>
@@ -136,6 +145,32 @@ const Check = () => {
             (3회 초과 시 세미나실 예약이 제한 됩니다)
           </Typography>
         </Popover>
+      </div>
+      <div className="flex justify-center items-center">
+        <Modal
+          className="flex justify-center items-center w-full p-4 sm:p-0"
+          show={openModal}
+          size="md"
+          onClose={() => setOpenModal(false)}
+          popup>
+          <Modal.Header />
+          <Modal.Body>
+            <div className="text-center">
+              <HiOutlineExclamationCircle className="mx-auto mb-4 h-14 w-14 text-gray-400 dark:text-gray-200" />
+              <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
+                이 예약을 삭제하시겠습니까?
+              </h3>
+              <div className="flex justify-center gap-4">
+                <Button color="gray" onClick={() => setOpenModal(false)}>
+                  취소
+                </Button>
+                <Button color="failure" onClick={handleDelete}>
+                  확인
+                </Button>
+              </div>
+            </div>
+          </Modal.Body>
+        </Modal>
       </div>
     </div>
   );

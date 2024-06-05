@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import { HiInformationCircle } from 'react-icons/hi';
 import {
@@ -83,6 +84,7 @@ const RoomPage = () => {
   const [startDateTime, setStartDateTime] = useState(null);
   const [endDateTime, setEndDateTime] = useState(null);
   const times = useMemo(() => createTimeTable(timeTableConfig), []);
+  const navigate = useNavigate();
 
   const { mutate: doReserve } = useReserve();
 
@@ -109,11 +111,21 @@ const RoomPage = () => {
     [startTime, endTime, selectedPartition, times],
   );
 
+  // 슬롯이 예약되었는지 확인하는 함수
+  const getSlotReserved = useCallback(
+    (partition, timeIndex) => {
+      const reserved = reservedSlots[partition.roomId];
+      return reserved ? reserved.includes(timeIndex) : false;
+    },
+    [reservedSlots],
+  );
+
   // 슬롯의 상태 토글하는 함수
   const toggleSlot = useCallback(
     (partition, time) => {
       const isExist = getSlotSelected(partition, time);
 
+      // 초기 상태: startTime과 endTime이 설정되지 않았을 때
       if (!startTime && !endTime) {
         setSelectedPartition(partition);
         setStartTime(time);
@@ -121,6 +133,7 @@ const RoomPage = () => {
         return;
       }
 
+      // 다른 방을 선택했을 때
       if (selectedPartition !== partition) {
         setSelectedPartition(partition);
         setStartTime(time);
@@ -128,14 +141,21 @@ const RoomPage = () => {
         return;
       }
 
-      const startTimeIndex = times.indexOf(startTime);
-      //const endTimeIndex = times.indexOf(endTime);
-      const timeIndex = times.indexOf(time);
+      // 동일한 방에서 시간을 선택할 때
+      const selectedTime = new Date(`1970-01-01T${time}:00`);
+      const selectedStartTime = new Date(`1970-01-01T${startTime}:00`);
+      const selectedEndTime = new Date(`1970-01-01T${endTime}:00`);
 
+      // 시작 시간과 종료 시간이 동일할 때
       if (startTime === endTime) {
+        const maxReservationDuration =
+          timeTableConfig.maxReservationSlots *
+          timeTableConfig.intervalMinute *
+          60 *
+          1000; // 밀리초로 변환
+
         if (
-          Math.abs(startTimeIndex - timeIndex) + 1 >
-          timeTableConfig.maxReservationSlots
+          Math.abs(selectedStartTime - selectedTime) > maxReservationDuration
         ) {
           return (
             <Alert color="failure" icon={HiInformationCircle}>
@@ -144,15 +164,16 @@ const RoomPage = () => {
             </Alert>
           );
         }
+
         if (startTime === time) {
           setSelectedPartition(null);
           setStartTime(null);
           setEndTime(null);
-        } else if (startTime < time) {
-          setEndTime(time);
+        } else if (selectedStartTime < selectedTime) {
+          setEndTime(time); // 종료 시간을 클릭된 시간으로 설정
         } else {
           setStartTime(time);
-          setEndTime(time);
+          setEndTime(startTime);
         }
 
         const formattedDate = formatDate(new Date(selectedDate));
@@ -162,22 +183,18 @@ const RoomPage = () => {
         setStartDateTime(start);
         setEndDateTime(end);
 
-        console.log({
-          partition,
-          start,
-          end,
-          isExist,
-          startTime,
-          endTime,
-          selectedDate: formattedDate,
-        });
-
         return;
       }
 
-      setSelectedPartition(partition);
-      setStartTime(time);
-      setEndTime(time);
+      // 시간 범위를 확장하거나 축소할 때
+      if (selectedTime < selectedStartTime) {
+        setStartTime(time);
+      } else if (selectedTime > selectedEndTime) {
+        setEndTime(time); // 종료 시간을 클릭된 시간으로 설정
+      } else {
+        setStartTime(time);
+        setEndTime(time);
+      }
 
       // 시간과 날짜를 포함한 ISO 형식으로 변환
       const formattedDate = formatDate(new Date(selectedDate));
@@ -186,28 +203,27 @@ const RoomPage = () => {
 
       setStartDateTime(start);
       setEndDateTime(end);
+    },
+    [getSlotSelected, selectedPartition, startTime, endTime, selectedDate],
+  );
+
+  // useEffect로 상태가 업데이트될 때마다 콘솔에 로그 출력
+  useEffect(() => {
+    if (selectedPartition && startTime && endTime) {
+      const formattedDate = formatDate(new Date(selectedDate));
+      const start = `${formattedDate}T${startTime}:00.000Z`;
+      const end = `${formattedDate}T${endTime}:00.000Z`;
 
       console.log({
-        partition,
+        partition: selectedPartition,
         start,
         end,
-        selectedPartition,
-        isExist,
         startTime,
         endTime,
         selectedDate: formattedDate,
-      }); // 시간 형식을 출력
-    },
-    [
-      getSlotSelected,
-      setStartTime,
-      setEndTime,
-      selectedPartition,
-      times,
-      startTime,
-      endTime,
-    ],
-  );
+      });
+    }
+  }, [selectedPartition, startTime, endTime, selectedDate]);
 
   // 자신의 예약 생성
   const handleReservation = useCallback(async () => {
@@ -217,12 +233,29 @@ const RoomPage = () => {
         startDateTime: new Date(startDateTime),
         endDateTime: new Date(endDateTime),
       });
-      setReservedSlots([startDateTime, endDateTime]);
+      setReservedSlots(prevState => ({
+        ...prevState,
+        [selectedPartition.roomId]: [
+          ...(prevState[selectedPartition.roomId] || []),
+          ...times
+            .slice(times.indexOf(startTime), times.indexOf(endTime) + 1)
+            .map(t => times.indexOf(t)),
+        ],
+      }));
+      navigate('/');
       console.log(reservedSlots);
     } catch (error) {
       console.error('Reservation error:', error);
     }
-  }, [doReserve, startDateTime, endDateTime, selectedPartition]);
+  }, [
+    doReserve,
+    startDateTime,
+    endDateTime,
+    selectedPartition,
+    times,
+    startTime,
+    endTime,
+  ]);
 
   // 최대 예약 시간에 부합하는지 계산하는 함수
   const handleCellClick = (partition, timeIndex) => {
@@ -272,7 +305,7 @@ const RoomPage = () => {
           {/* date-picker 부분 */}
           <div className="flex justify-center">
             <DatePicker
-              selected={selectedDate}
+              selected={new Date(selectedDate)}
               locale={ko}
               includeDates={availableDate}
               onChange={handleDateChange}
@@ -339,9 +372,11 @@ const RoomPage = () => {
                         reservationsByRoom,
                         time,
                       );
-                      const isSelectable = true;
-                      const isReserved =
-                        reservedSlots[reservationsByRoom]?.includes(timeIndex);
+                      const isReserved = getSlotReserved(
+                        reservationsByRoom,
+                        timeIndex,
+                      );
+                      const isSelectable = !isReserved;
 
                       const mode = isSelected
                         ? 'selected'
@@ -352,12 +387,12 @@ const RoomPage = () => {
                         <TableCell
                           key={timeIndex}
                           onClick={() =>
+                            isSelectable &&
                             handleCellClick(reservationsByRoom, timeIndex)
                           }
                           className={isSelected ? 'selected' : ''}
                           style={{
                             padding: 30,
-
                             backgroundColor: {
                               selected: '#7599BA',
                               reserved: '#002D56',

@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import QRCode from 'qrcode.react';
 
-import { useMe } from '../../api/user.api';
+import { useOtp } from '../../api/user.api';
 
 const TimerCircularProgressBar = ({ radius, strokeWidth, progress }) => {
   const center = radius + strokeWidth / 2;
@@ -35,27 +35,16 @@ const TimerCircularProgressBar = ({ radius, strokeWidth, progress }) => {
 };
 
 const Qrcode = () => {
-  const [qrValue, setQrValue] = useState('');
   const [timer, setTimer] = useState(30);
   const [radius, setRadius] = useState(170);
 
-  const { me } = useMe();
+  const { data: otpValue, refetch, dataUpdatedAt } = useOtp();
 
   useEffect(() => {
-    const generateQrValue = () => {
-      const newValue = me;
-      setQrValue(newValue);
-      setTimer(30);
-    };
-
-    generateQrValue();
-
-    const intervalId = setInterval(() => {
-      generateQrValue();
-    }, 30000);
+    const intervalId = setInterval(refetch, 30000);
 
     return () => clearInterval(intervalId);
-  }, [me]);
+  }, [otpValue]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -78,6 +67,10 @@ const Qrcode = () => {
     return () => clearInterval(timerInterval);
   }, []);
 
+  useEffect(() => {
+    setTimer(30);
+  }, [otpValue, dataUpdatedAt]);
+
   return (
     <div>
       <div className="text-center font-bold text-3xl mt-20">내 QR 코드</div>
@@ -88,7 +81,8 @@ const Qrcode = () => {
           progress={(timer / 30) * 100}
         />
         <QRCode
-          value={qrValue}
+          value={otpValue}
+          level="H"
           size={140}
           className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
         />
