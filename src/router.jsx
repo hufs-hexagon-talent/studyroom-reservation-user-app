@@ -6,11 +6,12 @@ import NavigationBar from './components/Navbar/NavigationBar';
 import Check from './pages/check/CheckRoom';
 import LoginPage from './pages/login/LoginPage';
 import Notice from './pages/notice/notice';
-import Qrcode from './pages/qrcode/qrcodePage';
+import OtpPage from './pages/OtpPage/OtpPage';
 import RoomPage from './pages/rooms/room/RoomPage';
+import useAuth from './hooks/useAuth';
 
 const Router = () => {
-  const isAuthorized = true;
+  const { loggedIn } = useAuth();
 
   return (
     <BrowserRouter basename={process.env.REACT_APP_BASEURL || '/'}>
@@ -20,12 +21,12 @@ const Router = () => {
           <Routes>
             <Route path="/" element={<Notice />} />
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/roompage" element={<RoomPage />} />
 
-            {isAuthorized && (
+            {loggedIn && (
               <>
-                <Route path="/roompage" element={<RoomPage />} />
                 <Route path="/check" element={<Check />} />
-                <Route path="/otp" element={<Qrcode />} />
+                <Route path="/otp" element={<OtpPage />} />
               </>
             )}
             <Route path="*" element={<Navigate to="/" />} />
