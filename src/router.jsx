@@ -9,6 +9,8 @@ import Notice from './pages/notice/notice';
 import OtpPage from './pages/OtpPage/OtpPage';
 import RoomPage from './pages/rooms/room/RoomPage';
 import useAuth from './hooks/useAuth';
+import CheckVisit from './pages/manage/checkVisit';
+import SelectRoom from './pages/manage/SelectRoom';
 
 const Router = () => {
   const { loggedIn } = useAuth();
@@ -22,7 +24,8 @@ const Router = () => {
             <Route path="/" element={<Notice />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/roompage" element={<RoomPage />} />
-
+            <Route path="/visit" element={<CheckVisit />} />
+            <Route path="/selectRoom" element={<SelectRoom />} />
             {loggedIn && (
               <>
                 <Route path="/check" element={<Check />} />
