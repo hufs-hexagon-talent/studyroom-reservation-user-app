@@ -7,14 +7,12 @@ import { HiOutlineExclamationCircle } from 'react-icons/hi';
 
 import './CheckRoom.css';
 
-import { deleteReservations, getUserReservation } from '../../api/user.api';
+import { useDeleteReservation, useUserReservation } from '../../api/user.api';
 
 const Check = () => {
+  const { data: reservations } = useUserReservation();
   const [anchorEl, setAnchorEl] = useState(null);
-  const [reservations, setReservations] = useState([]);
-  const [openModal, setOpenModal] = useState(false);
-  const [reservationId, setReservationId] = useState(null);
-  const navigate = useNavigate();
+  const [openModal, setOpenModal] = useState(null);
 
   const handleClick = event => {
     setAnchorEl(event.currentTarget);
@@ -27,39 +25,17 @@ const Check = () => {
   const open = Boolean(anchorEl);
   const id = open ? 'simple-popover' : undefined;
 
-  // 자신의 모든 예약 조회
-  const checkReservation = async () => {
-    try {
-      const response = await getUserReservation();
-      setReservations(response.data.data.items);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  useEffect(() => {
-    const accessToken = localStorage.getItem('accessToken');
-    if (!accessToken) {
-      navigate('/login');
-    } else {
-      checkReservation();
-    }
-  }, [navigate]);
+  const { mutate: deleteReservation } = useDeleteReservation();
 
   // 모달 열기와 예약 삭제를 위한 핸들러
-  const handleDelete = async () => {
+  const handleDelete = async id => {
     try {
-      await deleteReservations(reservationId);
+      await deleteReservation(id);
       // 삭제된 예약을 제외한 새로운 예약 배열 설정
-      setReservations(prevReservations =>
-        prevReservations.filter(
-          reservation => reservation.reservationId !== reservationId,
-        ),
-      );
     } catch (error) {
       console.error('Failed to delete reservation:', error);
     }
-    setOpenModal(false); // 모달 닫기
+    setOpenModal(null); // 모달 닫기
   };
 
   return (
@@ -82,7 +58,7 @@ const Check = () => {
             </Table.HeadCell>
           </Table.Head>
           <Table.Body className="divide-y">
-            {reservations.map((reservation, index) => {
+            {reservations?.map((reservation, index) => {
               const start = new Date(reservation.startDateTime);
               const end = new Date(reservation.endDateTime);
               const startLocal = new Date(
@@ -104,8 +80,7 @@ const Check = () => {
                     <a
                       href="#"
                       onClick={() => {
-                        setReservationId(reservation.reservationId);
-                        setOpenModal(true);
+                        setOpenModal(reservation.reservationId);
                       }}
                       className="font-medium text-cyan-600 hover:underline dark:text-cyan-500">
                       삭제
@@ -164,7 +139,12 @@ const Check = () => {
                 <Button color="gray" onClick={() => setOpenModal(false)}>
                   취소
                 </Button>
-                <Button color="failure" onClick={handleDelete}>
+                <Button
+                  color="failure"
+                  onClick={() => {
+                    handleDelete(openModal);
+                    setOpenModal(null);
+                  }}>
                   확인
                 </Button>
               </div>

@@ -8,7 +8,7 @@ import './index.css';
 import reportWebVitals from './reportWebVitals';
 import Router from './router';
 
-const queryClient = new QueryClient();
+export const queryClient = new QueryClient();
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
