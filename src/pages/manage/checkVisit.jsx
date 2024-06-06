@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useReservationsByRooms } from '../../api/user.api';
 import { useLocation } from 'react-router-dom';
-import { fetchRooms } from '../../api/user.api';
+import { useRooms } from '../../api/user.api';
 
 const CheckVisit = () => {
   const location = useLocation();
   const [roomIds, setRoomIds] = useState([]);
-  const [roomNames, setRoomNames] = useState([]);
   const [inputValue, setInputValue] = useState('');
   const [reservations, setReservations] = useState(null);
   const [error, setError] = useState(null);
@@ -20,25 +19,7 @@ const CheckVisit = () => {
     }
   }, [location.search]);
 
-  useEffect(() => {
-    const fetchRoomNames = async () => {
-      try {
-        const names = await Promise.all(
-          roomIds.map(roomId => fetchRooms(roomId)),
-        );
-        setRoomNames(names.map(room => room.roomName));
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    if (roomIds.length > 0) {
-      fetchRoomNames();
-    }
-  }, [roomIds]);
-
-  useEffect(() => {
-    console.log('roomNames', roomNames);
-  }, [roomNames]);
+  const { data: rooms } = useRooms(roomIds);
 
   // input 변화 감지
   const handleChange = e => {
@@ -77,6 +58,9 @@ const CheckVisit = () => {
 
   return (
     <div>
+      {rooms?.map(room => (
+        <p key={room.roomId}>{room.roomName}</p>
+      ))}
       <div>출석 일자</div>
       <input
         type="text"

@@ -99,10 +99,22 @@ export const useOtp = () =>
   });
 
 
-export const fetchRooms =async(roomId)=>{
+export const fetchRoom =async(roomId)=>{
   const room_response = await apiClient.get(
     `https://api.studyroom.jisub.kim/rooms/${roomId}`
   );
 
   return room_response.data;
 }
+
+export const useRooms = (roomIds) => useQuery({
+  queryKey: ['rooms', roomIds],
+  queryFn: async ()=>{
+      if(!roomIds) return [];
+      const rooms = await Promise.all(
+        roomIds.map(roomId => fetchRoom(roomId))
+      )
+      console.log(rooms)
+      return rooms
+  }
+})
