@@ -118,3 +118,19 @@ export const useRooms = (roomIds) => useQuery({
       return rooms
   }
 })
+
+export const fetchAllRooms=async()=>{
+  const all_rooms_response = await apiClient.get(
+    'https://api.studyroom.jisub.kim/rooms'
+  )
+  return all_rooms_response.data.data.items;
+}
+
+export const useAllRooms = () =>
+  useQuery({
+    queryKey: ['allRooms'],
+    queryFn: async () => {
+      const allRooms = await fetchAllRooms();
+      return allRooms.map(room => room.roomName);
+    },
+  });
