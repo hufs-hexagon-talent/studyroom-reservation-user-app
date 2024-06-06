@@ -12,8 +12,9 @@ import {
   TableRow,
   Typography,
 } from '@mui/material';
-import { addMinutes, format } from 'date-fns';
+import { addMinutes, format, parse } from 'date-fns';
 import { ko } from 'date-fns/locale';
+import { useSnackbar } from 'react-simple-snackbar';
 
 import 'react-datepicker/dist/react-datepicker.css';
 
@@ -61,6 +62,8 @@ const createTimeTable = config => {
   return timeTable;
 };
 
+const intervalMinute = 30;
+
 const RoomPage = () => {
   // 현재 시간
   const formatDate = date => {
@@ -69,12 +72,18 @@ const RoomPage = () => {
     const day = String(date.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
   };
+  const [openSnackbar, closeSnackbar] = useSnackbar({
+    position: 'top-right',
+    style: {
+      backgroundColor: '#FF3333',
+    },
+  });
 
   const today = new Date();
 
   const [selectedPartition, setSelectedPartition] = useState(null);
-  const [startTime, setStartTime] = useState(null);
-  const [endTime, setEndTime] = useState(null);
+  const [selectedRangeFrom, setSelectedRangeFrom] = useState(null);
+  const [selectedRangeTo, selSelectedRangeTo] = useState(null);
   const [slotsArr, setSlotsArr] = useState([]);
   const [reservedSlots, setReservedSlots] = useState({});
   const [selectedDate, setSelectedDate] = useState(
@@ -86,7 +95,7 @@ const RoomPage = () => {
   const times = useMemo(() => createTimeTable(timeTableConfig), []);
   const navigate = useNavigate();
 
-  const { mutate: doReserve } = useReserve();
+  const { mutateAsync: doReserve } = useReserve();
 
   const { data: reservationsByRooms } = useReservationsByRooms({
     date: selectedDate,
@@ -99,42 +108,63 @@ const RoomPage = () => {
   };
 
   // 슬롯이 선택되었는지 확인하는 함수
-  const getSlotSelected = useCallback(
-    (partition, time) => {
-      if (!startTime || !endTime) return false;
-      if (selectedPartition !== partition) return false;
-      const startTimeIndex = times.indexOf(startTime);
-      const endTimeIndex = times.indexOf(endTime);
-      const timeIndex = times.indexOf(time);
-      return startTimeIndex <= timeIndex && timeIndex <= endTimeIndex;
-    },
-    [startTime, endTime, selectedPartition, times],
-  );
+  // const getSlotSelected = useCallback(
+  //   ({ room, from, to }) => {
+  //     if (!selectedRangeFrom || !selectedRangeTo) return false;
+  //     if (selectedPartition !== room) return false;
+
+  //     const reservation = reservationsByRooms.find(
+  //       reservation => reservation.room === room,
+  //     );
+
+  //     if (!reservation) return false;
+
+  //     const startTimeIndex = times.indexOf(format(selectedRangeFrom, 'HH:mm'));
+  //     const endTimeIndex = times.indexOf(format(selectedRangeTo, 'HH:mm'));
+  //     const timeIndex = times.indexOf(time);
+
+  //     return startTimeIndex <= timeIndex && timeIndex <= endTimeIndex;
+  //   },
+  //   [selectedRangeFrom, selectedRangeTo, selectedPartition, times],
+  // );
 
   // 슬롯의 상태 토글하는 함수
   const toggleSlot = useCallback(
     (partition, time) => {
-      const isExist = getSlotSelected(partition, time);
+      const targetStartAt = parse(
+        `${selectedDate} ${time}`,
+        'yyyy-MM-dd HH:mm',
+        new Date(),
+      );
+      const targetEndAt = addMinutes(targetStartAt, intervalMinute);
 
-      if (!startTime && !endTime) {
+      // const isExist = getSlotSelected({
+      //   room: partition,
+      //   from: targetStartAt,
+      //   to: targetEndAt,
+      // });
+
+      // 처음 선택하는 경우,
+      if (!selectedRangeFrom && !selectedRangeTo) {
         setSelectedPartition(partition);
-        setStartTime(time);
-        setEndTime(time);
+        setSelectedRangeFrom(targetStartAt);
+        selSelectedRangeTo(targetEndAt);
+        console.log('처음 선택하는 경우');
         return;
       }
 
       if (selectedPartition !== partition) {
         setSelectedPartition(partition);
-        setStartTime(time);
-        setEndTime(time);
+        setSelectedRangeFrom(targetStartAt);
+        selSelectedRangeTo(targetEndAt);
         return;
       }
 
-      const startTimeIndex = times.indexOf(startTime);
-      //const endTimeIndex = times.indexOf(endTime);
+      const startTimeIndex = times.indexOf(selectedRangeFrom);
+      //const endTimeIndex = times.indexOf(selectedRangeTo);
       const timeIndex = times.indexOf(time);
 
-      if (startTime === endTime) {
+      if (selectedRangeFrom === selectedRangeTo) {
         if (
           Math.abs(startTimeIndex - timeIndex) + 1 >
           timeTableConfig.maxReservationSlots
@@ -146,86 +176,49 @@ const RoomPage = () => {
             </Alert>
           );
         }
-        if (startTime === time) {
+        if (selectedRangeFrom === time) {
           setSelectedPartition(null);
-          setStartTime(null);
-          setEndTime(null);
-        } else if (startTime < time) {
-          setEndTime(time);
+          setSelectedRangeFrom(null);
+          selSelectedRangeTo(null);
+        } else if (selectedRangeFrom < time) {
+          selSelectedRangeTo(targetEndAt);
         } else {
-          setStartTime(time);
-          setEndTime(time);
+          setSelectedRangeFrom(targetStartAt);
+          selSelectedRangeTo(targetEndAt);
         }
-
-        const formattedDate = formatDate(new Date(selectedDate));
-        const start = `${formattedDate}T${startTime}:00.000Z`;
-        const end = `${formattedDate}T${endTime}:00.000Z`;
-
-        setStartDateTime(start);
-        setEndDateTime(end);
-
-        console.log({
-          partition,
-          start,
-          end,
-          isExist,
-          startTime,
-          endTime,
-          selectedDate: formattedDate,
-        });
-
         return;
       }
 
       setSelectedPartition(partition);
-      setStartTime(time);
-      setEndTime(time);
-
-      // 시간과 날짜를 포함한 ISO 형식으로 변환
-      const formattedDate = formatDate(new Date(selectedDate));
-      const start = `${formattedDate}T${startTime}:00.000Z`;
-      const end = `${formattedDate}T${endTime}:00.000Z`;
-
-      setStartDateTime(start);
-      setEndDateTime(end);
-
-      console.log({
-        partition,
-        start,
-        end,
-        selectedPartition,
-        isExist,
-        startTime,
-        endTime,
-        selectedDate: formattedDate,
-      }); // 시간 형식을 출력
     },
     [
-      getSlotSelected,
-      setStartTime,
-      setEndTime,
+      // getSlotSelected,
+      setSelectedRangeFrom,
+      selSelectedRangeTo,
       selectedPartition,
       times,
-      startTime,
-      endTime,
+      selectedRangeFrom,
+      selectedRangeTo,
     ],
   );
 
   // 자신의 예약 생성
-  const handleReservation = useCallback(async () => {
-    try {
-      await doReserve({
-        roomId: selectedPartition.roomId,
-        startDateTime: new Date(startDateTime),
-        endDateTime: new Date(endDateTime),
-      });
-      setReservedSlots([startDateTime, endDateTime]);
-      navigate('/check');
-      console.log(reservedSlots);
-    } catch (error) {
-      console.error('Reservation error:', error);
-    }
-  }, [doReserve, startDateTime, endDateTime, selectedPartition]);
+  const handleReservation = useCallback(
+    async ({ startDateTime, endDateTime }) => {
+      try {
+        await doReserve({
+          roomId: selectedPartition.roomId,
+          startDateTime,
+          endDateTime,
+        });
+        navigate('/check');
+        console.log(reservedSlots);
+      } catch (error) {
+        openSnackbar(error.response.data.errorMessage);
+      }
+    },
+    [doReserve, selectedPartition],
+  );
 
   // 최대 예약 시간에 부합하는지 계산하는 함수
   const handleCellClick = (partition, timeIndex) => {
@@ -338,23 +331,49 @@ const RoomPage = () => {
                     {/* <pre>{JSON.stringify(reservationsByRoom, null, 2)}</pre> */}
                     <TableCell>{reservationsByRoom.roomName}</TableCell>
                     {times.map((time, timeIndex) => {
-                      const isSelected = getSlotSelected(
-                        reservationsByRoom,
-                        time,
+                      const slotDateFrom = parse(
+                        `${selectedDate} ${time}`,
+                        'yyyy-MM-dd HH:mm',
+                        new Date(),
                       );
-                      const isSelectable = true;
-                      const isReserved =
-                        reservedSlots[reservationsByRoom]?.includes(timeIndex);
+                      const slotDateTo = addMinutes(slotDateFrom, 30);
+                      const isSelected = false;
+                      // getSlotSelected({
+                      //   room: reservationsByRoom,
+                      //   from: slotDateFrom,
+                      //   to: slotDateTo,
+                      // });
+                      const isPast = new Date() > new Date(slotDateFrom);
+
+                      const isSelectable = !isPast;
+                      const isReserved = reservationsByRoom?.timeline?.some(
+                        reservation => {
+                          console.log('reservation', reservation);
+                          const reservationStart = new Date(
+                            reservation.selectedRangeFrom,
+                          );
+                          const reservationEnd = new Date(
+                            reservation.selectedRangeTo,
+                          );
+                          return (
+                            slotDateFrom >= reservationStart &&
+                            slotDateFrom < reservationEnd
+                          );
+                        },
+                      );
 
                       const mode = isSelected
                         ? 'selected'
                         : isReserved
                           ? 'reserved'
-                          : 'none';
+                          : isPast
+                            ? 'past'
+                            : 'none';
                       return (
                         <TableCell
                           key={timeIndex}
                           onClick={() =>
+                            isSelectable &&
                             handleCellClick(reservationsByRoom, timeIndex)
                           }
                           className={isSelected ? 'selected' : ''}
@@ -362,13 +381,22 @@ const RoomPage = () => {
                             padding: 30,
 
                             backgroundColor: {
+                              past: '#AAAAAA',
                               selected: '#7599BA',
                               reserved: '#002D56',
                               none: '#F1EEE9',
                             }[mode],
                             borderRight: '1px solid #ccc',
                             cursor: isSelectable ? 'pointer' : 'not-allowed',
-                          }}></TableCell>
+                          }}>
+                          {/* {JSON.stringify({
+                            slotDateFrom: slotDateFrom.toLocaleString(),
+                            time,
+                            isPast,
+                            isSelectable,
+                            isReserved,
+                          })} */}
+                        </TableCell>
                       );
                     })}
                   </TableRow>
@@ -378,7 +406,19 @@ const RoomPage = () => {
           </TableContainer>
         </div>
         <div className="p-10 flex justify-end">
-          <Button onClick={handleReservation} text="예약하기" />
+          {selectedRangeFrom && format(selectedRangeFrom, 'yyyy-MM-dd HH:mm')}
+          <br />
+          {selectedRangeTo && format(selectedRangeTo, 'yyyy-MM-dd HH:mm')}
+          <br />
+          <Button
+            onClick={() =>
+              handleReservation({
+                startDateTime,
+                endDateTime: addMinutes(endDateTime, intervalMinute),
+              })
+            }
+            text="예약하기"
+          />
         </div>
       </div>
     </>

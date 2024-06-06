@@ -45,29 +45,25 @@ export const fetchDate = async () => {
 
 //예약 정보 가져오기
 export const fetchReservationsByRooms = async ({ date }) => {
-  try {
-    const response = await apiClient.get(
-      `https://api.studyroom.jisub.kim/reservations/by-date?date=${date}`,
-    );
+  const response = await apiClient.get(
+    `https://api.studyroom.jisub.kim/reservations/by-date?date=${date}`,
+  );
 
-    const data = response.data.data.items;
-    console.log(data);
-    return data;
-  } catch (error) {
-    console.error('fetch error : ', error);
-  }
+  const data = response.data.data.items;
+
+  return data;
 };
 
-export const deleteReservations = async (reservationId) =>{
+export const deleteReservations = async reservationId => {
   await apiClient.delete(
-    `https://api.studyroom.jisub.kim/reservations/me/${reservationId}`,{ 
-    }
+    `https://api.studyroom.jisub.kim/reservations/me/${reservationId}`,
+    {},
   );
-}
+};
 
 export const useDeleteReservation = () => {
   return useMutation({
-    mutationFn: async (reservationId) => {
+    mutationFn: async reservationId => {
       const res = await apiClient.delete(`/reservations/me/${reservationId}`);
       return res.data;
     },
@@ -80,7 +76,6 @@ export const useReservationsByRooms = ({ date }) =>
     queryFn: () => fetchReservationsByRooms({ date }),
   });
 
-
 export const getUserReservation = async () => {
   const user_reservation_response = await apiClient.get(
     'https://api.studyroom.jisub.kim/reservations/me',
@@ -88,14 +83,16 @@ export const getUserReservation = async () => {
   return user_reservation_response;
 };
 
-export const fetchOtp = async() =>{
-  const otp_response =await apiClient.post('https://api.studyroom.jisub.kim/otp');
-  console.log(otp_response.data);
-  return otp_response.data.data.verificationCode;
-}
+export const fetchOtp = async () => {
+  const otp_response = await apiClient.post(
+    'https://api.studyroom.jisub.kim/otp',
+  );
 
-export const useOtp = () => 
+  return otp_response.data.data.verificationCode;
+};
+
+export const useOtp = () =>
   useQuery({
-    queryKey : ['otp'],
-    queryFn: () => fetchOtp()
-  })  
+    queryKey: ['otp'],
+    queryFn: () => fetchOtp(),
+  });

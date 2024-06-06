@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
+import SnackbarProvider from 'react-simple-snackbar';
 import './index.css';
 
 import reportWebVitals from './reportWebVitals';
@@ -13,7 +14,9 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
-      <Router />
+      <SnackbarProvider>
+        <Router />
+      </SnackbarProvider>
     </QueryClientProvider>
   </React.StrictMode>,
 );

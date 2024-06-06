@@ -1,10 +1,9 @@
-
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios'
+import axios from 'axios';
 
 const useAuth = () => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   const [accessToken, setAccessToken] = useState(
     localStorage.getItem('accessToken') || null,
@@ -13,18 +12,17 @@ const useAuth = () => {
     localStorage.getItem('refreshToken') || null,
   );
 
-  const isTokenValid = (token) =>{
-    return token !== 'undefined' && token !==null;
+  const isTokenValid = token => {
+    return token !== 'undefined' && token !== null;
   };
- 
-  const loggedIn = useMemo(()=> !!accessToken ,[])
+
+  const loggedIn = useMemo(() => !!accessToken, []);
 
   const fetchTokens = useCallback(() => {
-    
     const storedAccessToken = localStorage.getItem('accessToken');
     const storedRefreshToken = localStorage.getItem('refreshToken');
 
-    if(!isTokenValid(storedAccessToken)|| !isTokenValid(storedRefreshToken)){
+    if (!isTokenValid(storedAccessToken) || !isTokenValid(storedRefreshToken)) {
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
       return;
@@ -45,8 +43,8 @@ const useAuth = () => {
     };
   }, []);
 
-  const login = useCallback(async ({id, password}) => {
-    try{
+  const login = useCallback(async ({ id, password }) => {
+    try {
       const response = await axios.post(
         'https://api.studyroom.jisub.kim/auth/login',
         {
@@ -56,16 +54,16 @@ const useAuth = () => {
       );
       const access_token = response.data.data.access_token;
       const refresh_token = response.data.data.refresh_token;
-  
-      if(!isTokenValid(access_token)|| !isTokenValid(refresh_token)){
+
+      if (!isTokenValid(access_token) || !isTokenValid(refresh_token)) {
         throw new Error('유효하지 않는 토큰');
       }
-  
+
       localStorage.setItem('accessToken', access_token);
       localStorage.setItem('refreshToken', refresh_token);
-    } catch(error){
-      if(error.response && error.response.status === 412){
-        alert('아이디 또는 비밀번호가 틀렸습니다.')
+    } catch (error) {
+      if (error.response && error.response.status === 412) {
+        alert('아이디 또는 비밀번호가 틀렸습니다.');
       }
     }
   }, []);
@@ -73,7 +71,7 @@ const useAuth = () => {
   const logout = useCallback(async () => {
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
-    navigate('/login');
+    // navigate('/login');
   }, []);
 
   return { accessToken, refreshToken, loggedIn, login, logout };
