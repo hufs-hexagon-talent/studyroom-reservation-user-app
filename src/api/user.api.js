@@ -54,6 +54,13 @@ export const fetchReservationsByRooms = async ({ date }) => {
   return data;
 };
 
+export const useReservationsByRooms = ({ date }) =>
+  useQuery({
+    queryKey: ['reservationsByRooms', date],
+    queryFn: () => fetchReservationsByRooms({ date }),
+  });
+
+
 export const deleteReservations = async reservationId => {
   await apiClient.delete(
     `https://api.studyroom.jisub.kim/reservations/me/${reservationId}`,
@@ -69,12 +76,6 @@ export const useDeleteReservation = () => {
     },
   });
 };
-
-export const useReservationsByRooms = ({ date }) =>
-  useQuery({
-    queryKey: ['reservationsByRooms', date],
-    queryFn: () => fetchReservationsByRooms({ date }),
-  });
 
 export const getUserReservation = async () => {
   const user_reservation_response = await apiClient.get(
@@ -96,3 +97,12 @@ export const useOtp = () =>
     queryKey: ['otp'],
     queryFn: () => fetchOtp(),
   });
+
+
+export const fetchRooms =async(roomId)=>{
+  const room_response = await apiClient.get(
+    `https://api.studyroom.jisub.kim/rooms/${roomId}`
+  );
+
+  return room_response.data;
+}
