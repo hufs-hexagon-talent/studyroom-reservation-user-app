@@ -105,21 +105,22 @@ export const useRooms = roomIds =>
     },
   });
 
-export const useRooms = (roomIds) => useQuery({
-  queryKey: ['rooms', roomIds],
-  queryFn: async ()=>{
-      if(!roomIds) return [];
-      const rooms = await Promise.all(
-        roomIds.map(roomId => fetchRoom(roomId))
-      )
-      console.log(rooms)
-      return rooms
-  }
-})
+
+export const useCheckIn =()=>{
+  return useMutation({
+    mutationFn : async({verificationCode, roomIds})=>{
+      const check_in_res = await apiClient.post('/check-in',{
+        verificationCode,
+        roomIds
+      });
+      return check_in_res.data;
+    },
+  });
+};
 
 export const fetchAllRooms=async()=>{
   const all_rooms_response = await apiClient.get(
-    'https://api.studyroom.jisub.kim/rooms'
+    '/rooms'
   )
   return all_rooms_response.data.data.items;
 }
@@ -132,3 +133,17 @@ export const useAllRooms = () =>
       return allRooms.map(room => room.roomName);
     },
   });
+
+export const fetchReservedRooms =async({date,roomIds})=>{
+  const reserved_rooms_res = await apiClient.get(
+    `/reservations/rooms/by-date?date=${date}&roomIds=${roomIds}`
+  )
+  return reserved_rooms_res.data.data;
+}
+
+export const useReservedRooms =({date, roomIds})=>{
+  useQuery({
+    queryKey:[date,roomIds],
+    queryFn:()=>fetchReservedRooms(date,roomIds)
+  })
+}

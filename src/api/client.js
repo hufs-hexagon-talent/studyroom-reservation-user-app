@@ -1,7 +1,8 @@
 import axios from 'axios';
 
 export const apiClient = axios.create({
-  baseURL: 'https://api.studyroom.jisub.kim',
+  baseURL: 'http://192.168.0.91:8081',
+  // baseURL: 'https://api.studyroom.jisub.kim',
   headers: {
     Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
   },
@@ -38,13 +39,13 @@ apiClient.interceptors.response.use(
       }
       // todo : refresh가 401이 떴을 때 새로 refresh 떳을때) 지금 요청하려고 하는 api가 refresh면? 바로 종료
       // 현재 요청이 리프레시 요청이냐
-      if (error.config.url === 'https://api.studyroom.jisub.kim/auth/refresh') {
+      if (error.config.url.includes('/auth/refresh')) {
         return Promise.reject(error);
       }
       try {
         // 리프레시 토큰으로 액세스 토큰 와서 새 액세스 토큰으로 재요청하기
-        const response = await axios.post(
-          'https://api.studyroom.jisub.kim/auth/refresh',
+        const response = await apiClient.post(
+          '/auth/refresh',
           { refreshToken },
         );
         const accessToken = response.data.accessToken;

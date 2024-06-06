@@ -1,7 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { useReservationsByRooms } from '../../api/user.api';
+import React, { useState, useEffect, useCallback } from 'react';
+import {
+  useReservationsByRooms,
+  useRooms,
+  useCheckIn,
+} from '../../api/user.api';
 import { useLocation } from 'react-router-dom';
-import { useRooms } from '../../api/user.api';
 
 const CheckVisit = () => {
   const location = useLocation();
@@ -9,6 +12,8 @@ const CheckVisit = () => {
   const [inputValue, setInputValue] = useState('');
   const [reservations, setReservations] = useState(null);
   const [error, setError] = useState(null);
+
+  const { mutate: doCheckIn } = useCheckIn();
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -56,6 +61,26 @@ const CheckVisit = () => {
     }
   };
 
+  // 큐알코드 스캐너 입력 처리
+  const handleQrCode = async verificationCode => {
+    console.log({ verificationCode, roomIds });
+    try {
+      await doCheckIn({ verificationCode, roomIds });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleQrKeyDown = useCallback(
+    e => {
+      if (e.code === 'Enter') {
+        handleQrCode(e.target.value);
+        e.target.value = '';
+      }
+    },
+    [roomIds],
+  );
+
   return (
     <div>
       {rooms?.map(room => (
@@ -76,6 +101,14 @@ const CheckVisit = () => {
           <pre>{JSON.stringify(reservations, null, 2)}</pre>
         </div>
       )}
+      <div>
+        <h3>QR Code Verification:</h3>
+        <input
+          type="text"
+          onKeyDown={handleQrKeyDown}
+          placeholder="Scan QR Code"
+        />
+      </div>
     </div>
   );
 };
