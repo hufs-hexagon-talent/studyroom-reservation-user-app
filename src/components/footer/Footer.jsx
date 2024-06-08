@@ -1,8 +1,15 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import './Footer.css';
 
 const Footer = () => {
+  const navigate = useNavigate();
+
+  const handleAdminClick = () => {
+    navigate('/selectRoom');
+  };
+
   return (
     <footer
       id="footer"
@@ -37,6 +44,15 @@ const Footer = () => {
             Copyright ⓒ Hankuk University of Foreign Studies. All Rights
             Reserved.
           </p>
+          <div
+            onClick={handleAdminClick}
+            style={{
+              cursor: 'pointer',
+              color: 'white',
+              textDecoration: 'underline',
+            }}>
+            관리자 페이지
+          </div>
         </div>
       </div>
     </footer>
