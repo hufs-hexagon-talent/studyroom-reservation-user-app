@@ -29,11 +29,7 @@ import { useSnackbar } from 'react-simple-snackbar';
 
 import 'react-datepicker/dist/react-datepicker.css';
 
-import {
-  fetchDate,
-  useReservationsByRooms,
-  useReserve,
-} from '../../../api/user.api';
+import { fetchDate, useReservations, useReserve } from '../../../api/user.api';
 import Button from '../../../components/button/Button';
 
 const timeTableConfig = {
@@ -103,7 +99,7 @@ const RoomPage = () => {
 
   const { mutateAsync: doReserve } = useReserve();
 
-  const { data: reservationsByRooms } = useReservationsByRooms({
+  const { data: reservationsByRooms } = useReservations({
     date: selectedDate,
   });
   // date-picker에서 날짜 선택할 때마다 실행되는 함수

@@ -38,8 +38,24 @@ export const fetchDate = async () => {
   return dates;
 };
 
-//예약 정보 가져오기
-export const fetchReservationsByRooms = async ({ date }) => {
+//해당 날짜의 예약 정보 가져오기 (1차원, checkVisit에 사용)
+export const fetchReservationsByRooms = async ({ date, roomIds }) => {
+  const params = new URLSearchParams();
+  params.append('date', date);
+  roomIds.forEach(id => params.append('roomIds', id));
+
+  const response = await apiClient.get(`https://api.studyroom.jisub.kim/reservations/rooms/by-date?${params.toString()}`);
+  return response.data.data.reservations;
+};
+
+export const useReservationsByRooms = ({ date, roomIds }) =>
+  useQuery({
+    queryKey: ['reservationsByRooms', date, roomIds],
+    queryFn: () => fetchReservationsByRooms({ date, roomIds }),
+  });
+
+// 해당 날짜의 예약 정보 가져오기 (2차원, roomPage에 사용)
+export const fetchReservations = async ({ date }) => {
   const response = await apiClient.get(`/reservations/by-date?date=${date}`);
 
   const data = response.data.data.items;
@@ -47,12 +63,15 @@ export const fetchReservationsByRooms = async ({ date }) => {
   return data;
 };
 
-export const useReservationsByRooms = ({ date }) =>
+export const useReservations = ({ date }) =>
   useQuery({
     queryKey: ['reservationsByRooms', date],
-    queryFn: () => fetchReservationsByRooms({ date }),
+    queryFn: () => fetchReservations({ date }),
   });
 
+
+
+// 예약 삭제하기
 export const useDeleteReservation = () => {
   return useMutation({
     mutationFn: async reservationId => {

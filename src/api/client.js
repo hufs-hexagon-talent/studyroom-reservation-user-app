@@ -1,8 +1,7 @@
 import axios from 'axios';
 
 export const apiClient = axios.create({
-  baseURL: 'http://192.168.0.91:8081',
-  // baseURL: 'https://api.studyroom.jisub.kim',
+  baseURL: 'https://api.studyroom.jisub.kim',
   headers: {
     Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
   },
