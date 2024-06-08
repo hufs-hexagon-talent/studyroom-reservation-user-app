@@ -149,7 +149,7 @@ export const useAllRooms = () =>
     queryKey: ['allRooms'],
     queryFn: async () => {
       const allRooms = await fetchAllRooms();
-      return allRooms.map(room => room.roomName);
+      return allRooms.map(room => ({ roomId: room.roomId, roomName: room.roomName }));
     },
   });
 

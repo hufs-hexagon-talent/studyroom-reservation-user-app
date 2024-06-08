@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAllRooms } from '../../api/user.api';
 import { useNavigate } from 'react-router-dom';
 import { Button } from 'flowbite-react';
 
 const SelectRoom = () => {
-  const { data: roomNames, error, isLoading } = useAllRooms();
+  const { data: rooms, error, isLoading } = useAllRooms();
+  const [selectedRooms, setSelectedRooms] = useState([]);
   const navigate = useNavigate();
 
   if (isLoading) {
@@ -15,6 +16,22 @@ const SelectRoom = () => {
     return <div>Error loading rooms.</div>;
   }
 
+  const handleCheckboxChange = room => {
+    setSelectedRooms(prevSelectedRooms => {
+      if (prevSelectedRooms.find(r => r.roomId === room.roomId)) {
+        return prevSelectedRooms.filter(r => r.roomId !== room.roomId);
+      } else {
+        return [...prevSelectedRooms, room];
+      }
+    });
+  };
+
+  const handleNextClick = () => {
+    const selectedRoomIds = selectedRooms.map(room => room.roomId);
+    console.log('Selected rooms:', selectedRoomIds);
+    navigate(`/visit?roomIds[]=${selectedRoomIds.join(',')}`);
+  };
+
   return (
     <div className="m-10">
       <div className="font-bold mt-10 text-2xl text-center">
@@ -22,27 +39,25 @@ const SelectRoom = () => {
       </div>
       <div className="flex justify-center mt-4">
         <div className="flex flex-col">
-          {roomNames.map((roomName, index) => (
+          {rooms.map((room, index) => (
             <div className="flex items-center mb-4" key={index}>
               <input
-                id={`box-${roomName}`}
+                id={`box-${room.roomName}`}
                 type="checkbox"
-                value={roomName}
+                value={room.roomName}
                 className="w-4 h-4 bg-gray-100 border-gray-300 rounded"
+                onChange={() => handleCheckboxChange(room)}
               />
               <label
-                htmlFor={`box-${roomName}`}
+                htmlFor={`box-${room.roomName}`}
                 className="ml-2 text-xl font-medium">
-                {roomName}
+                {room.roomName}
               </label>
             </div>
           ))}
         </div>
       </div>
-      <Button
-        color="dark"
-        //onClick={navigate(`/visit?roomIds[]=${selectedRooms.join(',')}`)}
-      >
+      <Button color="dark" onClick={handleNextClick}>
         다음
       </Button>
     </div>
