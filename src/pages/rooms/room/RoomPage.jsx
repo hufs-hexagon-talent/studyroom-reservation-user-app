@@ -20,6 +20,7 @@ import {
   isAfter,
   differenceInMinutes,
   areIntervalsOverlapping,
+  isToday,
 } from 'date-fns';
 
 import useUrlQuery from '../../../hooks/useUrlQuery';
@@ -96,6 +97,7 @@ const RoomPage = () => {
   const [availableDate, setAvailableDate] = useState([]);
   const times = useMemo(() => createTimeTable(timeTableConfig), []);
   const navigate = useNavigate();
+  const today = new Date();
 
   const { mutateAsync: doReserve } = useReserve();
 
@@ -232,6 +234,7 @@ const RoomPage = () => {
             <DatePicker
               selected={selectedDate}
               locale={ko}
+              minDate={today}
               includeDates={availableDate}
               onChange={handleDateChange}
               dateFormat="yyyy년 MM월 dd일"
