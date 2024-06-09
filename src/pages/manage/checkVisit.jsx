@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
+import { convertToEnglish } from '../../api/convertToEnglish';
 import {
   useReservationsByRooms,
   useRooms,
@@ -14,7 +15,6 @@ const CheckVisit = () => {
   const [fetchParams, setFetchParams] = useState(null);
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  const { mutate: doCheckIn } = useCheckIn();
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -25,6 +25,7 @@ const CheckVisit = () => {
     }
   }, [location.search]);
 
+  const { mutate: doCheckIn } = useCheckIn();
   const { data: rooms } = useRooms(roomIds);
   const { data: reservations, refetch } = useReservationsByRooms(
     fetchParams || {},
@@ -66,25 +67,32 @@ const CheckVisit = () => {
 
   // 큐알코드 스캐너 입력 처리
   const handleQrCode = async verificationCode => {
-    console.log({ verificationCode, roomIds });
+    // 입력된 verificationCode를 소문자 영어로 변환
+    const sanitizedCode = convertToEnglish(verificationCode.toLowerCase());
+    console.log({ verificationCode: sanitizedCode, roomIds });
     try {
-      await doCheckIn({ verificationCode, roomIds });
-      setSuccessMessage(`${verificationCode}님, 출석 확인 되었습니다.`);
+      const result = await doCheckIn({
+        verificationCode: sanitizedCode,
+        roomIds,
+      });
+      if (result.errorMessage) {
+        throw new Error(result.errorMessage);
+      }
+      const userName = result.data.data.checkInReservations.name;
+      setSuccessMessage(`${userName}님, 출석 확인 되었습니다.`);
       setErrorMessage('');
       setTimeout(() => {
         setSuccessMessage('');
       }, 5000);
       console.log('checked');
     } catch (error) {
-      if (error.response && error.response.status === 422) {
-        setErrorMessage(error.response.data.message);
-        setSuccessMessage('');
-        setTimeout(() => {
-          setErrorMessage('');
-        }, 5000);
-      } else {
-        console.error(error);
-      }
+      setErrorMessage(
+        error.response?.data?.errorMessage || 'An unexpected error occurred',
+      );
+      setSuccessMessage('');
+      setTimeout(() => {
+        setErrorMessage('');
+      }, 5000);
     }
   };
 
@@ -117,25 +125,17 @@ const CheckVisit = () => {
           <table className="mt-4 border-collapse border border-gray-400">
             <thead>
               <tr>
-                <th className="border border-gray-300 px-4 py-2">
-                  Reservation ID
-                </th>
-                <th className="border border-gray-300 px-4 py-2">Room ID</th>
-                <th className="border border-gray-300 px-4 py-2">Room Name</th>
-                <th className="border border-gray-300 px-4 py-2">User ID</th>
-                <th className="border border-gray-300 px-4 py-2">Start Time</th>
-                <th className="border border-gray-300 px-4 py-2">End Time</th>
+                <th className="border border-gray-300 px-4 py-2">출석 유무</th>
+                <th className="border border-gray-300 px-4 py-2">호실</th>
+                <th className="border border-gray-300 px-4 py-2">사용자 ID</th>
+                <th className="border border-gray-300 px-4 py-2">시작 시간</th>
+                <th className="border border-gray-300 px-4 py-2">종료 시간</th>
               </tr>
             </thead>
             <tbody>
               {reservations.map(reservation => (
                 <tr key={reservation.reservationId}>
-                  <td className="border border-gray-300 px-4 py-2">
-                    {reservation.reservationId}
-                  </td>
-                  <td className="border border-gray-300 px-4 py-2">
-                    {reservation.roomId}
-                  </td>
+                  <td className="border border-gray-300 px-4 py-2">유/무</td>
                   <td className="border border-gray-300 px-4 py-2">
                     {reservation.roomName}
                   </td>
