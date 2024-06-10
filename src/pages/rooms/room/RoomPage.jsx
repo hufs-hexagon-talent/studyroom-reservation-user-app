@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import { HiInformationCircle } from 'react-icons/hi';
+import { Alert as FlowbiteAlert } from 'flowbite-react';
 import {
   Alert,
   Table,
@@ -25,12 +26,13 @@ import {
 
 import useUrlQuery from '../../../hooks/useUrlQuery';
 
-import { ko } from 'date-fns/locale';
+import { ko, tr } from 'date-fns/locale';
 import { useSnackbar } from 'react-simple-snackbar';
 
 import 'react-datepicker/dist/react-datepicker.css';
 
 import { fetchDate, useReservations, useReserve } from '../../../api/user.api';
+import useAuth from '../../../hooks/useAuth';
 import Button from '../../../components/button/Button';
 
 const timeTableConfig = {
@@ -89,21 +91,23 @@ const RoomPage = () => {
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [selectedRangeFrom, setSelectedRangeFrom] = useState(null);
   const [selectedRangeTo, selSelectedRangeTo] = useState(null);
-
   const [selectedDate, setSelectedDate] = useUrlQuery(
     'date',
     format(new Date(), 'yyyy-MM-dd'),
   );
   const [availableDate, setAvailableDate] = useState([]);
+  const [showLoginAlert, setShowLoginAlert] = useState(false);
+  const [showReserveAlert, setShowReserveAlert] = useState(false);
   const times = useMemo(() => createTimeTable(timeTableConfig), []);
   const navigate = useNavigate();
   const today = new Date();
 
   const { mutateAsync: doReserve } = useReserve();
-
   const { data: reservationsByRooms } = useReservations({
     date: selectedDate,
   });
+  const { loggedIn: isLoggedIn } = useAuth();
+
   // date-picker에서 날짜 선택할 때마다 실행되는 함수
   const handleDateChange = date => {
     const formattedDate = format(date, 'yyyy-MM-dd');
@@ -143,6 +147,17 @@ const RoomPage = () => {
 
       const isSelectPast = isBefore(targetStartAt, selectedRangeFrom);
 
+      if (
+        selectedRoom === partition &&
+        selectedRangeFrom?.getTime() === targetStartAt.getTime() &&
+        selectedRangeTo?.getTime() === targetEndAt.getTime()
+      ) {
+        setSelectedRoom(null);
+        setSelectedRangeFrom(null);
+        selSelectedRangeTo(null);
+        return;
+      }
+
       // 새롭게 시간을 선택함
       if (isFirstSelect || isDifferentRoom || isRangeSelected || isSelectPast) {
         setSelectedRoom(partition);
@@ -171,15 +186,32 @@ const RoomPage = () => {
       setSelectedRangeFrom,
       selSelectedRangeTo,
       selectedRoom,
-      times,
       selectedRangeFrom,
       selectedRangeTo,
+      isRangeSelected,
     ],
   );
 
   // 자신의 예약 생성
   const handleReservation = useCallback(
     async ({ roomId, startDateTime, endDateTime }) => {
+      if (!isLoggedIn) {
+        setShowLoginAlert(true); // Alert 표시
+        setTimeout(() => {
+          setShowLoginAlert(false);
+          navigate('/login'); // 로그인 페이지로 이동
+        }, 2000); // 2초 후에 로그인 페이지로 이동
+        return;
+      }
+      if (!selectedRoom || !selectedRangeFrom || !selectedRangeTo) {
+        setShowReserveAlert(true); // Alert 표시
+        console.log(showReserveAlert);
+        setTimeout(() => {
+          setShowReserveAlert(false); // alert 숨기기
+        }, 2000);
+        console.log(showReserveAlert);
+        return;
+      }
       try {
         await doReserve({
           roomId,
@@ -191,7 +223,7 @@ const RoomPage = () => {
         openSnackbar(error.response.data.errorMessage);
       }
     },
-    [doReserve],
+    [doReserve, isLoggedIn, selectedRoom, selectedRangeFrom, selectedRangeTo],
   );
 
   // 최대 예약 시간에 부합하는지 계산하는 함수
@@ -258,6 +290,28 @@ const RoomPage = () => {
           <div className="mt-10 ml-2">예약 완료</div>
         </div>
 
+        {showLoginAlert && (
+          <div className="p-5">
+            <FlowbiteAlert
+              className="w-96 h-16 flex items-center justify-center"
+              color="failure"
+              icon={HiInformationCircle}>
+              <span className="font-medium">주의! </span>
+              로그인 후에 세미나실 예약이 가능합니다.
+            </FlowbiteAlert>
+          </div>
+        )}
+        {showReserveAlert && (
+          <div className="p-5">
+            <FlowbiteAlert
+              className="p-3 w-96 h-16 flex items-center justify-center"
+              color="failure"
+              icon={HiInformationCircle}>
+              <span className="font-medium">주의! </span>
+              원하는 호실과 시간대를 선택하고 예약하기 버튼을 눌러주세요
+            </FlowbiteAlert>
+          </div>
+        )}
         {/* timeTable 시작 */}
         <div>
           <TableContainer
@@ -322,7 +376,7 @@ const RoomPage = () => {
 
                       const isReserved = reservationsByRoom?.timeline?.some(
                         reservation => {
-                          console.log('reservation', reservation);
+                          //console.log('reservation', reservation);
                           const reservationStart = new Date(
                             reservation.startDateTime,
                           );
@@ -384,11 +438,13 @@ const RoomPage = () => {
           <br />
           <Button
             onClick={() =>
-              handleReservation({
-                roomId: selectedRoom.roomId,
-                startDateTime: selectedRangeFrom,
-                endDateTime: selectedRangeTo,
-              })
+              selectedRoom && selectedRangeFrom && selectedRangeTo
+                ? handleReservation({
+                    roomId: selectedRoom.roomId,
+                    startDateTime: selectedRangeFrom,
+                    endDateTime: selectedRangeTo,
+                  })
+                : setShowReserveAlert(true)
             }
             text="예약하기"
           />

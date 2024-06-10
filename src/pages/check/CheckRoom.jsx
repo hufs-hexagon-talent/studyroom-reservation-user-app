@@ -61,21 +61,14 @@ const Check = () => {
             {reservations?.map((reservation, index) => {
               const start = new Date(reservation.startDateTime);
               const end = new Date(reservation.endDateTime);
-              const startLocal = new Date(
-                start.getTime() + start.getTimezoneOffset() * 60000,
-              );
-              const endLocal = new Date(
-                end.getTime() + end.getTimezoneOffset() * 60000,
-              );
-
               return (
                 <Table.Row
                   key={index}
                   className="bg-white dark:border-gray-700 dark:bg-gray-800 text-center text-gray-900">
                   <Table.Cell>{reservation.roomName}</Table.Cell>
-                  <Table.Cell>{format(startLocal, 'MM-dd')}</Table.Cell>
-                  <Table.Cell>{format(startLocal, 'HH:mm')}</Table.Cell>
-                  <Table.Cell>{format(endLocal, 'HH:mm')}</Table.Cell>
+                  <Table.Cell>{format(start, 'MM-dd')}</Table.Cell>
+                  <Table.Cell>{format(start, 'HH:mm')}</Table.Cell>
+                  <Table.Cell>{format(end, 'HH:mm')}</Table.Cell>
                   <Table.Cell>
                     <a
                       href="#"
