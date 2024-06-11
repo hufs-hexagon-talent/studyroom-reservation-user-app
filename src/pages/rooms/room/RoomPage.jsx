@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import {
-  Alert,
   Table,
   TableBody,
   TableCell,
@@ -16,15 +15,13 @@ import {
   format,
   parse,
   isBefore,
-  isAfter,
   differenceInMinutes,
   areIntervalsOverlapping,
-  isToday,
 } from 'date-fns';
 
 import useUrlQuery from '../../../hooks/useUrlQuery';
 
-import { ko, tr } from 'date-fns/locale';
+import { ko } from 'date-fns/locale';
 import { useSnackbar } from 'react-simple-snackbar';
 
 import 'react-datepicker/dist/react-datepicker.css';
@@ -334,7 +331,6 @@ const RoomPage = () => {
 
                       const isReserved = reservationsByRoom?.timeline?.some(
                         reservation => {
-                          //console.log('reservation', reservation);
                           const reservationStart = new Date(
                             reservation.startDateTime,
                           );
