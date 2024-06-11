@@ -8,7 +8,11 @@ import { Button } from 'flowbite-react';
 const Btn = ({ text, onClick }) => {
   return (
     <div>
-      <Button className="ml-5" size="sm" color="dark" onClick={onClick}>
+      <Button
+        className="ml-5 font-bold"
+        size="sm"
+        color="dark"
+        onClick={onClick}>
         {text}
         <HiOutlineArrowRight className="ml-2 h-5 w-5" />
       </Button>

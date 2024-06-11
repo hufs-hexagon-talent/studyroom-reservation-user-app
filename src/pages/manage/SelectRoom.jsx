@@ -37,7 +37,7 @@ const SelectRoom = () => {
       <div className="font-bold mt-10 text-2xl text-center">
         방을 선택하세요
       </div>
-      <div className="flex justify-center mt-4">
+      <div className="flex justify-center mt-12">
         <div className="flex flex-col">
           {rooms.map((room, index) => (
             <div className="flex items-center mb-4" key={index}>
@@ -57,7 +57,7 @@ const SelectRoom = () => {
           ))}
         </div>
       </div>
-      <div className="flex justify-end w-full">
+      <div className="flex justify-end w-full mt-6">
         <Button
           color="dark"
           onClick={handleNextClick}
