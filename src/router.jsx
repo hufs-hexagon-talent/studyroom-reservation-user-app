@@ -17,7 +17,7 @@ const Router = () => {
 
   return (
     <BrowserRouter basename={process.env.REACT_APP_BASEURL || '/'}>
-      <div>
+      <div className="flex flex-col">
         <NavigationBar />
         <div>
           <Routes>
