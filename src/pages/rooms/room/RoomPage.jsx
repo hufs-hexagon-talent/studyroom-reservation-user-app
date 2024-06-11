@@ -194,19 +194,21 @@ const RoomPage = () => {
   const handleReservation = useCallback(
     async ({ roomId, startDateTime, endDateTime }) => {
       if (!isLoggedIn) {
-        setShowLoginAlert(true); // Alert 표시
+        openSnackbar('로그인 후에 세미나실 예약이 가능합니다.');
         setTimeout(() => {
-          setShowLoginAlert(false);
-          navigate('/login'); // 로그인 페이지로 이동
-        }, 2000); // 2초 후에 로그인 페이지로 이동
+          closeSnackbar();
+          navigate('/login');
+        }, 5000);
         return;
       }
       if (!selectedRoom || !selectedRangeFrom || !selectedRangeTo) {
-        setShowReserveAlert(true); // Alert 표시
+        openSnackbar(
+          '원하는 호실과 시간대를 선택하고 예약하기 버튼을 눌러주세요',
+        );
         console.log(showReserveAlert);
         setTimeout(() => {
-          setShowReserveAlert(false); // alert 숨기기
-        }, 2000);
+          closeSnackbar();
+        }, 5000);
         console.log(showReserveAlert);
         return;
       }
@@ -287,29 +289,6 @@ const RoomPage = () => {
             style={{ backgroundColor: '#002D56' }}></div>
           <div className="mt-10 ml-2">예약 완료</div>
         </div>
-
-        {showLoginAlert && (
-          <div className="p-5">
-            <FlowbiteAlert
-              className="w-96 h-16 flex items-center justify-center"
-              color="failure"
-              icon={HiInformationCircle}>
-              <span className="font-medium">주의! </span>
-              로그인 후에 세미나실 예약이 가능합니다.
-            </FlowbiteAlert>
-          </div>
-        )}
-        {showReserveAlert && (
-          <div className="p-5">
-            <FlowbiteAlert
-              className="p-3 w-96 h-16 flex items-center justify-center"
-              color="failure"
-              icon={HiInformationCircle}>
-              <span className="font-medium">주의! </span>
-              원하는 호실과 시간대를 선택하고 예약하기 버튼을 눌러주세요
-            </FlowbiteAlert>
-          </div>
-        )}
         {/* timeTable 시작 */}
         <div>
           <TableContainer
@@ -436,13 +415,11 @@ const RoomPage = () => {
           <br />
           <Button
             onClick={() =>
-              selectedRoom && selectedRangeFrom && selectedRangeTo
-                ? handleReservation({
-                    roomId: selectedRoom.roomId,
-                    startDateTime: selectedRangeFrom,
-                    endDateTime: selectedRangeTo,
-                  })
-                : setShowReserveAlert(true)
+              handleReservation({
+                roomId: selectedRoom ? selectedRoom.roomId : null,
+                startDateTime: selectedRangeFrom,
+                endDateTime: selectedRangeTo,
+              })
             }
             text="예약하기"
           />
