@@ -146,6 +146,9 @@ const RoomPage = () => {
       const isDifferentRoom = selectedRoom !== partition;
 
       const isSelectPast = isBefore(targetStartAt, selectedRangeFrom);
+      const isOverDue =
+        differenceInMinutes(targetEndAt, selectedRangeFrom) >
+        timeTableConfig.maxReservationMinute;
 
       if (
         selectedRoom === partition &&
@@ -159,21 +162,16 @@ const RoomPage = () => {
       }
 
       // 새롭게 시간을 선택함
-      if (isFirstSelect || isDifferentRoom || isRangeSelected || isSelectPast) {
+      if (
+        isFirstSelect ||
+        isDifferentRoom ||
+        isRangeSelected ||
+        isSelectPast ||
+        isOverDue
+      ) {
         setSelectedRoom(partition);
         setSelectedRangeFrom(targetStartAt);
         selSelectedRangeTo(targetEndAt);
-        return;
-      }
-
-      // 너무 길게 범위를 선택함
-      if (
-        differenceInMinutes(targetEndAt, selectedRangeFrom) >
-        timeTableConfig.maxReservationMinute
-      ) {
-        openSnackbar(
-          `최대 ${timeTableConfig.maxReservationMinute}분까지 선택할 수 있습니다.`,
-        );
         return;
       }
 
