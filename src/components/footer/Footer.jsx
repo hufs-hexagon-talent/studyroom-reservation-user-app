@@ -11,7 +11,7 @@ const Footer = () => {
   };
 
   return (
-    <div className="bottom-0 absolute w-full">
+    <div className="w-full">
       <footer
         id="footer"
         className="bg-footermainbg relative p-0 block break-keep">
