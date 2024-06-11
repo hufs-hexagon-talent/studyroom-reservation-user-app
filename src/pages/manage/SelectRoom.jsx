@@ -57,9 +57,14 @@ const SelectRoom = () => {
           ))}
         </div>
       </div>
-      <Button color="dark" onClick={handleNextClick}>
-        다음
-      </Button>
+      <div className="flex justify-end w-full">
+        <Button
+          color="dark"
+          onClick={handleNextClick}
+          className="text-xl font-medium py-2 px-4">
+          다음
+        </Button>
+      </div>
     </div>
   );
 };
