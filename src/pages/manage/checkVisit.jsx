@@ -6,8 +6,9 @@ import {
   useRooms,
   useCheckIn,
 } from '../../api/user.api';
-import { Button } from 'flowbite-react';
+import { Button, Table } from 'flowbite-react';
 import Inko from 'inko';
+import { format } from 'date-fns';
 
 const CheckVisit = () => {
   const location = useLocation();
@@ -154,42 +155,38 @@ const CheckVisit = () => {
         </div>
         {error && <div style={{ color: 'red' }}>{error}</div>}
         {reservations.length > 0 && (
-          <table className="mt-4 border-collapse border border-gray-400 w-full">
-            <thead>
-              <tr>
-                <th className="border border-gray-300 px-4 py-2">출석 유무</th>
-                <th className="border border-gray-300 px-4 py-2">호실</th>
-                <th className="border border-gray-300 px-4 py-2">이름</th>
-                <th className="border border-gray-300 px-4 py-2">시작 시간</th>
-                <th className="border border-gray-300 px-4 py-2">종료 시간</th>
-              </tr>
-            </thead>
-            <tbody>
+          <Table hoverable className="mt-4 text-black text-center">
+            <Table.Head>
+              <Table.HeadCell>출석 유무</Table.HeadCell>
+              <Table.HeadCell>호실</Table.HeadCell>
+              <Table.HeadCell>이름</Table.HeadCell>
+              <Table.HeadCell>시작 시간</Table.HeadCell>
+              <Table.HeadCell>종료 시간</Table.HeadCell>
+            </Table.Head>
+            <Table.Body className="divide-y">
               {reservations.map(reservation => (
-                <tr
+                <Table.Row
                   key={reservation.reservationId}
                   className={
-                    reservation.state === 'VISITED' ? 'bg-yellow-300' : ''
+                    reservation.state === 'VISITED'
+                      ? 'bg-yellow-300 hover:bg-yellow-300'
+                      : ''
                   }>
-                  <td className="border border-gray-300 px-4 py-2">
-                    {reservation.state}
-                  </td>
-                  <td className="border border-gray-300 px-4 py-2">
-                    {reservation.roomName}
-                  </td>
-                  <td className="border border-gray-300 px-4 py-2">
-                    {reservation.name}
-                  </td>
-                  <td className="border border-gray-300 px-4 py-2">
-                    {new Date(reservation.startDateTime).toLocaleString()}
-                  </td>
-                  <td className="border border-gray-300 px-4 py-2">
-                    {new Date(reservation.endDateTime).toLocaleString()}
-                  </td>
-                </tr>
+                  <Table.Cell>
+                    {reservation.state === 'VISITED' ? '출석' : '미출석'}
+                  </Table.Cell>
+                  <Table.Cell>{reservation.roomName}</Table.Cell>
+                  <Table.Cell>{reservation.name}</Table.Cell>
+                  <Table.Cell>
+                    {format(new Date(reservation.startDateTime), 'HH:mm')}
+                  </Table.Cell>
+                  <Table.Cell>
+                    {format(new Date(reservation.endDateTime), 'HH:mm')}
+                  </Table.Cell>
+                </Table.Row>
               ))}
-            </tbody>
-          </table>
+            </Table.Body>
+          </Table>
         )}
       </div>
       <div className="w-full md:w-1/2 p-4">

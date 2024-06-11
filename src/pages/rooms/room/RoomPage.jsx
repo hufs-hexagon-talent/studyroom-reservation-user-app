@@ -1,10 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DatePicker, { registerLocale } from 'react-datepicker';
-import { HiInformationCircle } from 'react-icons/hi';
-import { Alert as FlowbiteAlert } from 'flowbite-react';
 import {
-  Alert,
   Table,
   TableBody,
   TableCell,
@@ -18,15 +15,13 @@ import {
   format,
   parse,
   isBefore,
-  isAfter,
   differenceInMinutes,
   areIntervalsOverlapping,
-  isToday,
 } from 'date-fns';
 
 import useUrlQuery from '../../../hooks/useUrlQuery';
 
-import { ko, tr } from 'date-fns/locale';
+import { ko } from 'date-fns/locale';
 import { useSnackbar } from 'react-simple-snackbar';
 
 import 'react-datepicker/dist/react-datepicker.css';
@@ -74,13 +69,6 @@ const createTimeTable = config => {
 };
 
 const RoomPage = () => {
-  // 현재 시간
-  const formatDate = date => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  };
   const [openSnackbar, closeSnackbar] = useSnackbar({
     position: 'top-right',
     style: {
@@ -96,8 +84,6 @@ const RoomPage = () => {
     format(new Date(), 'yyyy-MM-dd'),
   );
   const [availableDate, setAvailableDate] = useState([]);
-  const [showLoginAlert, setShowLoginAlert] = useState(false);
-  const [showReserveAlert, setShowReserveAlert] = useState(false);
   const times = useMemo(() => createTimeTable(timeTableConfig), []);
   const navigate = useNavigate();
   const today = new Date();
@@ -205,11 +191,9 @@ const RoomPage = () => {
         openSnackbar(
           '원하는 호실과 시간대를 선택하고 예약하기 버튼을 눌러주세요',
         );
-        console.log(showReserveAlert);
         setTimeout(() => {
           closeSnackbar();
         }, 5000);
-        console.log(showReserveAlert);
         return;
       }
       try {
@@ -333,27 +317,20 @@ const RoomPage = () => {
                         new Date(),
                       );
                       const slotDateTo = addMinutes(slotDateFrom, 30);
+
+                      // 30분 늦은 시간을 계산하여 비교
+                      const slotDateFromPlus30 = addMinutes(slotDateFrom, 30);
+                      const isPast = new Date() > slotDateFromPlus30;
+
                       const isSelected =
                         reservationsByRoom.roomId === selectedRoom?.roomId &&
                         areIntervalsOverlapping(
                           { start: selectedRangeFrom, end: selectedRangeTo },
                           { start: slotDateFrom, end: slotDateTo },
                         );
-                      const isPast = new Date() > new Date(slotDateFrom);
-
-                      const isSelectable = !isPast;
-
-                      const isInSelectableRange =
-                        selectedRangeTo &&
-                        differenceInMinutes(slotDateTo, selectedRangeFrom) <=
-                          timeTableConfig.maxReservationMinute &&
-                        differenceInMinutes(slotDateTo, selectedRangeFrom) >
-                          0 &&
-                        selectedRoom?.roomId === reservationsByRoom.roomId;
 
                       const isReserved = reservationsByRoom?.timeline?.some(
                         reservation => {
-                          //console.log('reservation', reservation);
                           const reservationStart = new Date(
                             reservation.startDateTime,
                           );
@@ -366,6 +343,16 @@ const RoomPage = () => {
                           );
                         },
                       );
+
+                      const isSelectable = !isPast && !isReserved;
+
+                      const isInSelectableRange =
+                        selectedRangeTo &&
+                        differenceInMinutes(slotDateTo, selectedRangeFrom) <=
+                          timeTableConfig.maxReservationMinute &&
+                        differenceInMinutes(slotDateTo, selectedRangeFrom) >
+                          0 &&
+                        selectedRoom?.roomId === reservationsByRoom.roomId;
 
                       const mode = isSelected
                         ? 'selected'
