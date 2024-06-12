@@ -394,12 +394,6 @@ const RoomPage = () => {
           </TableContainer>
         </div>
         <div className="p-10 flex justify-end">
-          {selectedRoom?.roomName}
-          <br />
-          {selectedRangeFrom && format(selectedRangeFrom, 'yyyy-MM-dd HH:mm')}
-          <br />
-          {selectedRangeTo && format(selectedRangeTo, 'yyyy-MM-dd HH:mm')}
-          <br />
           <Button
             onClick={() =>
               handleReservation({
