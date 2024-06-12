@@ -51,10 +51,9 @@ const Footer = () => {
               onClick={handleAdminClick}
               style={{
                 cursor: 'pointer',
-                color: 'white',
                 textDecoration: 'underline',
               }}>
-              관리자 페이지
+              <div className="mt-3 text-footertextcolor">관리자 페이지</div>
             </div>
           </div>
         </div>
