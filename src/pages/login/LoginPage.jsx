@@ -26,6 +26,13 @@ const LoginPage = () => {
     }
   };
 
+  const handleKeyDown = event => {
+    if (event.key === 'Enter') {
+      event.preventDefault(); // Prevent the default form submission
+      handleLogin();
+    }
+  };
+
   return (
     <div>
       <div>
@@ -43,6 +50,7 @@ const LoginPage = () => {
               className="ml-3 mr-3 mb-5"
               id="number"
               onChange={e => setStudentId(e.target.value)}
+              onKeyDown={handleKeyDown} // Attach to student ID input
             />
           </div>
           <div>
@@ -54,6 +62,7 @@ const LoginPage = () => {
               id="name"
               type="password"
               onChange={e => setPassword(e.target.value)}
+              onKeyDown={handleKeyDown} // Attach to password input
             />
           </div>
         </form>
