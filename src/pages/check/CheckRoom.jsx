@@ -49,11 +49,11 @@ const Check = () => {
           <Table.Head
             style={{ fontSize: 15 }}
             className="text-black text-center">
-            <Table.HeadCell>호실</Table.HeadCell>
-            <Table.HeadCell>날짜</Table.HeadCell>
-            <Table.HeadCell>시작 시간</Table.HeadCell>
-            <Table.HeadCell>종료 시간</Table.HeadCell>
-            <Table.HeadCell>
+            <Table.HeadCell className="px-2 py-4">호실</Table.HeadCell>
+            <Table.HeadCell className="px-2 py-4">날짜</Table.HeadCell>
+            <Table.HeadCell className="px-2 py-4">시작 시간</Table.HeadCell>
+            <Table.HeadCell className="px-2 py-4">종료 시간</Table.HeadCell>
+            <Table.HeadCell className="px-2 py-4">
               <span className="sr-only">삭제</span>
             </Table.HeadCell>
           </Table.Head>
@@ -65,11 +65,19 @@ const Check = () => {
                 <Table.Row
                   key={index}
                   className="bg-white dark:border-gray-700 dark:bg-gray-800 text-center text-gray-900">
-                  <Table.Cell>{reservation.roomName}</Table.Cell>
-                  <Table.Cell>{format(start, 'MM-dd')}</Table.Cell>
-                  <Table.Cell>{format(start, 'HH:mm')}</Table.Cell>
-                  <Table.Cell>{format(end, 'HH:mm')}</Table.Cell>
-                  <Table.Cell>
+                  <Table.Cell className="px-2 py-4">
+                    {reservation.roomName}
+                  </Table.Cell>
+                  <Table.Cell className="px-2 py-4">
+                    {format(start, 'MM-dd')}
+                  </Table.Cell>
+                  <Table.Cell className="px-2 py-4">
+                    {format(start, 'HH:mm')}
+                  </Table.Cell>
+                  <Table.Cell className="px-2 py-4">
+                    {format(end, 'HH:mm')}
+                  </Table.Cell>
+                  <Table.Cell className="px-2 py-4">
                     <a
                       href="#"
                       onClick={() => {

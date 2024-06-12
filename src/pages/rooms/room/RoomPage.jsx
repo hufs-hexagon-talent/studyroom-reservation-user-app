@@ -309,7 +309,9 @@ const RoomPage = () => {
                 {reservationsByRooms?.map((reservationsByRoom, i) => (
                   <TableRow key={i}>
                     {/* <pre>{JSON.stringify(reservationsByRoom, null, 2)}</pre> */}
-                    <TableCell>{reservationsByRoom.roomName}</TableCell>
+                    <TableCell sx={{ px: 2, py: 2, whiteSpace: 'nowrap' }}>
+                      {reservationsByRoom.roomName}
+                    </TableCell>
                     {times.map((time, timeIndex) => {
                       const slotDateFrom = parse(
                         `${selectedDate} ${time}`,
