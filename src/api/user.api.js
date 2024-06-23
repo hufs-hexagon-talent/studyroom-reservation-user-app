@@ -69,8 +69,6 @@ export const useReservations = ({ date }) =>
     queryFn: () => fetchReservations({ date }),
   });
 
-
-
 // 예약 삭제하기
 export const useDeleteReservation = () => {
   return useMutation({
@@ -119,7 +117,7 @@ export const useRooms = roomIds =>
     queryFn: async () => {
       if (!roomIds) return [];
       const rooms = await Promise.all(roomIds.map(roomId => fetchRoom(roomId)));
-      console.log(rooms);
+      //console.log(rooms);
       return rooms;
     },
   });
@@ -164,5 +162,19 @@ export const useReservedRooms =({date, roomIds})=>{
   useQuery({
     queryKey:[date,roomIds],
     queryFn:()=>fetchReservedRooms(date,roomIds)
+  })
+}
+
+export const fetchNoShow = async()=>{
+  const noshow_res = await apiClient.get(
+    '/reservations/me/no-show'
+  );
+  return noshow_res.data.data.noShowCount;
+}
+
+export const useNoShow =()=>{
+  useQuery({
+    queryKey:['noShow'],
+    queryFn:fetchNoShow
   })
 }

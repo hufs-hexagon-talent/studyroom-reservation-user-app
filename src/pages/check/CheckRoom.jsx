@@ -7,10 +7,17 @@ import { HiOutlineExclamationCircle } from 'react-icons/hi';
 
 import './CheckRoom.css';
 
-import { useDeleteReservation, useUserReservation } from '../../api/user.api';
+import {
+  useDeleteReservation,
+  useUserReservation,
+  useNoShow,
+} from '../../api/user.api';
 
 const Check = () => {
   const { data: reservations } = useUserReservation();
+  const { data: noShow } = useNoShow();
+  const { mutate: deleteReservation } = useDeleteReservation();
+
   const [anchorEl, setAnchorEl] = useState(null);
   const [openModal, setOpenModal] = useState(null);
 
@@ -24,8 +31,6 @@ const Check = () => {
 
   const open = Boolean(anchorEl);
   const id = open ? 'simple-popover' : undefined;
-
-  const { mutate: deleteReservation } = useDeleteReservation();
 
   // 모달 열기와 예약 삭제를 위한 핸들러
   const handleDelete = async id => {
@@ -116,7 +121,7 @@ const Check = () => {
             horizontal: 'left',
           }}>
           <Typography sx={{ p: 2 }}>
-            * 현재 예약 취소 없이 세미나실을 방문하지 않은 횟수는 n번 입니다.
+            {`* 현재 예약 취소 없이 세미나실을 방문하지 않은 횟수는 ${noShow}번 입니다.`}
             <br />
             (3회 초과 시 세미나실 예약이 제한 됩니다)
           </Typography>

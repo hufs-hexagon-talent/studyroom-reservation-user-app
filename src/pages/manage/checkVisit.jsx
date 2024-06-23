@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 import { convertToEnglish } from '../../api/convertToEnglish';
 import {
   useReservationsByRooms,
@@ -13,7 +15,7 @@ import { format } from 'date-fns';
 const CheckVisit = () => {
   const location = useLocation();
   const [roomIds, setRoomIds] = useState([]);
-  const [inputValue, setInputValue] = useState('');
+  const [selectedDate, setSelectedDate] = useState(new Date());
   const [error, setError] = useState(null);
   const [fetchParams, setFetchParams] = useState(null);
   const [successMessage, setSuccessMessage] = useState('');
@@ -32,9 +34,11 @@ const CheckVisit = () => {
 
   const { mutate: doCheckIn } = useCheckIn();
   const { data: rooms } = useRooms(roomIds);
-  const { data: fetchedReservations, refetch } = useReservationsByRooms(
-    fetchParams || {},
-  );
+  const {
+    data: fetchedReservations,
+    refetch,
+    isError: reservationsError,
+  } = useReservationsByRooms(fetchParams || {});
 
   useEffect(() => {
     if (fetchedReservations) {
@@ -42,26 +46,11 @@ const CheckVisit = () => {
     }
   }, [fetchedReservations]);
 
-  const handleChange = e => {
-    let value = e.target.value.replace(/-/g, '');
-    if (value.length > 8) {
-      value = value.slice(0, 8);
-    }
-
-    const formattedValue = formatInputValue(value);
-    setInputValue(formattedValue);
-  };
-
-  const formatInputValue = value => {
-    if (value.length < 5) return value;
-    if (value.length < 7) return `${value.slice(0, 4)}-${value.slice(4)}`;
-    return `${value.slice(0, 4)}-${value.slice(4, 6)}-${value.slice(6)}`;
-  };
-
   const handleFetchReservations = async () => {
-    if (inputValue.length === 10) {
+    if (selectedDate) {
       try {
-        setFetchParams({ date: inputValue, roomIds });
+        const formattedDate = format(selectedDate, 'yyyy-MM-dd');
+        setFetchParams({ date: formattedDate, roomIds });
         refetch();
         setError(null);
       } catch (err) {
@@ -69,7 +58,7 @@ const CheckVisit = () => {
         console.error(err);
       }
     } else {
-      setError('Invalid date format. Please enter a date in YYYYMMDD format.');
+      setError('Invalid date format. Please select a valid date.');
     }
   };
 
@@ -88,7 +77,6 @@ const CheckVisit = () => {
         onSuccess: result => {
           const checkedInReservations = result.data.checkInReservations;
 
-          // 지피티가 짜줬는데 뭔지 잘 ㅁㄹ겠음 공부하자
           setReservations(prevReservations =>
             prevReservations.map(reservation =>
               checkedInReservations.some(
@@ -142,11 +130,10 @@ const CheckVisit = () => {
         </div>
         <div className="pt-3 pb-3">출석 일자</div>
         <div className="flex items-center space-x-2">
-          <input
-            type="text"
-            value={inputValue}
-            onChange={handleChange}
-            placeholder="YYYYMMDD"
+          <DatePicker
+            selected={selectedDate}
+            onChange={date => setSelectedDate(date)}
+            dateFormat="yyyy-MM-dd"
             className="border border-gray-300 p-2 rounded"
           />
           <Button color="dark" onClick={handleFetchReservations} size="sm">
@@ -154,7 +141,11 @@ const CheckVisit = () => {
           </Button>
         </div>
         {error && <div style={{ color: 'red' }}>{error}</div>}
-        {reservations.length > 0 && (
+        {reservationsError ? (
+          <div>Error fetching reservations</div>
+        ) : reservations.length === 0 ? (
+          <div className="mt-3 ml-1">해당 날짜의 예약이 없습니다</div>
+        ) : (
           <Table hoverable className="mt-4 text-black text-center">
             <Table.Head>
               <Table.HeadCell>출석 유무</Table.HeadCell>
