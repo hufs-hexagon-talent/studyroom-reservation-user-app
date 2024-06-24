@@ -30,21 +30,6 @@ import { fetchDate, useReservations, useReserve } from '../../../api/user.api';
 import useAuth from '../../../hooks/useAuth';
 import Button from '../../../components/button/Button';
 
-const timeTableConfig = {
-  startTime: {
-    hour: 8,
-    minute: 30,
-  },
-  endTime: {
-    hour: 22,
-    minute: 30,
-  },
-  intervalMinute: 30,
-  maxReservationMinute: 120,
-  maxReservationSlots: 4,
-};
-
-// table 만드는 함수
 const createTimeTable = config => {
   const { startTime, endTime, intervalMinute } = config;
   const start = new Date();
@@ -84,7 +69,7 @@ const RoomPage = () => {
     format(new Date(), 'yyyy-MM-dd'),
   );
   const [availableDate, setAvailableDate] = useState([]);
-  const times = useMemo(() => createTimeTable(timeTableConfig), []);
+  //const times = useMemo(() => createTimeTable(timeTableConfig), []);
   const navigate = useNavigate();
   const today = new Date();
 
@@ -93,6 +78,65 @@ const RoomPage = () => {
     date: selectedDate,
   });
   const { loggedIn: isLoggedIn } = useAuth();
+
+  const [earliestStartTime, setEarliestStartTime] = useState(null);
+  const [latestEndTime, setLatestEndTime] = useState(null);
+  const [startHour, setStartHour] = useState(null);
+  const [startMinute, setStartMinute] = useState(null);
+  const [endHour, setEndHour] = useState(null);
+  const [endMinute, setEndMinute] = useState(null);
+
+  useEffect(() => {
+    if (reservationsByRooms && reservationsByRooms.length > 0) {
+      const startTimes = reservationsByRooms.map(
+        room => room.policy.operationStartTime,
+      );
+      const earliestTime = startTimes.reduce((earliest, current) => {
+        return earliest < current ? earliest : current;
+      });
+      setEarliestStartTime(earliestTime);
+
+      const [startHour, startMinute] = earliestTime.split(':');
+      setStartHour(parseInt(startHour, 10));
+      setStartMinute(parseInt(startMinute, 10));
+
+      const endTimes = reservationsByRooms.map(
+        room => room.policy.operationEndTime,
+      );
+      const latestTime = endTimes.reduce((latest, current) => {
+        return latest > current ? latest : current;
+      });
+      setLatestEndTime(latestTime);
+
+      const [endHour, endMinute] = latestTime.split(':');
+      setEndHour(parseInt(endHour, 10));
+      setEndMinute(parseInt(endMinute, 10));
+    }
+  }, [reservationsByRooms]);
+
+  const timeTableConfig = useMemo(
+    () => ({
+      startTime: {
+        hour: startHour,
+        minute: startMinute,
+      },
+      endTime: {
+        hour: endHour,
+        minute: endMinute,
+      },
+      intervalMinute: 30,
+      maxReservationMinute: 120,
+      maxReservationSlots: 4,
+    }),
+    [startHour, startMinute],
+  );
+
+  const times = useMemo(() => {
+    if (startHour !== null && startMinute !== null) {
+      return createTimeTable(timeTableConfig);
+    }
+    return [];
+  }, [timeTableConfig]);
 
   // date-picker에서 날짜 선택할 때마다 실행되는 함수
   const handleDateChange = date => {
