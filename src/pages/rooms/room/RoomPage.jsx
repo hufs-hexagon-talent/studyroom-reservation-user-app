@@ -178,7 +178,7 @@ const RoomPage = () => {
       const isSelectPast = isBefore(targetStartAt, selectedRangeFrom);
       const isOverDue =
         differenceInMinutes(targetEndAt, selectedRangeFrom) >
-        timeTableConfig.maxReservationMinute;
+        selectedRoom?.policy.eachMaxMinute;
 
       if (
         selectedRoom === partition &&
@@ -395,7 +395,7 @@ const RoomPage = () => {
                       const isInSelectableRange =
                         selectedRangeTo &&
                         differenceInMinutes(slotDateTo, selectedRangeFrom) <=
-                          timeTableConfig.maxReservationMinute &&
+                          reservationsByRoom.policy.eachMaxMinute &&
                         differenceInMinutes(slotDateTo, selectedRangeFrom) >
                           0 &&
                         selectedRoom?.roomId === reservationsByRoom.roomId;
