@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
+import DatePicker, { registerLocale } from 'react-datepicker';
+import ko from 'date-fns/locale/ko'; // 한국어 로케일 가져오기
+import { addMonths } from 'date-fns';
 import { convertToEnglish } from '../../api/convertToEnglish';
 import {
   useReservationsByRooms,
@@ -11,6 +12,8 @@ import {
 import { Button, Table } from 'flowbite-react';
 import Inko from 'inko';
 import { format } from 'date-fns';
+
+registerLocale('ko', ko); // 로케일 등록
 
 const CheckVisit = () => {
   const location = useLocation();
@@ -46,6 +49,12 @@ const CheckVisit = () => {
     }
   }, [fetchedReservations]);
 
+  useEffect(() => {
+    if (roomIds.length > 0 && selectedDate) {
+      handleFetchReservations();
+    }
+  }, [roomIds, selectedDate]);
+
   const handleFetchReservations = async () => {
     if (selectedDate) {
       try {
@@ -54,7 +63,7 @@ const CheckVisit = () => {
         refetch();
         setError(null);
       } catch (err) {
-        setError('Failed to fetch reservations');
+        setError('예약 불러오기 실패');
         console.error(err);
       }
     } else {
@@ -134,7 +143,9 @@ const CheckVisit = () => {
             selected={selectedDate}
             onChange={date => setSelectedDate(date)}
             dateFormat="yyyy-MM-dd"
+            locale="ko"
             className="border border-gray-300 p-2 rounded"
+            calendarClassName="ml-10"
           />
           <Button color="dark" onClick={handleFetchReservations} size="sm">
             조회
@@ -146,7 +157,7 @@ const CheckVisit = () => {
         ) : reservations.length === 0 ? (
           <div className="mt-3 ml-1">해당 날짜의 예약이 없습니다</div>
         ) : (
-          <Table hoverable className="mt-4 text-black text-center">
+          <Table hoverable className="mt-4 mb-3 text-black text-center">
             <Table.Head>
               <Table.HeadCell>출석 유무</Table.HeadCell>
               <Table.HeadCell>호실</Table.HeadCell>
@@ -181,7 +192,7 @@ const CheckVisit = () => {
         )}
       </div>
       <div className="w-full md:w-1/2 p-4">
-        <h3>QR Code Verification:</h3>
+        <h3 className="mb-2">QR 코드 확인 :</h3>
         <input
           type="text"
           onKeyDown={handleQrKeyDown}

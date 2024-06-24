@@ -16,6 +16,19 @@ export const useMe = () => {
   });
 };
 
+// 관리자인지 아닌지
+export const fetchIsAdmin = async()=>{
+  const isAdmin_res = await apiClient.get('/users/me');
+  return isAdmin_res.data.data.isAdmin;
+}
+
+export const useIsAdmin=()=>{
+  return useQuery({
+    queryKey:['isAdmin'],
+    queryFn:fetchIsAdmin
+  });
+}
+
 // 자신의 예약 생성
 export const useReserve = () => {
   return useMutation({
@@ -165,7 +178,7 @@ export const useReservedRooms =({date, roomIds})=>{
   })
 }
 
-export const fetchNoShow = async()=>{
+const fetchNoShow = async()=>{
   const noshow_res = await apiClient.get(
     '/reservations/me/no-show'
   );
@@ -173,8 +186,10 @@ export const fetchNoShow = async()=>{
 }
 
 export const useNoShow =()=>{
-  useQuery({
-    queryKey:['noShow'],
-    queryFn:fetchNoShow
-  })
+  return(
+    useQuery({
+      queryKey:['noShow'],
+      queryFn:fetchNoShow
+    })
+  )
 }

@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
+import { useSnackbar } from 'react-simple-snackbar';
 
 import Footer from './components/footer/Footer';
 import NavigationBar from './components/Navbar/NavigationBar';
@@ -14,6 +15,12 @@ import SelectRoom from './pages/manage/SelectRoom';
 
 const Router = () => {
   const { loggedIn } = useAuth();
+  const [openSnackbar] = useSnackbar({
+    position: 'top-right',
+    style: {
+      backgroundColor: '#FF3333',
+    },
+  });
 
   return (
     <BrowserRouter basename={process.env.REACT_APP_BASEURL || '/'}>
@@ -35,7 +42,7 @@ const Router = () => {
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </div>
-        <Footer />
+        <Footer showSnackbar={openSnackbar} />
       </div>
     </BrowserRouter>
   );

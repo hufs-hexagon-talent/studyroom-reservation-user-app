@@ -1,13 +1,18 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-
+import { useIsAdmin } from '../../api/user.api';
 import './Footer.css';
 
-const Footer = () => {
+const Footer = ({ showSnackbar }) => {
   const navigate = useNavigate();
+  const { data: isAdmin } = useIsAdmin();
 
   const handleAdminClick = () => {
-    navigate('/selectRoom');
+    if (isAdmin === true) {
+      navigate('/selectRoom');
+    } else {
+      showSnackbar('관리자 외에는 접근 권한이 없습니다.');
+    }
   };
 
   return (
