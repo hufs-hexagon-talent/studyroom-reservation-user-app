@@ -13,6 +13,7 @@ import useAuth from './hooks/useAuth';
 import CheckVisit from './pages/manage/checkVisit';
 import SelectRoom from './pages/manage/SelectRoom';
 import Manager from './pages/manage/Manager';
+import Password from './pages/login/Password';
 
 const Router = () => {
   const { loggedIn } = useAuth();
@@ -29,6 +30,7 @@ const Router = () => {
         <NavigationBar />
         <div className="flex-grow">
           <Routes>
+            <Route path="/password" element={<Password />} />
             <Route path="/" element={<Notice />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/roompage" element={<RoomPage />} />
