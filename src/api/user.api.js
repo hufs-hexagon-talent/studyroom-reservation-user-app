@@ -3,6 +3,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { apiClient } from './client';
 
 import { queryClient } from '../index';
+import axios from 'axios';
 
 const fetchMe = async () => {
   const response = await apiClient.get('/users/me');
@@ -13,6 +14,32 @@ export const useMe = () => {
   return useQuery({
     queryKey: ['me'],
     queryFn: fetchMe,
+  });
+};
+
+// id, pw 확인할 때 쓰려고
+const fetchAllUsers = async () => {
+  const allUser_res = await axios.get('/users');
+  return allUser_res.data.data.items;
+}
+
+export const useAllUsers = () => {
+  return useQuery({
+    queryKey: ['allUsers'],
+    queryFn: fetchAllUsers
+  });
+};
+
+
+const fetchMyInfo =async()=>{
+  const myInfo_res = await apiClient.get('/users/me');
+  return myInfo_res.data.data;
+}
+
+export const useMyInfo =()=>{
+  return useQuery({
+    queryKey:['myInfo'],
+    queryFn:fetchMyInfo
   });
 };
 
@@ -178,6 +205,7 @@ export const useReservedRooms =({date, roomIds})=>{
   })
 }
 
+// 노쇼 횟수
 const fetchNoShow = async()=>{
   const noshow_res = await apiClient.get(
     '/reservations/me/no-show'

@@ -26,45 +26,50 @@ const LoginPage = () => {
     }
   };
 
+  const handlePasword = () => {
+    navigate('/password');
+  };
+
   return (
     <div>
       <div>
-        <h1 className="flex justify-center w-screen text-3xl font-bold text-center mt-10 mb-5">
+        <h1 className="flex justify-center w-screen text-2xl font-bold text-center mt-10 mb-5">
           로그인
         </h1>
       </div>
       <div>
-        <form id="form" className="pt-3 pb-10 pl-10 pr-10">
-          <div>
-            <div className="mb-2 ml-3 block">
-              <Label htmlFor="studentId" value="학번" />
-            </div>
+        <form id="form" className="pt-3 pb-5">
+          <div className="inputContainer">
             <TextInput
-              className="ml-3 mr-3 mb-5"
+              className="textInput"
               id="number"
+              placeholder="학번을 입력해주세요"
               onChange={e => setStudentId(e.target.value)}
             />
           </div>
-          <div>
-            <div className="ml-3 block">
-              <Label htmlFor="name" value="비밀번호" />
-            </div>
+          <div className="inputContainer">
             <TextInput
-              className="ml-3 mr-3"
-              id="name"
+              className="textInput"
+              id="password"
               type="password"
+              placeholder="비밀번호를 입력해주세요"
               onChange={e => setPassword(e.target.value)}
             />
           </div>
         </form>
-        <div className="flex pb-20 justify-center">
+        <div className="buttonContainer pb-16">
           <Button
             id="btn"
-            className="w-auto h-auto cursor-pointer text-white"
+            className="cursor-pointer text-white"
             color="dark"
             onClick={handleLogin}>
             로그인하기
           </Button>
+          <div
+            onClick={handlePasword}
+            className="pt-4 text-sm text-gray-600 cursor-pointer">
+            비밀번호 변경 &gt;
+          </div>
         </div>
       </div>
     </div>

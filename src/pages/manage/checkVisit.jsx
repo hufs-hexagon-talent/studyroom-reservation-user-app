@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import ko from 'date-fns/locale/ko'; // 한국어 로케일 가져오기
-import { addMonths } from 'date-fns';
 import { convertToEnglish } from '../../api/convertToEnglish';
 import {
   useReservationsByRooms,
@@ -25,6 +24,7 @@ const CheckVisit = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [reservations, setReservations] = useState([]);
   let inko = new Inko();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -129,6 +129,10 @@ const CheckVisit = () => {
     [roomIds],
   );
 
+  const handleClick = () => {
+    navigate('/manager');
+  };
+
   const roomNames = rooms?.map(room => room.roomName).join(', ');
 
   return (
@@ -136,6 +140,11 @@ const CheckVisit = () => {
       <div className="w-full md:w-1/2 p-4 border-b md:border-b-0 md:border-r border-gray-300">
         <div>
           <p>{`선택된 방 : ${roomNames}`}</p>
+        </div>
+        <div
+          onClick={handleClick}
+          className="mt-3 inline-block hover:underline cursor-pointer">
+          <p>멀티지기 출석</p>
         </div>
         <div className="pt-3 pb-3">출석 일자</div>
         <div className="flex items-center space-x-2">

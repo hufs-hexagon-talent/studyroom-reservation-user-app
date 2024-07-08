@@ -1,13 +1,27 @@
-#form{
-    width: 100vw;
-    height: auto;
+#form {
+  width: 100vw;
+  height: auto;
 }
 
 @media (min-width: 768px) {
-    #form {
+  #form {
       padding-left: 20%;
       padding-right: 20%;
       max-width: 80%; /* 화면의 80%만 사용 */
       margin: 0 auto;
-    }
+  }
+}
+
+.inputContainer,
+.buttonContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.textInput,
+#btn {
+  width: calc(100% - 2rem);
+  max-width: 400px;
+  margin: 0.5rem 0; /* 상하단에 일정 간격을 추가합니다 */
 }
