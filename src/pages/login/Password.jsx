@@ -9,30 +9,28 @@ const Password = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [idError, setIdError] = useState('');
   const [passwordError, setPasswordError] = useState('');
-  const { data: users, isLoading } = useAllUsers(); // isLoading을 추가하여 로딩 상태를 확인합니다.
+  const { data: users } = useAllUsers();
 
-  useEffect(() => {
-    if (users) {
-      console.log(users); // 여기서 users를 사용할 수 있습니다.
-    }
-  }, [users]); // users가 변경될 때마다 실행됩니다.
-
+  // 아이디
   const handleIdChange = e => {
     setId(e.target.value);
-    setIdError(''); // 아이디 입력 시 에러 메시지 초기화
+    setIdError('');
   };
 
+  // 기존 비밀번호
   const handlePwChange = e => {
     setPassword(e.target.value);
   };
 
+  // 신규 비밀번호
   const handleNewPasswordChange = e => {
     setNewPassword(e.target.value);
   };
 
+  // 신규 비밀번호 확인
   const handleConfirmPasswordChange = e => {
     setConfirmPassword(e.target.value);
-    setPasswordError(''); // 비밀번호 확인 입력 시 에러 메시지 초기화
+    setPasswordError('');
   };
 
   const handleSubmit = e => {
@@ -53,12 +51,7 @@ const Password = () => {
     console.log('아이디:', id);
     console.log('기존 비밀번호:', password);
     console.log('신규 비밀번호:', newPassword);
-    // 추가 로직: 비밀번호 변경 API 호출 등
   };
-
-  if (isLoading) {
-    return <div>Loading...</div>; // 데이터 로딩 중일 때 로딩 메시지를 표시합니다.
-  }
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">

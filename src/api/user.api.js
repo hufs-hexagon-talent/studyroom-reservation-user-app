@@ -19,7 +19,7 @@ export const useMe = () => {
 
 // id, pw 확인할 때 쓰려고
 const fetchAllUsers = async () => {
-  const allUser_res = await axios.get('/users');
+  const allUser_res = await apiClient.get('/users');
   return allUser_res.data.data.items;
 }
 

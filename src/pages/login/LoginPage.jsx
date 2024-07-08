@@ -27,7 +27,7 @@ const LoginPage = () => {
   };
 
   const handlePasword = () => {
-    navigate('/password');
+    navigate('/pwreset');
   };
 
   return (

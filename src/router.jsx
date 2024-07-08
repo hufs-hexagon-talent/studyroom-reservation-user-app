@@ -14,6 +14,7 @@ import CheckVisit from './pages/manage/checkVisit';
 import SelectRoom from './pages/manage/SelectRoom';
 import Manager from './pages/manage/Manager';
 import Password from './pages/login/Password';
+import PasswordReset from './pages/login/PasswordReset';
 
 const Router = () => {
   const { loggedIn } = useAuth();
@@ -31,6 +32,7 @@ const Router = () => {
         <div className="flex-grow">
           <Routes>
             <Route path="/password" element={<Password />} />
+            <Route path="/pwreset" element={<PasswordReset />} />
             <Route path="/" element={<Notice />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/roompage" element={<RoomPage />} />
