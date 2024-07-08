@@ -48,17 +48,22 @@ const Footer = ({ showSnackbar }) => {
                 <a href="mailto:ces@hufs.ac.kr">ces@hufs.ac.kr</a>
               </span>
             </p>
-            <p className="text-sm font-light block mx-0">
-              Copyright ⓒ Hankuk University of Foreign Studies. All Rights
-              Reserved.
+            <p className="block my-2 mx-0 leading-2">
+              <span>
+                <b className="font-bormal text-footertextbrown">
+                  학부 홈페이지.{' '}
+                </b>
+                <a
+                  className="inline hover:underline"
+                  href="https://computer.hufs.ac.kr">
+                  https://computer.hufs.ac.kr
+                </a>
+              </span>
             </p>
             <div
               onClick={handleAdminClick}
-              style={{
-                cursor: 'pointer',
-                textDecoration: 'underline',
-              }}>
-              <div className="mt-3 text-footertextcolor">관리자 페이지</div>
+              className="inline hover:underline cursor-pointer text-gray-400 text-sm mt-3">
+              관리자
             </div>
           </div>
         </div>

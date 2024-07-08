@@ -45,7 +45,7 @@ const SelectRoom = () => {
                 id={`box-${room.roomName}`}
                 type="checkbox"
                 value={room.roomName}
-                className="w-4 h-4 bg-gray-100 border-gray-300 rounded"
+                className="w-4 h-4 bg-gray-100 border-gray-300"
                 onChange={() => handleCheckboxChange(room)}
               />
               <label

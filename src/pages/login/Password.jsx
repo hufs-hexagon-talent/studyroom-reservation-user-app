@@ -1,21 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button, Label, TextInput } from 'flowbite-react';
+import { useAllUsers } from '../../api/user.api';
 
 const Password = () => {
   const [id, setId] = useState('');
   const [password, setPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
+  const [idError, setIdError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const { data: users, isLoading } = useAllUsers(); // isLoading을 추가하여 로딩 상태를 확인합니다.
+
+  useEffect(() => {
+    if (users) {
+      console.log(users); // 여기서 users를 사용할 수 있습니다.
+    }
+  }, [users]); // users가 변경될 때마다 실행됩니다.
 
   const handleIdChange = e => {
     setId(e.target.value);
-    console.log(id);
+    setIdError(''); // 아이디 입력 시 에러 메시지 초기화
   };
 
   const handlePwChange = e => {
     setPassword(e.target.value);
-    console.log(password);
   };
 
   const handleNewPasswordChange = e => {
@@ -24,20 +32,33 @@ const Password = () => {
 
   const handleConfirmPasswordChange = e => {
     setConfirmPassword(e.target.value);
+    setPasswordError(''); // 비밀번호 확인 입력 시 에러 메시지 초기화
   };
 
   const handleSubmit = e => {
     e.preventDefault();
+
     if (newPassword !== confirmPassword) {
-      setErrorMessage('신규 비밀번호가 일치하지 않습니다.');
+      setPasswordError('신규 비밀번호가 일치하지 않습니다.');
       return;
     }
-    setErrorMessage('');
+
+    if (!users || !users.find(user => user.username === id)) {
+      setIdError('존재하지 않는 아이디입니다.');
+      return;
+    }
+
+    setIdError('');
+    setPasswordError('');
     console.log('아이디:', id);
     console.log('기존 비밀번호:', password);
     console.log('신규 비밀번호:', newPassword);
     // 추가 로직: 비밀번호 변경 API 호출 등
   };
+
+  if (isLoading) {
+    return <div>Loading...</div>; // 데이터 로딩 중일 때 로딩 메시지를 표시합니다.
+  }
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
@@ -56,6 +77,7 @@ const Password = () => {
             placeholder="아이디를 입력해주세요"
             required
           />
+          {idError && <div className="text-sm text-red-500">{idError}</div>}
         </div>
         <div>
           <div className="mb-2 block">
@@ -92,9 +114,15 @@ const Password = () => {
             placeholder="신규 비밀번호를 한번 더 입력해주세요"
             required
           />
+          {passwordError && (
+            <div className="text-sm text-red-500">{passwordError}</div>
+          )}
         </div>
-        {errorMessage && <div className="text-red-500">{errorMessage}</div>}
-        <Button className="mt-10 mb-10" color="dark" type="submit">
+        <Button
+          onClick={handleSubmit}
+          className="mt-10 mb-10"
+          color="dark"
+          type="submit">
           변경하기
         </Button>
       </form>

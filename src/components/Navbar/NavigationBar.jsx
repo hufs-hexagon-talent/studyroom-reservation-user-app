@@ -1,6 +1,5 @@
 import React from 'react';
 import { Navbar } from 'flowbite-react';
-
 import Logo from '../../assets/logo.png';
 import useAuth from '../../hooks/useAuth';
 
@@ -18,10 +17,14 @@ const NavigationBar = () => {
       <Navbar.Toggle />
       <Navbar.Collapse>
         <Navbar.Link href="/roompage">세미나실 예약</Navbar.Link>
-        <Navbar.Link href="/check" disabled={!loggedIn}>
+        <Navbar.Link
+          href={loggedIn ? '/check' : '#'}
+          className={!loggedIn ? 'pointer-events-none text-gray-400' : ''}>
           내 신청 현황
         </Navbar.Link>
-        <Navbar.Link href="/otp" disabled={!loggedIn}>
+        <Navbar.Link
+          href={loggedIn ? '/otp' : '#'}
+          className={!loggedIn ? 'pointer-events-none text-gray-400' : ''}>
           내 QR코드
         </Navbar.Link>
         <Navbar.Link href="/">이용 규칙</Navbar.Link>

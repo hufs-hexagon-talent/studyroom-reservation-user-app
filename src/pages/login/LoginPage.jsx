@@ -43,7 +43,7 @@ const LoginPage = () => {
             <TextInput
               className="textInput"
               id="number"
-              placeholder="학번을 입력해주세요."
+              placeholder="학번을 입력해주세요"
               onChange={e => setStudentId(e.target.value)}
             />
           </div>
@@ -57,7 +57,7 @@ const LoginPage = () => {
             />
           </div>
         </form>
-        <div className="buttonContainer pb-20">
+        <div className="buttonContainer pb-16">
           <Button
             id="btn"
             className="cursor-pointer text-white"
@@ -65,8 +65,10 @@ const LoginPage = () => {
             onClick={handleLogin}>
             로그인하기
           </Button>
-          <div onClick={handlePasword} className="text-gray-600 cursor-pointer">
-            비밀번호 변경
+          <div
+            onClick={handlePasword}
+            className="pt-4 text-sm text-gray-600 cursor-pointer">
+            비밀번호 변경 &gt;
           </div>
         </div>
       </div>

@@ -141,7 +141,9 @@ const CheckVisit = () => {
         <div>
           <p>{`선택된 방 : ${roomNames}`}</p>
         </div>
-        <div onClick={handleClick} className="mt-3 underline cursor-pointer">
+        <div
+          onClick={handleClick}
+          className="mt-3 inline-block hover:underline cursor-pointer">
           <p>멀티지기 출석</p>
         </div>
         <div className="pt-3 pb-3">출석 일자</div>
