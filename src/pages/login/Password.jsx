@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Label, TextInput } from 'flowbite-react';
 import { useAllUsers } from '../../api/user.api';
+import './Password.css';
 
 const Password = () => {
   const [id, setId] = useState('');
@@ -54,9 +55,10 @@ const Password = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen">
+    <div className="flex flex-col items-center justify-center">
       <div className="mt-8 text-xl font-bold mb-4">비밀번호 변경</div>
       <form
+        id="form"
         className="flex flex-col max-w-md w-full gap-4"
         onSubmit={handleSubmit}>
         <div>
