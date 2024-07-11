@@ -68,7 +68,7 @@ const LoginPage = () => {
           <div
             onClick={handlePasword}
             className="pt-4 text-sm text-gray-600 cursor-pointer">
-            비밀번호 변경 &gt;
+            비밀번호를 잊어버리셨나요? &gt;
           </div>
         </div>
       </div>
