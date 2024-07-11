@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useSnackbar } from 'react-simple-snackbar';
+import './PasswordReset.css';
 
 const PasswordReset = () => {
   const [email, setEmail] = useState('');
@@ -47,8 +48,9 @@ const PasswordReset = () => {
           placeholder="이메일 입력"
         />
         <button
+          id="button"
           onClick={handleSendCode}
-          className="text-white text-xs p-2 rounded-lg ml-2"
+          className="text-white p-2 rounded-lg ml-2"
           style={{ backgroundColor: '#002D56' }}>
           인증 코드 발송
         </button>
