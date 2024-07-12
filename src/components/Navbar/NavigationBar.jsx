@@ -35,7 +35,7 @@ const NavigationBar = () => {
             로그아웃
           </Navbar.Link>
         ) : (
-          <Navbar.Link href="/login">로그인</Navbar.Link>
+          <Navbar.Link href="/login">로그인/회원가입</Navbar.Link>
         )}
       </Navbar.Collapse>
     </Navbar>

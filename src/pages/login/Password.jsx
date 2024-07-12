@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Label, TextInput } from 'flowbite-react';
-import { useAllUsers, usePassword } from '../../api/user.api';
+import { useAllUsers, usePassword, useMyInfo } from '../../api/user.api';
 import './Password.css';
 
 const Password = () => {
@@ -11,6 +11,7 @@ const Password = () => {
   const [idError, setIdError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const { data: users } = useAllUsers();
+  const { data: me } = useMyInfo();
   const { mutateAsync: changePw } = usePassword();
 
   // 아이디
@@ -38,6 +39,13 @@ const Password = () => {
   // 비밀번호 수정
   const handleSubmit = e => {
     e.preventDefault();
+
+    if (me.username !== id) {
+      setIdError('본인의 아이디가 아닙니다.');
+      return;
+    }
+
+    // todo: 아이디에 부합하는 비밀번호 검증
 
     if (newPassword !== confirmPassword) {
       setPasswordError('신규 비밀번호가 일치하지 않습니다.');
