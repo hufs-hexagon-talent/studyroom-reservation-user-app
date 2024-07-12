@@ -15,6 +15,7 @@ import SelectRoom from './pages/manage/SelectRoom';
 import Manager from './pages/manage/Manager';
 import Password from './pages/login/Password';
 import PasswordReset from './pages/login/PasswordReset';
+import SignUp from './pages/signup/SignUp';
 
 const Router = () => {
   const { loggedIn } = useAuth();
@@ -35,6 +36,7 @@ const Router = () => {
             <Route path="/pwreset" element={<PasswordReset />} />
             <Route path="/" element={<Notice />} />
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/signup" element={<SignUp />} />
             <Route path="/roompage" element={<RoomPage />} />
             <Route path="/visit" element={<CheckVisit />} />
             <Route path="/selectRoom" element={<SelectRoom />} />

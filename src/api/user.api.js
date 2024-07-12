@@ -221,3 +221,15 @@ export const useNoShow =()=>{
     })
   )
 }
+
+// 비밀번호 수정
+export const usePassword =()=>{
+  return useMutation({
+    mutationFn:async(password)=>{
+      const password_res = await apiClient.patch('/users/me',{
+        password
+      });
+      return password_res.data;
+    }
+  })
+}

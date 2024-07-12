@@ -28,18 +28,14 @@ const NavigationBar = () => {
           내 QR코드
         </Navbar.Link>
         <Navbar.Link href="/">이용 규칙</Navbar.Link>
-        <Navbar.Link
-          href={loggedIn ? '/password' : '#'}
-          className={!loggedIn ? 'pointer-events-none text-gray-400' : ''}>
-          비밀번호 변경
-        </Navbar.Link>
+        {loggedIn && <Navbar.Link href="/password">비밀번호 변경</Navbar.Link>}
 
         {loggedIn ? (
           <Navbar.Link href="/" onClick={logout}>
             로그아웃
           </Navbar.Link>
         ) : (
-          <Navbar.Link href="/login">로그인</Navbar.Link>
+          <Navbar.Link href="/login">로그인/회원가입</Navbar.Link>
         )}
       </Navbar.Collapse>
     </Navbar>

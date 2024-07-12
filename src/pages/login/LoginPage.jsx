@@ -30,6 +30,10 @@ const LoginPage = () => {
     navigate('/pwreset');
   };
 
+  const handleSignUp = () => {
+    navigate('/signup');
+  };
+
   return (
     <div>
       <div>
@@ -39,15 +43,13 @@ const LoginPage = () => {
       </div>
       <div>
         <form id="form" className="pt-3 pb-5">
-          <div className="inputContainer">
+          <div className="flex flex-col items-center">
             <TextInput
               className="textInput"
               id="number"
               placeholder="학번을 입력해주세요"
               onChange={e => setStudentId(e.target.value)}
             />
-          </div>
-          <div className="inputContainer">
             <TextInput
               className="textInput"
               id="password"
@@ -55,21 +57,20 @@ const LoginPage = () => {
               placeholder="비밀번호를 입력해주세요"
               onChange={e => setPassword(e.target.value)}
             />
+            <Button
+              id="btn"
+              className="cursor-pointer text-white w-full max-w-xs"
+              color="dark"
+              onClick={handleLogin}>
+              로그인하기
+            </Button>
           </div>
         </form>
-        <div className="buttonContainer pb-16">
-          <Button
-            id="btn"
-            className="cursor-pointer text-white"
-            color="dark"
-            onClick={handleLogin}>
-            로그인하기
-          </Button>
-          <div
-            onClick={handlePasword}
-            className="pt-4 text-sm text-gray-600 cursor-pointer">
-            비밀번호 변경 &gt;
-          </div>
+        {/* todo: 두 개 정렬 다시하기 */}
+        <div className="flex justify-center w-screen pt-4 text-sm text-gray-600 cursor-pointer">
+          <span onClick={handleSignUp}>회원가입</span>
+          <span className="px-2">|</span>
+          <span onClick={handlePasword}>비밀번호 재설정</span>
         </div>
       </div>
     </div>
