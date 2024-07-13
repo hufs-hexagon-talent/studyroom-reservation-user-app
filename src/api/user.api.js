@@ -4,6 +4,7 @@ import { apiClient } from './client';
 
 import { queryClient } from '../index';
 import axios from 'axios';
+import { arSA } from 'date-fns/locale';
 
 const fetchMe = async () => {
   const response = await apiClient.get('/users/me');
@@ -249,3 +250,13 @@ export const useSignUp = () => {
     },
   });
 };
+
+// 이메일 전송
+export const useEmailSend =()=>{
+  return useMutation({
+    mutationFn:async(username)=>{
+      const email_res = await apiClient.post(`/auth/mail/send?username=${username}`);
+      return email_res.data.data;
+    }
+  })
+}
