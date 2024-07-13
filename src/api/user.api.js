@@ -233,3 +233,19 @@ export const usePassword =()=>{
     }
   })
 }
+
+// 회원 가입
+export const useSignUp = () => {
+  return useMutation({
+    mutationFn: async ({ username, password, serial, name, email }) => {
+      const signUp_res = await apiClient.post('/users/sign-up', {
+        username,
+        password,
+        serial,
+        name,
+        email,
+      });
+      return signUp_res.data;
+    },
+  });
+};
