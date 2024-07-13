@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { useSnackbar } from 'react-simple-snackbar';
 import './PasswordReset.css';
+import { useEmailSend } from '../../api/user.api';
 
 const PasswordReset = () => {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
+  const { mutateAsync: doEmailSend } = useEmailSend();
   const [openSnackbar, closeSnackbar] = useSnackbar({
     position: 'top-right',
     style: {
@@ -11,23 +13,8 @@ const PasswordReset = () => {
     },
   });
 
-  const emailRegEx =
-    /^[A-Za-z0-9]([-_.]?[A-Za-z0-9])*@[A-Za-z0-9]([-_.]?[A-Za-z0-9])*\.[A-Za-z]{2,3}$/;
-
-  const emailCheck = email => {
-    return emailRegEx.test(email);
-  };
-
   const handleSendCode = () => {
-    if (!emailCheck(email)) {
-      openSnackbar('유효하지 않는 이메일 형식입니다');
-      setTimeout(() => {
-        closeSnackbar();
-      }, 5000);
-    } else {
-      // todo:이메일 전송 로직 추가
-      console.log('인증 코드 발송');
-    }
+    doEmailSend(username);
   };
 
   return (
@@ -38,14 +25,18 @@ const PasswordReset = () => {
       <div
         className="mt-5 mb-10 text-sm text-center"
         style={{ color: '#9D9FA2' }}>
-        비밀번호 재설정을 위해선 이메일을 통한 본인 인증이 필요합니다.
+        비밀번호 재설정을 위해선 이메일을 통한 본인 인증이 필요합니다
+        <br />
+        <p className="mt-2">
+          본인의 아이디를 입력하면 해당하는 이메일로 인증 코드가 전송됩니다
+        </p>
       </div>
       <div className="flex items-center justify-center border rounded-lg p-2 mb-5 w-full max-w-md">
         <input
-          onChange={e => setEmail(e.target.value)}
-          type="email"
+          onChange={e => setUsername(e.target.value)}
+          type="text"
           className="focus:outline-none flex-grow p-2 text-sm border-none"
-          placeholder="이메일 입력"
+          placeholder="아이디 입력"
         />
         <button
           id="button"
