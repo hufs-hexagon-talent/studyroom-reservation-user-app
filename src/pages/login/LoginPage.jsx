@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Label, TextInput } from 'flowbite-react';
+import { Button, TextInput } from 'flowbite-react';
 
 import './LoginPage.css';
 
@@ -23,6 +23,7 @@ const LoginPage = () => {
       location.reload(); // 페이지 새로고침
     } catch (error) {
       setError('로그인 오류 : ', error.message);
+      location.reload();
     }
   };
 

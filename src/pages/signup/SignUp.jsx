@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button, Label, TextInput } from 'flowbite-react';
 import { useSignUp } from '../../api/user.api';
 import { useSnackbar } from 'react-simple-snackbar';
@@ -10,13 +11,19 @@ const SignUp = () => {
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
   const { mutateAsync: doSignUp } = useSignUp();
-  const [openSnackbar, closeSnackbar] = useSnackbar({
+  const navigate = useNavigate();
+  const [openErrorSnackbar, closeErrorSnackbar] = useSnackbar({
     position: 'top-right',
     style: {
-      backgroundColor: '#FF3333',
+      backgroundColor: '#FF3333', // 빨간색
     },
   });
-
+  const [openSuccessSnackbar, closeSuccessSnackbar] = useSnackbar({
+    position: 'top-right',
+    style: {
+      backgroundColor: '#4CAF50', // 초록색
+    },
+  });
   const handleName = e => {
     setName(e.target.value);
   };
@@ -37,25 +44,42 @@ const SignUp = () => {
     setEmail(e.target.value);
   };
 
+  const validateEmail = email => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
   const handleSignUp = async () => {
+    if (!validateEmail(email)) {
+      openErrorSnackbar('유효한 이메일을 입력해주세요.');
+      setTimeout(() => {
+        closeErrorSnackbar();
+      }, 5000);
+      return;
+    }
+
     try {
       await doSignUp({ username, password, serial, name, email });
-      // 성공시의 추가 작업
+      openSuccessSnackbar('회원 가입이 완료 되었습니다.');
+      setTimeout(() => {
+        closeSuccessSnackbar();
+      }, 3000);
+      navigate('/');
     } catch (error) {
       // 에러 처리
-      openSnackbar(
+      openErrorSnackbar(
         error.response?.data?.errorMessage ||
           '회원 가입 중 오류가 발생했습니다.',
       );
       setTimeout(() => {
-        closeSnackbar();
-      }, 5000);
+        closeErrorSnackbar();
+      }, 3000);
     }
   };
 
   return (
     <div>
-      <h1 className="flex justify-center w-screen text-xl font-bold text-center mt-10 mb-5">
+      <h1 className="flex justify-center w-screen text-2xl text-center mt-10 mb-5">
         회원가입
       </h1>
       <form id="form" className="flex flex-col max-w-md w-full gap-4">
