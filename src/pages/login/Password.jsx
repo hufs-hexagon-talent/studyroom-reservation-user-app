@@ -67,7 +67,7 @@ const Password = () => {
 
   return (
     <div className="flex flex-col items-center justify-center">
-      <div className="mt-8 text-xl font-bold mb-4">비밀번호 변경</div>
+      <div className="mt-10 text-2xl mb-4">비밀번호 변경</div>
       <form
         id="form"
         className="flex flex-col max-w-md w-full gap-4"

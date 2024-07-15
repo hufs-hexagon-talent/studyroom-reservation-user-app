@@ -44,9 +44,7 @@ const Check = () => {
 
   return (
     <div>
-      <div className="flex justify-center font-bold text-3xl mt-20">
-        내 신청 현황
-      </div>
+      <div className="flex justify-center text-2xl mt-20">내 신청 현황</div>
 
       <div id="table" className="overflow-x-auto mt-10">
         <Table className="border">

@@ -12,7 +12,7 @@ import RoomPage from './pages/rooms/room/RoomPage';
 import useAuth from './hooks/useAuth';
 import CheckVisit from './pages/manage/checkVisit';
 import SelectRoom from './pages/manage/SelectRoom';
-import Manager from './pages/manage/Manager';
+import QrCheck from './pages/qrcheck/QrCheck';
 import Password from './pages/login/Password';
 import PasswordReset from './pages/login/PasswordReset';
 import SignUp from './pages/signup/SignUp';
@@ -40,7 +40,7 @@ const Router = () => {
             <Route path="/roompage" element={<RoomPage />} />
             <Route path="/visit" element={<CheckVisit />} />
             <Route path="/selectRoom" element={<SelectRoom />} />
-            <Route path="/manager" element={<Manager />} />
+            <Route path="qrcheck" element={<QrCheck />} />
             {loggedIn && (
               <>
                 <Route path="/check" element={<Check />} />

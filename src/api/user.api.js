@@ -123,6 +123,16 @@ export const useDeleteReservation = () => {
   });
 };
 
+// 관리자 예약 삭제
+export const useAdminDeleteReservation=()=>{
+  return useMutation({
+    mutationFn: async(reservationId)=>{
+      const adminDelete_res = await apiClient.delete(`/reservations/admin/${reservationId}`);
+      return adminDelete_res.data;
+    }
+  })
+}
+
 export const fetchUserReservation = async () => {
   const user_reservation_response = await apiClient.get('/reservations/me');
   return user_reservation_response.data.data.items.reverse();
