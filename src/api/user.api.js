@@ -51,10 +51,7 @@ export const fetchIsAdmin = async()=>{
 }
 
 export const useIsAdmin=()=>{
-  return useQuery({
-    queryKey:['isAdmin'],
-    queryFn:fetchIsAdmin
-  });
+  return useMutation(fetchIsAdmin);
 }
 
 // 자신의 예약 생성

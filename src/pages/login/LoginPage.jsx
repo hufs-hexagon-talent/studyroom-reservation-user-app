@@ -61,7 +61,7 @@ const LoginPage = () => {
               id="password"
               type="password"
               placeholder="비밀번호를 입력해주세요"
-              onKeyDown={handleLogin}
+              onKeyDown={handleKeyDown}
               onChange={e => setPassword(e.target.value)}
             />
             <Button
