@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useIsAdmin } from '../../api/user.api';
 import { useSnackbar } from 'react-simple-snackbar';
@@ -14,12 +14,14 @@ const Footer = () => {
   });
   const navigate = useNavigate();
   const { mutate: checkIsAdmin } = useIsAdmin();
-  const { loggedin } = useAuth();
+  const { loggedIn } = useAuth();
 
   const handleAdminClick = () => {
     checkIsAdmin(null, {
-      onSuccess: isAdmin => {
-        if (loggedin && isAdmin === true) {
+      onSuccess: data => {
+        const isAdmin = data;
+        console.log(isAdmin);
+        if (loggedIn && isAdmin === true) {
           navigate('/selectRoom');
         } else {
           openSnackbar('관리자 외에는 접근 권한이 없습니다.');

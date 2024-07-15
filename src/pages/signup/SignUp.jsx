@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button, Label, TextInput } from 'flowbite-react';
 import { useSignUp } from '../../api/user.api';
 import { useSnackbar } from 'react-simple-snackbar';
@@ -10,6 +11,7 @@ const SignUp = () => {
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
   const { mutateAsync: doSignUp } = useSignUp();
+  const navigate = useNavigate();
   const [openSnackbar, closeSnackbar] = useSnackbar({
     position: 'top-right',
     style: {
@@ -40,7 +42,7 @@ const SignUp = () => {
   const handleSignUp = async () => {
     try {
       await doSignUp({ username, password, serial, name, email });
-      // 성공시의 추가 작업
+      navigate('/');
     } catch (error) {
       // 에러 처리
       openSnackbar(

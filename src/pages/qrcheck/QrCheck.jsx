@@ -1,7 +1,9 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import Inko from 'inko';
-import { useCheckIn } from '../../api/user.api';
+import { useCheckIn, fetchIsAdmin } from '../../api/user.api';
 import { convertToEnglish } from '../../api/convertToEnglish';
+import { useNavigate } from 'react-router-dom';
+import useAuth from '../../hooks/useAuth';
 
 const QrCheck = () => {
   const [roomIds, setRoomIds] = useState([]);
@@ -10,6 +12,32 @@ const QrCheck = () => {
   const [reservations, setReservations] = useState([]);
   const { mutate: doCheckIn } = useCheckIn();
   let inko = new Inko();
+  const navigate = useNavigate();
+  const { loggedIn } = useAuth();
+
+  useEffect(() => {
+    const checkAdminStatus = async () => {
+      // 관리자 인지 확인
+      try {
+        const isAdmin = await fetchIsAdmin();
+        if (!isAdmin) {
+          navigate('/');
+        }
+      } catch (error) {
+        console.error('관리자 외 접근 금지', error);
+        navigate('/');
+      }
+    };
+
+    // 로그인이 되어 있지 않으면 로그인 페이지로 이동
+    if (loggedIn) {
+      checkAdminStatus();
+    } else {
+      // todo: 이거 flowbite로
+      console.log('로그인이 되어 있지 않습니다');
+      navigate('/login');
+    }
+  }, [navigate, loggedIn]);
 
   const handleQrCode = verificationCode => {
     const lowerCaseCode = convertToEnglish(

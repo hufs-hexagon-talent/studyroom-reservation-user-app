@@ -50,8 +50,17 @@ export const fetchIsAdmin = async()=>{
   return isAdmin_res.data.data.isAdmin;
 }
 
+// Mutate
 export const useIsAdmin=()=>{
   return useMutation(fetchIsAdmin);
+}
+
+// Query
+export const useIsAdminData=()=>{
+  return useQuery({
+    queryKey:['isAdmin'],
+    queryFn:fetchIsAdmin
+  });
 }
 
 // 자신의 예약 생성
