@@ -242,9 +242,10 @@ export const useNoShow =()=>{
 // 비밀번호 수정
 export const usePassword =()=>{
   return useMutation({
-    mutationFn:async(password)=>{
-      const password_res = await apiClient.patch('/users/me',{
-        password
+    mutationFn:async({prePassword, newPassword})=>{
+      const password_res = await apiClient.put('/users/me/password',{
+        prePassword,
+        newPassword
       });
       return password_res.data;
     }

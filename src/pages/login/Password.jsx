@@ -5,7 +5,7 @@ import './Password.css';
 
 const Password = () => {
   const [id, setId] = useState('');
-  const [password, setPassword] = useState('');
+  const [prePassword, setPrePassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [idError, setIdError] = useState('');
@@ -22,7 +22,7 @@ const Password = () => {
 
   // 기존 비밀번호
   const handlePwChange = e => {
-    setPassword(e.target.value);
+    setPrePassword(e.target.value);
   };
 
   // 신규 비밀번호
@@ -37,7 +37,7 @@ const Password = () => {
   };
 
   // 비밀번호 수정
-  const handleSubmit = e => {
+  const handleSubmit = async e => {
     e.preventDefault();
 
     if (me.username !== id) {
@@ -60,9 +60,13 @@ const Password = () => {
     setIdError('');
     setPasswordError('');
     console.log('아이디:', id);
-    console.log('기존 비밀번호:', password);
+    console.log('기존 비밀번호:', prePassword);
     console.log('신규 비밀번호:', newPassword);
-    changePw(newPassword);
+    try {
+      await changePw({ prePassword, newPassword });
+    } catch (error) {
+      console.error('Failed to change password:', error);
+    }
   };
 
   return (
