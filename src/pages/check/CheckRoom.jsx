@@ -63,6 +63,7 @@ const Check = () => {
             {reservations?.map((reservation, index) => {
               const start = new Date(reservation.startDateTime);
               const end = new Date(reservation.endDateTime);
+              const isPast = end < new Date();
               return (
                 <Table.Row
                   key={index}
@@ -80,14 +81,16 @@ const Check = () => {
                     {format(end, 'HH:mm')}
                   </Table.Cell>
                   <Table.Cell className="px-2 py-4">
-                    <a
-                      href="#"
-                      onClick={() => {
-                        setOpenModal(reservation.reservationId);
-                      }}
-                      className="font-medium text-cyan-600 hover:underline dark:text-cyan-500">
-                      삭제
-                    </a>
+                    {!isPast && (
+                      <a
+                        href="#"
+                        onClick={() => {
+                          setOpenModal(reservation.reservationId);
+                        }}
+                        className="font-medium text-cyan-600 hover:underline dark:text-cyan-500">
+                        삭제
+                      </a>
+                    )}
                   </Table.Cell>
                 </Table.Row>
               );
@@ -137,7 +140,7 @@ const Check = () => {
             <div className="text-center">
               <HiOutlineExclamationCircle className="mx-auto mb-4 h-14 w-14 text-gray-400 dark:text-gray-200" />
               <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
-                이 예약을 삭제하시겠습니까?
+                해당 예약을 삭제하시겠습니까?
               </h3>
               <div className="flex justify-center gap-4">
                 <Button color="gray" onClick={() => setOpenModal(false)}>
