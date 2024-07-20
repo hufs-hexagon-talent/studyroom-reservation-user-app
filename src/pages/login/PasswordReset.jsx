@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSnackbar } from 'react-simple-snackbar';
 import './PasswordReset.css';
@@ -11,6 +11,9 @@ const PasswordReset = () => {
   const { mutateAsync: doEmailVerify } = useEmailVerify();
   const [email, setEmail] = useState('');
   const [verificationCode, setVerificationCode] = useState('');
+  const [timer, setTimer] = useState(null);
+  const [timerDisplay, setTimerDisplay] = useState(''); // 타이머 표시 상태
+
   const navigate = useNavigate();
 
   const [openSuccessSnackbar, closeSuccessSnackbar] = useSnackbar({
@@ -37,6 +40,7 @@ const PasswordReset = () => {
       setTimeout(() => {
         closeSuccessSnackbar();
       }, 5000);
+      setTimer(300);
     } catch (error) {
       openErrorSnackbar('인증 코드 전송에 실패하였습니다.');
       setTimeout(() => {
@@ -44,6 +48,25 @@ const PasswordReset = () => {
       }, 5000);
     }
   };
+  useEffect(() => {
+    if (timer === null) return;
+
+    const countdown = setInterval(() => {
+      setTimer(prevTimer => {
+        if (prevTimer <= 1) {
+          clearInterval(countdown);
+          setTimerDisplay(''); // 타이머 종료 시 표시 제거
+          return null;
+        }
+        const minutes = Math.floor(prevTimer / 60);
+        const seconds = prevTimer % 60;
+        setTimerDisplay(`${minutes}:${seconds < 10 ? `0${seconds}` : seconds}`);
+        return prevTimer - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(countdown);
+  }, [timer]);
 
   const handleVerificationCode = e => {
     setVerificationCode(e.target.value);
@@ -80,12 +103,20 @@ const PasswordReset = () => {
         </p>
       </div>
       <div className="flex items-center justify-center border rounded-lg p-2 mb-5 w-full max-w-md">
-        <input
-          onChange={e => setUsername(e.target.value)}
-          type="text"
-          className="focus:outline-none flex-grow p-2 text-sm border-none"
-          placeholder="아이디 입력"
-        />
+        <div className="relative flex-grow">
+          <input
+            onChange={e => setUsername(e.target.value)}
+            type="text"
+            className="focus:outline-none w-full p-2 text-sm border-none"
+            placeholder="아이디 입력"
+            value={username}
+          />
+          {timerDisplay && (
+            <span className="absolute right-2 top-1/2 -translate-y-1/2 text-red-500 text-sm">
+              {timerDisplay}
+            </span>
+          )}
+        </div>
         <button
           id="button"
           onClick={handleSendCode}
