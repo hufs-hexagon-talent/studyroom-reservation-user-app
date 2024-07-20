@@ -2,14 +2,14 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSnackbar } from 'react-simple-snackbar';
 import './PasswordReset.css';
-import { useEmailSend } from '../../api/user.api';
+import { useEmailSend, useEmailVerify } from '../../api/user.api';
 import { Button } from 'flowbite-react';
 
 const PasswordReset = () => {
   const [username, setUsername] = useState('');
   const { mutateAsync: doEmailSend } = useEmailSend();
-  const [verificationCodeFromServer, setVerificationCodeFromServer] =
-    useState('');
+  const { mutateAsync: doEmailVerify } = useEmailVerify();
+  const [email, setEmail] = useState('');
   const [verificationCode, setVerificationCode] = useState('');
   const navigate = useNavigate();
 
@@ -30,8 +30,8 @@ const PasswordReset = () => {
 
   const handleSendCode = async () => {
     try {
-      const data = await doEmailSend(username);
-      setVerificationCodeFromServer(data.verificationCode);
+      const response = await doEmailSend(username);
+      setEmail(response.email);
 
       openSuccessSnackbar('인증 코드 전송에 성공하였습니다.');
       setTimeout(() => {
@@ -49,18 +49,19 @@ const PasswordReset = () => {
     setVerificationCode(e.target.value);
   };
 
-  const handleButton = () => {
-    if (verificationCode === verificationCodeFromServer.toString()) {
-      openSuccessSnackbar('인증 코드가 일치합니다.');
+  const handleButton = async () => {
+    try {
+      await doEmailVerify({ email: email, verifyCode: verificationCode });
+      openSuccessSnackbar('인증 코드 확인에 성공하였습니다.');
       setTimeout(() => {
         closeSuccessSnackbar();
       }, 5000);
-      navigate('/password');
-    } else {
-      openErrorSnackbar('인증 코드가 일치하지 않습니다.');
+    } catch (error) {
+      console.log(error);
+      openErrorSnackbar('인증 코드 확인에 실패하였습니다.');
       setTimeout(() => {
         closeErrorSnackbar();
-      }, 5000);
+      }, 2500);
     }
   };
 
@@ -74,8 +75,9 @@ const PasswordReset = () => {
         style={{ color: '#9D9FA2' }}>
         {/* todo: 띄어쓰기 별로 줄바꿈*/}
         <p>비밀번호 재설정을 위해선 이메일을 통한 본인 인증이 필요합니다</p>
-        <br />
-        <p>본인의 아이디를 입력하면 해당하는 이메일로 인증 코드가 전송됩니다</p>
+        <p className="mt-2">
+          본인의 아이디를 입력하면 해당하는 이메일로 인증 코드가 전송됩니다
+        </p>
       </div>
       <div className="flex items-center justify-center border rounded-lg p-2 mb-5 w-full max-w-md">
         <input

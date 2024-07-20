@@ -16,6 +16,7 @@ import QrCheck from './pages/qrcheck/QrCheck';
 import Password from './pages/login/Password';
 import PasswordReset from './pages/login/PasswordReset';
 import SignUp from './pages/signup/SignUp';
+import SelectFloor from './pages/qrcheck/SelectFloor';
 
 const Router = () => {
   const { loggedIn } = useAuth();
@@ -32,6 +33,7 @@ const Router = () => {
         <NavigationBar />
         <div className="flex-grow">
           <Routes>
+            <Route path="/selectFloor" element={<SelectFloor />} />
             <Route path="/password" element={<Password />} />
             <Route path="/pwreset" element={<PasswordReset />} />
             <Route path="/" element={<Notice />} />
