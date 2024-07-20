@@ -13,8 +13,9 @@ import useAuth from './hooks/useAuth';
 import CheckVisit from './pages/manage/checkVisit';
 import SelectRoom from './pages/manage/SelectRoom';
 import QrCheck from './pages/qrcheck/QrCheck';
-import Password from './pages/login/Password';
-import PasswordReset from './pages/login/PasswordReset';
+import LoggedInPassword from './pages/password/LoggedInPassword';
+import LoggedOutPassword from './pages/password/LoggedOutPassword';
+import EmailVerify from './pages/password/EmailVerify';
 import SignUp from './pages/signup/SignUp';
 import SelectFloor from './pages/qrcheck/SelectFloor';
 
@@ -34,8 +35,9 @@ const Router = () => {
         <div className="flex-grow">
           <Routes>
             <Route path="/selectFloor" element={<SelectFloor />} />
-            <Route path="/password" element={<Password />} />
-            <Route path="/pwreset" element={<PasswordReset />} />
+            <Route path="/password" element={<LoggedInPassword />} />
+            <Route path="/email" element={<EmailVerify />} />
+            <Route path="/email/pwreset" element={<LoggedOutPassword />} />
             <Route path="/" element={<Notice />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignUp />} />

@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSnackbar } from 'react-simple-snackbar';
-import './PasswordReset.css';
+import './EmailVerify.css';
 import { useEmailSend, useEmailVerify } from '../../api/user.api';
 import { Button } from 'flowbite-react';
 
-const PasswordReset = () => {
+const EmailVerify = () => {
   const [username, setUsername] = useState('');
   const { mutateAsync: doEmailSend } = useEmailSend();
   const { mutateAsync: doEmailVerify } = useEmailVerify();
@@ -31,23 +31,7 @@ const PasswordReset = () => {
     },
   });
 
-  const handleSendCode = async () => {
-    try {
-      const response = await doEmailSend(username);
-      setEmail(response.email);
-
-      openSuccessSnackbar('인증 코드 전송에 성공하였습니다.');
-      setTimeout(() => {
-        closeSuccessSnackbar();
-      }, 5000);
-      setTimer(300);
-    } catch (error) {
-      openErrorSnackbar('인증 코드 전송에 실패하였습니다.');
-      setTimeout(() => {
-        closeErrorSnackbar();
-      }, 5000);
-    }
-  };
+  // timer
   useEffect(() => {
     if (timer === null) return;
 
@@ -68,10 +52,31 @@ const PasswordReset = () => {
     return () => clearInterval(countdown);
   }, [timer]);
 
+  // 인증 코드 발송
+  const handleSendCode = async () => {
+    try {
+      const response = await doEmailSend(username);
+      setEmail(response.email);
+
+      openSuccessSnackbar('인증 코드 발송에 성공하였습니다.');
+      setTimeout(() => {
+        closeSuccessSnackbar();
+      }, 5000);
+      setTimer(300);
+    } catch (error) {
+      openErrorSnackbar('인증 코드 발송에 실패하였습니다.');
+      setTimeout(() => {
+        closeErrorSnackbar();
+      }, 5000);
+    }
+  };
+
+  // 인증 코드 입력 감지
   const handleVerificationCode = e => {
     setVerificationCode(e.target.value);
   };
 
+  //인증 코드 확인
   const handleButton = async () => {
     try {
       await doEmailVerify({ email: email, verifyCode: verificationCode });
@@ -143,4 +148,4 @@ const PasswordReset = () => {
   );
 };
 
-export default PasswordReset;
+export default EmailVerify;

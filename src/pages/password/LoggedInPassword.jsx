@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Label, TextInput } from 'flowbite-react';
 import { useAllUsers, usePassword, useMyInfo } from '../../api/user.api';
-import './Password.css';
+import './LoggedInPassword.css';
 
-const Password = () => {
+const LoggedInPassword = () => {
   const [id, setId] = useState('');
   const [prePassword, setPrePassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -140,4 +140,4 @@ const Password = () => {
   );
 };
 
-export default Password;
+export default LoggedInPassword;

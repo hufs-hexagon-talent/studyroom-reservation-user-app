@@ -28,7 +28,7 @@ const LoginPage = () => {
   };
 
   const handlePasword = () => {
-    navigate('/pwreset');
+    navigate('/email');
   };
 
   const handleSignUp = () => {
