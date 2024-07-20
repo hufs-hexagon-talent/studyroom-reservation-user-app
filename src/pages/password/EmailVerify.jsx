@@ -61,13 +61,13 @@ const EmailVerify = () => {
       openSuccessSnackbar('인증 코드 발송에 성공하였습니다.');
       setTimeout(() => {
         closeSuccessSnackbar();
-      }, 5000);
+      }, 2500);
       setTimer(300);
     } catch (error) {
       openErrorSnackbar('인증 코드 발송에 실패하였습니다.');
       setTimeout(() => {
         closeErrorSnackbar();
-      }, 5000);
+      }, 2500);
     }
   };
 
@@ -83,7 +83,8 @@ const EmailVerify = () => {
       openSuccessSnackbar('인증 코드 확인에 성공하였습니다.');
       setTimeout(() => {
         closeSuccessSnackbar();
-      }, 5000);
+      }, 2500);
+      navigate('/email/pwreset');
     } catch (error) {
       console.log(error);
       openErrorSnackbar('인증 코드 확인에 실패하였습니다.');

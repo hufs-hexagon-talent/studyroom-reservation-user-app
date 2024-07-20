@@ -16,7 +16,7 @@ const Footer = () => {
   const { loggedIn } = useAuth();
   const { data: checkIsAdmin } = useIsAdminData();
 
-  const handleAdminClick = () => {
+  const handleAdminClick = async () => {
     if (loggedIn && checkIsAdmin === true) {
       navigate('/selectRoom');
     } else {
