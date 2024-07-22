@@ -28,6 +28,8 @@ const Router = () => {
     },
   });
 
+  const pwResetToken = sessionStorage.getItem('pwResetToken');
+
   return (
     <BrowserRouter basename={process.env.REACT_APP_BASEURL || '/'}>
       <div className="min-h-screen flex flex-col">
@@ -37,7 +39,12 @@ const Router = () => {
             <Route path="/selectFloor" element={<SelectFloor />} />
             <Route path="/password" element={<LoggedInPassword />} />
             <Route path="/email" element={<EmailVerify />} />
-            <Route path="/email/pwreset" element={<LoggedOutPassword />} />
+            <Route
+              path="/email/pwreset"
+              element={
+                pwResetToken ? <LoggedOutPassword /> : <Navigate to="/" />
+              }
+            />
             <Route path="/" element={<Notice />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignUp />} />

@@ -84,14 +84,14 @@ const EmailVerify = () => {
         email: email,
         verifyCode: verificationCode,
       });
-      setToken(response.data.passwordResetToken);
+      const passwordResetToken = response.data.passwordResetToken;
+      setToken(passwordResetToken);
+      sessionStorage.setItem('pwResetToken', passwordResetToken);
       openSuccessSnackbar('인증 코드 확인에 성공하였습니다.');
       setTimeout(() => {
         closeSuccessSnackbar();
       }, 2500);
-      navigate('/email/pwreset', {
-        state: { token: response.data.passwordResetToken },
-      });
+      navigate('/email/pwreset');
     } catch (error) {
       console.log(error);
       openErrorSnackbar('인증 코드 확인에 실패하였습니다.');
