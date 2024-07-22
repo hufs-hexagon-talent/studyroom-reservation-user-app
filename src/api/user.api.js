@@ -6,18 +6,6 @@ import { queryClient } from '../index';
 import axios from 'axios';
 import { arSA } from 'date-fns/locale';
 
-const fetchMe = async () => {
-  const response = await apiClient.get('/users/me');
-  return response.data.name;
-};
-
-export const useMe = () => {
-  return useQuery({
-    queryKey: ['me'],
-    queryFn: fetchMe,
-  });
-};
-
 // id, pw 확인할 때 쓰려고
 const fetchAllUsers = async () => {
   const allUser_res = await apiClient.get('/users');
@@ -31,7 +19,7 @@ export const useAllUsers = () => {
   });
 };
 
-
+// 자신의 정보 조회
 const fetchMyInfo =async()=>{
   const myInfo_res = await apiClient.get('/users/me');
   return myInfo_res.data.data;
@@ -50,10 +38,12 @@ export const fetchIsAdmin = async()=>{
   return isAdmin_res.data.data.isAdmin;
 }
 
-export const useIsAdmin=()=>{
+// Query
+export const useIsAdminData=()=>{
   return useQuery({
     queryKey:['isAdmin'],
-    queryFn:fetchIsAdmin
+    queryFn:fetchIsAdmin,
+    enabled:false,
   });
 }
 
@@ -122,6 +112,16 @@ export const useDeleteReservation = () => {
     },
   });
 };
+
+// 관리자 예약 삭제
+export const useAdminDeleteReservation=()=>{
+  return useMutation({
+    mutationFn: async(reservationId)=>{
+      const adminDelete_res = await apiClient.delete(`/reservations/admin/${reservationId}`);
+      return adminDelete_res.data;
+    }
+  })
+}
 
 export const fetchUserReservation = async () => {
   const user_reservation_response = await apiClient.get('/reservations/me');
@@ -223,14 +223,28 @@ export const useNoShow =()=>{
   )
 }
 
-// 비밀번호 수정
+// 로그인 된 상태에서 비밀번호 수정
 export const usePassword =()=>{
   return useMutation({
-    mutationFn:async(password)=>{
-      const password_res = await apiClient.patch('/users/me',{
-        password
+    mutationFn:async({prePassword, newPassword})=>{
+      const password_res = await apiClient.put('/users/me/password',{
+        prePassword,
+        newPassword
       });
       return password_res.data;
+    }
+  })
+}
+
+// 로그아웃 상태에서 비밀번호 수정
+export const useLoggedOutPassword=()=>{
+  return useMutation({
+    mutationFn:async({token, newPassword})=>{
+      const loggedOutPW_res = await apiClient.post('/auth/mail/reset-password',{
+        token,
+        newPassword
+      });
+      return loggedOutPW_res.data;
     }
   })
 }
@@ -257,6 +271,19 @@ export const useEmailSend =()=>{
     mutationFn:async(username)=>{
       const email_res = await apiClient.post(`/auth/mail/send?username=${username}`);
       return email_res.data.data;
+    }
+  })
+}
+
+// 이메일 검증
+export const useEmailVerify=()=>{
+  return useMutation({
+    mutationFn:async({email, verifyCode})=>{
+      const verify_res = await apiClient.post('/auth/mail/verify',{
+        email,
+        verifyCode
+      });
+      return verify_res.data;
     }
   })
 }

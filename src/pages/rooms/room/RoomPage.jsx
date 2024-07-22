@@ -278,7 +278,7 @@ const RoomPage = () => {
           <Typography
             marginTop="50px"
             variant="h5"
-            fontWeight={600}
+            fontWeight={350}
             component="div"
             align="center">
             일자별 세미나실 예약 현황

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import ko from 'date-fns/locale/ko'; // 한국어 로케일 가져오기
 import { convertToEnglish } from '../../api/convertToEnglish';
@@ -7,6 +7,7 @@ import {
   useReservationsByRooms,
   useRooms,
   useCheckIn,
+  useAdminDeleteReservation,
 } from '../../api/user.api';
 import { Button, Table } from 'flowbite-react';
 import Inko from 'inko';
@@ -24,7 +25,6 @@ const CheckVisit = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [reservations, setReservations] = useState([]);
   let inko = new Inko();
-  const navigate = useNavigate();
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -36,6 +36,7 @@ const CheckVisit = () => {
   }, [location.search]);
 
   const { mutate: doCheckIn } = useCheckIn();
+  const { mutate: doDelete } = useAdminDeleteReservation();
   const { data: rooms } = useRooms(roomIds);
   const {
     data: fetchedReservations,
@@ -129,22 +130,18 @@ const CheckVisit = () => {
     [roomIds],
   );
 
-  const handleClick = () => {
-    navigate('/manager');
-  };
-
   const roomNames = rooms?.map(room => room.roomName).join(', ');
+
+  // 예약 삭제
+  const handleDelete = reservationId => {
+    doDelete(reservationId);
+  };
 
   return (
     <div className="flex flex-col md:flex-row border-r md:border-r-2 border-gray-300">
-      <div className="w-full md:w-1/2 p-4 border-b md:border-b-0 md:border-r border-gray-300">
+      <div className="p-4 border-b md:border-b-0 md:border-r border-gray-300">
         <div>
           <p>{`선택된 방 : ${roomNames}`}</p>
-        </div>
-        <div
-          onClick={handleClick}
-          className="mt-3 inline-block hover:underline cursor-pointer">
-          <p>멀티지기 출석</p>
         </div>
         <div className="pt-3 pb-3">출석 일자</div>
         <div className="flex items-center space-x-2">
@@ -168,11 +165,15 @@ const CheckVisit = () => {
         ) : (
           <Table hoverable className="mt-4 mb-3 text-black text-center">
             <Table.Head>
+              {/* todo: 반응형 글자 작아지게 */}
               <Table.HeadCell>출석 유무</Table.HeadCell>
               <Table.HeadCell>호실</Table.HeadCell>
               <Table.HeadCell>이름</Table.HeadCell>
               <Table.HeadCell>시작 시간</Table.HeadCell>
               <Table.HeadCell>종료 시간</Table.HeadCell>
+              <Table.HeadCell>
+                <span className="sr-only">삭제</span>
+              </Table.HeadCell>
             </Table.Head>
             <Table.Body className="divide-y">
               {reservations.map(reservation => (
@@ -193,6 +194,11 @@ const CheckVisit = () => {
                   </Table.Cell>
                   <Table.Cell>
                     {format(new Date(reservation.endDateTime), 'HH:mm')}
+                  </Table.Cell>
+                  <Table.Cell
+                    onClick={() => handleDelete(reservation.reservationId)}
+                    className="cursor-pointer hover:underline font-bold">
+                    삭제
                   </Table.Cell>
                 </Table.Row>
               ))}

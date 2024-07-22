@@ -1,17 +1,29 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useIsAdmin } from '../../api/user.api';
+import { useIsAdminData } from '../../api/user.api';
+import { useSnackbar } from 'react-simple-snackbar';
+import useAuth from '../../hooks/useAuth';
 import './Footer.css';
 
-const Footer = ({ showSnackbar }) => {
+const Footer = () => {
+  const [openSnackbar, closeSnackbar] = useSnackbar({
+    position: 'top-right',
+    style: {
+      backgroundColor: '#FF3333',
+    },
+  });
   const navigate = useNavigate();
-  const { data: isAdmin } = useIsAdmin();
+  const { loggedIn } = useAuth();
+  const { data: checkIsAdmin } = useIsAdminData();
 
-  const handleAdminClick = () => {
-    if (isAdmin === true) {
+  const handleAdminClick = async () => {
+    if (loggedIn && checkIsAdmin === true) {
       navigate('/selectRoom');
     } else {
-      showSnackbar('관리자 외에는 접근 권한이 없습니다.');
+      openSnackbar('관리자 외에는 접근 권한이 없습니다.');
+      setTimeout(() => {
+        closeSnackbar();
+      }, 3000);
     }
   };
 

@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Navbar } from 'flowbite-react';
 import Logo from '../../assets/logo.png';
 import useAuth from '../../hooks/useAuth';
+import { useIsAdminData } from '../../api/user.api';
 
 const NavigationBar = () => {
   const { loggedIn, logout } = useAuth();
+  const { data: isAdmin } = useIsAdminData();
 
   return (
     <Navbar fluid rounded className="border-b-2">
@@ -16,6 +18,9 @@ const NavigationBar = () => {
       </Navbar.Brand>
       <Navbar.Toggle />
       <Navbar.Collapse>
+        {isAdmin === true && (
+          <Navbar.Link href="/selectFloor">출석 체크</Navbar.Link>
+        )}
         <Navbar.Link href="/roompage">세미나실 예약</Navbar.Link>
         <Navbar.Link
           href={loggedIn ? '/check' : '#'}

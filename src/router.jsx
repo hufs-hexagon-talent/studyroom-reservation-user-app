@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
 import { useSnackbar } from 'react-simple-snackbar';
 
@@ -12,10 +12,12 @@ import RoomPage from './pages/rooms/room/RoomPage';
 import useAuth from './hooks/useAuth';
 import CheckVisit from './pages/manage/checkVisit';
 import SelectRoom from './pages/manage/SelectRoom';
-import Manager from './pages/manage/Manager';
-import Password from './pages/login/Password';
-import PasswordReset from './pages/login/PasswordReset';
+import QrCheck from './pages/qrcheck/QrCheck';
+import LoggedInPassword from './pages/password/LoggedInPassword';
+import LoggedOutPassword from './pages/password/LoggedOutPassword';
+import EmailVerify from './pages/password/EmailVerify';
 import SignUp from './pages/signup/SignUp';
+import SelectFloor from './pages/qrcheck/SelectFloor';
 
 const Router = () => {
   const { loggedIn } = useAuth();
@@ -32,15 +34,17 @@ const Router = () => {
         <NavigationBar />
         <div className="flex-grow">
           <Routes>
-            <Route path="/password" element={<Password />} />
-            <Route path="/pwreset" element={<PasswordReset />} />
+            <Route path="/selectFloor" element={<SelectFloor />} />
+            <Route path="/password" element={<LoggedInPassword />} />
+            <Route path="/email" element={<EmailVerify />} />
+            <Route path="/email/pwreset" element={<LoggedOutPassword />} />
             <Route path="/" element={<Notice />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignUp />} />
             <Route path="/roompage" element={<RoomPage />} />
             <Route path="/visit" element={<CheckVisit />} />
             <Route path="/selectRoom" element={<SelectRoom />} />
-            <Route path="/manager" element={<Manager />} />
+            <Route path="qrcheck" element={<QrCheck />} />
             {loggedIn && (
               <>
                 <Route path="/check" element={<Check />} />

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Label, TextInput } from 'flowbite-react';
+import { Button, TextInput } from 'flowbite-react';
 
 import './LoginPage.css';
 
@@ -23,21 +23,28 @@ const LoginPage = () => {
       location.reload(); // 페이지 새로고침
     } catch (error) {
       setError('로그인 오류 : ', error.message);
+      location.reload();
     }
   };
 
   const handlePasword = () => {
-    navigate('/pwreset');
+    navigate('/email');
   };
 
   const handleSignUp = () => {
     navigate('/signup');
   };
 
+  const handleKeyDown = event => {
+    if (event.key === 'Enter') {
+      handleLogin();
+    }
+  };
+
   return (
     <div>
       <div>
-        <h1 className="flex justify-center w-screen text-2xl font-bold text-center mt-10 mb-5">
+        <h1 className="flex justify-center w-screen text-2xl text-center mt-10 mb-5">
           로그인
         </h1>
       </div>
@@ -55,6 +62,7 @@ const LoginPage = () => {
               id="password"
               type="password"
               placeholder="비밀번호를 입력해주세요"
+              onKeyDown={handleKeyDown}
               onChange={e => setPassword(e.target.value)}
             />
             <Button
@@ -67,7 +75,7 @@ const LoginPage = () => {
           </div>
         </form>
         {/* todo: 두 개 정렬 다시하기 */}
-        <div className="flex justify-center w-screen pt-4 text-sm text-gray-600 cursor-pointer">
+        <div className="flex justify-center w-screen pt-4 pb-10 text-sm text-gray-600 cursor-pointer">
           <span onClick={handleSignUp}>회원가입</span>
           <span className="px-2">|</span>
           <span onClick={handlePasword}>비밀번호 재설정</span>
