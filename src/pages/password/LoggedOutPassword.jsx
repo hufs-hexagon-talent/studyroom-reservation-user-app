@@ -4,7 +4,6 @@ import { Button, Label, TextInput } from 'flowbite-react';
 
 const LoggedOutPassword = () => {
   const { mutateAsync: doPasswordChange } = useLoggedOutPassword();
-  const [prePw, setprePw] = useState('');
   const [newPw, setNewPw] = useState('');
   const [confirmNewPw, setConfirmNewPw] = useState('');
 
@@ -20,7 +19,7 @@ const LoggedOutPassword = () => {
 
   // 비밀번호 변경
   const handleChange = () => {
-    doPasswordChange({ prePassword: prePw, newPassword: newPw });
+    doPasswordChange({ newPassword: newPw });
   };
 
   return (
@@ -30,7 +29,7 @@ const LoggedOutPassword = () => {
         <form id="form" className="flex flex-col max-w-md w-full gap-4">
           <div>
             <div className="mb-2 block">
-              <Label htmlFor="newPassword" value="신규 비밀번호" />
+              <Label htmlFor="newPassword" value="새 비밀번호" />
             </div>
             <TextInput
               onChange={handleNewPw}
@@ -42,13 +41,13 @@ const LoggedOutPassword = () => {
           </div>
           <div>
             <div className="mb-2 block">
-              <Label htmlFor="confirmPassword" value="신규 비밀번호 확인" />
+              <Label htmlFor="confirmPassword" value="새 비밀번호 확인" />
             </div>
             <TextInput
               onChange={handleConfirmNewPw}
               id="confirmPassword"
               type="password"
-              placeholder="신규 비밀번호를 한번 더 입력해주세요"
+              placeholder="새 비밀번호를 한번 더 입력해주세요"
               required
             />
           </div>

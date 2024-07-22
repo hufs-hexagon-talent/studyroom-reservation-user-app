@@ -239,10 +239,9 @@ export const usePassword =()=>{
 // 로그아웃 상태에서 비밀번호 수정
 export const useLoggedOutPassword=()=>{
   return useMutation({
-    mutationFn:async({token, prePassword, newPassword})=>{
+    mutationFn:async({token, newPassword})=>{
       const loggedOutPW_res = await apiClient.post('/auth/mail/reset-password',{
         token,
-        prePassword,
         newPassword
       });
       return loggedOutPW_res.data;

@@ -13,6 +13,7 @@ const EmailVerify = () => {
   const [verificationCode, setVerificationCode] = useState('');
   const [timer, setTimer] = useState(null);
   const [timerDisplay, setTimerDisplay] = useState(''); // 타이머 표시 상태
+  const [token, setToken] = useState('');
 
   const navigate = useNavigate();
 
@@ -79,12 +80,18 @@ const EmailVerify = () => {
   //인증 코드 확인
   const handleButton = async () => {
     try {
-      await doEmailVerify({ email: email, verifyCode: verificationCode });
+      const response = await doEmailVerify({
+        email: email,
+        verifyCode: verificationCode,
+      });
+      setToken(response.data.passwordResetToken);
       openSuccessSnackbar('인증 코드 확인에 성공하였습니다.');
       setTimeout(() => {
         closeSuccessSnackbar();
       }, 2500);
-      navigate('/email/pwreset');
+      navigate('/email/pwreset', {
+        state: { token: response.data.passwordResetToken },
+      });
     } catch (error) {
       console.log(error);
       openErrorSnackbar('인증 코드 확인에 실패하였습니다.');
