@@ -1,11 +1,28 @@
 import React, { useState } from 'react';
 import { useLoggedOutPassword } from '../../api/user.api';
 import { Button, Label, TextInput } from 'flowbite-react';
+import { useSnackbar } from 'react-simple-snackbar';
 
 const LoggedOutPassword = () => {
   const { mutateAsync: doPasswordChange } = useLoggedOutPassword();
   const [newPw, setNewPw] = useState('');
   const [confirmNewPw, setConfirmNewPw] = useState('');
+  const token = sessionStorage.getItem('pwResetToken');
+
+  const [openSuccessSnackbar, closeSuccessSnackbar] = useSnackbar({
+    position: 'top-right',
+    style: {
+      backgroundColor: '#4CAF50', // 초록색
+      color: '#FFFFFF',
+    },
+  });
+
+  const [openErrorSnackbar, closeErrorSnackbar] = useSnackbar({
+    position: 'top-right',
+    style: {
+      backgroundColor: '#FF3333',
+    },
+  });
 
   // 신규 비밀번호
   const handleNewPw = e => {
@@ -18,8 +35,21 @@ const LoggedOutPassword = () => {
   };
 
   // 비밀번호 변경
-  const handleChange = () => {
-    doPasswordChange({ newPassword: newPw });
+  const handleChange = async e => {
+    e.preventDefault();
+    if (newPw !== confirmNewPw) {
+      openErrorSnackbar('비밀번호가 일치하지 않습니다.', 2500);
+      return;
+    }
+    try {
+      await doPasswordChange({ token: token, newPassword: newPw });
+      openSuccessSnackbar('비밀번호가 성공적으로 변경되었습니다.', 2500);
+    } catch (error) {
+      openErrorSnackbar(
+        '비밀번호 변경에 실패했습니다. 다시 시도해 주세요.',
+        2500,
+      );
+    }
   };
 
   return (
