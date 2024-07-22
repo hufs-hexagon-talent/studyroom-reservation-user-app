@@ -240,7 +240,7 @@ export const usePassword =()=>{
 export const useLoggedOutPassword=()=>{
   return useMutation({
     mutationFn:async({token, newPassword})=>{
-      const loggedOutPW_res = await apiClient.post('/auth/mail/reset-password',{
+      const loggedOutPW_res = await apiClient.post('/users/reset-password',{
         token,
         newPassword
       });
