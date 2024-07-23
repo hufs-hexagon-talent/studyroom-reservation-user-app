@@ -224,17 +224,26 @@ export const useNoShow =()=>{
 }
 
 // 로그인 된 상태에서 비밀번호 수정
-export const usePassword =()=>{
+export const usePassword = () => {
   return useMutation({
-    mutationFn:async({prePassword, newPassword})=>{
-      const password_res = await apiClient.put('/users/me/password',{
-        prePassword,
-        newPassword
-      });
-      return password_res.data;
-    }
-  })
-}
+    mutationFn: async ({ prePassword, newPassword }) => {
+      try {
+        const password_res = await apiClient.put('/users/me/password', {
+          prePassword,
+          newPassword,
+        });
+        return password_res.data;
+      } catch (error) {
+        // 에러 발생 시 에러 응답을 반환
+        if (error.response && error.response.data) {
+          throw new Error(error.response.data.errorMessage);
+        }
+        throw error;
+      }
+    },
+  });
+};
+
 
 // 로그아웃 상태에서 비밀번호 수정
 export const useLoggedOutPassword=()=>{

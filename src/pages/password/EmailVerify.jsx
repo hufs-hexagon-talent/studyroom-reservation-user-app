@@ -116,7 +116,7 @@ const EmailVerify = () => {
         </p>
       </div>
       <div className="flex items-center justify-center border rounded-lg p-2 mb-5 w-full max-w-md">
-        <div className="relative flex-grow">
+        <div className="flex-grow">
           <input
             onChange={e => setUsername(e.target.value)}
             type="text"

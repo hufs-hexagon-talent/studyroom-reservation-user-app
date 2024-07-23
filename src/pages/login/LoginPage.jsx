@@ -74,7 +74,6 @@ const LoginPage = () => {
             </Button>
           </div>
         </form>
-        {/* todo: 두 개 정렬 다시하기 */}
         <div className="flex justify-center w-screen pt-4 pb-10 text-sm text-gray-600 cursor-pointer">
           <span onClick={handleSignUp}>회원가입</span>
           <span className="px-2">|</span>

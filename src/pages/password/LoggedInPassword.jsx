@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Label, TextInput } from 'flowbite-react';
 import { useAllUsers, usePassword, useMyInfo } from '../../api/user.api';
+import { useSnackbar } from 'react-simple-snackbar';
 import './LoggedInPassword.css';
 
 const LoggedInPassword = () => {
@@ -13,6 +14,12 @@ const LoggedInPassword = () => {
   const { data: users } = useAllUsers();
   const { data: me } = useMyInfo();
   const { mutateAsync: changePw } = usePassword();
+  const [openErrorSnackbar, closeErrorSnackbar] = useSnackbar({
+    position: 'top-right',
+    style: {
+      backgroundColor: '#FF3333', // 빨간색
+    },
+  });
 
   // 아이디
   const handleIdChange = e => {
@@ -42,13 +49,13 @@ const LoggedInPassword = () => {
 
     if (me.username !== id) {
       setIdError('본인의 아이디가 아닙니다.');
+      openErrorSnackbar(idError);
       return;
     }
 
-    // todo: 아이디에 부합하는 비밀번호 검증
-
     if (newPassword !== confirmPassword) {
       setPasswordError('신규 비밀번호가 일치하지 않습니다.');
+      openErrorSnackbar(passwordError);
       return;
     }
 
@@ -66,6 +73,7 @@ const LoggedInPassword = () => {
       await changePw({ prePassword, newPassword });
     } catch (error) {
       console.error('Failed to change password:', error);
+      openErrorSnackbar(error.message, 2500);
     }
   };
 
@@ -87,7 +95,6 @@ const LoggedInPassword = () => {
             placeholder="아이디를 입력해주세요"
             required
           />
-          {idError && <div className="text-sm text-red-500">{idError}</div>}
         </div>
         <div>
           <div className="mb-2 block">
@@ -103,7 +110,7 @@ const LoggedInPassword = () => {
         </div>
         <div>
           <div className="mb-2 block">
-            <Label htmlFor="newPassword" value="신규 비밀번호" />
+            <Label htmlFor="newPassword" value="새 비밀번호" />
           </div>
           <TextInput
             onChange={handleNewPasswordChange}
@@ -115,18 +122,15 @@ const LoggedInPassword = () => {
         </div>
         <div>
           <div className="mb-2 block">
-            <Label htmlFor="confirmPassword" value="신규 비밀번호 확인" />
+            <Label htmlFor="confirmPassword" value="새 비밀번호 확인" />
           </div>
           <TextInput
             onChange={handleConfirmPasswordChange}
             id="confirmPassword"
             type="password"
-            placeholder="신규 비밀번호를 한번 더 입력해주세요"
+            placeholder="새 비밀번호를 한번 더 입력해주세요"
             required
           />
-          {passwordError && (
-            <div className="text-sm text-red-500">{passwordError}</div>
-          )}
         </div>
         <Button
           onClick={handleSubmit}

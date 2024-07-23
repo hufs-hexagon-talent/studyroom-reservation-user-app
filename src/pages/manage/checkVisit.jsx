@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import DatePicker, { registerLocale } from 'react-datepicker';
-import ko from 'date-fns/locale/ko'; // 한국어 로케일 가져오기
+import ko from 'date-fns/locale/ko';
 import { convertToEnglish } from '../../api/convertToEnglish';
 import {
   useReservationsByRooms,
@@ -13,7 +13,7 @@ import { Button, Table } from 'flowbite-react';
 import Inko from 'inko';
 import { format } from 'date-fns';
 
-registerLocale('ko', ko); // 로케일 등록
+registerLocale('ko', ko);
 
 const CheckVisit = () => {
   const location = useLocation();
@@ -208,6 +208,9 @@ const CheckVisit = () => {
       </div>
       <div className="w-full md:w-1/2 p-4">
         <h3 className="mb-2">QR 코드 확인 :</h3>
+        <p className="text-red-700 text-sm mb-3">
+          입력란에 커서를 놓고 QR 코드를 스캔해주세요.
+        </p>
         <input
           type="text"
           onKeyDown={handleQrKeyDown}
