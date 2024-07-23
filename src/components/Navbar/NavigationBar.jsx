@@ -6,7 +6,13 @@ import { useIsAdminData } from '../../api/user.api';
 
 const NavigationBar = () => {
   const { loggedIn, logout } = useAuth();
-  const { data: isAdmin } = useIsAdminData();
+  const { data: isAdmin, refetch } = useIsAdminData();
+
+  useEffect(() => {
+    if (loggedIn) {
+      refetch();
+    }
+  }, [loggedIn, refetch]);
 
   return (
     <Navbar fluid rounded className="border-b-2">

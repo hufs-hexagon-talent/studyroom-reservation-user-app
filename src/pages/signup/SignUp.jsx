@@ -78,10 +78,8 @@ const SignUp = () => {
   };
 
   return (
-    <div>
-      <h1 className="flex justify-center w-screen text-2xl text-center mt-10 mb-5">
-        회원가입
-      </h1>
+    <div className="flex flex-col items-center w-screen ">
+      <h1 className="text-2xl text-center mt-10 mb-5">회원가입</h1>
       <form id="form" className="flex flex-col max-w-md w-full gap-4">
         <div>
           <div className="mb-2 block">
