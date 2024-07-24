@@ -112,12 +112,14 @@ const Schedule = () => {
       )}
       <div className="flex flex-row justify-between">
         <div className="w-1/2 pr-4">
-          <div className="pt-10 font-bold text-lg">날짜 선택</div>
+          <div className="flex justify-center pt-10 font-bold text-lg">
+            날짜 선택
+          </div>
           <div className="text-sm py-3">
             선택된 날짜 :{' '}
             {selectedDates.map(d => format(d, 'yyyy-MM-dd')).join(', ')}
           </div>
-          <div>
+          <div className="flex justify-center">
             <DatePicker
               locale={ko}
               dateFormat="yyyy년 MM월 dd일"
@@ -125,11 +127,12 @@ const Schedule = () => {
               onChange={handleDateChange}
               inline
               highlightDates={selectedDates}
+              showIcon
             />
           </div>
         </div>
         <div className="border-l border-gray-300"></div>
-        <div className="w-1/2 pl-10">
+        <div className="flex items-center flex-col w-1/2 pl-10">
           <div className="pt-10 pb-6 font-bold text-lg">호실 선택</div>
           <div>
             {rooms?.map(room => (
