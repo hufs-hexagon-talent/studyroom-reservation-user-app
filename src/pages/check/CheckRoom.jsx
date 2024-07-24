@@ -69,7 +69,7 @@ const Check = () => {
                   key={index}
                   className="bg-white dark:border-gray-700 dark:bg-gray-800 text-center text-gray-900">
                   <Table.Cell className="px-2 py-4">
-                    {reservation.roomName}
+                    {`${reservation.roomName}-${reservation.partitionNumber}`}
                   </Table.Cell>
                   <Table.Cell className="px-2 py-4">
                     {format(start, 'MM-dd')}
