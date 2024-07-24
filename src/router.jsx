@@ -18,6 +18,7 @@ import LoggedOutPassword from './pages/password/LoggedOutPassword';
 import EmailVerify from './pages/password/EmailVerify';
 import SignUp from './pages/signup/SignUp';
 import SelectFloor from './pages/qrcheck/SelectFloor';
+import Schedule from './pages/manage/Schedule';
 
 const Router = () => {
   const { loggedIn } = useAuth();
@@ -51,6 +52,7 @@ const Router = () => {
             <Route path="/roompage" element={<RoomPage />} />
             <Route path="/visit" element={<CheckVisit />} />
             <Route path="/selectRoom" element={<SelectRoom />} />
+            <Route path="/schedule" element={<Schedule />} />
             <Route path="qrcheck" element={<QrCheck />} />
             {loggedIn && (
               <>

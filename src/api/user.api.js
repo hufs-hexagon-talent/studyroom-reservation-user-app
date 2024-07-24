@@ -146,6 +146,8 @@ export const useOtp = () =>
     queryFn: () => fetchOtp(),
   });
 
+
+// room 조회
 export const fetchRoom = async roomId => {
   const room_response = await apiClient.get(`/rooms/${roomId}`);
 
@@ -158,7 +160,6 @@ export const useRooms = roomIds =>
     queryFn: async () => {
       if (!roomIds) return [];
       const rooms = await Promise.all(roomIds.map(roomId => fetchRoom(roomId)));
-      //console.log(rooms);
       return rooms;
     },
   });
@@ -176,6 +177,7 @@ export const useCheckIn =()=>{
   });
 };
 
+// 모든 room 조회
 export const fetchAllRooms=async()=>{
   const all_rooms_response = await apiClient.get(
     '/rooms'
@@ -293,6 +295,33 @@ export const useEmailVerify=()=>{
         verifyCode
       });
       return verify_res.data;
+    }
+  })
+}
+
+// 모든 roomPolicy 조회
+export const fetchAllPolicies=async()=>{
+  const all_policies_res = await apiClient.get('/policies')
+  return all_policies_res.data;
+}
+
+export const useAllPolicies =()=>{
+  return(
+    useQuery({
+      queryKey:['allPolicies'],
+      queryFn:fetchAllPolicies
+    })
+  )
+}
+
+// 스케줄 주입
+export const useSchedules=()=>{
+  return useMutation({
+    mutationFn:async({roomId, roomOperationPolicyId, policyApplicationDate})=>{
+      const schedules_policy = await apiClient.post('/schedules',{
+        roomId, roomOperationPolicyId, policyApplicationDate
+      })
+      return schedules_policy.data;
     }
   })
 }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import ko from 'date-fns/locale/ko';
 import { convertToEnglish } from '../../api/convertToEnglish';
@@ -25,6 +25,7 @@ const CheckVisit = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [reservations, setReservations] = useState([]);
   let inko = new Inko();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -140,6 +141,11 @@ const CheckVisit = () => {
   return (
     <div className="flex flex-col md:flex-row border-r md:border-r-2 border-gray-300">
       <div className="p-4 border-b md:border-b-0 md:border-r border-gray-300">
+        <p
+          onClick={() => navigate('/schedule')}
+          className="pb-3 hover:underline cursor-pointer">
+          스케줄 주입
+        </p>
         <div>
           <p>{`선택된 방 : ${roomNames}`}</p>
         </div>
