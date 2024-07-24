@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
 import { useSnackbar } from 'react-simple-snackbar';
+import { useIsAdminData } from './api/user.api';
 
 import Footer from './components/footer/Footer';
 import NavigationBar from './components/Navbar/NavigationBar';
@@ -22,6 +23,7 @@ import Schedule from './pages/manage/Schedule';
 
 const Router = () => {
   const { loggedIn } = useAuth();
+  const { data: isAdmin } = useIsAdminData();
   const [openSnackbar] = useSnackbar({
     position: 'top-right',
     style: {
@@ -37,7 +39,6 @@ const Router = () => {
         <NavigationBar />
         <div className="flex-grow">
           <Routes>
-            <Route path="/selectFloor" element={<SelectFloor />} />
             <Route path="/password" element={<LoggedInPassword />} />
             <Route path="/email" element={<EmailVerify />} />
             <Route
@@ -50,10 +51,15 @@ const Router = () => {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignUp />} />
             <Route path="/roompage" element={<RoomPage />} />
-            <Route path="/visit" element={<CheckVisit />} />
-            <Route path="/selectRoom" element={<SelectRoom />} />
-            <Route path="/schedule" element={<Schedule />} />
-            <Route path="qrcheck" element={<QrCheck />} />
+            {isAdmin && (
+              <>
+                <Route path="/selectFloor" element={<SelectFloor />} />
+                <Route path="/visit" element={<CheckVisit />} />
+                <Route path="/selectRoom" element={<SelectRoom />} />
+                <Route path="/schedule" element={<Schedule />} />
+                <Route path="qrcheck" element={<QrCheck />} />
+              </>
+            )}
             {loggedIn && (
               <>
                 <Route path="/check" element={<Check />} />
