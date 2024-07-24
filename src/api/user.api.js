@@ -178,19 +178,37 @@ export const useCheckIn =()=>{
 };
 
 // 모든 room 조회
-export const fetchAllRooms=async()=>{
+export const fetchAllRooms = async()=>{
   const all_rooms_response = await apiClient.get(
     '/rooms'
   )
   return all_rooms_response.data.data.items;
 }
 
-export const useAllRooms = () =>
+export const useAllRooms =()=>{
   useQuery({
-    queryKey: ['allRooms'],
-    queryFn: async () => {
+    queryKey:['allRooms'],
+    queryFn:async()=>{
       const allRooms = await fetchAllRooms();
-      return allRooms.map(room => ({ roomId: room.roomId, roomName: room.roomName }));
+      return allRooms.map(room=>({roomId:room.roomId, roomName : room.roomName}))
+    }
+  })
+}
+
+// 모든 partition 조회
+export const fetchAllPartitions=async()=>{
+  const all_partitions_response = await apiClient.get(
+    '/partitions'
+  )
+  return all_partitions_response.data.data.items;
+}
+
+export const useAllPartitions = () =>
+  useQuery({
+    queryKey: ['allPartitions'],
+    queryFn: async () => {
+      const allPartitions = await fetchAllPartitions();
+      return allPartitions.map(partition => ({ partitionId: partition.roomPartitionId, partitionNumber: partition.partitionNumber ,roomName: partition.roomName }));
     },
   });
 

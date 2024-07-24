@@ -35,7 +35,7 @@ const SelectFloor = () => {
   return (
     <div className="m-10">
       <div className="font-bold mt-10 text-2xl text-center">
-        층을 선택하세요
+        호실을 선택하세요
       </div>
       <div className="flex justify-center mt-12">
         <div className="flex flex-col">

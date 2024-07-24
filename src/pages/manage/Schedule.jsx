@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Checkbox, Table, Button } from 'flowbite-react';
-import { useAllPolicies, useAllRooms } from '../../api/user.api';
+import { useAllPolicies, useAllPartitions } from '../../api/user.api';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import { ko } from 'date-fns/locale';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -8,7 +8,7 @@ import { format } from 'date-fns';
 
 const Schedule = () => {
   const { data: policies, refetch } = useAllPolicies();
-  const { data: rooms } = useAllRooms();
+  const { data: rooms } = useAllPartitions();
   const [isFetched, setIsFetched] = useState(false);
   const [isTableVisible, setIsTableVisible] = useState(false);
   const [selectedPolicyId, setSelectedPolicyId] = useState(null);

@@ -12,7 +12,7 @@ import OtpPage from './pages/OtpPage/OtpPage';
 import RoomPage from './pages/rooms/room/RoomPage';
 import useAuth from './hooks/useAuth';
 import CheckVisit from './pages/manage/checkVisit';
-import SelectRoom from './pages/manage/SelectRoom';
+import SelectPartition from './pages/manage/SelectPartition';
 import QrCheck from './pages/qrcheck/QrCheck';
 import LoggedInPassword from './pages/password/LoggedInPassword';
 import LoggedOutPassword from './pages/password/LoggedOutPassword';
@@ -55,11 +55,11 @@ const Router = () => {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignUp />} />
             <Route path="/roompage" element={<RoomPage />} />
+            <Route path="/selectFloor" element={<SelectFloor />} />
             {isAdmin === true && (
               <>
-                <Route path="/selectFloor" element={<SelectFloor />} />
                 <Route path="/visit" element={<CheckVisit />} />
-                <Route path="/selectRoom" element={<SelectRoom />} />
+                <Route path="/selectPartition" element={<SelectPartition />} />
                 <Route path="/schedule" element={<Schedule />} />
                 <Route path="qrcheck" element={<QrCheck />} />
               </>
