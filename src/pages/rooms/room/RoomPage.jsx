@@ -222,7 +222,7 @@ const RoomPage = () => {
 
   // 자신의 예약 생성
   const handleReservation = useCallback(
-    async ({ roomId, startDateTime, endDateTime }) => {
+    async ({ roomPartitionId, startDateTime, endDateTime }) => {
       if (!isLoggedIn) {
         openSnackbar('로그인 후에 세미나실 예약이 가능합니다.');
         setTimeout(() => {
@@ -242,7 +242,7 @@ const RoomPage = () => {
       }
       try {
         await doReserve({
-          roomId,
+          roomPartitionId,
           startDateTime,
           endDateTime,
         });
@@ -445,7 +445,7 @@ const RoomPage = () => {
           <Button
             onClick={() =>
               handleReservation({
-                roomId: selectedRoom ? selectedRoom.roomId : null,
+                roomPartitionId: selectedRoom ? selectedRoom.partitionId : null,
                 startDateTime: selectedRangeFrom,
                 endDateTime: selectedRangeTo,
               })

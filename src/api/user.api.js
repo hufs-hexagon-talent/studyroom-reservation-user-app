@@ -50,9 +50,9 @@ export const useIsAdminData=()=>{
 // 자신의 예약 생성
 export const useReserve = () => {
   return useMutation({
-    mutationFn: async ({ roomId, startDateTime, endDateTime }) => {
+    mutationFn: async ({ roomPartitionId, startDateTime, endDateTime }) => {
       const res = await apiClient.post('/reservations', {
-        roomId,
+        roomPartitionId,
         startDateTime,
         endDateTime,
       });
