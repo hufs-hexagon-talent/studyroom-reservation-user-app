@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
 import { useSnackbar } from 'react-simple-snackbar';
 import { useIsAdminData } from './api/user.api';
@@ -23,7 +23,7 @@ import Schedule from './pages/manage/Schedule';
 
 const Router = () => {
   const { loggedIn } = useAuth();
-  const { data: isAdmin } = useIsAdminData();
+  const { data: isAdmin, refetch } = useIsAdminData();
   const [openSnackbar] = useSnackbar({
     position: 'top-right',
     style: {
@@ -32,6 +32,10 @@ const Router = () => {
   });
 
   const pwResetToken = sessionStorage.getItem('pwResetToken');
+
+  useEffect(() => {
+    refetch();
+  }, [refetch]);
 
   return (
     <BrowserRouter basename={process.env.REACT_APP_BASEURL || '/'}>
@@ -51,7 +55,7 @@ const Router = () => {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignUp />} />
             <Route path="/roompage" element={<RoomPage />} />
-            {isAdmin && (
+            {isAdmin === true && (
               <>
                 <Route path="/selectFloor" element={<SelectFloor />} />
                 <Route path="/visit" element={<CheckVisit />} />

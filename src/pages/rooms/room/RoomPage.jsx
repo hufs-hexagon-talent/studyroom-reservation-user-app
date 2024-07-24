@@ -54,6 +54,7 @@ const createTimeTable = config => {
 };
 
 const RoomPage = () => {
+  // snackBar
   const [openSnackbar, closeSnackbar] = useSnackbar({
     position: 'top-right',
     style: {
@@ -142,7 +143,6 @@ const RoomPage = () => {
   const handleDateChange = date => {
     const formattedDate = format(date, 'yyyy-MM-dd');
     setSelectedDate(formattedDate);
-    // fetchReservation(formattedDate, setSlotsArr, setReservedSlots);
   };
 
   const isRangeSelected = useMemo(
