@@ -369,7 +369,8 @@ const RoomPage = () => {
                       const isPast = new Date() > slotDateFromPlus30;
 
                       const isSelected =
-                        reservationsByRoom.roomId === selectedRoom?.roomId &&
+                        reservationsByRoom.partitionId ===
+                          selectedRoom?.partitionId &&
                         areIntervalsOverlapping(
                           { start: selectedRangeFrom, end: selectedRangeTo },
                           { start: slotDateFrom, end: slotDateTo },
@@ -398,7 +399,8 @@ const RoomPage = () => {
                           reservationsByRoom.policy.eachMaxMinute &&
                         differenceInMinutes(slotDateTo, selectedRangeFrom) >
                           0 &&
-                        selectedRoom?.roomId === reservationsByRoom.roomId;
+                        selectedRoom?.partitionId ===
+                          reservationsByRoom.partitionId;
 
                       const mode = isSelected
                         ? 'selected'
