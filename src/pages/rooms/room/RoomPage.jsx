@@ -354,7 +354,7 @@ const RoomPage = () => {
                   <TableRow key={i}>
                     {/* <pre>{JSON.stringify(reservationsByRoom, null, 2)}</pre> */}
                     <TableCell sx={{ px: 2, py: 2, whiteSpace: 'nowrap' }}>
-                      {reservationsByRoom.roomName}
+                      {`${reservationsByRoom.roomName}-${reservationsByRoom.partitionNumber}`}
                     </TableCell>
                     {times.map((time, timeIndex) => {
                       const slotDateFrom = parse(
@@ -423,9 +423,9 @@ const RoomPage = () => {
                                 ? 0.5
                                 : 1,
                             backgroundColor: {
-                              past: '#AAAAAA',
-                              selected: '#7599BA',
-                              reserved: '#002D56',
+                              past: '#AAAAAA', // 과거의 회색
+                              selected: '#7599BA', // 선택된 하늘색
+                              reserved: '#002D56', // 예약된 남색
                               none: '#F1EEE9',
                             }[mode],
                             borderRight: '1px solid #ccc',
