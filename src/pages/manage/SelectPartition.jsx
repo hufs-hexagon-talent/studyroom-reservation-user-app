@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { useAllRooms } from '../../api/user.api';
+import { useAllPartitions } from '../../api/user.api';
 import { useNavigate } from 'react-router-dom';
 import { Button } from 'flowbite-react';
 
 const SelectRoom = () => {
-  const { data: rooms, error, isLoading } = useAllRooms();
-  const [selectedRooms, setSelectedRooms] = useState([]);
+  const { data: partitions, error, isLoading } = useAllPartitions();
+  const [selectedPartitions, setSelectedPartitions] = useState([]);
   const navigate = useNavigate();
 
   if (isLoading) {
@@ -16,20 +16,26 @@ const SelectRoom = () => {
     return <div>Error loading rooms.</div>;
   }
 
-  const handleCheckboxChange = room => {
-    setSelectedRooms(prevSelectedRooms => {
-      if (prevSelectedRooms.find(r => r.roomId === room.roomId)) {
-        return prevSelectedRooms.filter(r => r.roomId !== room.roomId);
+  const handleCheckboxChange = partition => {
+    setSelectedPartitions(prevSelectedRooms => {
+      if (
+        prevSelectedRooms.find(r => r.partitionId === partition.partitionId)
+      ) {
+        return prevSelectedRooms.filter(
+          r => r.partitionId !== partition.partitionId,
+        );
       } else {
-        return [...prevSelectedRooms, room];
+        return [...prevSelectedRooms, partition];
       }
     });
   };
 
   const handleNextClick = () => {
-    const selectedRoomIds = selectedRooms.map(room => room.roomId);
-    console.log('Selected rooms:', selectedRoomIds);
-    navigate(`/visit?roomIds[]=${selectedRoomIds.join(',')}`);
+    const selectedPartitionIds = selectedPartitions.map(
+      partition => partition.partitionId,
+    );
+    console.log('Selected rooms:', selectedPartitionIds);
+    navigate(`/visit?partitionIds[]=${selectedPartitionIds.join(',')}`);
   };
 
   return (
@@ -39,19 +45,19 @@ const SelectRoom = () => {
       </div>
       <div className="flex justify-center mt-12">
         <div className="flex flex-col">
-          {rooms.map((room, index) => (
+          {partitions.map((partition, index) => (
             <div className="flex items-center mb-4" key={index}>
               <input
-                id={`box-${room.roomName}`}
+                id={`box-${partition.partitionId}`}
                 type="checkbox"
-                value={room.roomName}
+                value={partition.partitionId}
                 className="w-4 h-4 bg-gray-100 border-gray-300"
-                onChange={() => handleCheckboxChange(room)}
+                onChange={() => handleCheckboxChange(partition)}
               />
               <label
-                htmlFor={`box-${room.roomName}`}
+                htmlFor={`box-${partition.partitionId}`}
                 className="ml-2 text-xl font-medium">
-                {room.roomName}
+                {`${partition.roomName}-${partition.partitionNumber}`}
               </label>
             </div>
           ))}

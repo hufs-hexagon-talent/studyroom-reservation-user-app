@@ -2,11 +2,9 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import ko from 'date-fns/locale/ko';
-import { convertToEnglish } from '../../api/convertToEnglish';
 import {
-  useReservationsByRooms,
-  useRooms,
-  useCheckIn,
+  useReservationsByPartitions,
+  usePartition,
   useAdminDeleteReservation,
 } from '../../api/user.api';
 import { Button, Table } from 'flowbite-react';
@@ -17,51 +15,58 @@ registerLocale('ko', ko);
 
 const CheckVisit = () => {
   const location = useLocation();
-  const [roomIds, setRoomIds] = useState([]);
+  const [partitionIds, setPartitionIds] = useState([]);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [error, setError] = useState(null);
   const [fetchParams, setFetchParams] = useState(null);
-  const [successMessage, setSuccessMessage] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
   const [reservations, setReservations] = useState([]);
   let inko = new Inko();
   const navigate = useNavigate();
 
+  // location.search가 변경될 때 마다 실행
   useEffect(() => {
     const params = new URLSearchParams(location.search);
-    const roomIdsParam = params.get('roomIds[]');
-    if (roomIdsParam) {
-      const roomIdsArray = roomIdsParam.split(',').map(id => parseInt(id, 10));
-      setRoomIds(roomIdsArray);
+    const partitionIdsParmas = params.get('partitionIds[]');
+    if (partitionIdsParmas) {
+      const partitionIdsArray = partitionIdsParmas
+        .split(',')
+        .map(id => parseInt(id, 10));
+      setPartitionIds(partitionIdsArray);
     }
   }, [location.search]);
 
-  const { mutate: doCheckIn } = useCheckIn();
   const { mutate: doDelete } = useAdminDeleteReservation();
-  const { data: rooms } = useRooms(roomIds);
+  const { data: partitions } = usePartition(partitionIds);
   const {
     data: fetchedReservations,
     refetch,
     isError: reservationsError,
-  } = useReservationsByRooms(fetchParams || {});
+  } = useReservationsByPartitions(fetchParams || {});
 
+  const partitionId = partitions
+    ?.map(partition => partition.roomId)
+    .filter((value, index, self) => self.indexOf(value) === index);
+
+  // reservations 상태 변경
   useEffect(() => {
     if (fetchedReservations) {
       setReservations(fetchedReservations);
     }
   }, [fetchedReservations]);
 
+  // partitionIds & selectedDate가 변경될 때 마다 handleFetchReservations 호출
   useEffect(() => {
-    if (roomIds.length > 0 && selectedDate) {
+    if (partitionIds.length > 0 && selectedDate) {
       handleFetchReservations();
     }
-  }, [roomIds, selectedDate]);
+  }, [partitionIds, selectedDate]);
 
+  // 예약 정보 가져오는 함수
   const handleFetchReservations = async () => {
     if (selectedDate) {
       try {
         const formattedDate = format(selectedDate, 'yyyy-MM-dd');
-        setFetchParams({ date: formattedDate, roomIds });
+        setFetchParams({ date: formattedDate, partitionIds });
         refetch();
         setError(null);
       } catch (err) {
@@ -73,65 +78,15 @@ const CheckVisit = () => {
     }
   };
 
-  const handleQrCode = verificationCode => {
-    const lowerCaseCode = convertToEnglish(
-      inko.ko2en(verificationCode).toLowerCase(),
-    );
-    console.log({ verificationCode: lowerCaseCode, roomIds });
-
-    doCheckIn(
-      {
-        verificationCode: lowerCaseCode,
-        roomIds,
-      },
-      {
-        onSuccess: result => {
-          const checkedInReservations = result.data.checkInReservations;
-
-          setReservations(prevReservations =>
-            prevReservations.map(reservation =>
-              checkedInReservations.some(
-                checkedInReservation =>
-                  checkedInReservation.reservationId ===
-                  reservation.reservationId,
-              )
-                ? { ...reservation, state: 'VISITED' }
-                : reservation,
-            ),
-          );
-
-          const userName = checkedInReservations[0].name;
-          setSuccessMessage(`${userName}님, 출석 확인 되었습니다.`);
-          setErrorMessage('');
-          setTimeout(() => {
-            setSuccessMessage('');
-          }, 5000);
-        },
-        onError: error => {
-          setErrorMessage(
-            error.response?.data?.errorMessage ||
-              'An unexpected error occurred',
-          );
-          setSuccessMessage('');
-          setTimeout(() => {
-            setErrorMessage('');
-          }, 5000);
-        },
-      },
-    );
-  };
-
-  const handleQrKeyDown = useCallback(
-    e => {
-      if (e.code === 'Enter') {
-        handleQrCode(e.target.value);
-        e.target.value = '';
-      }
-    },
-    [roomIds],
-  );
-
-  const roomNames = rooms?.map(room => room.roomName).join(', ');
+  // 선택된 방 변수 (숫자대로 정렬)
+  const partitionNames = partitions
+    ?.map(partition => `${partition.roomName}-${partition.partitionNumber}`)
+    .sort((a, b) => {
+      const [roomA, partA] = a.split('-').map(Number);
+      const [roomB, partB] = b.split('-').map(Number);
+      return roomA - roomB || partA - partB;
+    })
+    .join(', ');
 
   // 예약 삭제
   const handleDelete = reservationId => {
@@ -139,15 +94,15 @@ const CheckVisit = () => {
   };
 
   return (
-    <div className="flex flex-col md:flex-row border-r md:border-r-2 border-gray-300">
-      <div className="p-4 border-b md:border-b-0 md:border-r border-gray-300">
+    <div className="flex flex-col">
+      <div className="p-4 ">
         <p
           onClick={() => navigate('/schedule')}
-          className="pb-3 hover:underline cursor-pointer">
-          스케줄 주입
+          className="inline-block pb-3 hover:underline cursor-pointer">
+          스케줄 주입하러 가기 &gt;
         </p>
         <div>
-          <p>{`선택된 방 : ${roomNames}`}</p>
+          <p>{`선택된 방 : ${partitionNames}`}</p>
         </div>
         <div className="pt-3 pb-3">출석 일자</div>
         <div className="flex items-center space-x-2">
@@ -185,15 +140,13 @@ const CheckVisit = () => {
               {reservations.map(reservation => (
                 <Table.Row
                   key={reservation.reservationId}
-                  className={
-                    reservation.state === 'VISITED'
-                      ? 'bg-yellow-300 hover:bg-yellow-300'
-                      : ''
-                  }>
+                  className={reservation.state === 'VISITED'}>
                   <Table.Cell>
                     {reservation.state === 'VISITED' ? '출석' : '미출석'}
                   </Table.Cell>
-                  <Table.Cell>{reservation.roomName}</Table.Cell>
+                  <Table.Cell>
+                    {reservation.roomName}-{reservation.partitionNumber}
+                  </Table.Cell>
                   <Table.Cell>{reservation.name}</Table.Cell>
                   <Table.Cell>
                     {format(new Date(reservation.startDateTime), 'HH:mm')}
@@ -210,26 +163,6 @@ const CheckVisit = () => {
               ))}
             </Table.Body>
           </Table>
-        )}
-      </div>
-      <div className="w-full md:w-1/2 p-4">
-        <h3 className="mb-2">QR 코드 확인 :</h3>
-        <p className="text-red-700 text-sm mb-3">
-          입력란에 커서를 놓고 QR 코드를 스캔해주세요.
-        </p>
-        <input
-          type="text"
-          onKeyDown={handleQrKeyDown}
-          placeholder="Scan QR Code"
-          className="border border-gray-300 p-2 rounded w-full"
-        />
-        {successMessage && (
-          <div className="mt-4 p-4 bg-green-100 text-green-700">
-            {successMessage}
-          </div>
-        )}
-        {errorMessage && (
-          <div className="mt-4 p-4 bg-red-100 text-red-700">{errorMessage}</div>
         )}
       </div>
     </div>

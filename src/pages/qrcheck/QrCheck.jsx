@@ -1,13 +1,13 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import Inko from 'inko';
-import { useCheckIn, fetchIsAdmin } from '../../api/user.api';
+import { useCheckIn, fetchIsAdmin, useRooms } from '../../api/user.api';
 import { convertToEnglish } from '../../api/convertToEnglish';
 import { useNavigate } from 'react-router-dom';
 import useAuth from '../../hooks/useAuth';
 import { useSnackbar } from 'react-simple-snackbar';
 
 const QrCheck = () => {
-  const [roomIds, setRoomIds] = useState([]);
+  const [roomId, setroomId] = useState([]);
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [reservations, setReservations] = useState([]);
@@ -22,13 +22,16 @@ const QrCheck = () => {
     },
   });
 
+  // useRooms 훅 사용
+  const { data: rooms } = useRooms(roomId);
+
   useEffect(() => {
     const params = new URLSearchParams(location.search);
-    const roomIdsParam = params.get('roomIds[]');
+    const roomIdsParam = params.get('roomId');
     if (roomIdsParam) {
-      const roomIdsArray = roomIdsParam.split(',').map(id => parseInt(id, 10));
-      setRoomIds(roomIdsArray);
+      setroomId(parseInt(roomIdsParam));
     }
+    console.log(roomId);
   }, [location.search]);
 
   useEffect(() => {
@@ -53,7 +56,6 @@ const QrCheck = () => {
     if (loggedIn) {
       checkAdminStatus();
     } else {
-      // todo: 이거 flowbite로
       console.log('로그인이 되어 있지 않습니다');
       navigate('/login');
     }
@@ -63,12 +65,12 @@ const QrCheck = () => {
     const lowerCaseCode = convertToEnglish(
       inko.ko2en(verificationCode).toLowerCase(),
     );
-    console.log({ verificationCode: lowerCaseCode, roomIds });
+    console.log({ verificationCode: lowerCaseCode, roomId });
 
     doCheckIn(
       {
         verificationCode: lowerCaseCode,
-        roomIds,
+        roomId: roomId,
       },
       {
         onSuccess: result => {
@@ -114,7 +116,7 @@ const QrCheck = () => {
         e.target.value = '';
       }
     },
-    [roomIds],
+    [roomId],
   );
 
   return (
@@ -123,8 +125,8 @@ const QrCheck = () => {
         QR코드 출석
       </h3>
       <div className="mt-5 mb-10 text-center" style={{ color: '#9D9FA2' }}>
-        {/* todo: 띄어쓰기 별로 줄바꿈*/}
-        본인의 QR코드를 스캐너에 스캔해주세요
+        <p>현재 선택된 호실 : {roomId ? roomId : '선택된 호실이 없음'}</p>
+        <p>본인의 QR코드를 스캐너에 스캔해주세요</p>
       </div>
       <div className="flex flex-col items-center justify-center w-screen">
         <input

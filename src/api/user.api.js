@@ -50,9 +50,9 @@ export const useIsAdminData=()=>{
 // 자신의 예약 생성
 export const useReserve = () => {
   return useMutation({
-    mutationFn: async ({ roomId, startDateTime, endDateTime }) => {
+    mutationFn: async ({ roomPartitionId, startDateTime, endDateTime }) => {
       const res = await apiClient.post('/reservations', {
-        roomId,
+        roomPartitionId,
         startDateTime,
         endDateTime,
       });
@@ -69,20 +69,20 @@ export const fetchDate = async () => {
   return dates;
 };
 
-//해당 날짜의 예약 정보 가져오기 (1차원, checkVisit에 사용)
-export const fetchReservationsByRooms = async ({ date, roomIds }) => {
+// 특정 날짜, 특정 partition들 모든 예약 상태 확인 (1차원, checkVisit에 사용)
+export const fetchReservationsByPartitions = async ({ date, partitionIds }) => {
   const params = new URLSearchParams();
   params.append('date', date);
-  roomIds.forEach(id => params.append('roomIds', id));
+  partitionIds.forEach(id => params.append('partitionIds', id));
 
-  const response = await apiClient.get(`https://api.studyroom.jisub.kim/reservations/rooms/by-date?${params.toString()}`);
+  const response = await apiClient.get(`https://api.studyroom.jisub.kim/reservations/partitions/by-date?${params.toString()}`);
   return response.data.data.reservations;
 };
 
-export const useReservationsByRooms = ({ date, roomIds }) =>
+export const useReservationsByPartitions = ({ date, partitionIds }) =>
   useQuery({
-    queryKey: ['reservationsByRooms', date, roomIds],
-    queryFn: () => fetchReservationsByRooms({ date, roomIds }),
+    queryKey: ['reservationsByPartitions', date, partitionIds],
+    queryFn: () => fetchReservationsByPartitions({ date, partitionIds }),
   });
 
 // 해당 날짜의 예약 정보 가져오기 (2차원, roomPage에 사용)
@@ -146,31 +146,46 @@ export const useOtp = () =>
     queryFn: () => fetchOtp(),
   });
 
+// partition 조회
+export const fetchPartiiton = async partitonId =>{
+  const partition_res = await apiClient.get(`/partitions/${partitonId}`);
+  return partition_res.data.data;
+}
+
+export const usePartition = partitionIds => 
+  useQuery({
+    queryKey:['partitions', partitionIds],
+    queryFn: async()=>{
+      if(!partitionIds) return [];
+      const partitions = await Promise.all(partitionIds.map(partitionId => fetchPartiiton(partitionId)));
+      return partitions;
+    }
+  })
 
 // room 조회
 export const fetchRoom = async roomId => {
   const room_response = await apiClient.get(`/rooms/${roomId}`);
-
-  return room_response.data;
+  return room_response.data.data;
 };
 
 export const useRooms = roomIds =>
   useQuery({
     queryKey: ['rooms', roomIds],
     queryFn: async () => {
-      if (!roomIds) return [];
+      if (!roomIds || roomIds.length === 0) return [];
       const rooms = await Promise.all(roomIds.map(roomId => fetchRoom(roomId)));
       return rooms;
     },
   });
 
+
 // 체크인 하기
 export const useCheckIn =()=>{
   return useMutation({
-    mutationFn : async({verificationCode, roomIds})=>{
+    mutationFn : async({verificationCode, roomId})=>{
       const check_in_res = await apiClient.post('/check-in',{
         verificationCode,
-        roomIds
+        roomId
       });
       return check_in_res.data;
     },
@@ -178,34 +193,49 @@ export const useCheckIn =()=>{
 };
 
 // 모든 room 조회
-export const fetchAllRooms=async()=>{
-  const all_rooms_response = await apiClient.get(
-    '/rooms'
-  )
+export const fetchAllRooms = async () => {
+  const all_rooms_response = await apiClient.get('/rooms');
   return all_rooms_response.data.data.items;
+};
+
+export const useAllRooms = () => {
+  return useQuery({
+    queryKey: ['allRooms'],
+    queryFn: fetchAllRooms,
+  });
+};
+
+// 모든 partition 조회
+export const fetchAllPartitions=async()=>{
+  const all_partitions_response = await apiClient.get(
+    '/partitions'
+  )
+  return all_partitions_response.data.data.items;
 }
 
-export const useAllRooms = () =>
+export const useAllPartitions = () =>
   useQuery({
-    queryKey: ['allRooms'],
+    queryKey: ['allPartitions'],
     queryFn: async () => {
-      const allRooms = await fetchAllRooms();
-      return allRooms.map(room => ({ roomId: room.roomId, roomName: room.roomName }));
+      const allPartitions = await fetchAllPartitions();
+      return allPartitions.map(partition => ({ partitionId: partition.roomPartitionId, partitionNumber: partition.partitionNumber ,roomName: partition.roomName }));
     },
   });
 
-export const fetchReservedRooms =async({date,roomIds})=>{
-  const reserved_rooms_res = await apiClient.get(
-    `/reservations/rooms/by-date?date=${date}&roomIds=${roomIds}`
-  )
-  return reserved_rooms_res.data.data;
+// roomId로 partition들 조회
+export const fetchPartitionsByRoomIds = async (roomIds) => {
+  const partitions = await Promise.all(
+    roomIds.map(roomId => apiClient.get(`/partitions/rooms/${roomId}`))
+  );
+  return partitions.flatMap(partition => partition.data.data.items);
 }
 
-export const useReservedRooms =({date, roomIds})=>{
-  useQuery({
-    queryKey:[date,roomIds],
-    queryFn:()=>fetchReservedRooms(date,roomIds)
-  })
+export const usePartitionsByRoomIds = (roomIds) => {
+  return useQuery({
+    queryKey: ['partitionsByRoomIds', roomIds],
+    queryFn: () => fetchPartitionsByRoomIds(roomIds),
+    enabled: !!roomIds.length, // roomIds가 비어있지 않을 때만 쿼리 실행
+  });
 }
 
 // 노쇼 횟수
@@ -317,9 +347,9 @@ export const useAllPolicies =()=>{
 // 스케줄 주입
 export const useSchedules=()=>{
   return useMutation({
-    mutationFn:async({roomId, roomOperationPolicyId, policyApplicationDate})=>{
+    mutationFn:async({roomIds, roomOperationPolicyId, policyApplicationDates})=>{
       const schedules_policy = await apiClient.post('/schedules',{
-        roomId, roomOperationPolicyId, policyApplicationDate
+        roomIds, roomOperationPolicyId, policyApplicationDates
       })
       return schedules_policy.data;
     }

@@ -54,6 +54,7 @@ const createTimeTable = config => {
 };
 
 const RoomPage = () => {
+  // snackBar
   const [openSnackbar, closeSnackbar] = useSnackbar({
     position: 'top-right',
     style: {
@@ -142,7 +143,6 @@ const RoomPage = () => {
   const handleDateChange = date => {
     const formattedDate = format(date, 'yyyy-MM-dd');
     setSelectedDate(formattedDate);
-    // fetchReservation(formattedDate, setSlotsArr, setReservedSlots);
   };
 
   const isRangeSelected = useMemo(
@@ -222,7 +222,7 @@ const RoomPage = () => {
 
   // 자신의 예약 생성
   const handleReservation = useCallback(
-    async ({ roomId, startDateTime, endDateTime }) => {
+    async ({ roomPartitionId, startDateTime, endDateTime }) => {
       if (!isLoggedIn) {
         openSnackbar('로그인 후에 세미나실 예약이 가능합니다.');
         setTimeout(() => {
@@ -242,7 +242,7 @@ const RoomPage = () => {
       }
       try {
         await doReserve({
-          roomId,
+          roomPartitionId,
           startDateTime,
           endDateTime,
         });
@@ -354,7 +354,7 @@ const RoomPage = () => {
                   <TableRow key={i}>
                     {/* <pre>{JSON.stringify(reservationsByRoom, null, 2)}</pre> */}
                     <TableCell sx={{ px: 2, py: 2, whiteSpace: 'nowrap' }}>
-                      {reservationsByRoom.roomName}
+                      {`${reservationsByRoom.roomName}-${reservationsByRoom.partitionNumber}`}
                     </TableCell>
                     {times.map((time, timeIndex) => {
                       const slotDateFrom = parse(
@@ -369,7 +369,8 @@ const RoomPage = () => {
                       const isPast = new Date() > slotDateFromPlus30;
 
                       const isSelected =
-                        reservationsByRoom.roomId === selectedRoom?.roomId &&
+                        reservationsByRoom.partitionId ===
+                          selectedRoom?.partitionId &&
                         areIntervalsOverlapping(
                           { start: selectedRangeFrom, end: selectedRangeTo },
                           { start: slotDateFrom, end: slotDateTo },
@@ -398,7 +399,8 @@ const RoomPage = () => {
                           reservationsByRoom.policy.eachMaxMinute &&
                         differenceInMinutes(slotDateTo, selectedRangeFrom) >
                           0 &&
-                        selectedRoom?.roomId === reservationsByRoom.roomId;
+                        selectedRoom?.partitionId ===
+                          reservationsByRoom.partitionId;
 
                       const mode = isSelected
                         ? 'selected'
@@ -423,9 +425,9 @@ const RoomPage = () => {
                                 ? 0.5
                                 : 1,
                             backgroundColor: {
-                              past: '#AAAAAA',
-                              selected: '#7599BA',
-                              reserved: '#002D56',
+                              past: '#AAAAAA', // 과거의 회색
+                              selected: '#7599BA', // 선택된 하늘색
+                              reserved: '#002D56', // 예약된 남색
                               none: '#F1EEE9',
                             }[mode],
                             borderRight: '1px solid #ccc',
@@ -443,7 +445,7 @@ const RoomPage = () => {
           <Button
             onClick={() =>
               handleReservation({
-                roomId: selectedRoom ? selectedRoom.roomId : null,
+                roomPartitionId: selectedRoom ? selectedRoom.partitionId : null,
                 startDateTime: selectedRangeFrom,
                 endDateTime: selectedRangeTo,
               })

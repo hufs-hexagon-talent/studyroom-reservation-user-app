@@ -2,11 +2,18 @@ import React, { useState } from 'react';
 import { useAllRooms } from '../../api/user.api';
 import { useNavigate } from 'react-router-dom';
 import { Button } from 'flowbite-react';
+import { useSnackbar } from 'react-simple-snackbar';
 
-const SelectFloor = () => {
+const SelectRoom = () => {
   const { data: rooms, error, isLoading } = useAllRooms();
-  const [selectedRooms, setSelectedRooms] = useState([]);
+  const [selectedRoom, setSelectedRoom] = useState(null);
   const navigate = useNavigate();
+  const [openSnackbar, closeSnackbar] = useSnackbar({
+    position: 'top-right',
+    style: {
+      backgroundColor: '#FF3333',
+    },
+  });
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -17,25 +24,32 @@ const SelectFloor = () => {
   }
 
   const handleCheckboxChange = room => {
-    setSelectedRooms(prevSelectedRooms => {
-      if (prevSelectedRooms.find(r => r.roomId === room.roomId)) {
-        return prevSelectedRooms.filter(r => r.roomId !== room.roomId);
+    setSelectedRoom(prevSelectedRoom => {
+      if (prevSelectedRoom && prevSelectedRoom.roomId === room.roomId) {
+        return null;
       } else {
-        return [...prevSelectedRooms, room];
+        return room;
       }
     });
   };
 
   const handleNextClick = () => {
-    const selectedRoomIds = selectedRooms.map(room => room.roomId);
-    console.log('Selected rooms:', selectedRoomIds);
-    navigate(`/visit?roomIds[]=${selectedRoomIds.join(',')}`);
+    if (!selectedRoom) {
+      openSnackbar('적어도 하나의 호실을 선택해주세요');
+      setTimeout(() => {
+        closeSnackbar();
+      }, 2500);
+      return;
+    }
+
+    console.log('Selected room:', selectedRoom.roomId);
+    navigate(`/qrcheck?roomId=${selectedRoom.roomId}`);
   };
 
   return (
     <div className="m-10">
       <div className="font-bold mt-10 text-2xl text-center">
-        층을 선택하세요
+        방을 선택하세요
       </div>
       <div className="flex justify-center mt-12">
         <div className="flex flex-col">
@@ -44,6 +58,7 @@ const SelectFloor = () => {
               <input
                 id={`box-${room.roomName}`}
                 type="checkbox"
+                checked={selectedRoom?.roomId === room.roomId}
                 value={room.roomName}
                 className="w-4 h-4 bg-gray-100 border-gray-300"
                 onChange={() => handleCheckboxChange(room)}
@@ -69,4 +84,4 @@ const SelectFloor = () => {
   );
 };
 
-export default SelectFloor;
+export default SelectRoom;

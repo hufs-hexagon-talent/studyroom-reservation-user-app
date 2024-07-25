@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
 import { useSnackbar } from 'react-simple-snackbar';
+import { useIsAdminData } from './api/user.api';
 
 import Footer from './components/footer/Footer';
 import NavigationBar from './components/Navbar/NavigationBar';
@@ -11,17 +12,18 @@ import OtpPage from './pages/OtpPage/OtpPage';
 import RoomPage from './pages/rooms/room/RoomPage';
 import useAuth from './hooks/useAuth';
 import CheckVisit from './pages/manage/checkVisit';
-import SelectRoom from './pages/manage/SelectRoom';
+import SelectPartition from './pages/manage/SelectPartition';
 import QrCheck from './pages/qrcheck/QrCheck';
 import LoggedInPassword from './pages/password/LoggedInPassword';
 import LoggedOutPassword from './pages/password/LoggedOutPassword';
 import EmailVerify from './pages/password/EmailVerify';
 import SignUp from './pages/signup/SignUp';
-import SelectFloor from './pages/qrcheck/SelectFloor';
+import SelectRoom from './pages/qrcheck/SelectRoom';
 import Schedule from './pages/manage/Schedule';
 
 const Router = () => {
   const { loggedIn } = useAuth();
+  const { data: isAdmin, refetch } = useIsAdminData();
   const [openSnackbar] = useSnackbar({
     position: 'top-right',
     style: {
@@ -31,13 +33,16 @@ const Router = () => {
 
   const pwResetToken = sessionStorage.getItem('pwResetToken');
 
+  useEffect(() => {
+    refetch();
+  }, [refetch]);
+
   return (
     <BrowserRouter basename={process.env.REACT_APP_BASEURL || '/'}>
       <div className="min-h-screen flex flex-col">
         <NavigationBar />
         <div className="flex-grow">
           <Routes>
-            <Route path="/selectFloor" element={<SelectFloor />} />
             <Route path="/password" element={<LoggedInPassword />} />
             <Route path="/email" element={<EmailVerify />} />
             <Route
@@ -50,10 +55,11 @@ const Router = () => {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignUp />} />
             <Route path="/roompage" element={<RoomPage />} />
+            <Route path="/SelectRoom" element={<SelectRoom />} />
             <Route path="/visit" element={<CheckVisit />} />
-            <Route path="/selectRoom" element={<SelectRoom />} />
+            <Route path="/selectPartition" element={<SelectPartition />} />
             <Route path="/schedule" element={<Schedule />} />
-            <Route path="qrcheck" element={<QrCheck />} />
+            <Route path="/qrcheck" element={<QrCheck />} />
             {loggedIn && (
               <>
                 <Route path="/check" element={<Check />} />

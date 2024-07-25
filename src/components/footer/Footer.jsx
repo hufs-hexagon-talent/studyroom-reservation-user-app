@@ -18,7 +18,7 @@ const Footer = () => {
 
   const handleAdminClick = async () => {
     if (loggedIn && checkIsAdmin === true) {
-      navigate('/selectRoom');
+      navigate('/selectPartition');
     } else {
       openSnackbar('관리자 외에는 접근 권한이 없습니다.');
       setTimeout(() => {
@@ -72,11 +72,13 @@ const Footer = () => {
                 </a>
               </span>
             </p>
-            <div
-              onClick={handleAdminClick}
-              className="inline hover:underline cursor-pointer text-gray-400 text-sm mt-3">
-              관리자
-            </div>
+            {checkIsAdmin === true && (
+              <div
+                onClick={handleAdminClick}
+                className="inline hover:underline cursor-pointer text-gray-400 text-sm mt-3">
+                관리자
+              </div>
+            )}
           </div>
         </div>
       </footer>
