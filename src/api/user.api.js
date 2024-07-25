@@ -182,10 +182,10 @@ export const useRooms = roomIds =>
 // 체크인 하기
 export const useCheckIn =()=>{
   return useMutation({
-    mutationFn : async({verificationCode, roomIds})=>{
+    mutationFn : async({verificationCode, roomId})=>{
       const check_in_res = await apiClient.post('/check-in',{
         verificationCode,
-        roomIds
+        roomId
       });
       return check_in_res.data;
     },

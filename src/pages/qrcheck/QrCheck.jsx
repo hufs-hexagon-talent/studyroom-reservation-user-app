@@ -7,7 +7,7 @@ import useAuth from '../../hooks/useAuth';
 import { useSnackbar } from 'react-simple-snackbar';
 
 const QrCheck = () => {
-  const [roomIds, setRoomIds] = useState([]);
+  const [roomId, setroomId] = useState([]);
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [reservations, setReservations] = useState([]);
@@ -23,14 +23,14 @@ const QrCheck = () => {
   });
 
   // useRooms 훅 사용
-  const { data: rooms } = useRooms(roomIds);
+  const { data: rooms } = useRooms(roomId);
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const roomIdsParam = params.get('roomIds[]');
     if (roomIdsParam) {
       const roomIdsArray = roomIdsParam.split(',').map(id => parseInt(id, 10));
-      setRoomIds(roomIdsArray);
+      setroomId(roomIdsArray);
     }
   }, [location.search]);
 
@@ -65,12 +65,14 @@ const QrCheck = () => {
     const lowerCaseCode = convertToEnglish(
       inko.ko2en(verificationCode).toLowerCase(),
     );
-    console.log({ verificationCode: lowerCaseCode, roomIds });
+    console.log({ verificationCode: lowerCaseCode, roomId });
+
+    const roomIds = roomId.length === 1 ? roomId[0] : roomId;
 
     doCheckIn(
       {
         verificationCode: lowerCaseCode,
-        roomIds,
+        roomId: roomIds, // roomId가 단일 정수로 전달
       },
       {
         onSuccess: result => {
@@ -116,7 +118,7 @@ const QrCheck = () => {
         e.target.value = '';
       }
     },
-    [roomIds],
+    [roomId],
   );
 
   return (

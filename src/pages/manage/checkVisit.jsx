@@ -2,11 +2,9 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import ko from 'date-fns/locale/ko';
-import { convertToEnglish } from '../../api/convertToEnglish';
 import {
   useReservationsByPartitions,
   usePartition,
-  useCheckIn,
   useAdminDeleteReservation,
 } from '../../api/user.api';
 import { Button, Table } from 'flowbite-react';
@@ -21,8 +19,6 @@ const CheckVisit = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [error, setError] = useState(null);
   const [fetchParams, setFetchParams] = useState(null);
-  const [successMessage, setSuccessMessage] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
   const [reservations, setReservations] = useState([]);
   let inko = new Inko();
   const navigate = useNavigate();
@@ -39,7 +35,6 @@ const CheckVisit = () => {
     }
   }, [location.search]);
 
-  const { mutate: doCheckIn } = useCheckIn();
   const { mutate: doDelete } = useAdminDeleteReservation();
   const { data: partitions } = usePartition(partitionIds);
   const {
@@ -47,6 +42,10 @@ const CheckVisit = () => {
     refetch,
     isError: reservationsError,
   } = useReservationsByPartitions(fetchParams || {});
+
+  const partitionId = partitions
+    ?.map(partition => partition.roomId)
+    .filter((value, index, self) => self.indexOf(value) === index);
 
   // reservations 상태 변경
   useEffect(() => {
@@ -79,66 +78,6 @@ const CheckVisit = () => {
     }
   };
 
-  // QR 코드 처리 함수
-  const handleQrCode = verificationCode => {
-    const lowerCaseCode = convertToEnglish(
-      inko.ko2en(verificationCode).toLowerCase(),
-    );
-    console.log({ verificationCode: lowerCaseCode, roomIds: partitionIds });
-
-    doCheckIn(
-      {
-        verificationCode: lowerCaseCode,
-        roomIds: partitionIds,
-      },
-      {
-        onSuccess: result => {
-          const checkedInReservations = result.data.checkInReservations;
-
-          setReservations(prevReservations =>
-            prevReservations.map(reservation =>
-              checkedInReservations.some(
-                checkedInReservation =>
-                  checkedInReservation.reservationId ===
-                  reservation.reservationId,
-              )
-                ? { ...reservation, state: 'VISITED' }
-                : reservation,
-            ),
-          );
-
-          const userName = checkedInReservations[0].name;
-          setSuccessMessage(`${userName}님, 출석 확인 되었습니다.`);
-          setErrorMessage('');
-          setTimeout(() => {
-            setSuccessMessage('');
-          }, 5000);
-        },
-        onError: error => {
-          setErrorMessage(
-            error.response?.data?.errorMessage ||
-              'An unexpected error occurred',
-          );
-          setSuccessMessage('');
-          setTimeout(() => {
-            setErrorMessage('');
-          }, 5000);
-        },
-      },
-    );
-  };
-
-  // QR코드 입력란에 스캐너가 찍혔을 떄 호출되는 함수
-  const handleQrKeyDown = useCallback(
-    e => {
-      if (e.code === 'Enter') {
-        handleQrCode(e.target.value);
-        e.target.value = '';
-      }
-    },
-    [setPartitionIds],
-  );
-
   // 선택된 방 변수 (숫자대로 정렬)
   const partitionNames = partitions
     ?.map(partition => `${partition.roomName}-${partition.partitionNumber}`)
@@ -159,12 +98,13 @@ const CheckVisit = () => {
       <div className="p-4 border-b md:border-b-0 md:border-r border-gray-300">
         <p
           onClick={() => navigate('/schedule')}
-          className="pb-3 hover:underline cursor-pointer">
-          스케줄 주입
+          className="inline-block pb-3 hover:underline cursor-pointer">
+          스케줄 주입하러 가기 &gt;
         </p>
         <div>
           <p>{`선택된 방 : ${partitionNames}`}</p>
         </div>
+        <pre>{partitionId}</pre>
         <div className="pt-3 pb-3">출석 일자</div>
         <div className="flex items-center space-x-2">
           <DatePicker
@@ -224,26 +164,6 @@ const CheckVisit = () => {
               ))}
             </Table.Body>
           </Table>
-        )}
-      </div>
-      <div className="w-full md:w-1/2 p-4">
-        <h3 className="mb-2">QR 코드 확인 :</h3>
-        <p className="text-red-700 text-sm mb-3">
-          입력란에 커서를 놓고 QR 코드를 스캔해주세요.
-        </p>
-        <input
-          type="text"
-          onKeyDown={handleQrKeyDown}
-          placeholder="Scan QR Code"
-          className="border border-gray-300 p-2 rounded w-full"
-        />
-        {successMessage && (
-          <div className="mt-4 p-4 bg-green-100 text-green-700">
-            {successMessage}
-          </div>
-        )}
-        {errorMessage && (
-          <div className="mt-4 p-4 bg-red-100 text-red-700">{errorMessage}</div>
         )}
       </div>
     </div>
