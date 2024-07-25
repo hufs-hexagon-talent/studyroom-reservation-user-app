@@ -84,12 +84,12 @@ const CheckVisit = () => {
     const lowerCaseCode = convertToEnglish(
       inko.ko2en(verificationCode).toLowerCase(),
     );
-    console.log({ verificationCode: lowerCaseCode, partitionIds });
+    console.log({ verificationCode: lowerCaseCode, roomIds: partitionIds });
 
     doCheckIn(
       {
         verificationCode: lowerCaseCode,
-        partitionIds,
+        roomIds: partitionIds,
       },
       {
         onSuccess: result => {

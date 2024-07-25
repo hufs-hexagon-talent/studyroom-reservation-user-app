@@ -18,7 +18,7 @@ import LoggedInPassword from './pages/password/LoggedInPassword';
 import LoggedOutPassword from './pages/password/LoggedOutPassword';
 import EmailVerify from './pages/password/EmailVerify';
 import SignUp from './pages/signup/SignUp';
-import SelectFloor from './pages/qrcheck/SelectFloor';
+import SelectRoom from './pages/qrcheck/SelectRoom';
 import Schedule from './pages/manage/Schedule';
 
 const Router = () => {
@@ -55,7 +55,7 @@ const Router = () => {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignUp />} />
             <Route path="/roompage" element={<RoomPage />} />
-            <Route path="/selectFloor" element={<SelectFloor />} />
+            <Route path="/SelectRoom" element={<SelectRoom />} />
             {isAdmin === true && (
               <>
                 <Route path="/visit" element={<CheckVisit />} />

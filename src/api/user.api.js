@@ -193,22 +193,17 @@ export const useCheckIn =()=>{
 };
 
 // 모든 room 조회
-export const fetchAllRooms = async()=>{
-  const all_rooms_response = await apiClient.get(
-    '/rooms'
-  )
+export const fetchAllRooms = async () => {
+  const all_rooms_response = await apiClient.get('/rooms');
   return all_rooms_response.data.data.items;
-}
+};
 
-export const useAllRooms =()=>{
-  useQuery({
-    queryKey:['allRooms'],
-    queryFn:async()=>{
-      const allRooms = await fetchAllRooms();
-      return allRooms.map(room=>({roomId:room.roomId, roomName : room.roomName}))
-    }
-  })
-}
+export const useAllRooms = () => {
+  return useQuery({
+    queryKey: ['allRooms'],
+    queryFn: fetchAllRooms,
+  });
+};
 
 // 모든 partition 조회
 export const fetchAllPartitions=async()=>{
@@ -227,18 +222,20 @@ export const useAllPartitions = () =>
     },
   });
 
-export const fetchReservedRooms =async({date,roomIds})=>{
-  const reserved_rooms_res = await apiClient.get(
-    `/reservations/rooms/by-date?date=${date}&roomIds=${roomIds}`
-  )
-  return reserved_rooms_res.data.data;
+// roomId로 partition들 조회
+export const fetchPartitionsByRoomIds = async (roomIds) => {
+  const partitions = await Promise.all(
+    roomIds.map(roomId => apiClient.get(`/partitions/rooms/${roomId}`))
+  );
+  return partitions.flatMap(partition => partition.data.data.items);
 }
 
-export const useReservedRooms =({date, roomIds})=>{
-  useQuery({
-    queryKey:[date,roomIds],
-    queryFn:()=>fetchReservedRooms(date,roomIds)
-  })
+export const usePartitionsByRoomIds = (roomIds) => {
+  return useQuery({
+    queryKey: ['partitionsByRoomIds', roomIds],
+    queryFn: () => fetchPartitionsByRoomIds(roomIds),
+    enabled: !!roomIds.length, // roomIds가 비어있지 않을 때만 쿼리 실행
+  });
 }
 
 // 노쇼 횟수

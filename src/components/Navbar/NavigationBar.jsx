@@ -25,7 +25,7 @@ const NavigationBar = () => {
       <Navbar.Toggle />
       <Navbar.Collapse>
         {isAdmin === true && (
-          <Navbar.Link href="/selectFloor">출석 체크</Navbar.Link>
+          <Navbar.Link href="/selectRoom">출석 체크</Navbar.Link>
         )}
         <Navbar.Link href="/roompage">세미나실 예약</Navbar.Link>
         <Navbar.Link
