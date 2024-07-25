@@ -139,9 +139,14 @@ const CheckVisit = () => {
     [setPartitionIds],
   );
 
-  // 선택된 방 변수
+  // 선택된 방 변수 (숫자대로 정렬)
   const partitionNames = partitions
     ?.map(partition => `${partition.roomName}-${partition.partitionNumber}`)
+    .sort((a, b) => {
+      const [roomA, partA] = a.split('-').map(Number);
+      const [roomB, partB] = b.split('-').map(Number);
+      return roomA - roomB || partA - partB;
+    })
     .join(', ');
 
   // 예약 삭제
@@ -196,15 +201,13 @@ const CheckVisit = () => {
               {reservations.map(reservation => (
                 <Table.Row
                   key={reservation.reservationId}
-                  className={
-                    reservation.state === 'VISITED'
-                      ? 'bg-yellow-300 hover:bg-yellow-300'
-                      : ''
-                  }>
+                  className={reservation.state === 'VISITED'}>
                   <Table.Cell>
                     {reservation.state === 'VISITED' ? '출석' : '미출석'}
                   </Table.Cell>
-                  <Table.Cell>{reservation.roomName}</Table.Cell>
+                  <Table.Cell>
+                    {reservation.roomName}-{reservation.partitionNumber}
+                  </Table.Cell>
                   <Table.Cell>{reservation.name}</Table.Cell>
                   <Table.Cell>
                     {format(new Date(reservation.startDateTime), 'HH:mm')}
