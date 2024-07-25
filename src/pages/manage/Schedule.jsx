@@ -1,21 +1,35 @@
 import React, { useState } from 'react';
 import { Checkbox, Table, Button } from 'flowbite-react';
-import { useAllPolicies, useAllPartitions } from '../../api/user.api';
+import { useAllPolicies, useAllRooms, useSchedules } from '../../api/user.api';
 import DatePicker, { registerLocale } from 'react-datepicker';
-import { ko } from 'date-fns/locale';
+import { ko, tr } from 'date-fns/locale';
 import 'react-datepicker/dist/react-datepicker.css';
 import { format } from 'date-fns';
+import { useSnackbar } from 'react-simple-snackbar';
 
 const Schedule = () => {
   const { data: policies, refetch } = useAllPolicies();
-  const { data: rooms } = useAllPartitions();
+  const { data: rooms } = useAllRooms();
+  const { mutateAsync: doSchedule } = useSchedules();
   const [isFetched, setIsFetched] = useState(false);
   const [isTableVisible, setIsTableVisible] = useState(false);
   const [selectedPolicyId, setSelectedPolicyId] = useState(null);
   const [selectedDates, setSelectedDates] = useState([]);
   const [selectedRooms, setSelectedRooms] = useState([]);
-
   registerLocale('ko', ko);
+
+  const [openErrorSnackbar, closeErrorSnackbar] = useSnackbar({
+    position: 'top-right',
+    style: {
+      backgroundColor: '#FF3333', // 빨간색
+    },
+  });
+  const [openSuccessSnackbar, closeSuccessSnackbar] = useSnackbar({
+    position: 'top-right',
+    style: {
+      backgroundColor: '#4CAF50', // 초록색
+    },
+  });
 
   const handleFetchPolicies = () => {
     refetch().then(() => {
@@ -58,14 +72,51 @@ const Schedule = () => {
     setSelectedDates(updatedDates);
     console.log(
       'Selected dates:',
-      updatedDates.map(d => format(d, 'yyyy-MM-dd')).join(', '),
+      updatedDates.map(d => format(d, 'yyyy-MM-dd')),
     );
   };
 
-  const handleButton = () => {};
+  const handleButton = async () => {
+    // console.log(
+    //   selectedPolicyId,
+    //   selectedRooms,
+    //   selectedDates.map(d => format(d, 'yyyy-MM-dd')),
+    // );
+    if (
+      !selectedPolicyId ||
+      selectedRooms.length === 0 ||
+      selectedDates.length === 0
+    ) {
+      openErrorSnackbar('정책, 날짜, 그리고 호실을 모두 선택해야 합니다.');
+      setTimeout(() => {
+        closeErrorSnackbar();
+      }, 3000);
+      return;
+    }
+    try {
+      const response = await doSchedule({
+        roomOperationPolicyId: selectedPolicyId,
+        roomIds: selectedRooms,
+        policyApplicationDates: selectedDates.map(d => format(d, 'yyyy-MM-dd')),
+      });
+      openSuccessSnackbar(response.message);
+      setTimeout(() => {
+        closeSuccessSnackbar();
+      }, 3000);
+    } catch (error) {
+      openErrorSnackbar(
+        error.response?.data?.errorMessage ||
+          '스케줄 주입 중 오류가 발생했습니다.',
+      );
+      setTimeout(() => {
+        closeErrorSnackbar();
+      }, 3000);
+    }
+  };
 
   return (
     <div className="p-4">
+      {/* room Policy 조회 */}
       <div className="flex flex-row items-center">
         <div>모든 room Policy 조회 및 선택</div>
         <button
@@ -111,6 +162,7 @@ const Schedule = () => {
         </div>
       )}
       <div className="flex flex-row justify-between">
+        {/* 날짜 선택 */}
         <div className="w-1/2 pr-4">
           <div className="flex justify-center pt-10 font-bold text-lg">
             날짜 선택
@@ -132,7 +184,8 @@ const Schedule = () => {
           </div>
         </div>
         <div className="border-l border-gray-300"></div>
-        <div className="flex items-center flex-col w-1/2 pl-10">
+        {/* 호실 선택 */}
+        <div className="flex items-center flex-col w-1/2">
           <div className="pt-10 pb-6 font-bold text-lg">호실 선택</div>
           <div>
             {rooms?.map(room => (
@@ -143,7 +196,7 @@ const Schedule = () => {
                   onChange={() => handleRoomCheckbox(room.roomId)}
                 />
                 <label htmlFor={room.roomId} className="ml-2">
-                  {room.roomName}
+                  {room.roomName}호
                 </label>
               </div>
             ))}

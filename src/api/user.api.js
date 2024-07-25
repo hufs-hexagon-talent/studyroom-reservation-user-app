@@ -347,9 +347,9 @@ export const useAllPolicies =()=>{
 // 스케줄 주입
 export const useSchedules=()=>{
   return useMutation({
-    mutationFn:async({roomId, roomOperationPolicyId, policyApplicationDate})=>{
+    mutationFn:async({roomIds, roomOperationPolicyId, policyApplicationDates})=>{
       const schedules_policy = await apiClient.post('/schedules',{
-        roomId, roomOperationPolicyId, policyApplicationDate
+        roomIds, roomOperationPolicyId, policyApplicationDates
       })
       return schedules_policy.data;
     }

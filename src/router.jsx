@@ -56,14 +56,10 @@ const Router = () => {
             <Route path="/signup" element={<SignUp />} />
             <Route path="/roompage" element={<RoomPage />} />
             <Route path="/SelectRoom" element={<SelectRoom />} />
-            {isAdmin === true && (
-              <>
-                <Route path="/visit" element={<CheckVisit />} />
-                <Route path="/selectPartition" element={<SelectPartition />} />
-                <Route path="/schedule" element={<Schedule />} />
-                <Route path="/qrcheck" element={<QrCheck />} />
-              </>
-            )}
+            <Route path="/visit" element={<CheckVisit />} />
+            <Route path="/selectPartition" element={<SelectPartition />} />
+            <Route path="/schedule" element={<Schedule />} />
+            <Route path="/qrcheck" element={<QrCheck />} />
             {loggedIn && (
               <>
                 <Route path="/check" element={<Check />} />
