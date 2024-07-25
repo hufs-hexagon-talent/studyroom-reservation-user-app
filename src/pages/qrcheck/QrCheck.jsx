@@ -29,9 +29,9 @@ const QrCheck = () => {
     const params = new URLSearchParams(location.search);
     const roomIdsParam = params.get('roomId');
     if (roomIdsParam) {
-      const roomIdsArray = roomIdsParam.split(',').map(id => parseInt(id, 10));
-      setroomId(roomIdsArray);
+      setroomId(parseInt(roomIdsParam));
     }
+    console.log(roomId);
   }, [location.search]);
 
   useEffect(() => {
@@ -67,12 +67,10 @@ const QrCheck = () => {
     );
     console.log({ verificationCode: lowerCaseCode, roomId });
 
-    const roomIds = roomId.length === 1 ? roomId[0] : roomId;
-
     doCheckIn(
       {
         verificationCode: lowerCaseCode,
-        roomId: roomIds, // roomId가 단일 정수로 전달
+        roomId: roomId,
       },
       {
         onSuccess: result => {
@@ -127,13 +125,7 @@ const QrCheck = () => {
         QR코드 출석
       </h3>
       <div className="mt-5 mb-10 text-center" style={{ color: '#9D9FA2' }}>
-        <p>
-          현재 선택된 호실 :{' '}
-          {rooms && rooms.length > 0
-            ? rooms.map(room => `${room.roomName}호`).join(', ')
-            : '선택된 호실 없음'}
-        </p>
-
+        <p>현재 선택된 호실 : {roomId ? roomId : '선택된 호실이 없음'}</p>
         <p>본인의 QR코드를 스캐너에 스캔해주세요</p>
       </div>
       <div className="flex flex-col items-center justify-center w-screen">
