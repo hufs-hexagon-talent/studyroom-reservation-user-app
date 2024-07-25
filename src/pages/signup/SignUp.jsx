@@ -100,6 +100,7 @@ const SignUp = () => {
             onChange={handleSerial}
             type="text"
             placeholder="학번을 입력해주세요"
+            maxLength={9}
             required
           />
         </div>
