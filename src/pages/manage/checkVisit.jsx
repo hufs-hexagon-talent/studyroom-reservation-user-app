@@ -5,7 +5,7 @@ import ko from 'date-fns/locale/ko';
 import { convertToEnglish } from '../../api/convertToEnglish';
 import {
   useReservationsByRooms,
-  useRooms,
+  usePartition,
   useCheckIn,
   useAdminDeleteReservation,
 } from '../../api/user.api';
@@ -17,7 +17,7 @@ registerLocale('ko', ko);
 
 const CheckVisit = () => {
   const location = useLocation();
-  const [roomIds, setRoomIds] = useState([]);
+  const [partitionIds, setPartitionIds] = useState([]);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [error, setError] = useState(null);
   const [fetchParams, setFetchParams] = useState(null);
@@ -29,16 +29,18 @@ const CheckVisit = () => {
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
-    const roomIdsParam = params.get('roomIds[]');
-    if (roomIdsParam) {
-      const roomIdsArray = roomIdsParam.split(',').map(id => parseInt(id, 10));
-      setRoomIds(roomIdsArray);
+    const partitionIdsParmas = params.get('partitionIds[]');
+    if (partitionIdsParmas) {
+      const partitionIdsArray = partitionIdsParmas
+        .split(',')
+        .map(id => parseInt(id, 10));
+      setPartitionIds(partitionIdsArray);
     }
   }, [location.search]);
 
   const { mutate: doCheckIn } = useCheckIn();
   const { mutate: doDelete } = useAdminDeleteReservation();
-  const { data: rooms } = useRooms(roomIds);
+  const { data: partitions } = usePartition(partitionIds);
   const {
     data: fetchedReservations,
     refetch,
@@ -52,16 +54,16 @@ const CheckVisit = () => {
   }, [fetchedReservations]);
 
   useEffect(() => {
-    if (roomIds.length > 0 && selectedDate) {
+    if (partitionIds.length > 0 && selectedDate) {
       handleFetchReservations();
     }
-  }, [roomIds, selectedDate]);
+  }, [partitionIds, selectedDate]);
 
   const handleFetchReservations = async () => {
     if (selectedDate) {
       try {
         const formattedDate = format(selectedDate, 'yyyy-MM-dd');
-        setFetchParams({ date: formattedDate, roomIds });
+        setFetchParams({ date: formattedDate, partitionIds });
         refetch();
         setError(null);
       } catch (err) {
@@ -77,12 +79,12 @@ const CheckVisit = () => {
     const lowerCaseCode = convertToEnglish(
       inko.ko2en(verificationCode).toLowerCase(),
     );
-    console.log({ verificationCode: lowerCaseCode, roomIds });
+    console.log({ verificationCode: lowerCaseCode, partitionIds });
 
     doCheckIn(
       {
         verificationCode: lowerCaseCode,
-        roomIds,
+        partitionIds,
       },
       {
         onSuccess: result => {
@@ -128,10 +130,11 @@ const CheckVisit = () => {
         e.target.value = '';
       }
     },
-    [roomIds],
+    [partitionIds],
   );
-
-  const roomNames = rooms?.map(room => room.roomName).join(', ');
+  const partitionNames = partitions
+    ?.map(partition => `${partition.roomName}-${partition.partitionNumber}`)
+    .join(', ');
 
   // 예약 삭제
   const handleDelete = reservationId => {
@@ -147,7 +150,7 @@ const CheckVisit = () => {
           스케줄 주입
         </p>
         <div>
-          <p>{`선택된 방 : ${roomNames}`}</p>
+          <p>{`선택된 방 : ${partitionNames}`}</p>
         </div>
         <div className="pt-3 pb-3">출석 일자</div>
         <div className="flex items-center space-x-2">

@@ -146,6 +146,21 @@ export const useOtp = () =>
     queryFn: () => fetchOtp(),
   });
 
+// partition 조회
+export const fetchPartiiton = async partitonId =>{
+  const partition_res = await apiClient.get(`/partitions/${partitonId}`);
+  return partition_res.data.data;
+}
+
+export const usePartition = partitionIds => 
+  useQuery({
+    queryKey:['partitions', partitionIds],
+    queryFn: async()=>{
+      if(!partitionIds) return [];
+      const partitions = await Promise.all(partitionIds.map(partitionId => fetchPartiiton(partitionId)));
+      return partitions;
+    }
+  })
 
 // room 조회
 export const fetchRoom = async roomId => {

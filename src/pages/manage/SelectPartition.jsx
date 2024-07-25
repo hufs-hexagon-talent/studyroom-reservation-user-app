@@ -35,7 +35,7 @@ const SelectRoom = () => {
       partition => partition.partitionId,
     );
     console.log('Selected rooms:', selectedPartitionIds);
-    navigate(`/visit?roomIds[]=${selectedPartitionIds.join(',')}`);
+    navigate(`/visit?partitionIds[]=${selectedPartitionIds.join(',')}`);
   };
 
   return (
