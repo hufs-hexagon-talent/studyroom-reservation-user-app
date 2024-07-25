@@ -69,20 +69,20 @@ export const fetchDate = async () => {
   return dates;
 };
 
-//해당 날짜의 예약 정보 가져오기 (1차원, checkVisit에 사용)
-export const fetchReservationsByRooms = async ({ date, roomIds }) => {
+// 특정 날짜, 특정 partition들 모든 예약 상태 확인 (1차원, checkVisit에 사용)
+export const fetchReservationsByPartitions = async ({ date, partitionIds }) => {
   const params = new URLSearchParams();
   params.append('date', date);
-  roomIds.forEach(id => params.append('roomIds', id));
+  partitionIds.forEach(id => params.append('partitionIds', id));
 
-  const response = await apiClient.get(`https://api.studyroom.jisub.kim/reservations/rooms/by-date?${params.toString()}`);
+  const response = await apiClient.get(`https://api.studyroom.jisub.kim/reservations/partitions/by-date?${params.toString()}`);
   return response.data.data.reservations;
 };
 
-export const useReservationsByRooms = ({ date, roomIds }) =>
+export const useReservationsByPartitions = ({ date, partitionIds }) =>
   useQuery({
-    queryKey: ['reservationsByRooms', date, roomIds],
-    queryFn: () => fetchReservationsByRooms({ date, roomIds }),
+    queryKey: ['reservationsByPartitions', date, partitionIds],
+    queryFn: () => fetchReservationsByPartitions({ date, partitionIds }),
   });
 
 // 해당 날짜의 예약 정보 가져오기 (2차원, roomPage에 사용)

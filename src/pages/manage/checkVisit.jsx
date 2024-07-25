@@ -4,7 +4,7 @@ import DatePicker, { registerLocale } from 'react-datepicker';
 import ko from 'date-fns/locale/ko';
 import { convertToEnglish } from '../../api/convertToEnglish';
 import {
-  useReservationsByRooms,
+  useReservationsByPartitions,
   usePartition,
   useCheckIn,
   useAdminDeleteReservation,
@@ -27,6 +27,7 @@ const CheckVisit = () => {
   let inko = new Inko();
   const navigate = useNavigate();
 
+  // location.search가 변경될 때 마다 실행
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const partitionIdsParmas = params.get('partitionIds[]');
@@ -45,20 +46,23 @@ const CheckVisit = () => {
     data: fetchedReservations,
     refetch,
     isError: reservationsError,
-  } = useReservationsByRooms(fetchParams || {});
+  } = useReservationsByPartitions(fetchParams || {});
 
+  // reservations 상태 변경
   useEffect(() => {
     if (fetchedReservations) {
       setReservations(fetchedReservations);
     }
   }, [fetchedReservations]);
 
+  // partitionIds & selectedDate가 변경될 때 마다 handleFetchReservations 호출
   useEffect(() => {
     if (partitionIds.length > 0 && selectedDate) {
       handleFetchReservations();
     }
   }, [partitionIds, selectedDate]);
 
+  // 예약 정보 가져오는 함수
   const handleFetchReservations = async () => {
     if (selectedDate) {
       try {
@@ -75,6 +79,7 @@ const CheckVisit = () => {
     }
   };
 
+  // QR 코드 처리 함수
   const handleQrCode = verificationCode => {
     const lowerCaseCode = convertToEnglish(
       inko.ko2en(verificationCode).toLowerCase(),
@@ -123,6 +128,7 @@ const CheckVisit = () => {
     );
   };
 
+  // QR코드 입력란에 스캐너가 찍혔을 떄 호출되는 함수
   const handleQrKeyDown = useCallback(
     e => {
       if (e.code === 'Enter') {
@@ -130,8 +136,10 @@ const CheckVisit = () => {
         e.target.value = '';
       }
     },
-    [partitionIds],
+    [setPartitionIds],
   );
+
+  // 선택된 방 변수
   const partitionNames = partitions
     ?.map(partition => `${partition.roomName}-${partition.partitionNumber}`)
     .join(', ');
