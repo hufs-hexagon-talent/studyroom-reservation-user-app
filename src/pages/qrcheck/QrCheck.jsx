@@ -27,7 +27,7 @@ const QrCheck = () => {
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
-    const roomIdsParam = params.get('roomIds[]');
+    const roomIdsParam = params.get('roomId');
     if (roomIdsParam) {
       const roomIdsArray = roomIdsParam.split(',').map(id => parseInt(id, 10));
       setroomId(roomIdsArray);

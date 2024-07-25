@@ -94,8 +94,8 @@ const CheckVisit = () => {
   };
 
   return (
-    <div className="flex flex-col md:flex-row border-r md:border-r-2 border-gray-300">
-      <div className="p-4 border-b md:border-b-0 md:border-r border-gray-300">
+    <div className="flex flex-col">
+      <div className="p-4 ">
         <p
           onClick={() => navigate('/schedule')}
           className="inline-block pb-3 hover:underline cursor-pointer">
@@ -104,7 +104,6 @@ const CheckVisit = () => {
         <div>
           <p>{`선택된 방 : ${partitionNames}`}</p>
         </div>
-        <pre>{partitionId}</pre>
         <div className="pt-3 pb-3">출석 일자</div>
         <div className="flex items-center space-x-2">
           <DatePicker

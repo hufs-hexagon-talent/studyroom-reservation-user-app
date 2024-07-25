@@ -6,7 +6,7 @@ import { useSnackbar } from 'react-simple-snackbar';
 
 const SelectRoom = () => {
   const { data: rooms, error, isLoading } = useAllRooms();
-  const [selectedRooms, setSelectedRooms] = useState([]);
+  const [selectedRoom, setSelectedRoom] = useState(null);
   const navigate = useNavigate();
   const [openSnackbar, closeSnackbar] = useSnackbar({
     position: 'top-right',
@@ -24,17 +24,17 @@ const SelectRoom = () => {
   }
 
   const handleCheckboxChange = room => {
-    setSelectedRooms(prevSelectedRooms => {
-      if (prevSelectedRooms.find(r => r.roomId === room.roomId)) {
-        return prevSelectedRooms.filter(r => r.roomId !== room.roomId);
+    setSelectedRoom(prevSelectedRoom => {
+      if (prevSelectedRoom && prevSelectedRoom.roomId === room.roomId) {
+        return null;
       } else {
-        return [...prevSelectedRooms, room];
+        return room;
       }
     });
   };
 
   const handleNextClick = () => {
-    if (selectedRooms.length === 0) {
+    if (!selectedRoom) {
       openSnackbar('적어도 하나의 호실을 선택해주세요');
       setTimeout(() => {
         closeSnackbar();
@@ -42,9 +42,8 @@ const SelectRoom = () => {
       return;
     }
 
-    const selectedRoomIds = selectedRooms.map(room => room.roomId);
-    console.log('Selected rooms:', selectedRoomIds);
-    navigate(`/qrcheck?roomIds[]=${selectedRoomIds.join(',')}`);
+    console.log('Selected room:', selectedRoom.roomId);
+    navigate(`/qrcheck?roomId=${selectedRoom.roomId}`);
   };
 
   return (
@@ -59,6 +58,7 @@ const SelectRoom = () => {
               <input
                 id={`box-${room.roomName}`}
                 type="checkbox"
+                checked={selectedRoom?.roomId === room.roomId}
                 value={room.roomName}
                 className="w-4 h-4 bg-gray-100 border-gray-300"
                 onChange={() => handleCheckboxChange(room)}
