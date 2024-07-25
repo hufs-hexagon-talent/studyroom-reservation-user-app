@@ -98,13 +98,13 @@ const CheckVisit = () => {
       <div className="p-4 ">
         <p
           onClick={() => navigate('/schedule')}
-          className="inline-block pb-3 hover:underline cursor-pointer">
+          className="inline-block font-bold pb-10 hover:underline cursor-pointer">
           스케줄 주입하러 가기 &gt;
         </p>
         <div>
           <p>{`선택된 방 : ${partitionNames}`}</p>
         </div>
-        <div className="pt-3 pb-3">출석 일자</div>
+        <div className="font-bold pt-6 pb-3">출석 일자</div>
         <div className="flex items-center space-x-2">
           <DatePicker
             selected={selectedDate}
