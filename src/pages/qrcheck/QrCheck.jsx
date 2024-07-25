@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import Inko from 'inko';
-import { useCheckIn, fetchIsAdmin } from '../../api/user.api';
+import { useCheckIn, fetchIsAdmin, useRooms } from '../../api/user.api';
 import { convertToEnglish } from '../../api/convertToEnglish';
 import { useNavigate } from 'react-router-dom';
 import useAuth from '../../hooks/useAuth';
@@ -21,6 +21,9 @@ const QrCheck = () => {
       backgroundColor: '#FF3333',
     },
   });
+
+  // useRooms 훅 사용
+  const { data: rooms } = useRooms(roomIds);
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -53,7 +56,6 @@ const QrCheck = () => {
     if (loggedIn) {
       checkAdminStatus();
     } else {
-      // todo: 이거 flowbite로
       console.log('로그인이 되어 있지 않습니다');
       navigate('/login');
     }
@@ -123,8 +125,14 @@ const QrCheck = () => {
         QR코드 출석
       </h3>
       <div className="mt-5 mb-10 text-center" style={{ color: '#9D9FA2' }}>
-        {/* todo: 띄어쓰기 별로 줄바꿈*/}
-        본인의 QR코드를 스캐너에 스캔해주세요
+        <p>
+          현재 선택된 호실 :{' '}
+          {rooms && rooms.length > 0
+            ? rooms.map(room => `${room.roomName}호`).join(', ')
+            : '선택된 호실 없음'}
+        </p>
+
+        <p>본인의 QR코드를 스캐너에 스캔해주세요</p>
       </div>
       <div className="flex flex-col items-center justify-center w-screen">
         <input

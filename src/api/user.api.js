@@ -165,19 +165,19 @@ export const usePartition = partitionIds =>
 // room 조회
 export const fetchRoom = async roomId => {
   const room_response = await apiClient.get(`/rooms/${roomId}`);
-
-  return room_response.data;
+  return room_response.data.data;
 };
 
 export const useRooms = roomIds =>
   useQuery({
     queryKey: ['rooms', roomIds],
     queryFn: async () => {
-      if (!roomIds) return [];
+      if (!roomIds || roomIds.length === 0) return [];
       const rooms = await Promise.all(roomIds.map(roomId => fetchRoom(roomId)));
       return rooms;
     },
   });
+
 
 // 체크인 하기
 export const useCheckIn =()=>{

@@ -1,21 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { useAllRooms, usePartitionsByRoomIds } from '../../api/user.api';
+import React, { useState } from 'react';
+import { useAllRooms } from '../../api/user.api';
 import { useNavigate } from 'react-router-dom';
 import { Button } from 'flowbite-react';
+import { useSnackbar } from 'react-simple-snackbar';
 
 const SelectRoom = () => {
   const { data: rooms, error, isLoading } = useAllRooms();
   const [selectedRooms, setSelectedRooms] = useState([]);
   const navigate = useNavigate();
-
-  const selectedRoomIds = selectedRooms.map(room => room.roomId);
-  const { data: partitions, refetch } = usePartitionsByRoomIds(selectedRoomIds);
-
-  useEffect(() => {
-    if (selectedRoomIds.length > 0) {
-      refetch();
-    }
-  }, [selectedRoomIds, refetch]);
+  const [openSnackbar, closeSnackbar] = useSnackbar({
+    position: 'top-right',
+    style: {
+      backgroundColor: '#FF3333',
+    },
+  });
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -36,11 +34,17 @@ const SelectRoom = () => {
   };
 
   const handleNextClick = () => {
-    const selectedPartitionIds = partitions.map(
-      partition => partition.roomPartitionId,
-    );
-    console.log('Selected partitions:', selectedPartitionIds);
-    navigate(`/visit?partitionIds[]=${selectedPartitionIds.join(',')}`);
+    if (selectedRooms.length === 0) {
+      openSnackbar('적어도 하나의 호실을 선택해주세요');
+      setTimeout(() => {
+        closeSnackbar();
+      }, 2500);
+      return;
+    }
+
+    const selectedRoomIds = selectedRooms.map(room => room.roomId);
+    console.log('Selected rooms:', selectedRoomIds);
+    navigate(`/qrcheck?roomIds[]=${selectedRoomIds.join(',')}`);
   };
 
   return (
@@ -50,7 +54,7 @@ const SelectRoom = () => {
       </div>
       <div className="flex justify-center mt-12">
         <div className="flex flex-col">
-          {rooms?.map((room, index) => (
+          {rooms.map((room, index) => (
             <div className="flex items-center mb-4" key={index}>
               <input
                 id={`box-${room.roomName}`}
@@ -62,7 +66,7 @@ const SelectRoom = () => {
               <label
                 htmlFor={`box-${room.roomName}`}
                 className="ml-2 text-xl font-medium">
-                {room.roomName}호
+                {room.roomName}
               </label>
             </div>
           ))}

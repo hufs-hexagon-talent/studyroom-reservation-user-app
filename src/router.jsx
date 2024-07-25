@@ -61,7 +61,7 @@ const Router = () => {
                 <Route path="/visit" element={<CheckVisit />} />
                 <Route path="/selectPartition" element={<SelectPartition />} />
                 <Route path="/schedule" element={<Schedule />} />
-                <Route path="qrcheck" element={<QrCheck />} />
+                <Route path="/qrcheck" element={<QrCheck />} />
               </>
             )}
             {loggedIn && (
