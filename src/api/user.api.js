@@ -178,7 +178,6 @@ export const useRooms = roomIds =>
     },
   });
 
-
 // 체크인 하기
 export const useCheckIn =()=>{
   return useMutation({

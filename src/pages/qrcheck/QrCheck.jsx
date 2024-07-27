@@ -7,7 +7,7 @@ import useAuth from '../../hooks/useAuth';
 import { useSnackbar } from 'react-simple-snackbar';
 
 const QrCheck = () => {
-  const [roomId, setroomId] = useState([]);
+  const [roomId, setroomId] = useState(null);
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [reservations, setReservations] = useState([]);
@@ -22,17 +22,19 @@ const QrCheck = () => {
     },
   });
 
-  // useRooms 훅 사용
-  const { data: rooms } = useRooms(roomId);
-
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const roomIdsParam = params.get('roomId');
+    console.log('roomIdsParam', roomIdsParam);
     if (roomIdsParam) {
       setroomId(parseInt(roomIdsParam));
     }
-    console.log(roomId);
   }, [location.search]);
+
+  const { data: rooms } = useRooms(roomId ? [roomId] : []);
+
+  console.log(roomId);
+  console.log(rooms);
 
   useEffect(() => {
     const checkAdminStatus = async () => {
@@ -125,7 +127,11 @@ const QrCheck = () => {
         QR코드 출석
       </h3>
       <div className="mt-5 mb-10 text-center" style={{ color: '#9D9FA2' }}>
-        <p>현재 선택된 호실 : {roomId ? roomId : '선택된 호실이 없음'}</p>
+        <p>
+          현재 선택된 호실 :{' '}
+          {rooms && rooms.length > 0 ? rooms[0].roomName : '선택된 호실이 없음'}
+        </p>
+
         <p>본인의 QR코드를 스캐너에 스캔해주세요</p>
       </div>
       <div className="flex flex-col items-center justify-center w-screen">
