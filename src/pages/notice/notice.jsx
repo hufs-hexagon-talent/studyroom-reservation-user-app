@@ -1,11 +1,8 @@
 import React from 'react';
 
-{
-  /*이용규칙 안내*/
-}
 const Notice = () => {
   return (
-    <div className="flex-grow ml-10 mr-10">
+    <div className="flex-grow ml-10 mr-10 break-keep">
       <div className="font-bold mt-10 text-2xl text-center break-keep">
         컴퓨터공학부 세미나실 이용 규칙 및 예약 주의 사항
       </div>

@@ -76,7 +76,7 @@ const SelectRoom = () => {
         <Button
           color="dark"
           onClick={handleNextClick}
-          className="text-xl font-medium py-2 px-4">
+          className="text-xl font-medium px-2">
           다음
         </Button>
       </div>

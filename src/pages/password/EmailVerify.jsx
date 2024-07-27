@@ -109,9 +109,10 @@ const EmailVerify = () => {
       <div
         className="mt-5 mb-10 text-sm text-center"
         style={{ color: '#9D9FA2' }}>
-        {/* todo: 띄어쓰기 별로 줄바꿈*/}
-        <p>비밀번호 재설정을 위해선 이메일을 통한 본인 인증이 필요합니다</p>
-        <p className="mt-2">
+        <p className="break-keep">
+          비밀번호 재설정을 위해선 이메일을 통한 본인 인증이 필요합니다
+        </p>
+        <p className="mt-2 break-keep">
           본인의 아이디를 입력하면 해당하는 이메일로 인증 코드가 전송됩니다
         </p>
       </div>

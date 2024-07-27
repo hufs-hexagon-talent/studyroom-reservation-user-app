@@ -122,7 +122,7 @@ const QrCheck = () => {
   );
 
   return (
-    <div>
+    <div className="pb-10">
       <h3 className="flex justify-center w-screen text-2xl text-center mt-10 mb-5">
         QR코드 출석
       </h3>
