@@ -33,12 +33,14 @@ const Footer = () => {
         id="footer"
         className="bg-footermainbg relative p-0 block break-keep">
         <div className="py-6 px-2.7 ml-5 mr-5">
-          <div className="footer-logo">
-            <img
-              className="w-50 h-10"
-              src="https://computer.hufs.ac.kr/sites/computer/masterSkin/computer_JW_MS_K2WT001_M/images/logo_footer.svg"
-              alt="한국외국어대학교"
-            />
+          <div className="footer-logo cursor-pointer">
+            <a href="https://www.hufs.ac.kr/">
+              <img
+                className="w-50 h-10"
+                src="https://computer.hufs.ac.kr/sites/computer/masterSkin/computer_JW_MS_K2WT001_M/images/logo_footer.svg"
+                alt="한국외국어대학교"
+              />
+            </a>
           </div>
           <div className="mt-5 leading-8 text-footertextcolor">
             <p className="block mx-0 leading-2">
