@@ -51,6 +51,7 @@ const Check = () => {
           <Table.Head
             style={{ fontSize: 15 }}
             className="text-black text-center">
+            <Table.HeadCell className="px-2 py-4">출석 여부</Table.HeadCell>
             <Table.HeadCell className="px-2 py-4">호실</Table.HeadCell>
             <Table.HeadCell className="px-2 py-4">날짜</Table.HeadCell>
             <Table.HeadCell className="px-2 py-4">시작 시간</Table.HeadCell>
@@ -68,6 +69,11 @@ const Check = () => {
                 <Table.Row
                   key={index}
                   className="bg-white dark:border-gray-700 dark:bg-gray-800 text-center text-gray-900">
+                  <Table.Cell>
+                    {reservation.reservationState === 'VISITED'
+                      ? '출석'
+                      : '미출석'}
+                  </Table.Cell>
                   <Table.Cell className="px-2 py-4">
                     {`${reservation.roomName}-${reservation.partitionNumber}`}
                   </Table.Cell>

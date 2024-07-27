@@ -99,7 +99,7 @@ const CheckVisit = () => {
         <p
           onClick={() => navigate('/schedule')}
           className="inline-block font-bold pb-10 hover:underline cursor-pointer">
-          스케줄 주입하러 가기 &gt;
+          스케줄 설정하러 가기 &gt;
         </p>
         <div>
           <p>{`선택된 방 : ${partitionNames}`}</p>
