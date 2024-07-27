@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useIsAdminData } from '../../api/user.api';
 import { useSnackbar } from 'react-simple-snackbar';
@@ -31,7 +31,7 @@ const Footer = () => {
     <div className="w-full">
       <footer
         id="footer"
-        className="bg-footermainbg relative p-0 block break-keep">
+        className="text-sm bg-footermainbg relative p-0 block break-keep">
         <div className="py-6 px-2.7 ml-5 mr-5">
           <div className="footer-logo cursor-pointer">
             <a href="https://www.hufs.ac.kr/">
@@ -44,7 +44,7 @@ const Footer = () => {
           </div>
           <div className="mt-5 leading-8 text-footertextcolor">
             <p className="block mx-0 leading-2">
-              <span className="inline-block text-base font-normal">
+              <span className="text-sm inline-block font-normal">
                 <b className="font-bormal text-footertextbrown">
                   글로벌캠퍼스{' '}
                 </b>
@@ -52,8 +52,8 @@ const Footer = () => {
                 글로벌캠퍼스 (공학관 205호)
               </span>
             </p>
-            <p className="block my-2 mx-0 leading-2">
-              <span className="inline-block text-base font-normal">
+            <p className="block  mx-0 leading-2">
+              <span className="inline-block font-normal">
                 <b className="font-bormal text-footertextbrown">TEL. </b>
                 031-330-4268
               </span>
@@ -62,7 +62,7 @@ const Footer = () => {
                 <a href="mailto:ces@hufs.ac.kr">ces@hufs.ac.kr</a>
               </span>
             </p>
-            <p className="block my-2 mx-0 leading-2">
+            <p className="block leading-2">
               <span>
                 <b className="font-bormal text-footertextbrown">
                   학부 홈페이지.{' '}

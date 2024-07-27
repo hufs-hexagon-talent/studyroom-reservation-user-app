@@ -125,7 +125,7 @@ const CheckVisit = () => {
           <div className="mt-3 ml-1">해당 날짜의 예약이 없습니다</div>
         ) : (
           <Table hoverable className="mt-4 mb-3 text-black text-center">
-            <Table.Head>
+            <Table.Head className="break-keep">
               {/* todo: 반응형 글자 작아지게 */}
               <Table.HeadCell>출석 유무</Table.HeadCell>
               <Table.HeadCell>호실</Table.HeadCell>

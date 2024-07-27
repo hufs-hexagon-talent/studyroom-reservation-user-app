@@ -169,8 +169,12 @@ const Schedule = () => {
           </div>
           <div className="text-sm py-3">
             선택된 날짜 :{' '}
-            {selectedDates.map(d => format(d, 'yyyy-MM-dd')).join(', ')}
+            {selectedDates
+              .sort((a, b) => a - b)
+              .map(d => format(d, 'yyyy-MM-dd'))
+              .join(', ')}
           </div>
+
           <div className="flex justify-center">
             <DatePicker
               locale={ko}
