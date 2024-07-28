@@ -70,7 +70,6 @@ const RoomPage = () => {
     format(new Date(), 'yyyy-MM-dd'),
   );
   const [availableDate, setAvailableDate] = useState([]);
-  //const times = useMemo(() => createTimeTable(timeTableConfig), []);
   const navigate = useNavigate();
   const today = new Date();
 
@@ -86,6 +85,7 @@ const RoomPage = () => {
   const [startMinute, setStartMinute] = useState(null);
   const [endHour, setEndHour] = useState(null);
   const [endMinute, setEndMinute] = useState(null);
+  const [maxReservationMinute, setMaxReservationMinute] = useState(null);
 
   useEffect(() => {
     if (reservationsByRooms && reservationsByRooms.length > 0) {
@@ -112,6 +112,12 @@ const RoomPage = () => {
       const [endHour, endMinute] = latestTime.split(':');
       setEndHour(parseInt(endHour, 10));
       setEndMinute(parseInt(endMinute, 10));
+
+      const eachMaxMinutes = reservationsByRooms.map(
+        partition => partition.policy.eachMaxMinute,
+      );
+      const maxEachMaxMinute = Math.max(...eachMaxMinutes);
+      setMaxReservationMinute(maxEachMaxMinute);
     }
   }, [reservationsByRooms]);
 
@@ -126,8 +132,7 @@ const RoomPage = () => {
         minute: endMinute,
       },
       intervalMinute: 30,
-      maxReservationMinute: 120,
-      maxReservationSlots: 4,
+      maxReservationMinute: maxReservationMinute,
     }),
     [startHour, startMinute],
   );
