@@ -103,7 +103,7 @@ const EmailVerify = () => {
 
   return (
     <div className="flex flex-col items-center p-5">
-      <h1 className="text-xl font-bold text-center mt-10 mb-5">
+      <h1 className="text-2xl text-center mt-10 mb-5">
         비밀번호 재설정을 위한 본인 인증
       </h1>
       <div
