@@ -87,7 +87,9 @@ const Check = () => {
                     {format(end, 'HH:mm')}
                   </Table.Cell>
                   <Table.Cell className="px-2 py-4">
-                    {!isPast && (
+                    {!(
+                      isPast || reservation.reservationState === 'VISITED'
+                    ) && (
                       <a
                         href="#"
                         onClick={() => {
