@@ -90,7 +90,19 @@ const CheckVisit = () => {
 
   // 예약 삭제
   const handleDelete = reservationId => {
-    doDelete(reservationId);
+    doDelete(reservationId, {
+      onSuccess: () => {
+        setReservations(prevReservations =>
+          prevReservations.filter(
+            reservation => reservation.reservationId !== reservationId,
+          ),
+        );
+      },
+      onError: err => {
+        setError('예약 삭제 실패');
+        console.error(err);
+      },
+    });
   };
 
   return (
