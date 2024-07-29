@@ -11,6 +11,8 @@ const QrCheck = () => {
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [reservations, setReservations] = useState([]);
+  const [scannedCode, setScannedCode] = useState('');
+
   const { mutate: doCheckIn } = useCheckIn();
   let inko = new Inko();
   const navigate = useNavigate();
@@ -25,7 +27,7 @@ const QrCheck = () => {
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const roomIdsParam = params.get('roomId');
-    console.log('roomIdsParam', roomIdsParam);
+    //console.log('roomIdsParam', roomIdsParam);
     if (roomIdsParam) {
       setroomId(parseInt(roomIdsParam));
     }
@@ -33,8 +35,8 @@ const QrCheck = () => {
 
   const { data: rooms } = useRooms(roomId ? [roomId] : []);
 
-  console.log(roomId);
-  console.log(rooms);
+  // console.log(roomId);
+  // console.log(rooms);
 
   useEffect(() => {
     const checkAdminStatus = async () => {
@@ -114,16 +116,31 @@ const QrCheck = () => {
   const handleQrKeyDown = useCallback(
     e => {
       if (e.code === 'Enter') {
-        handleQrCode(e.target.value);
-        e.target.value = '';
+        handleQrCode(scannedCode);
+        setScannedCode('');
+      } else {
+        setScannedCode(prev => prev + e.key);
       }
     },
-    [roomId],
+    [roomId, scannedCode],
   );
+
+  useEffect(() => {
+    const handleKeyPress = e => {
+      if (e.target.tagName !== 'INPUT') {
+        handleQrKeyDown(e);
+      }
+    };
+
+    document.addEventListener('keypress', handleKeyPress);
+    return () => {
+      document.removeEventListener('keypress', handleKeyPress);
+    };
+  }, [handleQrKeyDown]);
 
   return (
     <div className="pb-10">
-      <h3 className="flex justify-center w-screen text-2xl text-center mt-10 mb-5">
+      <h3 className="flex justify-center w-screen text-2xl text-center mt-20 mb-5">
         QR코드 출석
       </h3>
       <div className="mt-5 mb-10 text-center" style={{ color: '#9D9FA2' }}>
