@@ -23,19 +23,21 @@ import Schedule from './pages/manage/Schedule';
 
 const Router = () => {
   const { loggedIn } = useAuth();
-  const { data: isAdmin, refetch } = useIsAdminData();
+  const { data: isAdmin, refetch, isLoading } = useIsAdminData();
+
   const [openSnackbar] = useSnackbar({
     position: 'top-right',
     style: {
       backgroundColor: '#FF3333',
     },
   });
-
   const pwResetToken = sessionStorage.getItem('pwResetToken');
 
   // useEffect(() => {
   //   refetch();
   // }, [refetch]);
+
+  if (isLoading) return null;
 
   return (
     <BrowserRouter basename={process.env.REACT_APP_BASEURL || '/'}>
@@ -43,30 +45,38 @@ const Router = () => {
         <NavigationBar />
         <div className="flex-grow">
           <Routes>
-            <Route path="/password" element={<LoggedInPassword />} />
-            <Route path="/email" element={<EmailVerify />} />
-            <Route
-              path="/email/pwreset"
-              element={
-                pwResetToken ? <LoggedOutPassword /> : <Navigate to="/" />
-              }
-            />
             <Route path="/" element={<Notice />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/signup" element={<SignUp />} />
             <Route path="/roompage" element={<RoomPage />} />
-            {/* todo : isAdmin === false이면 접근 못하게 해야 됨 */}
-            <>
-              <Route path="/SelectRoom" element={<SelectRoom />} />
-              <Route path="/visit" element={<CheckVisit />} />
-              <Route path="/selectPartition" element={<SelectPartition />} />
-              <Route path="/schedule" element={<Schedule />} />
-              <Route path="/qrcheck" element={<QrCheck />} />
-            </>
-            {loggedIn && (
+
+            {loggedIn ? (
               <>
                 <Route path="/check" element={<Check />} />
                 <Route path="/otp" element={<OtpPage />} />
+                <Route path="/password" element={<LoggedInPassword />} />
+                {isAdmin && (
+                  <>
+                    <Route path="/SelectRoom" element={<SelectRoom />} />
+                    <Route path="/visit" element={<CheckVisit />} />
+                    <Route
+                      path="/selectPartition"
+                      element={<SelectPartition />}
+                    />
+                    <Route path="/schedule" element={<Schedule />} />
+                    <Route path="/qrcheck" element={<QrCheck />} />
+                  </>
+                )}
+              </>
+            ) : (
+              <>
+                <Route
+                  path="/email/pwreset"
+                  element={
+                    pwResetToken ? <LoggedOutPassword /> : <Navigate to="/" />
+                  }
+                />
+                <Route path="/email" element={<EmailVerify />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/signup" element={<SignUp />} />
               </>
             )}
             <Route path="*" element={<Navigate to="/" />} />

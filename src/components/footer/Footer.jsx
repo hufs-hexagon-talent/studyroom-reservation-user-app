@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useIsAdminData } from '../../api/user.api';
 import { useSnackbar } from 'react-simple-snackbar';

@@ -21,8 +21,10 @@ export const useAllUsers = () => {
 
 // 자신의 정보 조회
 const fetchMyInfo =async()=>{
+  try{
   const myInfo_res = await apiClient.get('/users/me');
   return myInfo_res.data.data;
+  }catch(e){return false}
 }
 
 export const useMyInfo =()=>{
@@ -34,16 +36,18 @@ export const useMyInfo =()=>{
 
 // 관리자인지 아닌지
 export const fetchIsAdmin = async()=>{
-  const isAdmin_res = await apiClient.get('/users/me');
-  return isAdmin_res.data.data.isAdmin;
+  try{
+    const isAdmin_res = await apiClient.get('/users/me');
+    return isAdmin_res.data.data.isAdmin;
+  }catch(e){return false}
 }
+
 
 // Query
 export const useIsAdminData=()=>{
   return useQuery({
     queryKey:['isAdmin'],
     queryFn:fetchIsAdmin,
-    enabled:false,
   });
 }
 
