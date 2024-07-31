@@ -64,7 +64,7 @@ const Check = () => {
             {reservations?.map((reservation, index) => {
               const start = new Date(reservation.startDateTime);
               const end = new Date(reservation.endDateTime);
-              const isPast = end < new Date();
+              const isPast = start < new Date();
               return (
                 <Table.Row
                   key={index}
