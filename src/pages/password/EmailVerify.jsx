@@ -14,6 +14,7 @@ const EmailVerify = () => {
   const [timer, setTimer] = useState(null);
   const [timerDisplay, setTimerDisplay] = useState(''); // 타이머 표시 상태
   const [token, setToken] = useState('');
+  const [disabled, setDisabled] = useState(false);
 
   const navigate = useNavigate();
 
@@ -41,6 +42,7 @@ const EmailVerify = () => {
         if (prevTimer <= 1) {
           clearInterval(countdown);
           setTimerDisplay(''); // 타이머 종료 시 표시 제거
+          setDisabled(false);
           return null;
         }
         const minutes = Math.floor(prevTimer / 60);
@@ -56,6 +58,7 @@ const EmailVerify = () => {
   // 인증 코드 발송
   const handleSendCode = async () => {
     try {
+      setDisabled(true);
       const response = await doEmailSend(username);
       setEmail(response.email);
 
@@ -102,8 +105,8 @@ const EmailVerify = () => {
   };
 
   return (
-    <div className="flex flex-col items-center p-5">
-      <h1 className="text-2xl text-center mt-10 mb-5">
+    <div className="flex flex-col items-center w-screen p-5">
+      <h1 className="text-xl font-bold text-center mt-10 mb-5">
         비밀번호 재설정을 위한 본인 인증
       </h1>
       <div
@@ -117,7 +120,7 @@ const EmailVerify = () => {
         </p>
       </div>
       <div className="flex items-center justify-center border rounded-lg p-2 mb-5 w-full max-w-md">
-        <div className="flex-grow">
+        <div className="relative flex-grow">
           <input
             onChange={e => setUsername(e.target.value)}
             type="text"
@@ -134,8 +137,9 @@ const EmailVerify = () => {
         <button
           id="button"
           onClick={handleSendCode}
-          className="text-white p-2 rounded-lg ml-2"
-          style={{ backgroundColor: '#1e2332' }}>
+          className={`text-white p-2 rounded-lg ml-2 ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+          style={{ backgroundColor: '#1e2332' }}
+          disabled={disabled}>
           인증 코드 발송
         </button>
       </div>
