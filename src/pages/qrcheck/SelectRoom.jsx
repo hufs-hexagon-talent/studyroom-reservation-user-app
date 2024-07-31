@@ -66,7 +66,7 @@ const SelectRoom = () => {
               <label
                 htmlFor={`box-${room.roomName}`}
                 className="ml-2 text-xl font-medium">
-                {room.roomName}
+                {room.roomName}호
               </label>
             </div>
           ))}

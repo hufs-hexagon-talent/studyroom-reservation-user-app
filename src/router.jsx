@@ -33,9 +33,9 @@ const Router = () => {
 
   const pwResetToken = sessionStorage.getItem('pwResetToken');
 
-  useEffect(() => {
-    refetch();
-  }, [refetch]);
+  // useEffect(() => {
+  //   refetch();
+  // }, [refetch]);
 
   return (
     <BrowserRouter basename={process.env.REACT_APP_BASEURL || '/'}>
@@ -55,11 +55,14 @@ const Router = () => {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignUp />} />
             <Route path="/roompage" element={<RoomPage />} />
-            <Route path="/SelectRoom" element={<SelectRoom />} />
-            <Route path="/visit" element={<CheckVisit />} />
-            <Route path="/selectPartition" element={<SelectPartition />} />
-            <Route path="/schedule" element={<Schedule />} />
-            <Route path="/qrcheck" element={<QrCheck />} />
+            {/* todo : isAdmin === false이면 접근 못하게 해야 됨 */}
+            <>
+              <Route path="/SelectRoom" element={<SelectRoom />} />
+              <Route path="/visit" element={<CheckVisit />} />
+              <Route path="/selectPartition" element={<SelectPartition />} />
+              <Route path="/schedule" element={<Schedule />} />
+              <Route path="/qrcheck" element={<QrCheck />} />
+            </>
             {loggedIn && (
               <>
                 <Route path="/check" element={<Check />} />

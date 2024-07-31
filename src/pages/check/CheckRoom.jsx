@@ -64,7 +64,7 @@ const Check = () => {
             {reservations?.map((reservation, index) => {
               const start = new Date(reservation.startDateTime);
               const end = new Date(reservation.endDateTime);
-              const isPast = end < new Date();
+              const isPast = start < new Date();
               return (
                 <Table.Row
                   key={index}
@@ -87,7 +87,9 @@ const Check = () => {
                     {format(end, 'HH:mm')}
                   </Table.Cell>
                   <Table.Cell className="px-2 py-4">
-                    {!isPast && (
+                    {!(
+                      isPast || reservation.reservationState === 'VISITED'
+                    ) && (
                       <a
                         href="#"
                         onClick={() => {
