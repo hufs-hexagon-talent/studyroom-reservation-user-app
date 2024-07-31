@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
 import { useSnackbar } from 'react-simple-snackbar';
-import { useIsAdminData } from './api/user.api';
+import { useIsAdminData, useMyInfo } from './api/user.api';
 
 import Footer from './components/footer/Footer';
 import NavigationBar from './components/Navbar/NavigationBar';
@@ -21,9 +21,12 @@ import SignUp from './pages/signup/SignUp';
 import SelectRoom from './pages/qrcheck/SelectRoom';
 import Schedule from './pages/manage/Schedule';
 
-const Router = () => {
+const RouterComponent = () => {
   const { loggedIn } = useAuth();
-  const { data: isAdmin, refetch, isLoading } = useIsAdminData();
+  const { data: isAdmin, isLoading } = useIsAdminData();
+  const { data: me } = useMyInfo();
+
+  const username = me?.username;
 
   const [openSnackbar] = useSnackbar({
     position: 'top-right',
@@ -32,10 +35,6 @@ const Router = () => {
     },
   });
   const pwResetToken = sessionStorage.getItem('pwResetToken');
-
-  // useEffect(() => {
-  //   refetch();
-  // }, [refetch]);
 
   if (isLoading) return null;
 
@@ -51,18 +50,22 @@ const Router = () => {
             {loggedIn ? (
               <>
                 <Route path="/check" element={<Check />} />
-                <Route path="/otp" element={<OtpPage />} />
-                <Route path="/password" element={<LoggedInPassword />} />
-                {isAdmin && (
+                {username !== 'ces_studyroom' && (
                   <>
-                    <Route path="/SelectRoom" element={<SelectRoom />} />
-                    <Route path="/visit" element={<CheckVisit />} />
-                    <Route
-                      path="/selectPartition"
-                      element={<SelectPartition />}
-                    />
-                    <Route path="/schedule" element={<Schedule />} />
-                    <Route path="/qrcheck" element={<QrCheck />} />
+                    <Route path="/otp" element={<OtpPage />} />
+                    <Route path="/password" element={<LoggedInPassword />} />
+                    {isAdmin && (
+                      <>
+                        <Route path="/SelectRoom" element={<SelectRoom />} />
+                        <Route path="/visit" element={<CheckVisit />} />
+                        <Route
+                          path="/selectPartition"
+                          element={<SelectPartition />}
+                        />
+                        <Route path="/schedule" element={<Schedule />} />
+                        <Route path="/qrcheck" element={<QrCheck />} />
+                      </>
+                    )}
                   </>
                 )}
               </>
@@ -88,4 +91,4 @@ const Router = () => {
   );
 };
 
-export default Router;
+export default RouterComponent;

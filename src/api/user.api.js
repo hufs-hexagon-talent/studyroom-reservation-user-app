@@ -22,9 +22,11 @@ export const useAllUsers = () => {
 // 자신의 정보 조회
 const fetchMyInfo =async()=>{
   try{
-  const myInfo_res = await apiClient.get('/users/me');
-  return myInfo_res.data.data;
-  }catch(e){return false}
+    const myInfo_res = await apiClient.get('/users/me');
+    return myInfo_res.data.data;
+  } catch(e) {
+    return false
+  }
 }
 
 export const useMyInfo =()=>{
