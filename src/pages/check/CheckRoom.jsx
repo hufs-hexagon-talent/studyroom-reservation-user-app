@@ -10,11 +10,13 @@ import {
   useDeleteReservation,
   useUserReservation,
   useNoShow,
+  useMyInfo,
 } from '../../api/user.api';
 
 const Check = () => {
   const { data: noShow } = useNoShow();
   const { data: reservations } = useUserReservation();
+  const { data: me } = useMyInfo();
   const { mutate: deleteReservation } = useDeleteReservation();
 
   const [anchorEl, setAnchorEl] = useState(null);
@@ -44,7 +46,9 @@ const Check = () => {
 
   return (
     <div>
-      <div className="flex justify-center text-2xl mt-20">내 신청 현황</div>
+      <div className="flex justify-center text-2xl mt-20">
+        {me.name}님의 신청 현황
+      </div>
 
       <div id="table" className="overflow-x-auto mt-10">
         <Table className="border">

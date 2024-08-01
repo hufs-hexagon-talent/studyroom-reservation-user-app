@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import QRCode from 'qrcode.react';
 
-import { useOtp } from '../../api/user.api';
+import { useOtp, useMyInfo } from '../../api/user.api';
 
 const TimerCircularProgressBar = ({ radius, strokeWidth, progress }) => {
   const center = radius + strokeWidth / 2;
@@ -38,6 +38,7 @@ const Qrcode = () => {
   const [timer, setTimer] = useState(30);
   const [radius, setRadius] = useState(170);
 
+  const { data: me } = useMyInfo();
   const { data: otpValue, refetch, dataUpdatedAt } = useOtp();
 
   useEffect(() => {
@@ -73,7 +74,7 @@ const Qrcode = () => {
 
   return (
     <div>
-      <div className="text-center text-3xl mt-20">내 QR 코드</div>
+      <div className="text-center text-3xl mt-20">{me.name}님의 QR 코드</div>
       <div className="flex justify-center mt-10 relative">
         <TimerCircularProgressBar
           radius={radius}

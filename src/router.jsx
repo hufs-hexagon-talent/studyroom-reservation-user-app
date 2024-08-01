@@ -56,7 +56,7 @@ const RouterComponent = () => {
                     <Route path="/password" element={<LoggedInPassword />} />
                     {isAdmin && (
                       <>
-                        <Route path="/SelectRoom" element={<SelectRoom />} />
+                        <Route path="/selectRoom" element={<SelectRoom />} />
                         <Route path="/visit" element={<CheckVisit />} />
                         <Route
                           path="/selectPartition"
