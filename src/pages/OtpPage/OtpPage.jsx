@@ -3,6 +3,7 @@ import QRCode from 'qrcode.react';
 
 import { useOtp, useMyInfo } from '../../api/user.api';
 
+// jhjhjh
 const TimerCircularProgressBar = ({ radius, strokeWidth, progress }) => {
   const center = radius + strokeWidth / 2;
   const circumference = 2 * Math.PI * radius;
