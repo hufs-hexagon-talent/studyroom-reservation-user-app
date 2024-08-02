@@ -24,10 +24,7 @@ import Schedule from './pages/manage/Schedule';
 const RouterComponent = () => {
   const { loggedIn } = useAuth();
   const { data: serviceRole, isLoading } = useServiceRole();
-  const { data: me } = useMyInfo();
-
-  const username = me?.username;
-
+  console.log(serviceRole);
   const [openSnackbar] = useSnackbar({
     position: 'top-right',
     style: {
@@ -35,7 +32,6 @@ const RouterComponent = () => {
     },
   });
   const pwResetToken = sessionStorage.getItem('pwResetToken');
-
   if (isLoading) return null;
 
   return (
@@ -45,31 +41,30 @@ const RouterComponent = () => {
         <div className="flex-grow">
           <Routes>
             <Route path="/" element={<Notice />} />
-            <Route path="/roompage" element={<RoomPage />} />
-
-            {loggedIn ? (
+            {serviceRole !== 'RESIDENT' && (
               <>
+                <Route path="/roompage" element={<RoomPage />} />
                 <Route path="/check" element={<Check />} />
-                {serviceRole !== 'RESIDENT' && (
-                  <>
-                    <Route path="/otp" element={<OtpPage />} />
-                    <Route path="/password" element={<LoggedInPassword />} />
-                    {serviceRole === 'ADMIN' && (
-                      <>
-                        <Route path="/selectRoom" element={<SelectRoom />} />
-                        <Route path="/visit" element={<CheckVisit />} />
-                        <Route
-                          path="/selectPartition"
-                          element={<SelectPartition />}
-                        />
-                        <Route path="/schedule" element={<Schedule />} />
-                        <Route path="/qrcheck" element={<QrCheck />} />
-                      </>
-                    )}
-                  </>
-                )}
+                <Route path="/otp" element={<OtpPage />} />
+                <Route path="/password" element={<LoggedInPassword />} />
               </>
-            ) : (
+            )}
+            {serviceRole === 'ADMIN' && (
+              <>
+                <Route path="/selectRoom" element={<SelectRoom />} />
+                <Route path="/visit" element={<CheckVisit />} />
+                <Route path="/selectPartition" element={<SelectPartition />} />
+                <Route path="/schedule" element={<Schedule />} />
+                <Route path="/qrcheck" element={<QrCheck />} />
+              </>
+            )}
+            {serviceRole === 'RESIDENT' && (
+              <>
+                <Route path="/selectRoom" element={<SelectRoom />} />
+                <Route path="/qrcheck" element={<QrCheck />} />
+              </>
+            )}
+            {!loggedIn && (
               <>
                 <Route
                   path="/email/pwreset"

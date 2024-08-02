@@ -47,7 +47,7 @@ const Check = () => {
   return (
     <div>
       <div className="flex justify-center text-2xl mt-20">
-        {me.name}님의 신청 현황
+        {me?.name}님의 신청 현황
       </div>
 
       <div id="table" className="overflow-x-auto mt-10">

@@ -75,7 +75,7 @@ const Qrcode = () => {
 
   return (
     <div>
-      <div className="text-center text-3xl mt-20">{me.name}님의 QR 코드</div>
+      <div className="text-center text-3xl mt-20">{me?.name}님의 QR 코드</div>
       <div className="flex justify-center mt-10 relative">
         <TimerCircularProgressBar
           radius={radius}

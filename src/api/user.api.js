@@ -3,8 +3,8 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { apiClient } from './client';
 
 import { queryClient } from '../index';
-import axios from 'axios';
-import { arSA } from 'date-fns/locale';
+//import axios from 'axios';
+//import { arSA } from 'date-fns/locale';
 
 // id, pw 확인할 때 쓰려고
 const fetchAllUsers = async () => {
