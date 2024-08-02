@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
 import { useSnackbar } from 'react-simple-snackbar';
-import { useServiceRole, useMyInfo } from './api/user.api';
+import { useServiceRole } from './api/user.api';
 
 import Footer from './components/footer/Footer';
 import NavigationBar from './components/Navbar/NavigationBar';

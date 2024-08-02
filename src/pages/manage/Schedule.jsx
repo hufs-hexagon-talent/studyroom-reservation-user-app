@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Checkbox, Table, Button } from 'flowbite-react';
 import { useAllPolicies, useAllRooms, useSchedules } from '../../api/user.api';
 import DatePicker, { registerLocale } from 'react-datepicker';
-import { ko, tr } from 'date-fns/locale';
+import { ko } from 'date-fns/locale';
 import 'react-datepicker/dist/react-datepicker.css';
 import { format } from 'date-fns';
 import { useSnackbar } from 'react-simple-snackbar';
@@ -77,11 +77,6 @@ const Schedule = () => {
   };
 
   const handleButton = async () => {
-    // console.log(
-    //   selectedPolicyId,
-    //   selectedRooms,
-    //   selectedDates.map(d => format(d, 'yyyy-MM-dd')),
-    // );
     if (
       !selectedPolicyId ||
       selectedRooms.length === 0 ||
@@ -176,15 +171,18 @@ const Schedule = () => {
           </div>
 
           <div className="flex justify-center">
-            <DatePicker
-              locale={ko}
-              dateFormat="yyyy년 MM월 dd일"
-              selected={null}
-              onChange={handleDateChange}
-              inline
-              highlightDates={selectedDates}
-              showIcon
-            />
+            <div className="w-full max-w-md md:max-w-xs">
+              <DatePicker
+                locale={ko}
+                dateFormat="yyyy년 MM월 dd일"
+                selected={null}
+                onChange={handleDateChange}
+                inline
+                highlightDates={selectedDates}
+                showIcon
+                className="w-full p-2 text-sm md:text-xs"
+              />
+            </div>
           </div>
         </div>
         <div className="border-l border-gray-300"></div>
