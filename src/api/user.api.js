@@ -37,19 +37,19 @@ export const useMyInfo =()=>{
 };
 
 // 관리자인지 아닌지
-export const fetchIsAdmin = async()=>{
+export const fetchServiceRole = async()=>{
   try{
     const isAdmin_res = await apiClient.get('/users/me');
-    return isAdmin_res.data.data.isAdmin;
+    return isAdmin_res.data.data.serviceRole;
   }catch(e){return false}
 }
 
 
 // Query
-export const useIsAdminData=()=>{
+export const useServiceRole=()=>{
   return useQuery({
-    queryKey:['isAdmin'],
-    queryFn:fetchIsAdmin,
+    queryKey:['serviceRole'],
+    queryFn:fetchServiceRole,
   });
 }
 

@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useIsAdminData } from '../../api/user.api';
+import { useServiceRole } from '../../api/user.api';
 import { useSnackbar } from 'react-simple-snackbar';
 import useAuth from '../../hooks/useAuth';
 import './Footer.css';
@@ -14,10 +14,10 @@ const Footer = () => {
   });
   const navigate = useNavigate();
   const { loggedIn } = useAuth();
-  const { data: checkIsAdmin } = useIsAdminData();
+  const { data: serviceRole } = useServiceRole();
 
   const handleAdminClick = async () => {
-    if (loggedIn && checkIsAdmin === true) {
+    if (loggedIn && serviceRole === 'ADMIN') {
       navigate('/selectPartition');
     } else {
       openSnackbar('관리자 외에는 접근 권한이 없습니다.');
@@ -74,7 +74,7 @@ const Footer = () => {
                 </a>
               </span>
             </p>
-            {checkIsAdmin === true && (
+            {serviceRole === 'ADMIN' && (
               <div
                 onClick={handleAdminClick}
                 className="inline hover:underline cursor-pointer text-gray-400 text-sm mt-3">

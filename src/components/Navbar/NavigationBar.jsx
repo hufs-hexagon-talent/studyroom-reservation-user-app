@@ -2,22 +2,18 @@ import React, { useEffect } from 'react';
 import { Navbar } from 'flowbite-react';
 import Logo from '../../assets/logo.png';
 import useAuth from '../../hooks/useAuth';
-import { useIsAdminData, useMyInfo } from '../../api/user.api';
+import { useServiceRole, useMyInfo } from '../../api/user.api';
 import { Link } from 'react-router-dom';
 
 const NavigationBar = () => {
   const { loggedIn, logout } = useAuth();
-  const { data: myInfo } = useMyInfo();
-  const { data: isAdmin, refetch } = useIsAdminData();
+  const { data: serviceRole, refetch } = useServiceRole();
 
   useEffect(() => {
     if (loggedIn) {
       refetch();
     }
   }, [loggedIn, refetch]);
-
-  // 출석체크용 아이디
-  const isCesStudyroom = myInfo?.username === 'ces_studyroom';
 
   return (
     <Navbar fluid rounded className="border-b-2">
@@ -30,7 +26,7 @@ const NavigationBar = () => {
       <Navbar.Toggle />
       <Navbar.Collapse>
         {/* 출석 체크용 아이디라면 */}
-        {isCesStudyroom ? (
+        {serviceRole === 'RESIDENT' ? (
           <>
             <Navbar.Link href="/selectRoom">출석 체크</Navbar.Link>
             <Navbar.Link href="/">이용 규칙</Navbar.Link>
@@ -44,7 +40,7 @@ const NavigationBar = () => {
           </>
         ) : (
           <>
-            {isAdmin === true && (
+            {serviceRole === 'ADMIN' && (
               <Navbar.Link href="/selectRoom">출석 체크</Navbar.Link>
             )}
             <Navbar.Link href="/roompage">세미나실 예약</Navbar.Link>

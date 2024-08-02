@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
 import { useSnackbar } from 'react-simple-snackbar';
-import { useIsAdminData, useMyInfo } from './api/user.api';
+import { useServiceRole, useMyInfo } from './api/user.api';
 
 import Footer from './components/footer/Footer';
 import NavigationBar from './components/Navbar/NavigationBar';
@@ -23,7 +23,7 @@ import Schedule from './pages/manage/Schedule';
 
 const RouterComponent = () => {
   const { loggedIn } = useAuth();
-  const { data: isAdmin, isLoading } = useIsAdminData();
+  const { data: serviceRole, isLoading } = useServiceRole();
   const { data: me } = useMyInfo();
 
   const username = me?.username;
@@ -50,11 +50,11 @@ const RouterComponent = () => {
             {loggedIn ? (
               <>
                 <Route path="/check" element={<Check />} />
-                {username !== 'ces_studyroom' && (
+                {serviceRole !== 'RESIDENT' && (
                   <>
                     <Route path="/otp" element={<OtpPage />} />
                     <Route path="/password" element={<LoggedInPassword />} />
-                    {isAdmin && (
+                    {serviceRole === 'ADMIN' && (
                       <>
                         <Route path="/selectRoom" element={<SelectRoom />} />
                         <Route path="/visit" element={<CheckVisit />} />

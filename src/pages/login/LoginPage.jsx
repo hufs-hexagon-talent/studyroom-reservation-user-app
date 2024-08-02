@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, TextInput } from 'flowbite-react';
 import { useSnackbar } from 'react-simple-snackbar';
-import { useMyInfo } from '../../api/user.api';
 import './LoginPage.css';
 
 import useAuth from '../../hooks/useAuth';
@@ -11,7 +10,7 @@ const LoginPage = () => {
   const [password, setPassword] = useState('');
   const [studentId, setStudentId] = useState('');
   const [error, setError] = useState('');
-  const { login, loggedIn, userName } = useAuth();
+  const { login, loggedIn } = useAuth();
   const navigate = useNavigate();
 
   const [openSuccessSnackbar, closeSuccessSnackbar] = useSnackbar({
@@ -31,8 +30,7 @@ const LoginPage = () => {
       await login({ id: studentId, password });
 
       openSuccessSnackbar(`로그인 되었습니다`, 2500);
-      navigate('/');
-      //location.reload(); // 페이지 새로고침
+      location.reload(); // 페이지 새로고침
     } catch (error) {
       setError('로그인 오류 : ', error.message);
       location.reload();

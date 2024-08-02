@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import Inko from 'inko';
-import { useCheckIn, fetchIsAdmin, useRooms } from '../../api/user.api';
+import { useCheckIn, useRooms, fetchServiceRole } from '../../api/user.api';
 import { convertToEnglish } from '../../api/convertToEnglish';
 import { useNavigate } from 'react-router-dom';
 import useAuth from '../../hooks/useAuth';
@@ -42,7 +42,7 @@ const QrCheck = () => {
     const checkAdminStatus = async () => {
       // 관리자 인지 확인
       try {
-        const isAdmin = await fetchIsAdmin();
+        const isAdmin = await fetchServiceRole();
         if (!isAdmin) {
           navigate('/');
         }
