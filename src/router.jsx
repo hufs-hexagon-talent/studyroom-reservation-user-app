@@ -24,7 +24,6 @@ import Schedule from './pages/manage/Schedule';
 const RouterComponent = () => {
   const { loggedIn } = useAuth();
   const { data: serviceRole, isLoading } = useServiceRole();
-  console.log(serviceRole);
   const [openSnackbar] = useSnackbar({
     position: 'top-right',
     style: {

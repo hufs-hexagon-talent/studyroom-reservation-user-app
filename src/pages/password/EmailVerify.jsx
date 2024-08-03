@@ -96,7 +96,6 @@ const EmailVerify = () => {
       }, 2500);
       navigate('/email/pwreset');
     } catch (error) {
-      console.log(error);
       openErrorSnackbar('인증 코드 확인에 실패하였습니다.');
       setTimeout(() => {
         closeErrorSnackbar();

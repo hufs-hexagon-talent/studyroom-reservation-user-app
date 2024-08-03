@@ -42,7 +42,6 @@ const SelectRoom = () => {
       return;
     }
 
-    console.log('Selected room:', selectedRoom.roomId);
     navigate(`/qrcheck?roomId=${selectedRoom.roomId}`);
   };
 
