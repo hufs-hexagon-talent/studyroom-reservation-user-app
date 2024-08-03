@@ -66,9 +66,6 @@ const LoggedInPassword = () => {
 
     setIdError('');
     setPasswordError('');
-    console.log('아이디:', id);
-    console.log('기존 비밀번호:', prePassword);
-    console.log('신규 비밀번호:', newPassword);
     try {
       await changePw({ prePassword, newPassword });
     } catch (error) {

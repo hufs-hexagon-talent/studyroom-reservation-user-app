@@ -44,7 +44,6 @@ const Schedule = () => {
 
   const handlePolicyCheckBox = policyId => {
     setSelectedPolicyId(policyId === selectedPolicyId ? null : policyId);
-    console.log(selectedPolicyId);
   };
 
   const handleRoomCheckbox = roomId => {
@@ -53,7 +52,6 @@ const Schedule = () => {
         ? prevSelectedRooms.filter(id => id !== roomId)
         : [...prevSelectedRooms, roomId],
     );
-    console.log('Selected rooms:', selectedRooms);
   };
 
   const handleDateChange = date => {
@@ -70,10 +68,6 @@ const Schedule = () => {
       updatedDates = [...selectedDates, date];
     }
     setSelectedDates(updatedDates);
-    console.log(
-      'Selected dates:',
-      updatedDates.map(d => format(d, 'yyyy-MM-dd')),
-    );
   };
 
   const handleButton = async () => {

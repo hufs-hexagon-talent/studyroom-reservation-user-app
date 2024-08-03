@@ -27,16 +27,12 @@ const QrCheck = () => {
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const roomIdsParam = params.get('roomId');
-    //console.log('roomIdsParam', roomIdsParam);
     if (roomIdsParam) {
       setroomId(parseInt(roomIdsParam));
     }
   }, [location.search]);
 
   const { data: rooms } = useRooms(roomId ? [roomId] : []);
-
-  // console.log(roomId);
-  // console.log(rooms);
 
   useEffect(() => {
     const checkAdminStatus = async () => {
@@ -60,7 +56,7 @@ const QrCheck = () => {
     if (loggedIn) {
       checkAdminStatus();
     } else {
-      console.log('로그인이 되어 있지 않습니다');
+      openSnackbar('로그인이 되어 있지 않습니다', 2500);
       navigate('/login');
     }
   }, [navigate, loggedIn]);
@@ -69,7 +65,6 @@ const QrCheck = () => {
     const lowerCaseCode = convertToEnglish(
       inko.ko2en(verificationCode).toLowerCase(),
     );
-    console.log({ verificationCode: lowerCaseCode, roomId });
 
     doCheckIn(
       {

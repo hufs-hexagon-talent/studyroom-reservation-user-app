@@ -69,13 +69,13 @@ const useSlot = (
       const startDateTime = `${formattedDate}T${times[startTimeIndex]}:00.000Z`;
       const endDateTime = `${formattedDate}T${times[endTimeIndex]}:00.000Z`;
 
-      console.log({
-        partition,
-        startDateTime,
-        endDateTime,
-        isExist,
-        selectedDate: formattedDate,
-      });
+      // console.log({
+      //   partition,
+      //   startDateTime,
+      //   endDateTime,
+      //   isExist,
+      //   selectedDate: formattedDate,
+      // });
     },
     [
       getSlotSelected,
