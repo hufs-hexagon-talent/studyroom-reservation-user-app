@@ -21,7 +21,6 @@ import {
 
 import useUrlQuery from '../../../hooks/useUrlQuery';
 
-import './RoomPage.css';
 import { ko } from 'date-fns/locale';
 import { useSnackbar } from 'react-simple-snackbar';
 
