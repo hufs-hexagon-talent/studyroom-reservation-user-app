@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useLoggedOutPassword } from '../../api/user.api';
 import { Button, Label, TextInput } from 'flowbite-react';
 import { useSnackbar } from 'react-simple-snackbar';
@@ -8,6 +9,7 @@ const LoggedOutPassword = () => {
   const [newPw, setNewPw] = useState('');
   const [confirmNewPw, setConfirmNewPw] = useState('');
   const token = sessionStorage.getItem('pwResetToken');
+  const navigate = useNavigate();
 
   const [openSuccessSnackbar, closeSuccessSnackbar] = useSnackbar({
     position: 'top-right',
@@ -43,6 +45,7 @@ const LoggedOutPassword = () => {
     }
     try {
       await doPasswordChange({ token: token, newPassword: newPw });
+      navigate('/login');
       openSuccessSnackbar('비밀번호가 성공적으로 변경되었습니다.', 2500);
     } catch (error) {
       openErrorSnackbar(

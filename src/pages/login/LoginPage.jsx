@@ -32,7 +32,6 @@ const LoginPage = () => {
       location.reload(); // 페이지 새로고침
       openSuccessSnackbar(`로그인 되었습니다`, 2500); //todo
     } catch (error) {
-      setError('로그인 오류 : ', error.message);
       location.reload();
     }
   };
