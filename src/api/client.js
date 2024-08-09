@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 export const apiClient = axios.create({
-  baseURL: 'https://api.studyroom.jisub.kim',
+  baseURL: 'https://api.studyroom.computer.hufs.ac.kr',
   headers: {
     Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
   },

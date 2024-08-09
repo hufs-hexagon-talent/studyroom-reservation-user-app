@@ -81,7 +81,7 @@ export const fetchReservationsByPartitions = async ({ date, partitionIds }) => {
   params.append('date', date);
   partitionIds.forEach(id => params.append('partitionIds', id));
 
-  const response = await apiClient.get(`https://api.studyroom.jisub.kim/reservations/partitions/by-date?${params.toString()}`);
+  const response = await apiClient.get(`/reservations/partitions/by-date?${params.toString()}`);
   return response.data.data.reservations;
 };
 
