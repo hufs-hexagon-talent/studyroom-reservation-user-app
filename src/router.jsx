@@ -20,6 +20,7 @@ import EmailVerify from './pages/password/EmailVerify';
 //import SignUp from './pages/signup/SignUp';
 import SelectRoom from './pages/qrcheck/SelectRoom';
 import Schedule from './pages/manage/Schedule';
+import DivideAct from './pages/manage/DivideAct';
 
 const RouterComponent = () => {
   const { loggedIn } = useAuth();
@@ -50,6 +51,7 @@ const RouterComponent = () => {
             )}
             {serviceRole === 'ADMIN' && (
               <>
+                <Route path="/divide" element={<DivideAct />} />
                 <Route path="/selectRoom" element={<SelectRoom />} />
                 <Route path="/visit" element={<CheckVisit />} />
                 <Route path="/selectPartition" element={<SelectPartition />} />
