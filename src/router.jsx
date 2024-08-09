@@ -17,7 +17,7 @@ import QrCheck from './pages/qrcheck/QrCheck';
 import LoggedInPassword from './pages/password/LoggedInPassword';
 import LoggedOutPassword from './pages/password/LoggedOutPassword';
 import EmailVerify from './pages/password/EmailVerify';
-import SignUp from './pages/signup/SignUp';
+//import SignUp from './pages/signup/SignUp';
 import SelectRoom from './pages/qrcheck/SelectRoom';
 import Schedule from './pages/manage/Schedule';
 
@@ -73,7 +73,7 @@ const RouterComponent = () => {
                 />
                 <Route path="/email" element={<EmailVerify />} />
                 <Route path="/login" element={<LoginPage />} />
-                <Route path="/signup" element={<SignUp />} />
+                {/* <Route path="/signup" element={<SignUp />} /> */}
               </>
             )}
             <Route path="*" element={<Navigate to="/" />} />

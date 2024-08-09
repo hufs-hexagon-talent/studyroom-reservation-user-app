@@ -84,10 +84,10 @@ const LoginPage = () => {
             </Button>
           </div>
         </form>
-        <div className="flex justify-center w-screen pt-4 pb-10 text-sm text-gray-600 cursor-pointer">
-          <span onClick={handleSignUp}>회원가입</span>
-          <span className="px-2">|</span>
-          <span onClick={handlePasword}>비밀번호 재설정</span>
+        <div className="flex flex-col items-center justify-center w-screen pt-4 pb-10 text-sm text-gray-600 cursor-pointer">
+          {/* <span onClick={handleSignUp}>회원가입</span>
+          <span className="px-2">|</span> */}
+          <span onClick={handlePasword}>비밀번호 재설정하러 가기 &gt;</span>
         </div>
       </div>
     </div>
