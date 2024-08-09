@@ -84,6 +84,7 @@ const RoomPage = () => {
   const [startHour, setStartHour] = useState(null);
   const [startMinute, setStartMinute] = useState(null);
   const [endHour, setEndHour] = useState(null);
+  const [endTime, setEndTime] = useState(null);
   const [endMinute, setEndMinute] = useState(null);
   const [maxReservationMinute, setMaxReservationMinute] = useState(null);
 
@@ -104,6 +105,9 @@ const RoomPage = () => {
       const endTimes = reservationsByRooms.map(
         room => room.policy.operationEndTime,
       );
+      setEndTime(endTimes);
+      console.log(endTime);
+
       const latestTime = endTimes.reduce((latest, current) => {
         return latest > current ? latest : current;
       });
@@ -361,7 +365,6 @@ const RoomPage = () => {
               <TableBody>
                 {reservationsByRooms?.map((reservationsByRoom, i) => (
                   <TableRow key={i}>
-                    {/* <pre>{JSON.stringify(reservationsByRoom, null, 2)}</pre> */}
                     <TableCell sx={{ px: 2, py: 2, whiteSpace: 'nowrap' }}>
                       {`${reservationsByRoom.roomName}-${reservationsByRoom.partitionNumber}`}
                     </TableCell>
@@ -375,6 +378,13 @@ const RoomPage = () => {
 
                       // 30분 늦은 시간을 계산하여 비교
                       const slotDateFromPlus30 = addMinutes(slotDateFrom, 30);
+
+                      const roomEndTime =
+                        reservationsByRoom.policy.operationEndTime; // 각 room의 endTime
+                      const isFuture =
+                        format(slotDateFrom, 'HH:mm') > roomEndTime &&
+                        format(slotDateFrom, 'HH:mm') <= latestEndTime;
+
                       const isPast = new Date() > slotDateFromPlus30;
 
                       const isSelected =
@@ -399,8 +409,7 @@ const RoomPage = () => {
                           );
                         },
                       );
-
-                      const isSelectable = !isPast && !isReserved;
+                      const isSelectable = !isPast && !isReserved && !isFuture;
 
                       const isInSelectableRange =
                         selectedRangeTo &&
@@ -417,7 +426,9 @@ const RoomPage = () => {
                           ? 'reserved'
                           : isPast
                             ? 'past'
-                            : 'none';
+                            : isFuture
+                              ? 'future'
+                              : 'none';
                       return (
                         <TableCell
                           key={timeIndex}
@@ -435,6 +446,7 @@ const RoomPage = () => {
                                 : 1,
                             backgroundColor: {
                               past: '#AAAAAA', // 과거의 회색
+                              future: '#AAAAAA', // 미래의 회색
                               selected: '#7599BA', // 선택된 하늘색
                               reserved: '#002D56', // 예약된 남색
                               none: '#F1EEE9',
