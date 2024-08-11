@@ -60,9 +60,7 @@ const useAuth = () => {
       localStorage.setItem('accessToken', access_token);
       localStorage.setItem('refreshToken', refresh_token);
     } catch (error) {
-      if (error.response && error.response.status === 412) {
-        alert('아이디 또는 비밀번호가 틀렸습니다.');
-      }
+      alert(error.response.data.errorMessage);
     }
   }, []);
 

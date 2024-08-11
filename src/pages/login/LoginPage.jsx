@@ -21,11 +21,22 @@ const LoginPage = () => {
     },
   });
 
+  const [openErrorSnackbar, closeErrorSnackbar] = useSnackbar({
+    position: 'top-right',
+    style: {
+      backgroundColor: '#FF3333', // 빨간색
+    },
+  });
+
   useEffect(() => {
     if (loggedIn) navigate('/');
   }, [loggedIn, navigate]);
 
   const handleLogin = async () => {
+    if (!studentId || !password) {
+      openErrorSnackbar('아이디와 비밀번호를 모두 입력해주세요.');
+      return;
+    }
     try {
       await login({ id: studentId, password });
 
