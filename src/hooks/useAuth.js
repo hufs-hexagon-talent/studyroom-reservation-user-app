@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 
 const useAuth = () => {
-
   const [accessToken, setAccessToken] = useState(
     localStorage.getItem('accessToken') || null,
   );
@@ -14,7 +13,7 @@ const useAuth = () => {
     return token !== 'undefined' && token !== null;
   };
 
-  const loggedIn = useMemo(() => !!accessToken, []);
+  const loggedIn = useMemo(() => !!accessToken, [accessToken]);
 
   const fetchTokens = useCallback(() => {
     const storedAccessToken = localStorage.getItem('accessToken');
@@ -28,14 +27,12 @@ const useAuth = () => {
 
     setAccessToken(storedAccessToken);
     setRefreshToken(storedRefreshToken);
-  }, [setAccessToken, setRefreshToken]);
+  }, []);
 
   useEffect(() => fetchTokens(), [fetchTokens]);
 
   useEffect(() => {
-    // storage 이벤트 발생할 때마다 fetchTokens 함수 실행
     window.addEventListener('storage', fetchTokens);
-    //fetchTokens 함수를 storage 이벤트에 연결했다면 이벤트 제거
     return () => {
       window.removeEventListener('storage', fetchTokens);
     };
@@ -59,14 +56,20 @@ const useAuth = () => {
 
       localStorage.setItem('accessToken', access_token);
       localStorage.setItem('refreshToken', refresh_token);
+      setAccessToken(access_token);
+      setRefreshToken(refresh_token);
+
+      return true; // 성공 시 true 반환
     } catch (error) {
-      alert(error.response.data.errorMessage);
+      throw new Error(error.response.data.errorMessage || '로그인에 실패했습니다.');
     }
   }, []);
 
-  const logout = useCallback(async () => {
+  const logout = useCallback(() => {
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
+    setAccessToken(null);
+    setRefreshToken(null);
     // navigate('/login');
   }, []);
 

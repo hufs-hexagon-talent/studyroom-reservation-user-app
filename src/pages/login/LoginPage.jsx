@@ -9,11 +9,10 @@ import useAuth from '../../hooks/useAuth';
 const LoginPage = () => {
   const [password, setPassword] = useState('');
   const [studentId, setStudentId] = useState('');
-  const [error, setError] = useState('');
   const { login, loggedIn } = useAuth();
   const navigate = useNavigate();
 
-  const [openSuccessSnackbar, closeSuccessSnackbar] = useSnackbar({
+  const [openSuccessSnackbar] = useSnackbar({
     position: 'top-right',
     style: {
       backgroundColor: '#4CAF50', // 초록색
@@ -21,7 +20,7 @@ const LoginPage = () => {
     },
   });
 
-  const [openErrorSnackbar, closeErrorSnackbar] = useSnackbar({
+  const [openErrorSnackbar] = useSnackbar({
     position: 'top-right',
     style: {
       backgroundColor: '#FF3333', // 빨간색
@@ -34,16 +33,16 @@ const LoginPage = () => {
 
   const handleLogin = async () => {
     if (!studentId || !password) {
-      openErrorSnackbar('아이디와 비밀번호를 모두 입력해주세요.');
+      openErrorSnackbar('아이디와 비밀번호를 모두 입력해주세요.', 2500);
       return;
     }
     try {
       await login({ id: studentId, password });
 
+      openSuccessSnackbar('로그인 되었습니다', 2500); // 성공 시 스낵바 실행
       location.reload(); // 페이지 새로고침
-      openSuccessSnackbar(`로그인 되었습니다`, 2500); //todo
     } catch (error) {
-      location.reload();
+      openErrorSnackbar(error.message, 2500); // 실패 시 에러 메시지 표시
     }
   };
 
@@ -95,8 +94,6 @@ const LoginPage = () => {
           </div>
         </form>
         <div className="flex flex-col items-center justify-center w-screen pt-4 pb-10 text-sm text-gray-600 cursor-pointer">
-          {/* <span onClick={handleSignUp}>회원가입</span>
-          <span className="px-2">|</span> */}
           <span onClick={handlePasword}>비밀번호 재설정하러 가기 &gt;</span>
         </div>
       </div>
