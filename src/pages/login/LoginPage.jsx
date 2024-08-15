@@ -21,18 +21,28 @@ const LoginPage = () => {
     },
   });
 
+  const [openErrorSnackbar, closeErrorSnackbar] = useSnackbar({
+    position: 'top-right',
+    style: {
+      backgroundColor: '#FF3333', // 빨간색
+    },
+  });
+
   useEffect(() => {
     if (loggedIn) navigate('/');
   }, [loggedIn, navigate]);
 
   const handleLogin = async () => {
+    if (!studentId || !password) {
+      openErrorSnackbar('아이디와 비밀번호를 모두 입력해주세요.');
+      return;
+    }
     try {
       await login({ id: studentId, password });
 
       location.reload(); // 페이지 새로고침
       openSuccessSnackbar(`로그인 되었습니다`, 2500); //todo
     } catch (error) {
-      setError('로그인 오류 : ', error.message);
       location.reload();
     }
   };

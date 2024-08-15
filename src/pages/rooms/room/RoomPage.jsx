@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import {
@@ -104,6 +104,8 @@ const RoomPage = () => {
       const endTimes = reservationsByRooms.map(
         room => room.policy.operationEndTime,
       );
+      console.log(endTimes);
+
       const latestTime = endTimes.reduce((latest, current) => {
         return latest > current ? latest : current;
       });
@@ -118,31 +120,50 @@ const RoomPage = () => {
       );
       const maxEachMaxMinute = Math.max(...eachMaxMinutes);
       setMaxReservationMinute(maxEachMaxMinute);
-    }
-  }, [reservationsByRooms]);
 
-  const timeTableConfig = useMemo(
-    () => ({
-      startTime: {
-        hour: startHour,
-        minute: startMinute,
-      },
-      endTime: {
-        hour: endHour,
-        minute: endMinute,
-      },
-      intervalMinute: 30,
-      maxReservationMinute: maxReservationMinute,
-    }),
-    [startHour, startMinute],
-  );
+      // 'times'를 여기서 계산하고 사용
+      const calculatedTimes = createTimeTable({
+        startTime: {
+          hour: parseInt(startHour, 10),
+          minute: parseInt(startMinute, 10),
+        },
+        endTime: {
+          hour: parseInt(endHour, 10),
+          minute: parseInt(endMinute, 10),
+        },
+        intervalMinute: 30,
+      });
 
-  const times = useMemo(() => {
-    if (startHour !== null && startMinute !== null) {
-      return createTimeTable(timeTableConfig);
+      const isFutureCalculated = calculatedTimes.map((time, timeIndex) => {
+        const slotDateFrom = parse(
+          `${selectedDate} ${time}`,
+          'yyyy-MM-dd HH:mm',
+          new Date(),
+        );
+        return format(slotDateFrom, 'HH:mm') > latestTime;
+      });
+
+      // 이후 필요한 로직 수행 가능
     }
-    return [];
-  }, [timeTableConfig]);
+  }, [reservationsByRooms, selectedDate]);
+
+  const timeTableConfig = {
+    startTime: {
+      hour: startHour,
+      minute: startMinute,
+    },
+    endTime: {
+      hour: endHour,
+      minute: endMinute,
+    },
+    intervalMinute: 30,
+    maxReservationMinute: maxReservationMinute,
+  };
+
+  const times =
+    startHour !== null && startMinute !== null
+      ? createTimeTable(timeTableConfig)
+      : [];
 
   // date-picker에서 날짜 선택할 때마다 실행되는 함수
   const handleDateChange = date => {
@@ -150,19 +171,14 @@ const RoomPage = () => {
     setSelectedDate(formattedDate);
   };
 
-  const isRangeSelected = useMemo(
-    () =>
-      selectedRangeFrom &&
-      selectedRangeTo &&
-      differenceInMinutes(selectedRangeTo, selectedRangeFrom) >
-        timeTableConfig.intervalMinute,
-    [selectedRangeFrom, selectedRangeTo],
-  );
+  const isRangeSelected =
+    selectedRangeFrom &&
+    selectedRangeTo &&
+    differenceInMinutes(selectedRangeTo, selectedRangeFrom) >
+      timeTableConfig.intervalMinute;
 
-  const isSomethingSelected = useMemo(
-    () => selectedRoom && selectedRangeFrom && selectedRangeTo,
-    [selectedRoom, selectedRangeFrom, selectedRangeTo],
-  );
+  const isSomethingSelected =
+    selectedRoom && selectedRangeFrom && selectedRangeTo;
 
   // 슬롯의 상태 토글하는 함수
   const toggleSlot = useCallback(
@@ -261,7 +277,17 @@ const RoomPage = () => {
 
   // 최대 예약 시간에 부합하는지 계산하는 함수
   const handleCellClick = (partition, timeIndex) => {
-    toggleSlot(partition, times[timeIndex]);
+    const slotDateFrom = parse(
+      `${selectedDate} ${times[timeIndex]}`,
+      'yyyy-MM-dd HH:mm',
+      new Date(),
+    );
+
+    const isFuture = format(slotDateFrom, 'HH:mm') > latestEndTime;
+
+    if (!isFuture) {
+      toggleSlot(partition, times[timeIndex]);
+    }
   };
 
   // date-picker 설정
@@ -361,7 +387,6 @@ const RoomPage = () => {
               <TableBody>
                 {reservationsByRooms?.map((reservationsByRoom, i) => (
                   <TableRow key={i}>
-                    {/* <pre>{JSON.stringify(reservationsByRoom, null, 2)}</pre> */}
                     <TableCell sx={{ px: 2, py: 2, whiteSpace: 'nowrap' }}>
                       {`${reservationsByRoom.roomName}-${reservationsByRoom.partitionNumber}`}
                     </TableCell>
@@ -375,6 +400,14 @@ const RoomPage = () => {
 
                       // 30분 늦은 시간을 계산하여 비교
                       const slotDateFromPlus30 = addMinutes(slotDateFrom, 30);
+
+                      const roomEndTime =
+                        reservationsByRoom.policy.operationEndTime; // 각 room의 endTime
+
+                      const isFuture =
+                        format(slotDateFrom, 'HH:mm') > roomEndTime &&
+                        format(slotDateFrom, 'HH:mm') <= latestEndTime;
+
                       const isPast = new Date() > slotDateFromPlus30;
 
                       const isSelected =
@@ -399,8 +432,7 @@ const RoomPage = () => {
                           );
                         },
                       );
-
-                      const isSelectable = !isPast && !isReserved;
+                      const isSelectable = !isPast && !isReserved && !isFuture;
 
                       const isInSelectableRange =
                         selectedRangeTo &&
@@ -417,7 +449,10 @@ const RoomPage = () => {
                           ? 'reserved'
                           : isPast
                             ? 'past'
-                            : 'none';
+                            : isFuture
+                              ? 'future'
+                              : 'none';
+
                       return (
                         <TableCell
                           key={timeIndex}
@@ -435,6 +470,7 @@ const RoomPage = () => {
                                 : 1,
                             backgroundColor: {
                               past: '#AAAAAA', // 과거의 회색
+                              future: '#AAAAAA', // 미래의 회색
                               selected: '#7599BA', // 선택된 하늘색
                               reserved: '#002D56', // 예약된 남색
                               none: '#F1EEE9',

@@ -107,13 +107,8 @@ const CheckVisit = () => {
 
   return (
     <div className="flex flex-col">
-      <div className="p-4 ">
-        <p
-          onClick={() => navigate('/schedule')}
-          className="inline-block font-bold pb-10 hover:underline cursor-pointer">
-          스케줄 설정하러 가기 &gt;
-        </p>
-        <div>
+      <div className="p-4">
+        <div className="pt-2">
           <p>{`선택된 방 : ${partitionNames}`}</p>
         </div>
         <div className="font-bold pt-6 pb-3">출석 일자</div>

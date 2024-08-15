@@ -29,7 +29,7 @@ const EmailVerify = () => {
   const [openErrorSnackbar, closeErrorSnackbar] = useSnackbar({
     position: 'top-right',
     style: {
-      backgroundColor: '#FF3333',
+      backgroundColor: '#FF3333', // 빨간색
     },
   });
 

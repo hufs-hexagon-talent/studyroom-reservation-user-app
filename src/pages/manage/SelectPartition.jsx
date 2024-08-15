@@ -38,9 +38,9 @@ const SelectRoom = () => {
   };
 
   return (
-    <div className="m-10">
-      <div className="font-bold mt-10 text-2xl text-center">
-        방을 선택하세요
+    <div className="p-10">
+      <div className="mt-20 text-2xl text-center">
+        예약 조회를 원하는 방을 선택하세요
       </div>
       <div className="flex justify-center mt-12">
         <div className="flex flex-col">
@@ -55,7 +55,7 @@ const SelectRoom = () => {
               />
               <label
                 htmlFor={`box-${partition.partitionId}`}
-                className="ml-2 text-xl font-medium">
+                className="ml-2 text-xl">
                 {`${partition.roomName}-${partition.partitionNumber}`}
               </label>
             </div>
