@@ -47,7 +47,7 @@ const SelectRoom = () => {
 
   return (
     <div className="p-10">
-      <div className="mt-10 text-2xl text-center">방을 선택하세요</div>
+      <div className="mt-10 text-2xl text-center">호실을 선택하세요</div>
       <div className="flex justify-center mt-12">
         <div className="flex flex-col">
           {rooms.map((room, index) => (

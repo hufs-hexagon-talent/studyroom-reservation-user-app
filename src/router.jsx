@@ -40,10 +40,10 @@ const RouterComponent = () => {
         <NavigationBar />
         <div className="flex-grow">
           <Routes>
-            <Route path="/" element={<Notice />} />
+            <Route path="/" element={<RoomPage />} />
             {serviceRole !== 'RESIDENT' && (
               <>
-                <Route path="/roompage" element={<RoomPage />} />
+                <Route path="/notice" element={<Notice />} />
                 <Route path="/check" element={<Check />} />
                 <Route path="/otp" element={<OtpPage />} />
                 <Route path="/password" element={<LoggedInPassword />} />
