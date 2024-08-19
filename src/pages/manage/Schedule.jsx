@@ -204,7 +204,7 @@ const Schedule = () => {
           onClick={handleButton}
           color="dark"
           className="w-full max-w-lg px-3 py-2 text-sm">
-          스케줄 주입
+          스케줄 설정
         </Button>
       </div>
     </div>

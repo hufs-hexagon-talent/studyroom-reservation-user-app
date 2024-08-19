@@ -105,12 +105,12 @@ const EmailVerify = () => {
 
   return (
     <div className="flex flex-col items-center w-screen p-5">
-      <h1 className="text-xl font-bold text-center mt-10 mb-5">
+      <h1
+        style={{ fontWeight: 450 }}
+        className="text-2xl text-center mt-10 mb-5">
         비밀번호 재설정을 위한 본인 인증
       </h1>
-      <div
-        className="mt-5 mb-10 text-sm text-center"
-        style={{ color: '#9D9FA2' }}>
+      <div className="mt-5 mb-10 text-center" style={{ color: '#9D9FA2' }}>
         <p className="break-keep">
           비밀번호 재설정을 위해선 이메일을 통한 본인 인증이 필요합니다
         </p>

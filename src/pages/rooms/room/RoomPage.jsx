@@ -309,7 +309,7 @@ const RoomPage = () => {
           <Typography
             marginTop="50px"
             variant="h5"
-            fontWeight={350}
+            fontWeight={450}
             component="div"
             align="center">
             일자별 세미나실 예약 현황
@@ -318,8 +318,8 @@ const RoomPage = () => {
             id="text"
             className="mt-5 mb-10 mx-3 justify-center text-center break-keep"
             style={{ color: '#9D9FA2' }}>
-            아래 예약 현황의 예약가능 시간을 선택하시면 해당 세미나실을 대관할
-            수 있습니다.
+            아래 예약 현황의 예약가능 시간을 선택하면 해당 세미나실을 예약하여
+            사용할 수 있습니다.
           </div>
 
           {/* date-picker 부분 */}
