@@ -21,6 +21,7 @@ import EmailVerify from './pages/password/EmailVerify';
 import SelectRoom from './pages/qrcheck/SelectRoom';
 import Schedule from './pages/manage/Schedule';
 import DivideAct from './pages/manage/DivideAct';
+import SerialCheck from './pages/manage/SerialCheck';
 
 const RouterComponent = () => {
   const { loggedIn } = useAuth();
@@ -57,6 +58,7 @@ const RouterComponent = () => {
                 <Route path="/selectPartition" element={<SelectPartition />} />
                 <Route path="/schedule" element={<Schedule />} />
                 <Route path="/qrcheck" element={<QrCheck />} />
+                <Route path="/serialCheck" element={<SerialCheck />} />
               </>
             )}
             {serviceRole === 'RESIDENT' && (

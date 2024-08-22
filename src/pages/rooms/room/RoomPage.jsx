@@ -331,6 +331,7 @@ const RoomPage = () => {
                 minDate={today}
                 includeDates={availableDate}
                 onChange={handleDateChange}
+                className="text-center"
                 dateFormat="yyyy년 MM월 dd일"
                 showIcon
               />

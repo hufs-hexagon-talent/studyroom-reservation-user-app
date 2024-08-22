@@ -360,3 +360,17 @@ export const useSchedules=()=>{
     }
   })
 }
+
+// 학번으로 사용자 예약들 조회
+export const fetchSerialReservation = async (serial) => {
+  const serialReservation_res = await apiClient.get(`/reservations/admin/${serial}`);
+  return serialReservation_res.data.data.items;
+};
+
+export const useSerialReservation = (serial) => {
+  return useQuery({
+    queryKey: ['serialReservation', serial],
+    queryFn: () => fetchSerialReservation(serial),
+    enabled: false,
+  });
+};
