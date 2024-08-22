@@ -8,7 +8,6 @@ const Notice = () => {
       </div>
       <div className="font-bold mt-10 text-xl">예약 주의 사항 :</div>
       <div className="mt-6 ml-3">
-        <div>하루에 최대 두 번의 예약이 가능합니다.</div>
         <div className="mt-5">
           사용자는 한 번에 한 개의 예약 만을 소유할 수 있습니다. <br />
           <span className="text-red-600">
@@ -16,6 +15,7 @@ const Notice = () => {
             종료 시간)에 출석 체크를 한 뒤에 예약이 추가로 가능합니다.
           </span>
         </div>
+        <div className="mt-5">하루에 최대 두 번의 예약이 가능합니다.</div>
         <div className="mt-5">
           예약을 취소하지 않고 세미나실을 방문하지 않아 출석 체크를 하지 않은
           경우 (노쇼) 가 3번이 되면 3개월 동안 세미나실 예약 시스템을 사용할 수
@@ -37,7 +37,7 @@ const Notice = () => {
         </div>
       </div>
       <div className="font-bold mt-10 text-xl">계정 :</div>
-      <div className="mt-6 ml-3 mb-20">
+      <div className="mt-6 ml-3 mb-10">
         <div>
           초기 설정은 <span className="text-red-600">ID : 학번, PW : 학번</span>
           으로 이루어져 있습니다.
@@ -54,6 +54,7 @@ const Notice = () => {
           해당 인증 코드를 입력한 후에 비밀번호를 재설정 하실 수 있습니다.
         </div>
       </div>
+      <div className="mb-20">* 사용 관련 건의 및 문의 : ces@hufs.ac.kr</div>
     </div>
   );
 };

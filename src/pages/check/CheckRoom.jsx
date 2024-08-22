@@ -9,8 +9,6 @@ import { format } from 'date-fns';
 import { Button, Modal, Table } from 'flowbite-react';
 import { HiOutlineExclamationCircle } from 'react-icons/hi';
 
-import './CheckRoom.css';
-
 import {
   useDeleteReservation,
   useUserReservation,
@@ -171,6 +169,11 @@ const Check = () => {
           className="flex justify-center items-center w-full p-4 sm:p-0"
           show={openModal}
           size="md"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
           onClose={() => setOpenModal(false)}
           popup>
           <Modal.Header />

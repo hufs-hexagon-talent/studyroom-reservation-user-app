@@ -67,11 +67,11 @@ const SerialCheck = () => {
   };
 
   return (
-    <div className="p-10">
-      <div className="flex flex-row mb-5">
-        <div className="mr-3">학번 : </div>
+    <div className="p-6">
+      <div className="flex flex-row items-center mb-5">
+        <div className="mr-3">학번 </div>
         <input
-          className="border rounded-sm h-7"
+          className="border rounded-sm w-32 h-7"
           onChange={changeSerial}
           onKeyDown={handleKeyPress}
           type="text"
@@ -128,10 +128,10 @@ const SerialCheck = () => {
             ))}
           </Table.Body>
         </Table>
-        <Button onClick={handlePatchBtn} className="mt-10" color="dark">
-          출석 상태 수정
-        </Button>
       </div>
+      <Button onClick={handlePatchBtn} className="mt-10" color="dark">
+        출석 상태 수정
+      </Button>
     </div>
   );
 };

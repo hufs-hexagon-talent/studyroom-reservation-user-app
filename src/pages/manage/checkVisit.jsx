@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import ko from 'date-fns/locale/ko';
 import {
@@ -7,7 +7,9 @@ import {
   usePartition,
   useAdminDeleteReservation,
 } from '../../api/user.api';
-import { Button, Table } from 'flowbite-react';
+import { Button, Table, Modal } from 'flowbite-react';
+import { HiOutlineExclamationCircle } from 'react-icons/hi';
+
 import Inko from 'inko';
 import { format } from 'date-fns';
 
@@ -20,10 +22,10 @@ const CheckVisit = () => {
   const [error, setError] = useState(null);
   const [fetchParams, setFetchParams] = useState(null);
   const [reservations, setReservations] = useState([]);
-  let inko = new Inko();
-  const navigate = useNavigate();
+  const [openModal, setOpenModal] = useState(null);
 
-  // location.search가 변경될 때 마다 실행
+  let inko = new Inko();
+
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const partitionIdsParmas = params.get('partitionIds[]');
@@ -131,46 +133,81 @@ const CheckVisit = () => {
         ) : reservations.length === 0 ? (
           <div className="mt-3 ml-1">해당 날짜의 예약이 없습니다</div>
         ) : (
-          <Table hoverable className="mt-4 mb-3 text-black text-center">
-            <Table.Head className="break-keep">
-              {/* todo: 반응형 글자 작아지게 */}
-              <Table.HeadCell>출석 유무</Table.HeadCell>
-              <Table.HeadCell>호실</Table.HeadCell>
-              <Table.HeadCell>이름</Table.HeadCell>
-              <Table.HeadCell>시작 시간</Table.HeadCell>
-              <Table.HeadCell>종료 시간</Table.HeadCell>
-              <Table.HeadCell>
-                <span className="sr-only">삭제</span>
-              </Table.HeadCell>
-            </Table.Head>
-            <Table.Body className="divide-y">
-              {reservations.map(reservation => (
-                <Table.Row
-                  key={reservation.reservationId}
-                  className={reservation.state === 'VISITED'}>
-                  <Table.Cell>
-                    {reservation.state === 'VISITED' ? '출석' : '미출석'}
-                  </Table.Cell>
-                  <Table.Cell>
-                    {reservation.roomName}-{reservation.partitionNumber}
-                  </Table.Cell>
-                  <Table.Cell>{reservation.name}</Table.Cell>
-                  <Table.Cell>
-                    {format(new Date(reservation.startDateTime), 'HH:mm')}
-                  </Table.Cell>
-                  <Table.Cell>
-                    {format(new Date(reservation.endDateTime), 'HH:mm')}
-                  </Table.Cell>
-                  <Table.Cell
-                    onClick={() => handleDelete(reservation.reservationId)}
-                    className="cursor-pointer hover:underline font-bold">
-                    삭제
-                  </Table.Cell>
-                </Table.Row>
-              ))}
-            </Table.Body>
-          </Table>
+          <div className="overflow-x-auto mt-4 mb-3 w-full">
+            <Table hoverable className="mt-4 mb-3  text-black text-center">
+              <Table.Head className="break-keep">
+                <Table.HeadCell>출석 유무</Table.HeadCell>
+                <Table.HeadCell>호실</Table.HeadCell>
+                <Table.HeadCell>이름</Table.HeadCell>
+                <Table.HeadCell>시작 시간</Table.HeadCell>
+                <Table.HeadCell>종료 시간</Table.HeadCell>
+                <Table.HeadCell></Table.HeadCell>
+              </Table.Head>
+              <Table.Body className="divide-y">
+                {reservations.map(reservation => (
+                  <Table.Row
+                    key={reservation.reservationId}
+                    className={reservation.state === 'VISITED'}>
+                    <Table.Cell>
+                      {reservation.state === 'VISITED' ? '출석' : '미출석'}
+                    </Table.Cell>
+                    <Table.Cell>
+                      {reservation.roomName}-{reservation.partitionNumber}
+                    </Table.Cell>
+                    <Table.Cell>{reservation.name}</Table.Cell>
+                    <Table.Cell>
+                      {format(new Date(reservation.startDateTime), 'HH:mm')}
+                    </Table.Cell>
+                    <Table.Cell>
+                      {format(new Date(reservation.endDateTime), 'HH:mm')}
+                    </Table.Cell>
+                    <Table.Cell
+                      onClick={() => setOpenModal(reservation.reservationId)}
+                      className="cursor-pointer hover:underline font-bold">
+                      삭제
+                    </Table.Cell>
+                  </Table.Row>
+                ))}
+              </Table.Body>
+            </Table>
+          </div>
         )}
+      </div>
+      <div className="flex justify-center items-center">
+        <Modal
+          className="flex justify-center items-center w-full p-4 sm:p-0"
+          show={openModal}
+          size="md"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+          onClose={() => setOpenModal(false)}
+          popup>
+          <Modal.Header />
+          <Modal.Body>
+            <div className="text-center">
+              <HiOutlineExclamationCircle className="mx-auto mb-4 h-14 w-14 text-gray-400 dark:text-gray-200" />
+              <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
+                해당 예약을 삭제하시겠습니까?
+              </h3>
+              <div className="flex justify-center gap-4">
+                <Button color="gray" onClick={() => setOpenModal(false)}>
+                  취소
+                </Button>
+                <Button
+                  color="failure"
+                  onClick={() => {
+                    handleDelete(openModal);
+                    setOpenModal(null);
+                  }}>
+                  확인
+                </Button>
+              </div>
+            </div>
+          </Modal.Body>
+        </Modal>
       </div>
     </div>
   );
