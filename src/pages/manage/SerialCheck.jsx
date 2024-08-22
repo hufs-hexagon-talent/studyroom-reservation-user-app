@@ -1,12 +1,28 @@
 import React, { useState } from 'react';
-import { Button, Table } from 'flowbite-react';
-import { useSerialReservation } from '../../api/user.api';
+import { Button, Table, Checkbox } from 'flowbite-react';
+import { useSerialReservation, useChangeState } from '../../api/user.api';
 import { format } from 'date-fns';
+import { useSnackbar } from 'react-simple-snackbar';
 
 const SerialCheck = () => {
   const [serial, setSerial] = useState('');
   const [reservation, setReservation] = useState([]);
+  const [selectedReservationId, setSelectedReservationId] = useState(null);
   const { refetch } = useSerialReservation(serial);
+  const { mutateAsync: changeState } = useChangeState();
+
+  const [openErrorSnackbar] = useSnackbar({
+    position: 'top-right',
+    style: {
+      backgroundColor: '#FF3333', // 빨간색
+    },
+  });
+  const [openSuccessSnackbar] = useSnackbar({
+    position: 'top-right',
+    style: {
+      backgroundColor: '#4CAF50', // 초록색
+    },
+  });
 
   const changeSerial = e => {
     setSerial(e.target.value);
@@ -14,15 +30,37 @@ const SerialCheck = () => {
 
   const handleKeyPress = e => {
     if (e.key === 'Enter') {
-      handleBtn(); // Enter 키를 눌렀을 때 handleBtn 함수 호출
+      handleFetchBtn();
     }
   };
 
-  const handleBtn = async () => {
+  const handleFetchBtn = async () => {
+    if (!serial) {
+      openErrorSnackbar('학번을 입력해주세요', 2500);
+    }
+
     if (serial) {
       const response = await refetch();
       setReservation(response.data);
     }
+  };
+
+  const handlePatchBtn = async () => {
+    if (!selectedReservationId) {
+      openErrorSnackbar('선택된 예약이 없습니다.', 2500);
+      return;
+    }
+
+    try {
+      const response = await changeState(selectedReservationId);
+      openSuccessSnackbar(response.message, 2500);
+    } catch (error) {
+      openErrorSnackbar('예약 상태를 변경하는 도중 오류가 발생했습니다.', 2500);
+    }
+  };
+
+  const handleCheckboxChange = reservationId => {
+    setSelectedReservationId(reservationId);
   };
 
   return (
@@ -32,9 +70,10 @@ const SerialCheck = () => {
         <input
           className="border rounded-sm h-8"
           onChange={changeSerial}
-          onKeyDown={handleKeyPress} // Enter 키 감지
-          type="text"></input>
-        <Button onClick={handleBtn} color="dark" className="ml-4">
+          onKeyDown={handleKeyPress}
+          type="text"
+          maxLength="9"></input>
+        <Button onClick={handleFetchBtn} color="dark" className="ml-4">
           조회
         </Button>
       </div>
@@ -42,6 +81,7 @@ const SerialCheck = () => {
       <div className="overflow-x-auto">
         <Table>
           <Table.Head className="text-center">
+            <Table.HeadCell></Table.HeadCell>
             <Table.HeadCell>예약 ID</Table.HeadCell>
             <Table.HeadCell>호실</Table.HeadCell>
             <Table.HeadCell>날짜</Table.HeadCell>
@@ -50,10 +90,16 @@ const SerialCheck = () => {
             <Table.HeadCell>출석 유무</Table.HeadCell>
           </Table.Head>
           <Table.Body className="divide-y text-center">
-            {reservation.map(item => (
+            {reservation?.map(item => (
               <Table.Row
                 key={item.reservationId}
                 className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                <Table.Cell>
+                  <Checkbox
+                    checked={selectedReservationId === item.reservationId}
+                    onChange={() => handleCheckboxChange(item.reservationId)}
+                  />
+                </Table.Cell>
                 <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
                   {item.reservationId}
                 </Table.Cell>
@@ -70,12 +116,15 @@ const SerialCheck = () => {
                   {format(new Date(item.endDateTime), 'HH:mm')}
                 </Table.Cell>
                 <Table.Cell>
-                  {item.state === 'VISITED' ? '출석' : '미출석'}
+                  {item.reservationState === 'VISITED' ? '출석' : '미출석'}
                 </Table.Cell>
               </Table.Row>
             ))}
           </Table.Body>
         </Table>
+        <Button onClick={handlePatchBtn} className="mt-10" color="dark">
+          출석 상태 수정
+        </Button>
       </div>
     </div>
   );

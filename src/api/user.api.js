@@ -374,3 +374,19 @@ export const useSerialReservation = (serial) => {
     enabled: false,
   });
 };
+
+// 특정 에약 상태 변경
+export const useChangeState = () => {
+  return useMutation({
+    mutationFn: async (reservationId) => {
+      const changeState_res = await apiClient.patch(
+        `/reservations/admin/${reservationId}`,
+        {
+          state: 'VISITED',
+        }
+      );
+      console.log('ok');
+      return changeState_res.data;
+    },
+  });
+};
