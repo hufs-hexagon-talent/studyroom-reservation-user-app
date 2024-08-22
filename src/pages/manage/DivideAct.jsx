@@ -16,8 +16,13 @@ const DivideAct = () => {
         </p>
         <p
           onClick={() => navigate('/selectPartition')}
-          className="inline-block text-xl hover:underline cursor-pointer">
+          className="inline-block text-xl hover:underline cursor-pointer pb-10">
           예약 조회하러 가기 &gt;
+        </p>
+        <p
+          onClick={() => navigate('/serialCheck')}
+          className="inline-block text-xl hover:underline cursor-pointer">
+          학번으로 예약 조회하러 가기 &gt;
         </p>
       </div>
     </div>

@@ -360,3 +360,33 @@ export const useSchedules=()=>{
     }
   })
 }
+
+// 학번으로 사용자 예약들 조회
+export const fetchSerialReservation = async (serial) => {
+  const serialReservation_res = await apiClient.get(`/reservations/admin/${serial}`);
+  return serialReservation_res.data.data.items;
+};
+
+export const useSerialReservation = (serial) => {
+  return useQuery({
+    queryKey: ['serialReservation', serial],
+    queryFn: () => fetchSerialReservation(serial),
+    enabled: false,
+  });
+};
+
+// 특정 에약 상태 변경
+export const useChangeState = () => {
+  return useMutation({
+    mutationFn: async (reservationId) => {
+      const changeState_res = await apiClient.patch(
+        `/reservations/admin/${reservationId}`,
+        {
+          state: 'VISITED',
+        }
+      );
+      console.log('ok');
+      return changeState_res.data;
+    },
+  });
+};
