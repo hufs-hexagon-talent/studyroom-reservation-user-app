@@ -54,8 +54,11 @@ const SerialCheck = () => {
     try {
       const response = await changeState(selectedReservationId);
       openSuccessSnackbar(response.message, 2500);
+
+      const updatedReservations = await refetch();
+      setReservation(updatedReservations.data);
     } catch (error) {
-      openErrorSnackbar('예약 상태를 변경하는 도중 오류가 발생했습니다.', 2500);
+      openErrorSnackbar(error.response.data.errorMessage, 2500);
     }
   };
 
@@ -68,12 +71,15 @@ const SerialCheck = () => {
       <div className="flex flex-row mb-5">
         <div className="mr-3">학번 : </div>
         <input
-          className="border rounded-sm h-8"
+          className="border rounded-sm h-7"
           onChange={changeSerial}
           onKeyDown={handleKeyPress}
           type="text"
           maxLength="9"></input>
-        <Button onClick={handleFetchBtn} color="dark" className="ml-4">
+        <Button
+          onClick={handleFetchBtn}
+          color="dark"
+          className="ml-4 items-center h-8">
           조회
         </Button>
       </div>

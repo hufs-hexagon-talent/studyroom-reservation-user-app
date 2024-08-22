@@ -45,7 +45,7 @@ const Check = () => {
       await deleteReservation(id);
     } catch (error) {
       // todo
-      console.error('예약 실패', error);
+      console.error('예약 삭제 실패', error);
     }
     setOpenModal(null); // 모달 닫기
   };
@@ -81,7 +81,8 @@ const Check = () => {
             </Table.HeadCell>
           </Table.Head>
           <Table.Body className="divide-y">
-            {reservations?.map((reservation, index) => {
+            {paginatedReservations?.map((reservation, index) => {
+              // 수정된 부분
               const start = new Date(reservation.startDateTime);
               const end = new Date(reservation.endDateTime);
               const isPast = start < new Date();
