@@ -23,7 +23,14 @@ const DivideAct = () => {
           예약 조회하러 가기 &gt;
         </p>
       </div>
-      <Modal show={openModal} onClose={() => setOpenModal(false)}>
+      <Modal
+        show={openModal}
+        onClose={() => setOpenModal(false)}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
         <Modal.Header>예약 조회 방법 선택</Modal.Header>
         <Modal.Body>
           <div className="flex flex-col space-y-6">

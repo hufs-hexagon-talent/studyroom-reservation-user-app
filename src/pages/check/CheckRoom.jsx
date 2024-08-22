@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
-import { Button as MuiButton, Popover, Typography } from '@mui/material';
+import {
+  Button as MuiButton,
+  Popover,
+  Typography,
+  Pagination,
+} from '@mui/material';
 import { format } from 'date-fns';
 import { Button, Modal, Table } from 'flowbite-react';
 import { HiOutlineExclamationCircle } from 'react-icons/hi';
-
-import './CheckRoom.css';
 
 import {
   useDeleteReservation,
@@ -19,6 +22,8 @@ const Check = () => {
   const { data: me } = useMyInfo();
   const { mutate: deleteReservation } = useDeleteReservation();
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
   const [anchorEl, setAnchorEl] = useState(null);
   const [openModal, setOpenModal] = useState(null);
 
@@ -33,16 +38,25 @@ const Check = () => {
   const open = Boolean(anchorEl);
   const id = open ? 'simple-popover' : undefined;
 
-  // 모달 열기와 예약 삭제를 위한 핸들러
   const handleDelete = async id => {
     try {
       await deleteReservation(id);
-      // 삭제된 예약을 제외한 새로운 예약 배열 설정
     } catch (error) {
-      console.error('Failed to delete reservation:', error);
+      // todo
+      console.error('예약 삭제 실패', error);
     }
     setOpenModal(null); // 모달 닫기
   };
+
+  const handlePageChange = (event, value) => {
+    setCurrentPage(value);
+  };
+
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedReservations = reservations?.slice(
+    startIndex,
+    startIndex + itemsPerPage,
+  );
 
   return (
     <div>
@@ -65,7 +79,8 @@ const Check = () => {
             </Table.HeadCell>
           </Table.Head>
           <Table.Body className="divide-y">
-            {reservations?.map((reservation, index) => {
+            {paginatedReservations?.map((reservation, index) => {
+              // 수정된 부분
               const start = new Date(reservation.startDateTime);
               const end = new Date(reservation.endDateTime);
               const isPast = start < new Date();
@@ -110,6 +125,15 @@ const Check = () => {
           </Table.Body>
         </Table>
       </div>
+
+      <Pagination
+        count={Math.ceil(reservations?.length / itemsPerPage)}
+        page={currentPage}
+        onChange={handlePageChange}
+        shape="rounded"
+        className="flex justify-center mt-4"
+      />
+
       <div id="popover" className="mt-6">
         <Button
           style={{
@@ -145,6 +169,11 @@ const Check = () => {
           className="flex justify-center items-center w-full p-4 sm:p-0"
           show={openModal}
           size="md"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
           onClose={() => setOpenModal(false)}
           popup>
           <Modal.Header />
