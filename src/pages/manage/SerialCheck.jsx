@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import { Button, Table, Checkbox } from 'flowbite-react';
-import { useSerialReservation, useChangeState } from '../../api/user.api';
+import {
+  useSerialReservation,
+  useChangeState,
+  useAdminDeleteReservation,
+} from '../../api/user.api';
 import { format } from 'date-fns';
 import { useSnackbar } from 'react-simple-snackbar';
 
@@ -10,6 +14,7 @@ const SerialCheck = () => {
   const [selectedReservationId, setSelectedReservationId] = useState(null);
   const { refetch } = useSerialReservation(serial);
   const { mutateAsync: changeState } = useChangeState();
+  const { mutateAsync: deleteReservation } = useAdminDeleteReservation();
 
   const [openErrorSnackbar] = useSnackbar({
     position: 'top-right',
@@ -64,6 +69,23 @@ const SerialCheck = () => {
 
   const handleCheckboxChange = reservationId => {
     setSelectedReservationId(reservationId);
+  };
+
+  const handleDeleteBtn = async () => {
+    if (!selectedReservationId) {
+      openErrorSnackbar('선택된 예약이 없습니다.', 2500);
+      return;
+    }
+
+    try {
+      const response = await deleteReservation(selectedReservationId);
+      openSuccessSnackbar(response.message, 2500);
+
+      const updatedReservations = await refetch();
+      setReservation(updatedReservations.data);
+    } catch (error) {
+      openErrorSnackbar(error.response.data.errorMessage, 2500);
+    }
   };
 
   return (
@@ -129,9 +151,14 @@ const SerialCheck = () => {
           </Table.Body>
         </Table>
       </div>
-      <Button onClick={handlePatchBtn} className="mt-10" color="dark">
-        출석 상태 수정
-      </Button>
+      <div className="flex space-x-8">
+        <Button onClick={handlePatchBtn} className="mt-10" color="dark">
+          출석 상태 수정
+        </Button>
+        <Button onClick={handleDeleteBtn} className="mt-10" color="failure">
+          예약 삭제
+        </Button>
+      </div>
     </div>
   );
 };
