@@ -363,6 +363,7 @@ const RoomPage = () => {
               '@media (max-width : 1300px)': {
                 overflowX: 'scroll',
               },
+              paddingLeft: '60px',
             }}>
             <Table>
               <TableHead
@@ -375,7 +376,12 @@ const RoomPage = () => {
                       key={timeIndex}
                       align="center"
                       width={200}
-                      className="fixedPartitions relative">
+                      className="fixedPartitions relative"
+                      sx={{
+                        borderRight: 'none',
+                        borderTop: 'none',
+                        borderBottom: 'none',
+                      }}>
                       <div style={{ width: 20, height: 30 }}>
                         <span className="absolute top-1/2 left-0 transform -translate-x-1/2 -translate-y-1/2 bg-white px-2">
                           {time}
@@ -388,29 +394,33 @@ const RoomPage = () => {
               <TableBody>
                 {reservationsByRooms?.map((reservationsByRoom, i) => (
                   <TableRow key={i}>
-                    <TableCell sx={{ px: 2, py: 2, whiteSpace: 'nowrap' }}>
+                    <TableCell
+                      sx={{
+                        px: 2,
+                        py: 2,
+                        borderLeft: '1px solid #ccc',
+                        whiteSpace: 'nowrap',
+                      }}>
                       {`${reservationsByRoom.roomName}-${reservationsByRoom.partitionNumber}`}
                     </TableCell>
                     {times.map((time, timeIndex) => {
+                      if (timeIndex === times.length - 1) {
+                        return null; // 마지막 열을 제외
+                      }
+
                       const slotDateFrom = parse(
                         `${selectedDate} ${time}`,
                         'yyyy-MM-dd HH:mm',
                         new Date(),
                       );
                       const slotDateTo = addMinutes(slotDateFrom, 30);
-
-                      // 30분 늦은 시간을 계산하여 비교
                       const slotDateFromPlus30 = addMinutes(slotDateFrom, 30);
-
                       const roomEndTime =
-                        reservationsByRoom.policy.operationEndTime; // 각 room의 endTime
-
+                        reservationsByRoom.policy.operationEndTime;
                       const isFuture =
                         format(slotDateFrom, 'HH:mm') > roomEndTime &&
                         format(slotDateFrom, 'HH:mm') <= latestEndTime;
-
                       const isPast = new Date() > slotDateFromPlus30;
-
                       const isSelected =
                         reservationsByRoom.partitionId ===
                           selectedRoom?.partitionId &&
@@ -418,7 +428,6 @@ const RoomPage = () => {
                           { start: selectedRangeFrom, end: selectedRangeTo },
                           { start: slotDateFrom, end: slotDateTo },
                         );
-
                       const isReserved = reservationsByRoom?.timeline?.some(
                         reservation => {
                           const reservationStart = new Date(
@@ -434,7 +443,6 @@ const RoomPage = () => {
                         },
                       );
                       const isSelectable = !isPast && !isReserved && !isFuture;
-
                       const isInSelectableRange =
                         selectedRangeTo &&
                         differenceInMinutes(slotDateTo, selectedRangeFrom) <=
@@ -443,7 +451,6 @@ const RoomPage = () => {
                           0 &&
                         selectedRoom?.partitionId ===
                           reservationsByRoom.partitionId;
-
                       const mode = isSelected
                         ? 'selected'
                         : isReserved
@@ -470,13 +477,16 @@ const RoomPage = () => {
                                 ? 0.5
                                 : 1,
                             backgroundColor: {
-                              past: '#AAAAAA', // 과거의 회색
-                              future: '#AAAAAA', // 미래의 회색
-                              selected: '#7599BA', // 선택된 하늘색
-                              reserved: '#002D56', // 예약된 남색
+                              past: '#AAAAAA',
+                              future: '#AAAAAA',
+                              selected: '#7599BA',
+                              reserved: '#002D56',
                               none: '#F1EEE9',
                             }[mode],
                             borderRight: '1px solid #ccc',
+                            borderLeft: '1px solid #ccc',
+                            borderTop: '1px solid #ccc',
+                            borderBottom: '1px solid #ccc',
                             cursor: isSelectable ? 'pointer' : 'not-allowed',
                           }}></TableCell>
                       );
