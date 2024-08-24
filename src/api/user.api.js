@@ -375,14 +375,30 @@ export const useSerialReservation = (serial) => {
   });
 };
 
-// 특정 에약 상태 변경
-export const useChangeState = () => {
+// visited로 변경
+export const useVisitedState = () => {
   return useMutation({
     mutationFn: async (reservationId) => {
       const changeState_res = await apiClient.patch(
         `/reservations/admin/${reservationId}`,
         {
           state: 'VISITED',
+        }
+      );
+      console.log('ok');
+      return changeState_res.data;
+    },
+  });
+};
+
+// visited로 변경
+export const useNotVisitedState = () => {
+  return useMutation({
+    mutationFn: async (reservationId) => {
+      const changeState_res = await apiClient.patch(
+        `/reservations/admin/${reservationId}`,
+        {
+          state: 'NOT_VISITED',
         }
       );
       console.log('ok');

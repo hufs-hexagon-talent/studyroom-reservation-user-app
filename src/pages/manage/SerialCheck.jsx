@@ -1,19 +1,23 @@
 import React, { useState } from 'react';
-import { Button, Table, Checkbox } from 'flowbite-react';
+import { Button, Table, Checkbox, Modal } from 'flowbite-react';
 import {
   useSerialReservation,
-  useChangeState,
   useAdminDeleteReservation,
+  useVisitedState,
+  useNotVisitedState,
 } from '../../api/user.api';
 import { format } from 'date-fns';
 import { useSnackbar } from 'react-simple-snackbar';
 
 const SerialCheck = () => {
+  const [openModal, setOpenModal] = useState(false);
   const [serial, setSerial] = useState('');
   const [reservation, setReservation] = useState([]);
   const [selectedReservationId, setSelectedReservationId] = useState(null);
+  const [selectedStateChange, setSelectedStateChange] = useState(null); // New state to track selection
   const { refetch } = useSerialReservation(serial);
-  const { mutateAsync: changeState } = useChangeState();
+  const { mutateAsync: visitedState } = useVisitedState();
+  const { mutateAsync: notVisitedState } = useNotVisitedState();
   const { mutateAsync: deleteReservation } = useAdminDeleteReservation();
 
   const [openErrorSnackbar] = useSnackbar({
@@ -50,21 +54,12 @@ const SerialCheck = () => {
     }
   };
 
-  const handlePatchBtn = async () => {
+  const handlePatchBtn = () => {
     if (!selectedReservationId) {
       openErrorSnackbar('선택된 예약이 없습니다.', 2500);
       return;
     }
-
-    try {
-      const response = await changeState(selectedReservationId);
-      openSuccessSnackbar(response.message, 2500);
-
-      const updatedReservations = await refetch();
-      setReservation(updatedReservations.data);
-    } catch (error) {
-      openErrorSnackbar(error.response.data.errorMessage, 2500);
-    }
+    setOpenModal(true); // Open modal on button click
   };
 
   const handleCheckboxChange = reservationId => {
@@ -83,6 +78,24 @@ const SerialCheck = () => {
 
       const updatedReservations = await refetch();
       setReservation(updatedReservations.data);
+    } catch (error) {
+      openErrorSnackbar(error.response.data.errorMessage, 2500);
+    }
+  };
+
+  const handleStateChange = async state => {
+    try {
+      if (state === 'notVisited') {
+        const response = await notVisitedState(selectedReservationId);
+        openSuccessSnackbar(response.message, 2500);
+      } else if (state === 'visited') {
+        const response = await visitedState(selectedReservationId);
+        openSuccessSnackbar(response.message, 2500);
+      }
+
+      const updatedReservations = await refetch();
+      setReservation(updatedReservations.data);
+      setOpenModal(false); // Close modal after state change
     } catch (error) {
       openErrorSnackbar(error.response.data.errorMessage, 2500);
     }
@@ -159,6 +172,35 @@ const SerialCheck = () => {
           예약 삭제
         </Button>
       </div>
+      <Modal
+        show={openModal}
+        onClose={() => setOpenModal(false)}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
+        <Modal.Header className="pr-24">예약 조회 방법 선택</Modal.Header>
+        <Modal.Body>
+          <div className="flex flex-col space-y-6">
+            <p
+              className="inline-block text-lg hover:underline cursor-pointer"
+              onClick={() => handleStateChange('notVisited')}>
+              출석 -&gt; 미출석
+            </p>
+            <p
+              className="inline-block text-lg hover:underline cursor-pointer"
+              onClick={() => handleStateChange('visited')}>
+              미출석 -&gt; 출석
+            </p>
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button color="gray" onClick={() => setOpenModal(false)}>
+            취소
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };
