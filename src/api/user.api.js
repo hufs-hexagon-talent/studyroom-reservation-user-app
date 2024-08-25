@@ -391,7 +391,7 @@ export const useVisitedState = () => {
   });
 };
 
-// visited로 변경
+// not_visited로 변경
 export const useNotVisitedState = () => {
   return useMutation({
     mutationFn: async (reservationId) => {
@@ -399,6 +399,22 @@ export const useNotVisitedState = () => {
         `/reservations/admin/${reservationId}`,
         {
           state: 'NOT_VISITED',
+        }
+      );
+      console.log('ok');
+      return changeState_res.data;
+    },
+  });
+};
+
+// processed 변경
+export const useProcessedState = () => {
+  return useMutation({
+    mutationFn: async (reservationId) => {
+      const changeState_res = await apiClient.patch(
+        `/reservations/admin/${reservationId}`,
+        {
+          state: 'PROCESSED',
         }
       );
       console.log('ok');

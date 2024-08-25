@@ -339,7 +339,7 @@ const RoomPage = () => {
           </div>
         </div>
 
-        <div id="squares" className="flex p-4">
+        <div id="squares" className="flex pl-4">
           <div
             className="w-6 h-6 mt-10"
             style={{ backgroundColor: '#F1EEE9' }}></div>
@@ -368,7 +368,10 @@ const RoomPage = () => {
             <Table>
               <TableHead
                 className="fixedPartitions"
-                sx={{ borderBottom: 'none' }}>
+                sx={{
+                  overflowX: 'auto',
+                  borderBottom: 'none',
+                }}>
                 <TableRow>
                   <TableCell align="center" width={100} />
                   {times.map((time, timeIndex) => (
