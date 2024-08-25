@@ -195,18 +195,18 @@ const SerialCheck = () => {
           <div className="flex flex-col space-y-6">
             <p
               className="inline-block text-lg hover:underline cursor-pointer"
-              onClick={() => handleStateChange('notVisited')}>
-              출석 -&gt; 미출석
+              onClick={() => handleStateChange('visited')}>
+              출석으로 변경
             </p>
             <p
               className="inline-block text-lg hover:underline cursor-pointer"
-              onClick={() => handleStateChange('visited')}>
-              미출석 -&gt; 출석
+              onClick={() => handleStateChange('notVisited')}>
+              미출석으로 변경
             </p>
             <p
               className="inline-block text-lg hover:underline cursor-pointer"
               onClick={() => handleStateChange('processed')}>
-              처리됨
+              처리됨으로 변경
             </p>
           </div>
         </Modal.Body>

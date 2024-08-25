@@ -91,7 +91,9 @@ const Check = () => {
                   <Table.Cell>
                     {reservation.reservationState === 'VISITED'
                       ? '출석'
-                      : '미출석'}
+                      : reservation.reservationState === 'NOT_VISITED'
+                        ? '미출석'
+                        : '처리됨'}
                   </Table.Cell>
                   <Table.Cell className="px-2 py-4">
                     {`${reservation.roomName}-${reservation.partitionNumber}`}
