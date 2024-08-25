@@ -153,6 +153,7 @@ const QrCheck = () => {
           onKeyDown={handleQrKeyDown}
           className="flex items-center mt-1 border border-gray-300 p-2 rounded"
           type="text"
+          disabled
           placeholder="Scan QR Code"></input>
         <div className="flex flex-col items-center mt-4">
           {successMessage && (
