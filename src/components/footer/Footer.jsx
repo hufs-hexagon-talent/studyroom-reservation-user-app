@@ -74,7 +74,7 @@ const Footer = () => {
                 </a>
               </span>
             </p>
-            {serviceRole === 'ADMIN' && (
+            {loggedIn && serviceRole === 'ADMIN' && (
               <div
                 onClick={handleAdminClick}
                 className="inline hover:underline cursor-pointer text-gray-400 text-sm mt-3">

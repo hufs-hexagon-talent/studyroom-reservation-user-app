@@ -33,7 +33,8 @@ const RouterComponent = () => {
     },
   });
   const pwResetToken = sessionStorage.getItem('pwResetToken');
-  if (isLoading) return null;
+
+  if (isLoading) return <div>Loading...</div>;
 
   return (
     <BrowserRouter basename={process.env.REACT_APP_BASEURL || '/'}>
@@ -42,7 +43,7 @@ const RouterComponent = () => {
         <div className="flex-grow">
           <Routes>
             <Route path="/" element={<RoomPage />} />
-            {serviceRole !== 'RESIDENT' && (
+            {loggedIn && serviceRole !== 'RESIDENT' && (
               <>
                 <Route path="/notice" element={<Notice />} />
                 <Route path="/check" element={<Check />} />
@@ -50,7 +51,7 @@ const RouterComponent = () => {
                 <Route path="/password" element={<LoggedInPassword />} />
               </>
             )}
-            {serviceRole === 'ADMIN' && (
+            {loggedIn && serviceRole === 'ADMIN' && (
               <>
                 <Route path="/divide" element={<DivideAct />} />
                 <Route path="/selectRoom" element={<SelectRoom />} />
@@ -61,7 +62,7 @@ const RouterComponent = () => {
                 <Route path="/serialCheck" element={<SerialCheck />} />
               </>
             )}
-            {serviceRole === 'RESIDENT' && (
+            {loggedIn && serviceRole === 'RESIDENT' && (
               <>
                 <Route path="/selectRoom" element={<SelectRoom />} />
                 <Route path="/qrcheck" element={<QrCheck />} />
@@ -80,6 +81,7 @@ const RouterComponent = () => {
                 {/* <Route path="/signup" element={<SignUp />} /> */}
               </>
             )}
+            {}
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </div>

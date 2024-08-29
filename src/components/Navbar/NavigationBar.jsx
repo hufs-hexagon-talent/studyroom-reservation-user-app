@@ -26,7 +26,7 @@ const NavigationBar = () => {
       <Navbar.Toggle />
       <Navbar.Collapse>
         {/* 출석 체크용 아이디라면 */}
-        {serviceRole === 'RESIDENT' ? (
+        {loggedIn && serviceRole === 'RESIDENT' ? (
           <>
             <Navbar.Link href="/selectRoom">출석 체크</Navbar.Link>
             <Navbar.Link href="/notice">이용 규칙</Navbar.Link>
@@ -40,7 +40,7 @@ const NavigationBar = () => {
           </>
         ) : (
           <>
-            {serviceRole === 'ADMIN' && (
+            {loggedIn && serviceRole === 'ADMIN' && (
               <Navbar.Link href="/selectRoom">출석 체크</Navbar.Link>
             )}
             <Navbar.Link href="/">세미나실 예약</Navbar.Link>
