@@ -4,6 +4,7 @@ import {
   Popover,
   Typography,
   Pagination,
+  Tooltip, // Tooltip 추가
 } from '@mui/material';
 import { format } from 'date-fns';
 import { Button, Modal, Table } from 'flowbite-react';
@@ -42,7 +43,6 @@ const Check = () => {
     try {
       await deleteReservation(id);
     } catch (error) {
-      // todo
       console.error('예약 삭제 실패', error);
     }
     setOpenModal(null); // 모달 닫기
@@ -80,7 +80,6 @@ const Check = () => {
           </Table.Head>
           <Table.Body className="divide-y">
             {paginatedReservations?.map((reservation, index) => {
-              // 수정된 부분
               const start = new Date(reservation.startDateTime);
               const end = new Date(reservation.endDateTime);
               const isPast = start < new Date();
@@ -89,11 +88,21 @@ const Check = () => {
                   key={index}
                   className="bg-white dark:border-gray-700 dark:bg-gray-800 text-center text-gray-900">
                   <Table.Cell>
-                    {reservation.reservationState === 'VISITED'
-                      ? '출석'
-                      : reservation.reservationState === 'NOT_VISITED'
-                        ? '미출석'
-                        : '처리됨'}
+                    {reservation.reservationState === 'VISITED' ? (
+                      '출석'
+                    ) : reservation.reservationState === 'NOT_VISITED' ? (
+                      '미출석'
+                    ) : (
+                      <Tooltip
+                        title={
+                          <Typography sx={{ fontSize: '1.2em' }}>
+                            노쇼를 3번 이상 하여 제한된 후 상태가 초기화된
+                            상태를 말합니다.
+                          </Typography>
+                        }>
+                        <span>처리됨</span>
+                      </Tooltip>
+                    )}
                   </Table.Cell>
                   <Table.Cell className="px-2 py-4">
                     {`${reservation.roomName}-${reservation.partitionNumber}`}
@@ -137,7 +146,7 @@ const Check = () => {
       />
 
       <div id="popover" className="mt-6">
-        <Button
+        <MuiButton
           style={{
             backgroundColor: '#002D56',
             marginLeft: 15,
@@ -148,7 +157,7 @@ const Check = () => {
           variant="contained"
           onClick={handleClick}>
           내 노쇼 현황
-        </Button>
+        </MuiButton>
         <Popover
           id={id}
           open={open}
@@ -161,7 +170,7 @@ const Check = () => {
           <Typography sx={{ p: 2 }}>
             {`* 현재 예약 취소 없이 세미나실을 방문하지 않은 횟수는 ${noShow}번 입니다.`}
             <div className="text-red-700">
-              (3회 초과 시 세미나실 예약이 제한 됩니다)
+              (3회 초과 시 세미나실 예약이 1개월 동안 제한 됩니다)
             </div>
           </Typography>
         </Popover>
