@@ -18,7 +18,7 @@ import LoggedInPassword from './pages/password/LoggedInPassword';
 import LoggedOutPassword from './pages/password/LoggedOutPassword';
 import EmailVerify from './pages/password/EmailVerify';
 //import SignUp from './pages/signup/SignUp';
-import SelectRoom from './pages/qrcheck/SelectRoom';
+//import SelectRoom from './pages/qrcheck/SelectRoom';
 import Schedule from './pages/manage/Schedule';
 import DivideAct from './pages/manage/DivideAct';
 import SerialCheck from './pages/manage/SerialCheck';
@@ -56,7 +56,7 @@ const RouterComponent = () => {
                 <Route path="/notice" element={<Notice />} />
                 <Route path="/qrcheck" element={<QrCheck />} />
                 <Route path="/divide" element={<DivideAct />} />
-                <Route path="/selectRoom" element={<SelectRoom />} />
+                {/* <Route path="/selectRoom" element={<SelectRoom />} /> */}
                 <Route path="/check" element={<Check />} />
                 <Route path="/otp" element={<OtpPage />} />
                 <Route path="/password" element={<LoggedInPassword />} />
@@ -68,7 +68,7 @@ const RouterComponent = () => {
             )}
             {loggedIn && serviceRole === 'RESIDENT' && (
               <>
-                <Route path="/selectRoom" element={<SelectRoom />} />
+                {/* <Route path="/selectRoom" element={<SelectRoom />} /> */}
                 <Route path="/qrcheck" element={<QrCheck />} />
               </>
             )}
