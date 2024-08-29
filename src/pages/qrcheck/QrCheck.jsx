@@ -1,6 +1,11 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import Inko from 'inko';
-import { useCheckIn, useRooms, fetchServiceRole } from '../../api/user.api';
+import {
+  useCheckIn,
+  useRooms,
+  fetchServiceRole,
+  useMyInfo,
+} from '../../api/user.api';
 import { convertToEnglish } from '../../api/convertToEnglish';
 import { useNavigate } from 'react-router-dom';
 import useAuth from '../../hooks/useAuth';
@@ -14,6 +19,7 @@ const QrCheck = () => {
   const [scannedCode, setScannedCode] = useState('');
 
   const { mutate: doCheckIn } = useCheckIn();
+  const { data: me } = useMyInfo();
   let inko = new Inko();
   const navigate = useNavigate();
   const { loggedIn } = useAuth();
@@ -25,12 +31,25 @@ const QrCheck = () => {
   });
 
   useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const roomIdsParam = params.get('roomId');
-    if (roomIdsParam) {
-      setroomId(parseInt(roomIdsParam));
+    console.log(me);
+  });
+
+  useEffect(() => {
+    if (me) {
+      if (me.name === 'RESIDENT_306') {
+        setroomId(1);
+      } else if (me.name === 'RESIDENT_428') {
+        setroomId(2);
+      } else {
+        setroomId(null);
+        openSnackbar('유효하지 않은 사용자입니다');
+        setTimeout(() => {
+          closeSnackbar();
+        }, 2500);
+        navigate('/');
+      }
     }
-  }, [location.search]);
+  }, [me, navigate, openSnackbar, closeSnackbar]);
 
   const { data: rooms } = useRooms(roomId ? [roomId] : []);
 
@@ -145,7 +164,6 @@ const QrCheck = () => {
             ? `${rooms[0].roomName}호`
             : '선택된 호실이 없음'}
         </p>
-
         <p>본인의 QR코드를 스캐너에 스캔해주세요</p>
       </div>
       <div className="flex flex-col items-center justify-center w-screen">
