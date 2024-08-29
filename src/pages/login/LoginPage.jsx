@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+// src/components/Login.jsx
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, TextInput } from 'flowbite-react';
 import { useSnackbar } from 'react-simple-snackbar';
@@ -27,9 +28,7 @@ const LoginPage = () => {
     },
   });
 
-  useEffect(() => {
-    if (loggedIn) navigate('/');
-  }, [loggedIn, navigate]);
+  if (loggedIn) navigate('/');
 
   const handleLogin = async () => {
     if (!studentId || !password) {
@@ -38,9 +37,7 @@ const LoginPage = () => {
     }
     try {
       await login({ id: studentId, password });
-
-      openSuccessSnackbar('로그인 되었습니다', 2500); // 성공 시 스낵바 실행
-      location.reload(); // 페이지 새로고침
+      openSuccessSnackbar('로그인 되었습니다', 1500); // 성공 시 스낵바 실행
     } catch (error) {
       openErrorSnackbar(error.message, 2500); // 실패 시 에러 메시지 표시
     }

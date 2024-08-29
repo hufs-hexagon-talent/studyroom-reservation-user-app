@@ -142,8 +142,6 @@ const RoomPage = () => {
         );
         return format(slotDateFrom, 'HH:mm') > latestTime;
       });
-
-      // 이후 필요한 로직 수행 가능
     }
   }, [reservationsByRooms, selectedDate]);
 
