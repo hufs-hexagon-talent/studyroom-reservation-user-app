@@ -32,7 +32,7 @@ const useAuth = () => {
         refreshToken: refresh_token,
       });
 
-      return true; // 성공 시 true 반환
+      return true;
     } catch (error) {
       throw new Error(error.response?.data?.errorMessage || '로그인에 실패했습니다.');
     }

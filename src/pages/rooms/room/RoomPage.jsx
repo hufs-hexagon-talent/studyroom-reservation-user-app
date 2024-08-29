@@ -104,7 +104,6 @@ const RoomPage = () => {
       const endTimes = reservationsByRooms.map(
         room => room.policy.operationEndTime,
       );
-      console.log(endTimes);
 
       const latestTime = endTimes.reduce((latest, current) => {
         return latest > current ? latest : current;

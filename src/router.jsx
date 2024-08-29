@@ -43,7 +43,7 @@ const RouterComponent = () => {
         <div className="flex-grow">
           <Routes>
             <Route path="/" element={<RoomPage />} />
-            {loggedIn && serviceRole !== 'RESIDENT' && (
+            {loggedIn && serviceRole === 'USER' && (
               <>
                 <Route path="/notice" element={<Notice />} />
                 <Route path="/check" element={<Check />} />
@@ -53,12 +53,16 @@ const RouterComponent = () => {
             )}
             {loggedIn && serviceRole === 'ADMIN' && (
               <>
+                <Route path="/notice" element={<Notice />} />
+                <Route path="/qrcheck" element={<QrCheck />} />
                 <Route path="/divide" element={<DivideAct />} />
                 <Route path="/selectRoom" element={<SelectRoom />} />
-                <Route path="/visit" element={<CheckVisit />} />
+                <Route path="/check" element={<Check />} />
+                <Route path="/otp" element={<OtpPage />} />
+                <Route path="/password" element={<LoggedInPassword />} />
                 <Route path="/selectPartition" element={<SelectPartition />} />
+                <Route path="/visit" element={<CheckVisit />} />
                 <Route path="/schedule" element={<Schedule />} />
-                <Route path="/qrcheck" element={<QrCheck />} />
                 <Route path="/serialCheck" element={<SerialCheck />} />
               </>
             )}
@@ -76,12 +80,12 @@ const RouterComponent = () => {
                     pwResetToken ? <LoggedOutPassword /> : <Navigate to="/" />
                   }
                 />
+                <Route path="/notice" element={<Notice />} />
                 <Route path="/email" element={<EmailVerify />} />
                 <Route path="/login" element={<LoginPage />} />
                 {/* <Route path="/signup" element={<SignUp />} /> */}
               </>
             )}
-            {}
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </div>

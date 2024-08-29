@@ -1,15 +1,22 @@
 import axios from 'axios';
 
+// 기존 authState를 가져오는 함수 정의
+const getAuthState = () => {
+  const authState = localStorage.getItem('authState');
+  return authState ? JSON.parse(authState) : null;
+};
+
 export const apiClient = axios.create({
   baseURL: 'https://api.studyroom.computer.hufs.ac.kr',
   headers: {
-    Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+    Authorization: `Bearer ${getAuthState()?.accessToken}`, // 수정된 부분
   },
 });
 
 apiClient.interceptors.request.use(
   config => {
-    const accessToken = localStorage.getItem('accessToken');
+    const authState = getAuthState(); // authState 객체를 가져옵니다.
+    const accessToken = authState?.accessToken;
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
     } else {
@@ -29,30 +36,38 @@ apiClient.interceptors.response.use(
   async error => {
     if (error.response && error.response.status === 401) {
       // 리프레시 토큰 가져오기
-      const refreshToken = localStorage.getItem('refreshToken');
+      const authState = getAuthState(); // authState 객체를 가져옵니다.
+      const refreshToken = authState?.refreshToken;
 
       if (!refreshToken) {
-        // 리프레시 토큰이 없으면 로그아웃 하기
-
+        // 리프레시 토큰이 없으면 로그아웃 처리
         return Promise.reject(error);
       }
-      // todo : refresh가 401이 떴을 때 새로 refresh 떳을때) 지금 요청하려고 하는 api가 refresh면? 바로 종료
-      // 현재 요청이 리프레시 요청이냐
+      
+      // 현재 요청이 리프레시 요청인지 확인
       if (error.config.url.includes('/auth/refresh')) {
         return Promise.reject(error);
       }
+      
       try {
-        // 리프레시 토큰으로 액세스 토큰 와서 새 액세스 토큰으로 재요청하기
-        const response = await apiClient.post(
-          '/auth/refresh',
-          { refreshToken },
-        );
-        const accessToken = response.data.accessToken;
-        localStorage.setItem('accessToken', accessToken);
-        return apiClient(error.config);
-      } catch (refreshError) {
-        // 토큰 갱신 실패하면 로그아웃
+        // 리프레시 토큰으로 액세스 토큰 갱신
+        const response = await axios.post('https://api.studyroom.computer.hufs.ac.kr/auth/refresh', {
+          refresh_token: refreshToken // 올바른 키 사용
+        });
+        const accessToken = response.data.data.access_token;
 
+        // authState 업데이트
+        const updatedAuthState = {
+          ...authState,
+          accessToken: accessToken,
+        };
+
+        localStorage.setItem('authState', JSON.stringify(updatedAuthState));
+        // 새로운 토큰으로 원래 요청 재시도
+        error.config.headers['Authorization'] = `Bearer ${accessToken}`;
+        return axios(error.config); // 원래 요청 재시도
+      } catch (refreshError) {
+        // 토큰 갱신 실패 시 로그아웃 처리
         return Promise.reject(error);
       }
     }

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate, useNavigation } from 'react-router-dom';
 import { Button, Label, TextInput } from 'flowbite-react';
 import { useAllUsers, usePassword, useMyInfo } from '../../api/user.api';
 import { useSnackbar } from 'react-simple-snackbar';
@@ -14,10 +15,18 @@ const LoggedInPassword = () => {
   const { data: users } = useAllUsers();
   const { data: me } = useMyInfo();
   const { mutateAsync: changePw } = usePassword();
-  const [openErrorSnackbar, closeErrorSnackbar] = useSnackbar({
+  const navigate = useNavigate();
+  const [openErrorSnackbar] = useSnackbar({
     position: 'top-right',
     style: {
       backgroundColor: '#FF3333', // 빨간색
+    },
+  });
+  const [openSuccessSnackbar] = useSnackbar({
+    position: 'top-right',
+    style: {
+      backgroundColor: '#4CAF50', // 초록색
+      color: '#FFFFFF',
     },
   });
 
@@ -47,15 +56,24 @@ const LoggedInPassword = () => {
   const handleSubmit = async e => {
     e.preventDefault();
 
+    // 모든 필드가 채워져 있는지 확인
+    if (!id || !prePassword || !newPassword || !confirmPassword) {
+      const errorMessage = '모든 값을 입력해주세요';
+      openErrorSnackbar(errorMessage); // 모든 값을 입력하라는 오류 메시지 표시
+      return;
+    }
+
     if (me.username !== id) {
-      setIdError('본인의 아이디가 아닙니다.');
-      openErrorSnackbar(idError);
+      const errorMessage = '본인의 아이디가 아닙니다.';
+      setIdError(errorMessage);
+      openErrorSnackbar(errorMessage); // 직접 문자열을 전달
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      setPasswordError('신규 비밀번호가 일치하지 않습니다.');
-      openErrorSnackbar(passwordError);
+      const errorMessage = '신규 비밀번호가 일치하지 않습니다.';
+      setPasswordError(errorMessage);
+      openErrorSnackbar(errorMessage); // 직접 문자열을 전달
       return;
     }
 
@@ -67,7 +85,9 @@ const LoggedInPassword = () => {
     setIdError('');
     setPasswordError('');
     try {
-      await changePw({ prePassword, newPassword });
+      const response = await changePw({ prePassword, newPassword });
+      openSuccessSnackbar(response.message);
+      navigate('/');
     } catch (error) {
       console.error('Failed to change password:', error);
       openErrorSnackbar(error.message, 2500);
