@@ -69,6 +69,7 @@ const RouterComponent = () => {
             {loggedIn && serviceRole === 'RESIDENT' && (
               <>
                 {/* <Route path="/selectRoom" element={<SelectRoom />} /> */}
+                <Route path="/notice" element={<Notice />} />
                 <Route path="/qrcheck" element={<QrCheck />} />
               </>
             )}
