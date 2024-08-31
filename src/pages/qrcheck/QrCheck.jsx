@@ -3,6 +3,7 @@ import Inko from 'inko';
 import {
   useCheckIn,
   useRooms,
+  useAllRooms,
   fetchServiceRole,
   useMyInfo,
 } from '../../api/user.api';
@@ -31,12 +32,10 @@ const QrCheck = () => {
   });
 
   useEffect(() => {
-    console.log(me);
-  });
-
-  useEffect(() => {
     if (me) {
-      if (me.name === 'RESIDENT_306') {
+      if (me.serviceRole === 'ADMIN') {
+        setroomId(null);
+      } else if (me.name === 'RESIDENT_306') {
         setroomId(1);
       } else if (me.name === 'RESIDENT_428') {
         setroomId(2);
@@ -51,7 +50,12 @@ const QrCheck = () => {
     }
   }, [me, navigate, openSnackbar, closeSnackbar]);
 
-  const { data: rooms } = useRooms(roomId ? [roomId] : []);
+  const { data: rooms } =
+    me?.serviceRole === 'ADMIN'
+      ? useAllRooms()
+      : useRooms(roomId ? [roomId] : []);
+
+  console.log(rooms);
 
   useEffect(() => {
     const checkAdminStatus = async () => {
@@ -161,11 +165,12 @@ const QrCheck = () => {
         <p>
           현재 선택된 호실 :{' '}
           {rooms && rooms.length > 0
-            ? `${rooms[0].roomName}호`
+            ? rooms.map(room => room.roomName).join(', ') + '호'
             : '선택된 호실이 없음'}
         </p>
         <p>본인의 QR코드를 스캐너에 스캔해주세요</p>
       </div>
+
       <div className="flex flex-col items-center justify-center w-screen">
         <input
           onKeyDown={handleQrKeyDown}

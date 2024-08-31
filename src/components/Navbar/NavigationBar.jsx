@@ -41,7 +41,7 @@ const NavigationBar = () => {
         ) : (
           <>
             {loggedIn && serviceRole === 'ADMIN' && (
-              <Navbar.Link href="/selectRoom">출석 체크</Navbar.Link>
+              <Navbar.Link href="/qrcheck">출석 체크</Navbar.Link>
             )}
             <Navbar.Link href="/">세미나실 예약</Navbar.Link>
             <Navbar.Link
