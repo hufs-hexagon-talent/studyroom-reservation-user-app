@@ -18,7 +18,6 @@ const QrCheck = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [reservations, setReservations] = useState([]);
   const [scannedCode, setScannedCode] = useState('');
-  const [inputLocked, setInputLocked] = useState(false);
 
   const { mutate: doCheckIn } = useCheckIn();
   const { data: me } = useMyInfo();
@@ -134,18 +133,14 @@ const QrCheck = () => {
 
   const handleQrKeyDown = useCallback(
     e => {
-      if (inputLocked) return;
-
       if (e.code === 'Enter') {
         handleQrCode(scannedCode);
         setScannedCode('');
-        setInputLocked(true);
-        setTimeout(() => setInputLocked(false), 2000);
       } else {
         setScannedCode(prev => prev + e.key);
       }
     },
-    [roomId, scannedCode, inputLocked],
+    [roomId, scannedCode],
   );
 
   useEffect(() => {
