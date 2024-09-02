@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useNavigation } from 'react-router-dom';
 import { Button, Label, TextInput } from 'flowbite-react';
-import { useAllUsers, usePassword, useMyInfo } from '../../api/user.api';
+import { usePassword, useMyInfo } from '../../api/user.api';
 import { useSnackbar } from 'react-simple-snackbar';
 import './LoggedInPassword.css';
 
@@ -12,7 +12,7 @@ const LoggedInPassword = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [idError, setIdError] = useState('');
   const [passwordError, setPasswordError] = useState('');
-  const { data: users } = useAllUsers();
+  //const { data: users } = useAllUsers();
   const { data: me } = useMyInfo();
   const { mutateAsync: changePw } = usePassword();
   const navigate = useNavigate();
@@ -77,10 +77,10 @@ const LoggedInPassword = () => {
       return;
     }
 
-    if (!users || !users.find(user => user.username === id)) {
-      setIdError('존재하지 않는 아이디입니다.');
-      return;
-    }
+    // if (!users || !users.find(user => user.username === id)) {
+    //   setIdError('존재하지 않는 아이디입니다.');
+    //   return;
+    // }
 
     setIdError('');
     setPasswordError('');
