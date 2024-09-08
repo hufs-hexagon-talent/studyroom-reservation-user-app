@@ -149,7 +149,13 @@ const CheckVisit = () => {
                     key={reservation.reservationId}
                     className={reservation.state === 'VISITED'}>
                     <Table.Cell>
-                      {reservation.state === 'VISITED' ? '출석' : '미출석'}
+                      {reservation.state === 'VISITED'
+                        ? '출석'
+                        : reservation.state === 'NOT_VISITED'
+                          ? '미출석'
+                          : reservation.state === 'PROCESSED'
+                            ? '처리됨'
+                            : ''}
                     </Table.Cell>
                     <Table.Cell>
                       {reservation.roomName}-{reservation.partitionNumber}

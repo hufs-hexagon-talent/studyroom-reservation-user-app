@@ -18,6 +18,7 @@ const QrCheck = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [reservations, setReservations] = useState([]);
   const [scannedCode, setScannedCode] = useState('');
+  const [isScanDisabled, setIsScanDisabled] = useState(false);
 
   const { mutate: doCheckIn } = useCheckIn();
   const { data: me } = useMyInfo();
@@ -35,6 +36,7 @@ const QrCheck = () => {
     if (me) {
       if (me.serviceRole === 'ADMIN') {
         setroomId(null);
+        //console.log(roomId);
       } else if (me.name === 'RESIDENT_306') {
         setroomId(1);
       } else if (me.name === 'RESIDENT_428') {
@@ -54,8 +56,8 @@ const QrCheck = () => {
     me?.serviceRole === 'ADMIN'
       ? useAllRooms()
       : useRooms(roomId ? [roomId] : []);
-
-  console.log(rooms);
+  // console.log(roomId);
+  // console.log(rooms);
 
   useEffect(() => {
     const checkAdminStatus = async () => {
@@ -85,9 +87,16 @@ const QrCheck = () => {
   }, [navigate, loggedIn]);
 
   const handleQrCode = verificationCode => {
+    if (isScanDisabled) return; // 스캔이 차단된 경우 함수 종료
+
     const lowerCaseCode = convertToEnglish(
       inko.ko2en(verificationCode).toLowerCase(),
     );
+
+    setIsScanDisabled(true); // 스캔 차단 시작
+    setTimeout(() => {
+      setIsScanDisabled(false); //1초 후 스캔 차단 해제
+    }, 1000);
 
     doCheckIn(
       {

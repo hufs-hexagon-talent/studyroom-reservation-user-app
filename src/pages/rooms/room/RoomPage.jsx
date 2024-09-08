@@ -318,17 +318,17 @@ const RoomPage = () => {
             아래 예약 현황의 예약가능 시간을 선택하면 해당 세미나실을 예약하여
             사용할 수 있습니다.
           </div>
-
           {/* date-picker 부분 */}
           <div className="flex justify-center">
             <div id="datepicker-container">
               <DatePicker
+                id="date"
+                className={'text-center flex'}
                 selected={selectedDate}
                 locale={ko}
                 minDate={today}
                 includeDates={availableDate}
                 onChange={handleDateChange}
-                className="text-center"
                 dateFormat="yyyy년 MM월 dd일"
                 showIcon
               />
