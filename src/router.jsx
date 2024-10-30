@@ -6,7 +6,8 @@ import { useDomain } from './contexts/DomainContext';
 
 import FooterCes from './components/footer/FooterCes';
 import FooterIce from './components/footer/FooterIce';
-import NavigationBar from './components/Navbar/NavigationBar';
+import NavigationBarCes from './components/Navbar/NavigationBarCes';
+import NavigationBarIce from './components/Navbar/NavigationBarIce';
 import Check from './pages/check/CheckRoom';
 import LoginPage from './pages/login/LoginPage';
 import Notice from './pages/notice/notice';
@@ -42,7 +43,11 @@ const RouterComponent = () => {
   return (
     <BrowserRouter basename={process.env.REACT_APP_BASEURL || '/'}>
       <div className="min-h-screen flex flex-col">
-        <NavigationBar />
+        {domain === 'ces' ? (
+          <NavigationBarCes showSnackbar={openSnackbar} />
+        ) : domain === 'ice' ? (
+          <NavigationBarIce showSnackbar={openSnackbar} />
+        ) : null}
         <div className="flex-grow">
           <Routes>
             <Route path="/" element={<RoomPage />} />
