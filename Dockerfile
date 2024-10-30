@@ -1,8 +1,8 @@
-FROM node:20-alpine as build-stage
+FROM node:20-alpine AS build-stage
 WORKDIR /app
 
 # ENV 설정
-ENV REACT_APP_API_URL APP__REPLACE_ME__REACT_APP_API_URL
+ENV REACT_APP_API_URL=APP__REPLACE_ME__REACT_APP_API_URL
 
 # 의존성 파일 복사 및 설치
 COPY package.json yarn.lock ./
@@ -13,7 +13,7 @@ COPY . .
 RUN yarn build
 
 # 두 번째 단계: Nginx를 사용하여 빌드된 앱을 서빙
-FROM nginx:stable-alpine as production-stage
+FROM nginx:stable-alpine AS production-stage
 WORKDIR /app
 COPY --from=build-stage /app/entrypoint.sh /app
 RUN chmod +x /app/entrypoint.sh

@@ -10,7 +10,7 @@ const baseUrl =
   process.env.REACT_APP_API_URL || 'https://api.studyroom.computer.hufs.ac.kr';
 
 export const apiClient = axios.create({
-  baseURL,
+  baseURL: baseUrl,
   headers: {
     Authorization: `Bearer ${getAuthState()?.accessToken}`, // 수정된 부분
   },
