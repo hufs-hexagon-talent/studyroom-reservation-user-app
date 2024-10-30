@@ -6,8 +6,11 @@ const getAuthState = () => {
   return authState ? JSON.parse(authState) : null;
 };
 
+const baseUrl =
+  process.env.REACT_APP_API_URL || 'https://api.studyroom.computer.hufs.ac.kr';
+
 export const apiClient = axios.create({
-  baseURL: 'https://api.studyroom.computer.hufs.ac.kr',
+  baseURL,
   headers: {
     Authorization: `Bearer ${getAuthState()?.accessToken}`, // 수정된 부분
   },
@@ -43,16 +46,16 @@ apiClient.interceptors.response.use(
         // 리프레시 토큰이 없으면 로그아웃 처리
         return Promise.reject(error);
       }
-      
+
       // 현재 요청이 리프레시 요청인지 확인
       if (error.config.url.includes('/auth/refresh')) {
         return Promise.reject(error);
       }
-      
+
       try {
         // 리프레시 토큰으로 액세스 토큰 갱신
-        const response = await axios.post('https://api.studyroom.computer.hufs.ac.kr/auth/refresh', {
-          refresh_token: refreshToken // 올바른 키 사용
+        const response = await axios.post(`${baseUrl}/auth/refresh`, {
+          refresh_token: refreshToken, // 올바른 키 사용
         });
         const accessToken = response.data.data.access_token;
 
