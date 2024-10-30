@@ -2,8 +2,10 @@ import React from 'react';
 import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
 import { useSnackbar } from 'react-simple-snackbar';
 import { useServiceRole } from './api/user.api';
+import { useDomain } from './contexts/DomainContext';
 
-import Footer from './components/footer/Footer';
+import FooterCes from './components/footer/FooterCes';
+import FooterIce from './components/footer/FooterIce';
 import NavigationBar from './components/Navbar/NavigationBar';
 import Check from './pages/check/CheckRoom';
 import LoginPage from './pages/login/LoginPage';
@@ -25,6 +27,7 @@ import SerialCheck from './pages/manage/SerialCheck';
 
 const RouterComponent = () => {
   const { loggedIn } = useAuth();
+  const { domain } = useDomain();
   const { data: serviceRole, isLoading } = useServiceRole();
   const [openSnackbar] = useSnackbar({
     position: 'top-right',
@@ -90,7 +93,11 @@ const RouterComponent = () => {
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </div>
-        <Footer showSnackbar={openSnackbar} />
+        {domain === 'ces' ? (
+          <FooterCes showSnackbar={openSnackbar} />
+        ) : domain === 'ice' ? (
+          <FooterIce showSnackbar={openSnackbar} />
+        ) : null}
       </div>
     </BrowserRouter>
   );
