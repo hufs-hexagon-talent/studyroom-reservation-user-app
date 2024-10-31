@@ -1,7 +1,32 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useServiceRole } from '../../api/user.api';
+import { useSnackbar } from 'react-simple-snackbar';
+import useAuth from '../../hooks/useAuth';
 import './Footer.css';
 
 const FooterIce = () => {
+  const [openSnackbar, closeSnackbar] = useSnackbar({
+    position: 'top-right',
+    style: {
+      backgroundColor: '#FF3333',
+    },
+  });
+  const navigate = useNavigate();
+  const { loggedIn } = useAuth();
+  const { data: serviceRole } = useServiceRole();
+
+  const handleAdminClick = async () => {
+    if (loggedIn && serviceRole === 'ADMIN') {
+      navigate('/divide');
+    } else {
+      openSnackbar('관리자 외에는 접근 권한이 없습니다.');
+      setTimeout(() => {
+        closeSnackbar();
+      }, 3000);
+    }
+  };
+
   return (
     <div className="w-full">
       <footer
@@ -49,9 +74,13 @@ const FooterIce = () => {
                 </a>
               </span>
             </p>
-            <div className="inline hover:underline cursor-pointer text-gray-400 text-sm mt-3">
-              관리자
-            </div>
+            {loggedIn && serviceRole === 'ADMIN' && (
+              <div
+                onClick={handleAdminClick}
+                className="inline hover:underline cursor-pointer text-gray-400 text-sm mt-3">
+                관리자
+              </div>
+            )}
           </div>
         </div>
       </footer>
