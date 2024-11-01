@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import {
   Table,
@@ -29,6 +29,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import { fetchDate, useReservations, useReserve } from '../../../api/user.api';
 import useAuth from '../../../hooks/useAuth';
 import Button from '../../../components/button/Button';
+import { useDomain } from '../../../contexts/DomainContext';
 
 const createTimeTable = config => {
   const { startTime, endTime, intervalMinute } = config;
@@ -65,20 +66,7 @@ const RoomPage = () => {
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [selectedRangeFrom, setSelectedRangeFrom] = useState(null);
   const [selectedRangeTo, selSelectedRangeTo] = useState(null);
-  const [selectedDate, setSelectedDate] = useUrlQuery(
-    'date',
-    format(new Date(), 'yyyy-MM-dd'),
-  );
   const [availableDate, setAvailableDate] = useState([]);
-  const navigate = useNavigate();
-  const today = new Date();
-
-  const { mutateAsync: doReserve } = useReserve();
-  const { data: reservationsByRooms } = useReservations({
-    date: selectedDate,
-  });
-  const { loggedIn: isLoggedIn } = useAuth();
-
   const [earliestStartTime, setEarliestStartTime] = useState(null);
   const [latestEndTime, setLatestEndTime] = useState(null);
   const [startHour, setStartHour] = useState(null);
@@ -87,10 +75,41 @@ const RoomPage = () => {
   const [endMinute, setEndMinute] = useState(null);
   const [maxReservationMinute, setMaxReservationMinute] = useState(null);
 
+  const navigate = useNavigate();
+  const today = new Date();
+  const { departmentId: urlDepartmentId } = useParams();
+  const { domain } = useDomain();
+
+  const [departmentId, setDepartmentId] = useState(() => {
+    if (urlDepartmentId) return Number(urlDepartmentId);
+    return domain === 'computer' ? 1 : 2;
+  });
+
+  // domain에 따라 departmentId 설정
   useEffect(() => {
+    if (!urlDepartmentId) {
+      setDepartmentId(domain === 'computer' ? 1 : 2);
+    }
+  }, [domain, urlDepartmentId]);
+
+  const [selectedDate, setSelectedDate] = useUrlQuery(
+    'date',
+    format(new Date(), 'yyyy-MM-dd'),
+    departmentId,
+  );
+
+  const { mutateAsync: doReserve } = useReserve();
+  const { data: reservationsByRooms } = useReservations({
+    date: selectedDate,
+    departmentId: departmentId,
+  });
+  const { loggedIn: isLoggedIn } = useAuth();
+
+  useEffect(() => {
+    console.log(reservationsByRooms);
     if (reservationsByRooms && reservationsByRooms.length > 0) {
-      const startTimes = reservationsByRooms.map(
-        room => room.policy.operationStartTime,
+      const startTimes = reservationsByRooms?.map(
+        room => room.operationStartTime,
       );
       const earliestTime = startTimes.reduce((earliest, current) => {
         return earliest < current ? earliest : current;
@@ -101,9 +120,7 @@ const RoomPage = () => {
       setStartHour(parseInt(startHour, 10));
       setStartMinute(parseInt(startMinute, 10));
 
-      const endTimes = reservationsByRooms.map(
-        room => room.policy.operationEndTime,
-      );
+      const endTimes = reservationsByRooms?.map(room => room.operationEndTime);
 
       const latestTime = endTimes.reduce((latest, current) => {
         return latest > current ? latest : current;
@@ -114,8 +131,8 @@ const RoomPage = () => {
       setEndHour(parseInt(endHour, 10));
       setEndMinute(parseInt(endMinute, 10));
 
-      const eachMaxMinutes = reservationsByRooms.map(
-        partition => partition.policy.eachMaxMinute,
+      const eachMaxMinutes = reservationsByRooms?.map(
+        partition => partition.eachMaxMinute,
       );
       const maxEachMaxMinute = Math.max(...eachMaxMinutes);
       setMaxReservationMinute(maxEachMaxMinute);
@@ -415,8 +432,7 @@ const RoomPage = () => {
                       );
                       const slotDateTo = addMinutes(slotDateFrom, 30);
                       const slotDateFromPlus30 = addMinutes(slotDateFrom, 30);
-                      const roomEndTime =
-                        reservationsByRoom.policy.operationEndTime;
+                      const roomEndTime = reservationsByRoom.operationEndTime;
                       const isFuture =
                         format(slotDateFrom, 'HH:mm') > roomEndTime &&
                         format(slotDateFrom, 'HH:mm') <= latestEndTime;

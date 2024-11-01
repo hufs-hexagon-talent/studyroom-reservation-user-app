@@ -10,48 +10,49 @@ import { queryClient } from '../index';
 const fetchAllUsers = async () => {
   const allUser_res = await apiClient.get('/users');
   return allUser_res.data.data.items;
-}
+};
 
 export const useAllUsers = () => {
   return useQuery({
     queryKey: ['allUsers'],
-    queryFn: fetchAllUsers
+    queryFn: fetchAllUsers,
   });
 };
 
 // 자신의 정보 조회
-const fetchMyInfo =async()=>{
-  try{
+const fetchMyInfo = async () => {
+  try {
     const myInfo_res = await apiClient.get('/users/me');
     return myInfo_res.data.data;
-  } catch(e) {
-    return false
+  } catch (e) {
+    return false;
   }
-}
+};
 
-export const useMyInfo =()=>{
+export const useMyInfo = () => {
   return useQuery({
-    queryKey:['myInfo'],
-    queryFn:fetchMyInfo
+    queryKey: ['myInfo'],
+    queryFn: fetchMyInfo,
   });
 };
 
 // 관리자인지 아닌지
-export const fetchServiceRole = async()=>{
-  try{
+export const fetchServiceRole = async () => {
+  try {
     const isAdmin_res = await apiClient.get('/users/me');
     return isAdmin_res.data.data.serviceRole;
-  }catch(e){return false}
-}
-
+  } catch (e) {
+    return false;
+  }
+};
 
 // Query
-export const useServiceRole=()=>{
+export const useServiceRole = () => {
   return useQuery({
-    queryKey:['serviceRole'],
-    queryFn:fetchServiceRole,
+    queryKey: ['serviceRole'],
+    queryFn: fetchServiceRole,
   });
-}
+};
 
 // 자신의 예약 생성
 export const useReserve = () => {
@@ -81,7 +82,9 @@ export const fetchReservationsByPartitions = async ({ date, partitionIds }) => {
   params.append('date', date);
   partitionIds.forEach(id => params.append('partitionIds', id));
 
-  const response = await apiClient.get(`/reservations/partitions/by-date?${params.toString()}`);
+  const response = await apiClient.get(
+    `/reservations/partitions/by-date?${params.toString()}`,
+  );
   return response.data.data.reservations;
 };
 
@@ -91,19 +94,22 @@ export const useReservationsByPartitions = ({ date, partitionIds }) =>
     queryFn: () => fetchReservationsByPartitions({ date, partitionIds }),
   });
 
-// 해당 날짜의 예약 정보 가져오기 (2차원, roomPage에 사용)
-export const fetchReservations = async ({ date }) => {
-  const response = await apiClient.get(`/reservations/by-date?date=${date}`);
+// 특정 날짜, 특정 부서가 관리하는 모든 파티션의 예약 상태 조회
+export const fetchReservations = async ({ date, departmentId }) => {
+  const response = await apiClient.get(
+    `https://api.studyroom-qa.alpaon.net/reservations/by-date/${departmentId}?date=${date}`,
+  );
 
-  const data = response.data.data.items;
+  const data = response.data.data.partitionReservationInfos;
 
   return data;
 };
 
-export const useReservations = ({ date }) =>
+export const useReservations = ({ date, departmentId }) =>
   useQuery({
-    queryKey: ['reservationsByRooms', date],
-    queryFn: () => fetchReservations({ date }),
+    queryKey: ['reservationsByRooms', date, departmentId],
+    queryFn: () => fetchReservations({ date, departmentId }),
+    enabled: !!departmentId,
   });
 
 // 예약 삭제하기
@@ -120,14 +126,16 @@ export const useDeleteReservation = () => {
 };
 
 // 관리자 예약 삭제
-export const useAdminDeleteReservation=()=>{
+export const useAdminDeleteReservation = () => {
   return useMutation({
-    mutationFn: async(reservationId)=>{
-      const adminDelete_res = await apiClient.delete(`/reservations/admin/${reservationId}`);
+    mutationFn: async reservationId => {
+      const adminDelete_res = await apiClient.delete(
+        `/reservations/admin/${reservationId}`,
+      );
       return adminDelete_res.data;
-    }
-  })
-}
+    },
+  });
+};
 
 export const fetchUserReservation = async () => {
   const user_reservation_response = await apiClient.get('/reservations/me');
@@ -153,20 +161,22 @@ export const useOtp = () =>
   });
 
 // partition 조회
-export const fetchPartiiton = async partitonId =>{
+export const fetchPartiiton = async partitonId => {
   const partition_res = await apiClient.get(`/partitions/${partitonId}`);
   return partition_res.data.data;
-}
+};
 
-export const usePartition = partitionIds => 
+export const usePartition = partitionIds =>
   useQuery({
-    queryKey:['partitions', partitionIds],
-    queryFn: async()=>{
-      if(!partitionIds) return [];
-      const partitions = await Promise.all(partitionIds.map(partitionId => fetchPartiiton(partitionId)));
+    queryKey: ['partitions', partitionIds],
+    queryFn: async () => {
+      if (!partitionIds) return [];
+      const partitions = await Promise.all(
+        partitionIds.map(partitionId => fetchPartiiton(partitionId)),
+      );
       return partitions;
-    }
-  })
+    },
+  });
 
 // room 조회
 export const fetchRoom = async roomId => {
@@ -185,12 +195,12 @@ export const useRooms = roomIds =>
   });
 
 // 체크인 하기
-export const useCheckIn =()=>{
+export const useCheckIn = () => {
   return useMutation({
-    mutationFn : async({verificationCode, roomId})=>{
-      const check_in_res = await apiClient.post('/check-in',{
+    mutationFn: async ({ verificationCode, roomId }) => {
+      const check_in_res = await apiClient.post('/check-in', {
         verificationCode,
-        roomId
+        roomId,
       });
       return check_in_res.data;
     },
@@ -211,54 +221,52 @@ export const useAllRooms = () => {
 };
 
 // 모든 partition 조회
-export const fetchAllPartitions=async()=>{
-  const all_partitions_response = await apiClient.get(
-    '/partitions'
-  )
+export const fetchAllPartitions = async () => {
+  const all_partitions_response = await apiClient.get('/partitions');
   return all_partitions_response.data.data.items;
-}
+};
 
 export const useAllPartitions = () =>
   useQuery({
     queryKey: ['allPartitions'],
     queryFn: async () => {
       const allPartitions = await fetchAllPartitions();
-      return allPartitions.map(partition => ({ partitionId: partition.roomPartitionId, partitionNumber: partition.partitionNumber ,roomName: partition.roomName }));
+      return allPartitions.map(partition => ({
+        partitionId: partition.roomPartitionId,
+        partitionNumber: partition.partitionNumber,
+        roomName: partition.roomName,
+      }));
     },
   });
 
 // roomId로 partition들 조회
-export const fetchPartitionsByRoomIds = async (roomIds) => {
+export const fetchPartitionsByRoomIds = async roomIds => {
   const partitions = await Promise.all(
-    roomIds.map(roomId => apiClient.get(`/partitions/rooms/${roomId}`))
+    roomIds.map(roomId => apiClient.get(`/partitions/rooms/${roomId}`)),
   );
   return partitions.flatMap(partition => partition.data.data.items);
-}
+};
 
-export const usePartitionsByRoomIds = (roomIds) => {
+export const usePartitionsByRoomIds = roomIds => {
   return useQuery({
     queryKey: ['partitionsByRoomIds', roomIds],
     queryFn: () => fetchPartitionsByRoomIds(roomIds),
     enabled: !!roomIds.length, // roomIds가 비어있지 않을 때만 쿼리 실행
   });
-}
+};
 
 // 노쇼 횟수
-const fetchNoShow = async()=>{
-  const noshow_res = await apiClient.get(
-    '/reservations/me/no-show'
-  );
+const fetchNoShow = async () => {
+  const noshow_res = await apiClient.get('/reservations/me/no-show');
   return noshow_res.data.data.noShowCount;
-}
+};
 
-export const useNoShow =()=>{
-  return(
-    useQuery({
-      queryKey:['noShow'],
-      queryFn:fetchNoShow
-    })
-  )
-}
+export const useNoShow = () => {
+  return useQuery({
+    queryKey: ['noShow'],
+    queryFn: fetchNoShow,
+  });
+};
 
 // 로그인 된 상태에서 비밀번호 수정
 export const usePassword = () => {
@@ -281,19 +289,18 @@ export const usePassword = () => {
   });
 };
 
-
 // 로그아웃 상태에서 비밀번호 수정
-export const useLoggedOutPassword=()=>{
+export const useLoggedOutPassword = () => {
   return useMutation({
-    mutationFn:async({token, newPassword})=>{
-      const loggedOutPW_res = await apiClient.post('/users/reset-password',{
+    mutationFn: async ({ token, newPassword }) => {
+      const loggedOutPW_res = await apiClient.post('/users/reset-password', {
         token,
-        newPassword
+        newPassword,
       });
       return loggedOutPW_res.data;
-    }
-  })
-}
+    },
+  });
+};
 
 // 회원 가입
 export const useSignUp = () => {
@@ -312,62 +319,70 @@ export const useSignUp = () => {
 };
 
 // 이메일 전송
-export const useEmailSend =()=>{
+export const useEmailSend = () => {
   return useMutation({
-    mutationFn:async(username)=>{
-      const email_res = await apiClient.post(`/auth/mail/send?username=${username}`);
+    mutationFn: async username => {
+      const email_res = await apiClient.post(
+        `/auth/mail/send?username=${username}`,
+      );
       return email_res.data.data;
-    }
-  })
-}
+    },
+  });
+};
 
 // 이메일 검증
-export const useEmailVerify=()=>{
+export const useEmailVerify = () => {
   return useMutation({
-    mutationFn:async({email, verifyCode})=>{
-      const verify_res = await apiClient.post('/auth/mail/verify',{
+    mutationFn: async ({ email, verifyCode }) => {
+      const verify_res = await apiClient.post('/auth/mail/verify', {
         email,
-        verifyCode
+        verifyCode,
       });
       return verify_res.data;
-    }
-  })
-}
+    },
+  });
+};
 
 // 모든 roomPolicy 조회
-export const fetchAllPolicies=async()=>{
-  const all_policies_res = await apiClient.get('/policies')
+export const fetchAllPolicies = async () => {
+  const all_policies_res = await apiClient.get('/policies');
   return all_policies_res.data;
-}
+};
 
-export const useAllPolicies =()=>{
-  return(
-    useQuery({
-      queryKey:['allPolicies'],
-      queryFn:fetchAllPolicies
-    })
-  )
-}
+export const useAllPolicies = () => {
+  return useQuery({
+    queryKey: ['allPolicies'],
+    queryFn: fetchAllPolicies,
+  });
+};
 
 // 스케줄 주입
-export const useSchedules=()=>{
+export const useSchedules = () => {
   return useMutation({
-    mutationFn:async({roomIds, roomOperationPolicyId, policyApplicationDates})=>{
-      const schedules_policy = await apiClient.post('/schedules',{
-        roomIds, roomOperationPolicyId, policyApplicationDates
-      })
+    mutationFn: async ({
+      roomIds,
+      roomOperationPolicyId,
+      policyApplicationDates,
+    }) => {
+      const schedules_policy = await apiClient.post('/schedules', {
+        roomIds,
+        roomOperationPolicyId,
+        policyApplicationDates,
+      });
       return schedules_policy.data;
-    }
-  })
-}
+    },
+  });
+};
 
 // 학번으로 사용자 예약들 조회
-export const fetchSerialReservation = async (serial) => {
-  const serialReservation_res = await apiClient.get(`/reservations/admin/${serial}`);
+export const fetchSerialReservation = async serial => {
+  const serialReservation_res = await apiClient.get(
+    `/reservations/admin/${serial}`,
+  );
   return serialReservation_res.data.data.items;
 };
 
-export const useSerialReservation = (serial) => {
+export const useSerialReservation = serial => {
   return useQuery({
     queryKey: ['serialReservation', serial],
     queryFn: () => fetchSerialReservation(serial),
@@ -378,12 +393,12 @@ export const useSerialReservation = (serial) => {
 // visited로 변경
 export const useVisitedState = () => {
   return useMutation({
-    mutationFn: async (reservationId) => {
+    mutationFn: async reservationId => {
       const changeState_res = await apiClient.patch(
         `/reservations/admin/${reservationId}`,
         {
           state: 'VISITED',
-        }
+        },
       );
       console.log('ok');
       return changeState_res.data;
@@ -394,12 +409,12 @@ export const useVisitedState = () => {
 // not_visited로 변경
 export const useNotVisitedState = () => {
   return useMutation({
-    mutationFn: async (reservationId) => {
+    mutationFn: async reservationId => {
       const changeState_res = await apiClient.patch(
         `/reservations/admin/${reservationId}`,
         {
           state: 'NOT_VISITED',
-        }
+        },
       );
       console.log('ok');
       return changeState_res.data;
@@ -410,12 +425,12 @@ export const useNotVisitedState = () => {
 // processed 변경
 export const useProcessedState = () => {
   return useMutation({
-    mutationFn: async (reservationId) => {
+    mutationFn: async reservationId => {
       const changeState_res = await apiClient.patch(
         `/reservations/admin/${reservationId}`,
         {
           state: 'PROCESSED',
-        }
+        },
       );
       console.log('ok');
       return changeState_res.data;

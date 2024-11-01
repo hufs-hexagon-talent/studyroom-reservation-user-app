@@ -43,17 +43,20 @@ apiClient.interceptors.response.use(
         // 리프레시 토큰이 없으면 로그아웃 처리
         return Promise.reject(error);
       }
-      
+
       // 현재 요청이 리프레시 요청인지 확인
       if (error.config.url.includes('/auth/refresh')) {
         return Promise.reject(error);
       }
-      
+
       try {
         // 리프레시 토큰으로 액세스 토큰 갱신
-        const response = await axios.post('https://api.studyroom.computer.hufs.ac.kr/auth/refresh', {
-          refresh_token: refreshToken // 올바른 키 사용
-        });
+        const response = await axios.post(
+          'https://api.studyroom.computer.hufs.ac.kr/auth/refresh',
+          {
+            refresh_token: refreshToken, // 올바른 키 사용
+          },
+        );
         const accessToken = response.data.data.access_token;
 
         // authState 업데이트

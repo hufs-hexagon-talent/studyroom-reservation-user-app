@@ -1,7 +1,7 @@
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 
-function useUrlQuery(param, defaultValue = '') {
+function useUrlQuery(param, defaultValue = '', departmentId) {
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -27,7 +27,9 @@ function useUrlQuery(param, defaultValue = '') {
     } else {
       params.delete(param);
     }
-    navigate(`?${params.toString()}`, { replace: true });
+
+    // departmentId를 URL 경로에 추가하여 이동
+    navigate(`/${departmentId}?${params.toString()}`, { replace: true });
   };
 
   return [value, updateQuery];
