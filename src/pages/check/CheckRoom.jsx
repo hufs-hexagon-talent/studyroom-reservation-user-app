@@ -4,7 +4,7 @@ import {
   Popover,
   Typography,
   Pagination,
-  Tooltip, // Tooltip 추가
+  Tooltip,
 } from '@mui/material';
 import { format } from 'date-fns';
 import { Button, Modal, Table } from 'flowbite-react';
@@ -80,8 +80,8 @@ const Check = () => {
           </Table.Head>
           <Table.Body className="divide-y">
             {paginatedReservations?.map((reservation, index) => {
-              const start = new Date(reservation.startDateTime);
-              const end = new Date(reservation.endDateTime);
+              const start = new Date(reservation.reservationStartTime);
+              const end = new Date(reservation.reservationEndTime);
               const isPast = start < new Date();
               return (
                 <Table.Row

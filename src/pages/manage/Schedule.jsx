@@ -125,18 +125,22 @@ const Schedule = () => {
               <Table.HeadCell>최대 사용 시간(분)</Table.HeadCell>
             </Table.Head>
             <Table.Body className="text-center divide-y">
-              {policies.data.items.map(policy => (
+              {policies.data.operationPolicyInfos.map(policy => (
                 <Table.Row
-                  key={policy.policyId}
+                  key={policy.roomOperationPolicyId}
                   className="bg-white dark:border-gray-700 dark:bg-gray-800">
                   <Table.Cell className="p-4">
                     <Checkbox
-                      checked={selectedPolicyId === policy.policyId}
-                      onChange={() => handlePolicyCheckBox(policy.policyId)}
+                      checked={
+                        selectedPolicyId === policy.roomOperationPolicyId
+                      }
+                      onChange={() =>
+                        handlePolicyCheckBox(policy.roomOperationPolicyId)
+                      }
                     />
                   </Table.Cell>
                   <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                    {policy.policyId}
+                    {policy.roomOperationPolicyId}
                   </Table.Cell>
                   <Table.Cell>{policy.operationStartTime}</Table.Cell>
                   <Table.Cell>{policy.operationEndTime}</Table.Cell>

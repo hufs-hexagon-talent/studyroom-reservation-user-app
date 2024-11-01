@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
-
+import axios from 'axios';
 import { apiClient } from './client';
 
 import { queryClient } from '../index';
@@ -72,7 +72,9 @@ export const useReserve = () => {
 // 현재로부터 예약 가능한 방들의 날짜 목록 가져오기
 export const fetchDate = async () => {
   const date_response = await apiClient.get('/schedules/available-dates');
-  const dates = date_response.data.data.items.map(date => new Date(date));
+  const dates = date_response.data.data.availableDates.map(
+    date => new Date(date),
+  );
   return dates;
 };
 
@@ -139,7 +141,7 @@ export const useAdminDeleteReservation = () => {
 
 export const fetchUserReservation = async () => {
   const user_reservation_response = await apiClient.get('/reservations/me');
-  return user_reservation_response.data.data.items.reverse();
+  return user_reservation_response.data.data.reservationInfoResponses.reverse();
 };
 
 export const useUserReservation = () =>
@@ -210,7 +212,7 @@ export const useCheckIn = () => {
 // 모든 room 조회
 export const fetchAllRooms = async () => {
   const all_rooms_response = await apiClient.get('/rooms');
-  return all_rooms_response.data.data.items;
+  return all_rooms_response.data.data.rooms;
 };
 
 export const useAllRooms = () => {

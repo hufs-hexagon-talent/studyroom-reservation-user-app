@@ -105,7 +105,8 @@ const QrCheck = () => {
       },
       {
         onSuccess: result => {
-          const checkedInReservations = result.data.checkInReservations;
+          const checkedInReservations =
+            result.data.reservationInfoResponses.reservationInfoResponses;
 
           setReservations(prevReservations =>
             prevReservations.map(reservation =>

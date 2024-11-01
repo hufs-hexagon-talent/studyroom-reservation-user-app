@@ -213,7 +213,7 @@ const RoomPage = () => {
       const isSelectPast = isBefore(targetStartAt, selectedRangeFrom);
       const isOverDue =
         differenceInMinutes(targetEndAt, selectedRangeFrom) >
-        selectedRoom?.policy.eachMaxMinute;
+        selectedRoom?.eachMaxMinute;
 
       if (
         selectedRoom === partition &&
@@ -283,7 +283,7 @@ const RoomPage = () => {
         });
         navigate('/check');
       } catch (error) {
-        openSnackbar(error.response.data.errorMessage);
+        openSnackbar(error.response.data.message);
       }
     },
     [doReserve, isLoggedIn, selectedRoom, selectedRangeFrom, selectedRangeTo],
@@ -444,25 +444,26 @@ const RoomPage = () => {
                           { start: selectedRangeFrom, end: selectedRangeTo },
                           { start: slotDateFrom, end: slotDateTo },
                         );
-                      const isReserved = reservationsByRoom?.timeline?.some(
-                        reservation => {
-                          const reservationStart = new Date(
-                            reservation.startDateTime,
-                          );
-                          const reservationEnd = new Date(
-                            reservation.endDateTime,
-                          );
-                          return (
-                            slotDateFrom >= reservationStart &&
-                            slotDateFrom < reservationEnd
-                          );
-                        },
-                      );
+                      const isReserved =
+                        reservationsByRoom?.reservationTimeRanges.some(
+                          reservation => {
+                            const reservationStart = new Date(
+                              reservation.startDateTime,
+                            );
+                            const reservationEnd = new Date(
+                              reservation.endDateTime,
+                            );
+                            return (
+                              slotDateFrom >= reservationStart &&
+                              slotDateFrom < reservationEnd
+                            );
+                          },
+                        );
                       const isSelectable = !isPast && !isReserved && !isFuture;
                       const isInSelectableRange =
                         selectedRangeTo &&
                         differenceInMinutes(slotDateTo, selectedRangeFrom) <=
-                          reservationsByRoom.policy.eachMaxMinute &&
+                          reservationsByRoom.eachMaxMinute &&
                         differenceInMinutes(slotDateTo, selectedRangeFrom) >
                           0 &&
                         selectedRoom?.partitionId ===
@@ -490,7 +491,7 @@ const RoomPage = () => {
                               !isRangeSelected &&
                               !isInSelectableRange &&
                               isSomethingSelected
-                                ? 0.5
+                                ? 0.4
                                 : 1,
                             backgroundColor: {
                               past: '#AAAAAA',
