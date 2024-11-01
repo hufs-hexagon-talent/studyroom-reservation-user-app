@@ -106,7 +106,6 @@ const RoomPage = () => {
   const { loggedIn: isLoggedIn } = useAuth();
 
   useEffect(() => {
-    console.log(reservationsByRooms);
     if (reservationsByRooms && reservationsByRooms.length > 0) {
       const startTimes = reservationsByRooms?.map(
         room => room.operationStartTime,
