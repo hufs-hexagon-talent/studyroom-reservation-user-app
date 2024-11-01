@@ -170,7 +170,7 @@ const Check = () => {
           <Typography sx={{ p: 2 }}>
             {`* 현재 예약 취소 없이 세미나실을 방문하지 않은 횟수는 ${noShow}번 입니다.`}
             <div className="text-red-700">
-              (3회 초과 시 세미나실 예약이 1개월 동안 제한 됩니다)
+              (노쇼 3회 시 세미나실 예약이 1개월 동안 제한 됩니다)
             </div>
           </Typography>
         </Popover>
