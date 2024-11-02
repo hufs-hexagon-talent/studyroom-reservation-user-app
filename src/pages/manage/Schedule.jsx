@@ -94,8 +94,7 @@ const Schedule = () => {
       }, 3000);
     } catch (error) {
       openErrorSnackbar(
-        error.response?.data?.errorMessage ||
-          '스케줄 주입 중 오류가 발생했습니다.',
+        error.response?.data?.message || '스케줄 주입 중 오류가 발생했습니다.',
       );
       setTimeout(() => {
         closeErrorSnackbar();

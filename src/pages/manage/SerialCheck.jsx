@@ -81,10 +81,11 @@ const SerialCheck = () => {
       const updatedReservations = await refetch();
       setReservation(updatedReservations.data);
     } catch (error) {
-      openErrorSnackbar(error.response.data.errorMessage, 2500);
+      openErrorSnackbar(error.response.data.message, 2500);
     }
   };
 
+  // 예약 상태 변경
   const handleStateChange = async state => {
     try {
       if (state === 'notVisited') {
@@ -102,7 +103,7 @@ const SerialCheck = () => {
       setReservation(updatedReservations.data);
       setOpenModal(false); // Close modal after state change
     } catch (error) {
-      openErrorSnackbar(error.response.data.errorMessage, 2500);
+      openErrorSnackbar(error.response?.data?.message, 2500);
     }
   };
 
@@ -153,13 +154,13 @@ const SerialCheck = () => {
                   {item.roomName}-{item.partitionNumber}
                 </Table.Cell>
                 <Table.Cell>
-                  {format(new Date(item.startDateTime), 'yyyy-MM-dd')}
+                  {format(new Date(item.reservationStartTime), 'yyyy-MM-dd')}
                 </Table.Cell>
                 <Table.Cell>
-                  {format(new Date(item.startDateTime), 'HH:mm')}
+                  {format(new Date(item.reservationStartTime), 'HH:mm')}
                 </Table.Cell>
                 <Table.Cell>
-                  {format(new Date(item.endDateTime), 'HH:mm')}
+                  {format(new Date(item.reservationEndTime), 'HH:mm')}
                 </Table.Cell>
                 <Table.Cell>
                   {item.reservationState === 'VISITED'

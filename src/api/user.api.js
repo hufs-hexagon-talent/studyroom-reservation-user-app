@@ -382,7 +382,7 @@ export const fetchSerialReservation = async serial => {
   const serialReservation_res = await apiClient.get(
     `/reservations/admin/${serial}`,
   );
-  return serialReservation_res.data.data.items;
+  return serialReservation_res.data.data.reservationInfoResponses;
 };
 
 export const useSerialReservation = serial => {

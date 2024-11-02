@@ -129,8 +129,7 @@ const QrCheck = () => {
         },
         onError: error => {
           setErrorMessage(
-            error.response?.data?.errorMessage ||
-              'An unexpected error occurred',
+            error.response?.data?.message || 'An unexpected error occurred',
           );
           setSuccessMessage('');
           setTimeout(() => {
