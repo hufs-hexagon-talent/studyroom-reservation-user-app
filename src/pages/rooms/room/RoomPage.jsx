@@ -88,7 +88,7 @@ const RoomPage = () => {
   // domain에 따라 departmentId 설정
   useEffect(() => {
     if (!urlDepartmentId) {
-      setDepartmentId(domain === 'computer' ? 1 : 2);
+      setDepartmentId(domain === 'ice' ? 2 : 1);
     }
   }, [domain, urlDepartmentId]);
 
