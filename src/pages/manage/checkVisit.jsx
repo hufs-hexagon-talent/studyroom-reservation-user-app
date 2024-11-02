@@ -147,13 +147,13 @@ const CheckVisit = () => {
                 {reservations.map(reservation => (
                   <Table.Row
                     key={reservation.reservationId}
-                    className={reservation.state === 'VISITED'}>
+                    className={reservation.reservationState === 'VISITED'}>
                     <Table.Cell>
-                      {reservation.state === 'VISITED'
+                      {reservation.reservationState === 'VISITED'
                         ? '출석'
-                        : reservation.state === 'NOT_VISITED'
+                        : reservation.reservationState === 'NOT_VISITED'
                           ? '미출석'
-                          : reservation.state === 'PROCESSED'
+                          : reservation.reservationState === 'PROCESSED'
                             ? '처리됨'
                             : ''}
                     </Table.Cell>
@@ -162,10 +162,16 @@ const CheckVisit = () => {
                     </Table.Cell>
                     <Table.Cell>{reservation.name}</Table.Cell>
                     <Table.Cell>
-                      {format(new Date(reservation.startDateTime), 'HH:mm')}
+                      {format(
+                        new Date(reservation.reservationStartTime),
+                        'HH:mm',
+                      )}
                     </Table.Cell>
                     <Table.Cell>
-                      {format(new Date(reservation.endDateTime), 'HH:mm')}
+                      {format(
+                        new Date(reservation.reservationEndTime),
+                        'HH:mm',
+                      )}
                     </Table.Cell>
                     <Table.Cell
                       onClick={() => setOpenModal(reservation.reservationId)}

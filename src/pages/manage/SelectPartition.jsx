@@ -6,7 +6,9 @@ import { Button } from 'flowbite-react';
 const SelectRoom = () => {
   const { data: partitions, error, isLoading } = useAllPartitions();
   const [selectedPartitions, setSelectedPartitions] = useState([]);
-  const [isAllSelected, setIsAllSelected] = useState(false); // 전체 선택 상태 추가
+  const [isAllSelected, setIsAllSelected] = useState(false);
+  const [isCSSelected, setIsCSSelected] = useState(false);
+  const [isECESelected, setIsECESelected] = useState(false);
   const navigate = useNavigate();
 
   if (isLoading) {
@@ -33,13 +35,54 @@ const SelectRoom = () => {
 
   const handleSelectAllChange = () => {
     if (isAllSelected) {
-      // 이미 전체 선택된 상태라면 선택을 모두 해제
       setSelectedPartitions([]);
       setIsAllSelected(false);
+      setIsCSSelected(false);
+      setIsECESelected(false);
     } else {
-      // 전체 선택되지 않은 상태라면 모든 파티션 선택
       setSelectedPartitions(partitions);
       setIsAllSelected(true);
+      setIsCSSelected(true);
+      setIsECESelected(true);
+    }
+  };
+
+  const handleCSSelectChange = () => {
+    if (isCSSelected) {
+      // 이미 선택된 상태라면 해제
+      setSelectedPartitions(prevSelected =>
+        prevSelected.filter(
+          partition => !(partition.roomId === 1 || partition.roomId === 2),
+        ),
+      );
+      setIsCSSelected(false);
+    } else {
+      // 선택되지 않은 상태라면 추가
+      const csPartitions = partitions.filter(
+        partition => partition.roomId === 1 || partition.roomId === 2,
+      );
+      setSelectedPartitions(prevSelected => [...prevSelected, ...csPartitions]);
+      setIsCSSelected(true);
+    }
+  };
+
+  const handleECESelectChange = () => {
+    if (isECESelected) {
+      setSelectedPartitions(prevSelected =>
+        prevSelected.filter(
+          partition => !(partition.roomId === 3 || partition.roomId === 4),
+        ),
+      );
+      setIsECESelected(false);
+    } else {
+      const ecePartitions = partitions.filter(
+        partition => partition.roomId === 3 || partition.roomId === 4,
+      );
+      setSelectedPartitions(prevSelected => [
+        ...prevSelected,
+        ...ecePartitions,
+      ]);
+      setIsECESelected(true);
     }
   };
 
@@ -76,6 +119,30 @@ const SelectRoom = () => {
               </label>
             </div>
           ))}
+          <div className="flex items-center mb-4">
+            <input
+              id="select-cs"
+              type="checkbox"
+              className="w-4 h-4 bg-gray-100 border-gray-300"
+              checked={isCSSelected}
+              onChange={handleCSSelectChange}
+            />
+            <label htmlFor="select-cs" className="ml-2 text-xl">
+              컴퓨터공학부 선택
+            </label>
+          </div>
+          <div className="flex items-center mb-4">
+            <input
+              id="select-ece"
+              type="checkbox"
+              className="w-4 h-4 bg-gray-100 border-gray-300"
+              checked={isECESelected}
+              onChange={handleECESelectChange}
+            />
+            <label htmlFor="select-ece" className="ml-2 text-xl">
+              정보통신공학과 선택
+            </label>
+          </div>
           <div className="flex items-center mb-4">
             <input
               id="select-all"

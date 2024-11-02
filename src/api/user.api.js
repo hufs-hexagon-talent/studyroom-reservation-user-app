@@ -87,7 +87,7 @@ export const fetchReservationsByPartitions = async ({ date, partitionIds }) => {
   const response = await apiClient.get(
     `/reservations/partitions/by-date?${params.toString()}`,
   );
-  return response.data.data.reservations;
+  return response.data.data.reservationInfoResponses;
 };
 
 export const useReservationsByPartitions = ({ date, partitionIds }) =>
@@ -98,7 +98,6 @@ export const useReservationsByPartitions = ({ date, partitionIds }) =>
 
 // 특정 날짜, 특정 부서가 관리하는 모든 파티션의 예약 상태 조회
 export const fetchReservations = async ({ date, departmentId }) => {
-  console.log('date : ', date, 'departmentId', departmentId);
   const response = await apiClient.get(
     `/reservations/by-date/${departmentId}?date=${date}`,
   );
@@ -226,7 +225,7 @@ export const useAllRooms = () => {
 // 모든 partition 조회
 export const fetchAllPartitions = async () => {
   const all_partitions_response = await apiClient.get('/partitions');
-  return all_partitions_response.data.data.items;
+  return all_partitions_response.data.data.partitions;
 };
 
 export const useAllPartitions = () =>
