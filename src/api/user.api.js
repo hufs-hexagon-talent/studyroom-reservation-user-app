@@ -153,7 +153,7 @@ export const useUserReservation = () =>
   });
 
 export const fetchOtp = async () => {
-  const otp_response = await apiClient.post('/otp');
+  const otp_response = await apiClient.post('/check-in/otp');
 
   return otp_response.data.data.verificationCode;
 };
