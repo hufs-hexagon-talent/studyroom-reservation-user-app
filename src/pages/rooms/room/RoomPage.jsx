@@ -82,8 +82,12 @@ const RoomPage = () => {
 
   const [departmentId, setDepartmentId] = useState(() => {
     if (urlDepartmentId) return Number(urlDepartmentId);
-    return domain === 'computer' ? 1 : 2;
+    return domain === 'ice' ? 2 : 1;
   });
+
+  useEffect(() => {
+    console.log(departmentId);
+  }, []);
 
   // domain에 따라 departmentId 설정
   useEffect(() => {
@@ -308,11 +312,11 @@ const RoomPage = () => {
 
   // 현재로부터 예약 가능한 방들의 날짜 목록 가져오기
   useEffect(() => {
-    const getDate = async () => {
-      const dates = await fetchDate();
+    const getDate = async departmentId => {
+      const dates = await fetchDate(departmentId);
       setAvailableDate(dates);
     };
-    getDate();
+    getDate(departmentId);
   }, []);
 
   return (

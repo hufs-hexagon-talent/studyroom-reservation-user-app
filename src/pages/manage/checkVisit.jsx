@@ -144,42 +144,48 @@ const CheckVisit = () => {
                 <Table.HeadCell></Table.HeadCell>
               </Table.Head>
               <Table.Body className="divide-y">
-                {reservations.map(reservation => (
-                  <Table.Row
-                    key={reservation.reservationId}
-                    className={reservation.reservationState === 'VISITED'}>
-                    <Table.Cell>
-                      {reservation.reservationState === 'VISITED'
-                        ? '출석'
-                        : reservation.reservationState === 'NOT_VISITED'
-                          ? '미출석'
-                          : reservation.reservationState === 'PROCESSED'
-                            ? '처리됨'
-                            : ''}
-                    </Table.Cell>
-                    <Table.Cell>
-                      {reservation.roomName}-{reservation.partitionNumber}
-                    </Table.Cell>
-                    <Table.Cell>{reservation.name}</Table.Cell>
-                    <Table.Cell>
-                      {format(
-                        new Date(reservation.reservationStartTime),
-                        'HH:mm',
-                      )}
-                    </Table.Cell>
-                    <Table.Cell>
-                      {format(
-                        new Date(reservation.reservationEndTime),
-                        'HH:mm',
-                      )}
-                    </Table.Cell>
-                    <Table.Cell
-                      onClick={() => setOpenModal(reservation.reservationId)}
-                      className="cursor-pointer hover:underline font-bold">
-                      삭제
-                    </Table.Cell>
-                  </Table.Row>
-                ))}
+                {reservations
+                  .sort(
+                    (a, b) =>
+                      new Date(a.reservationStartTime) -
+                      new Date(b.reservationStartTime),
+                  )
+                  .map(reservation => (
+                    <Table.Row
+                      key={reservation.reservationId}
+                      className={reservation.reservationState === 'VISITED'}>
+                      <Table.Cell>
+                        {reservation.reservationState === 'VISITED'
+                          ? '출석'
+                          : reservation.reservationState === 'NOT_VISITED'
+                            ? '미출석'
+                            : reservation.reservationState === 'PROCESSED'
+                              ? '처리됨'
+                              : ''}
+                      </Table.Cell>
+                      <Table.Cell>
+                        {reservation.roomName}-{reservation.partitionNumber}
+                      </Table.Cell>
+                      <Table.Cell>{reservation.name}</Table.Cell>
+                      <Table.Cell>
+                        {format(
+                          new Date(reservation.reservationStartTime),
+                          'HH:mm',
+                        )}
+                      </Table.Cell>
+                      <Table.Cell>
+                        {format(
+                          new Date(reservation.reservationEndTime),
+                          'HH:mm',
+                        )}
+                      </Table.Cell>
+                      <Table.Cell
+                        onClick={() => setOpenModal(reservation.reservationId)}
+                        className="cursor-pointer hover:underline font-bold">
+                        삭제
+                      </Table.Cell>
+                    </Table.Row>
+                  ))}
               </Table.Body>
             </Table>
           </div>

@@ -137,40 +137,46 @@ const SerialCheck = () => {
             <Table.HeadCell>출석 유무</Table.HeadCell>
           </Table.Head>
           <Table.Body className="divide-y text-center">
-            {reservation?.map(item => (
-              <Table.Row
-                key={item.reservationId}
-                className="bg-white dark:border-gray-700 dark:bg-gray-800">
-                <Table.Cell>
-                  <Checkbox
-                    checked={selectedReservationId === item.reservationId}
-                    onChange={() => handleCheckboxChange(item.reservationId)}
-                  />
-                </Table.Cell>
-                <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                  {item.reservationId}
-                </Table.Cell>
-                <Table.Cell>
-                  {item.roomName}-{item.partitionNumber}
-                </Table.Cell>
-                <Table.Cell>
-                  {format(new Date(item.reservationStartTime), 'yyyy-MM-dd')}
-                </Table.Cell>
-                <Table.Cell>
-                  {format(new Date(item.reservationStartTime), 'HH:mm')}
-                </Table.Cell>
-                <Table.Cell>
-                  {format(new Date(item.reservationEndTime), 'HH:mm')}
-                </Table.Cell>
-                <Table.Cell>
-                  {item.reservationState === 'VISITED'
-                    ? '출석'
-                    : item.reservationState === 'NOT_VISITED'
-                      ? '미출석'
-                      : '처리됨'}
-                </Table.Cell>
-              </Table.Row>
-            ))}
+            {reservation
+              ?.sort(
+                (a, b) =>
+                  new Date(b.reservationStartTime) -
+                  new Date(a.reservationStartTime),
+              )
+              .map(item => (
+                <Table.Row
+                  key={item.reservationId}
+                  className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                  <Table.Cell>
+                    <Checkbox
+                      checked={selectedReservationId === item.reservationId}
+                      onChange={() => handleCheckboxChange(item.reservationId)}
+                    />
+                  </Table.Cell>
+                  <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
+                    {item.reservationId}
+                  </Table.Cell>
+                  <Table.Cell>
+                    {item.roomName}-{item.partitionNumber}
+                  </Table.Cell>
+                  <Table.Cell>
+                    {format(new Date(item.reservationStartTime), 'yyyy-MM-dd')}
+                  </Table.Cell>
+                  <Table.Cell>
+                    {format(new Date(item.reservationStartTime), 'HH:mm')}
+                  </Table.Cell>
+                  <Table.Cell>
+                    {format(new Date(item.reservationEndTime), 'HH:mm')}
+                  </Table.Cell>
+                  <Table.Cell>
+                    {item.reservationState === 'VISITED'
+                      ? '출석'
+                      : item.reservationState === 'NOT_VISITED'
+                        ? '미출석'
+                        : '처리됨'}
+                  </Table.Cell>
+                </Table.Row>
+              ))}
           </Table.Body>
         </Table>
       </div>
