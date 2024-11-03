@@ -8,12 +8,12 @@
       "type": "image/x-icon"
     },
     {
-      "src": "img/logo.png",
+      "src": "img/logoCes.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "img/logo.png",
+      "src": "img/logoIce.png",
       "type": "image/png",
       "sizes": "512x512"
     }

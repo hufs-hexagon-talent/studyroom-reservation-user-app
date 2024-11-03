@@ -46,7 +46,6 @@ export const fetchServiceRole = async () => {
   }
 };
 
-// Query
 export const useServiceRole = () => {
   return useQuery({
     queryKey: ['serviceRole'],
@@ -285,7 +284,7 @@ export const usePassword = () => {
       } catch (error) {
         // 에러 발생 시 에러 응답을 반환
         if (error.response && error.response.data) {
-          throw new Error(error.response.data.errorMessage);
+          throw new Error(error.response.data.message);
         }
         throw error;
       }

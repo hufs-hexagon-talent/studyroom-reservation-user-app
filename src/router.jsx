@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
 import { useSnackbar } from 'react-simple-snackbar';
-import { useMyInfo, useServiceRole } from './api/user.api';
+import { useServiceRole } from './api/user.api';
 import { useDomain } from './contexts/DomainContext';
 
 import FooterCes from './components/footer/FooterCes';
@@ -30,7 +30,6 @@ const RouterComponent = () => {
   const { loggedIn } = useAuth();
   const { domain } = useDomain();
   const { data: serviceRole, isLoading } = useServiceRole();
-  const { data: me } = useMyInfo();
   const [openSnackbar] = useSnackbar({
     position: 'top-right',
     style: {

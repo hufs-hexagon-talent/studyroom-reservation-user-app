@@ -7,8 +7,10 @@ const SelectRoom = () => {
   const { data: partitions, error, isLoading } = useAllPartitions();
   const [selectedPartitions, setSelectedPartitions] = useState([]);
   const [isAllSelected, setIsAllSelected] = useState(false);
-  const [isCSSelected, setIsCSSelected] = useState(false);
-  const [isECESelected, setIsECESelected] = useState(false);
+  const [selectedCesPartitions, setSelectedCesPartitions] = useState([]);
+  const [isCesSelected, setIsCesSelected] = useState(false);
+  const [selectedIcePartitions, setSelectedIcePartitions] = useState([]);
+  const [isIceSelected, setIsIceSelected] = useState(false);
   const navigate = useNavigate();
 
   if (isLoading) {
@@ -37,43 +39,50 @@ const SelectRoom = () => {
     if (isAllSelected) {
       setSelectedPartitions([]);
       setIsAllSelected(false);
-      setIsCSSelected(false);
-      setIsECESelected(false);
+      setIsCesSelected(false);
+      setIsIceSelected(false);
     } else {
       setSelectedPartitions(partitions);
       setIsAllSelected(true);
-      setIsCSSelected(true);
-      setIsECESelected(true);
+      setIsCesSelected(true);
+      setIsIceSelected(true);
     }
   };
 
-  const handleCSSelectChange = () => {
-    if (isCSSelected) {
-      // 이미 선택된 상태라면 해제
-      setSelectedPartitions(prevSelected =>
-        prevSelected.filter(
+  console.log(selectedPartitions);
+  // console.log(selectedCesPartitions);
+  // console.log(selectedIcePartitions);
+
+  // 컴퓨터공학부 선택
+  const handleCesSelectChange = () => {
+    setSelectedPartitions(prevSelected => {
+      if (isCesSelected) {
+        // 이미 선택된 상태라면 해제
+        return prevSelected.filter(
           partition => !(partition.roomId === 1 || partition.roomId === 2),
-        ),
-      );
-      setIsCSSelected(false);
-    } else {
-      // 선택되지 않은 상태라면 추가
-      const csPartitions = partitions.filter(
-        partition => partition.roomId === 1 || partition.roomId === 2,
-      );
-      setSelectedPartitions(prevSelected => [...prevSelected, ...csPartitions]);
-      setIsCSSelected(true);
-    }
+        );
+      } else {
+        // 선택되지 않은 상태라면 기존 선택을 유지하면서 추가
+        const csPartitions = partitions.filter(
+          partition => partition.roomId === 1 || partition.roomId === 2,
+        );
+        return [...prevSelected, ...csPartitions];
+      }
+    });
+
+    // 상태 변경을 한 번에 적용
+    setIsCesSelected(prevState => !prevState);
   };
 
-  const handleECESelectChange = () => {
-    if (isECESelected) {
+  // 정보통신공학과 선택
+  const handleIceSelectChange = () => {
+    if (isIceSelected) {
       setSelectedPartitions(prevSelected =>
         prevSelected.filter(
           partition => !(partition.roomId === 3 || partition.roomId === 4),
         ),
       );
-      setIsECESelected(false);
+      setIsIceSelected(false);
     } else {
       const ecePartitions = partitions.filter(
         partition => partition.roomId === 3 || partition.roomId === 4,
@@ -82,7 +91,7 @@ const SelectRoom = () => {
         ...prevSelected,
         ...ecePartitions,
       ]);
-      setIsECESelected(true);
+      setIsIceSelected(true);
     }
   };
 
@@ -124,8 +133,8 @@ const SelectRoom = () => {
               id="select-cs"
               type="checkbox"
               className="w-4 h-4 bg-gray-100 border-gray-300"
-              checked={isCSSelected}
-              onChange={handleCSSelectChange}
+              checked={isCesSelected}
+              onChange={handleCesSelectChange}
             />
             <label htmlFor="select-cs" className="ml-2 text-xl">
               컴퓨터공학부 선택
@@ -136,8 +145,8 @@ const SelectRoom = () => {
               id="select-ece"
               type="checkbox"
               className="w-4 h-4 bg-gray-100 border-gray-300"
-              checked={isECESelected}
-              onChange={handleECESelectChange}
+              checked={isIceSelected}
+              onChange={handleIceSelectChange}
             />
             <label htmlFor="select-ece" className="ml-2 text-xl">
               정보통신공학과 선택

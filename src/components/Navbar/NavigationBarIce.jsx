@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { Navbar } from 'flowbite-react';
 import Logo from '../../assets/logoIce.png';
 import useAuth from '../../hooks/useAuth';
-import { useServiceRole, useMyInfo } from '../../api/user.api';
+import { useServiceRole } from '../../api/user.api';
 
 const NavigationBarCes = () => {
   const { loggedIn, logout } = useAuth();
