@@ -59,8 +59,6 @@ const QrCheck = () => {
     me?.serviceRole === 'ADMIN'
       ? useAllRooms()
       : useRooms(roomId ? [roomId] : []);
-  // console.log(roomId);
-  // console.log(rooms);
 
   useEffect(() => {
     const checkAdminStatus = async () => {

@@ -28,22 +28,33 @@ const FetchBlockedUser = () => {
           <Table.HeadCell>학번</Table.HeadCell>
           <Table.HeadCell>이름</Table.HeadCell>
           <Table.HeadCell>학과</Table.HeadCell>
+          <Table.HeadCell>block 시작 날짜</Table.HeadCell>
+          <Table.HeadCell>block 종료 날짜</Table.HeadCell>
         </Table.Head>
         <Table.Body className="divide-y text-center">
-          {paginatedData?.map((user, index) => (
-            <Table.Row
-              key={index}
-              className="bg-white dark:border-gray-700 dark:bg-gray-800">
-              <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                {user.userId}
-              </Table.Cell>
-              <Table.Cell>{user.serial}</Table.Cell>
-              <Table.Cell>{user.name}</Table.Cell>
-              <Table.Cell>
-                {user.departmentId === 1 ? '컴퓨터공학부' : '정보통신공학과'}
-              </Table.Cell>
-            </Table.Row>
-          ))}
+          {paginatedData
+            ?.sort(
+              (a, b) =>
+                new Date(b.startBlockedDate) - new Date(a.startBlockedDate),
+            )
+            .map((user, index) => (
+              <Table.Row
+                key={index}
+                className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
+                  {user.userInfoResponse.userId}
+                </Table.Cell>
+                <Table.Cell>{user.userInfoResponse.serial}</Table.Cell>
+                <Table.Cell>{user.userInfoResponse.name}</Table.Cell>
+                <Table.Cell>
+                  {user.userInfoResponse.departmentId === 1
+                    ? '컴퓨터공학부'
+                    : '정보통신공학과'}
+                </Table.Cell>
+                <Table.Cell>{user.startBlockedDate}</Table.Cell>
+                <Table.Cell>{user.endBlockedDate}</Table.Cell>
+              </Table.Row>
+            ))}
         </Table.Body>
       </Table>
 

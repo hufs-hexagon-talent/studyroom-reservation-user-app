@@ -444,7 +444,7 @@ export const useProcessedState = () => {
 // [관리자] 블락당한 사용자들 조회
 const fetchBlockedUser = async () => {
   const blockedUser_res = await apiClient.get('/users/blocked');
-  return blockedUser_res.data.data.users;
+  return blockedUser_res.data.data.UserBlockedInfoResponses;
 };
 
 export const useBlockedUser = () => {
