@@ -22,6 +22,11 @@ const DivideAct = () => {
           className="inline-block text-xl hover:underline cursor-pointer pb-10">
           예약 조회하러 가기 &gt;
         </p>
+        <p
+          onClick={() => navigate('/blocked')}
+          className="inline-block text-xl hover:underline cursor-pointer pb-10">
+          블락 사용자 조회하러 가기 &gt;
+        </p>
       </div>
       <Modal
         show={openModal}

@@ -25,6 +25,7 @@ import EmailVerify from './pages/password/EmailVerify';
 import Schedule from './pages/manage/Schedule';
 import DivideAct from './pages/manage/DivideAct';
 import SerialCheck from './pages/manage/SerialCheck';
+import FetchBlockedUser from './pages/manage/FetchBlockedUser';
 
 const RouterComponent = () => {
   const { loggedIn } = useAuth();
@@ -72,6 +73,7 @@ const RouterComponent = () => {
                 <Route path="/visit" element={<CheckVisit />} />
                 <Route path="/schedule" element={<Schedule />} />
                 <Route path="/serialCheck" element={<SerialCheck />} />
+                <Route path="/blocked" element={<FetchBlockedUser />} />
               </>
             )}
             {loggedIn && serviceRole === 'RESIDENT' && (
