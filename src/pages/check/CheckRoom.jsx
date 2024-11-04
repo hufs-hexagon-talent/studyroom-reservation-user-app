@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Button as MuiButton,
   Popover,
@@ -57,6 +57,11 @@ const Check = () => {
     startIndex,
     startIndex + itemsPerPage,
   );
+
+  // count를 계산하고 NaN이 아닐 때만 사용할 수 있도록 안전한 변수를 생성합니다.
+  const pageCount = reservations
+    ? Math.ceil(reservations.length / itemsPerPage)
+    : 0;
 
   return (
     <div>
@@ -138,7 +143,7 @@ const Check = () => {
       </div>
 
       <Pagination
-        count={Math.ceil(reservations?.length / itemsPerPage)}
+        count={pageCount} // 안전한 pageCount 값을 전달합니다.
         page={currentPage}
         onChange={handlePageChange}
         shape="rounded"
@@ -167,12 +172,51 @@ const Check = () => {
             vertical: 'bottom',
             horizontal: 'left',
           }}>
-          <Typography sx={{ p: 2 }}>
-            {`* 현재 예약 취소 없이 세미나실을 방문하지 않은 횟수는 ${noShow}번 입니다.`}
-            <div className="text-red-700">
-              (3회 초과 시 세미나실 예약이 1개월 동안 제한 됩니다)
-            </div>
+          <Typography sx={{ px: 2, py: 1 }}>
+            {`* 현재 예약 취소 없이 세미나실을 방문하지 않은 횟수는 ${noShow?.noShowCount}번 입니다.`}
           </Typography>
+          <Typography sx={{ px: 3 }} className="text-red-700">
+            (3회 초과 시 세미나실 예약이 1개월 동안 제한 됩니다)
+          </Typography>
+          <div className="overflow-x-auto">
+            <Table>
+              <Table.Head className="text-black text-center">
+                <Table.HeadCell>출석 상태</Table.HeadCell>
+                <Table.HeadCell>날짜</Table.HeadCell>
+                <Table.HeadCell>호실</Table.HeadCell>
+                <Table.HeadCell>시작 시간</Table.HeadCell>
+                <Table.HeadCell>종료 시간</Table.HeadCell>
+              </Table.Head>
+              <Table.Body className="divide-y text-center">
+                {noShow?.reservationList.reservationInfoResponses.map(
+                  (reservation, index) => (
+                    <Table.Row
+                      key={index}
+                      className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                      <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
+                        {reservation.reservationState === 'NOT_VISITED'
+                          ? '미출석'
+                          : ''}
+                      </Table.Cell>
+                      <Table.Cell>
+                        {format(
+                          new Date(reservation.reservationStartTime),
+                          'yyyy-MM-dd',
+                        )}
+                      </Table.Cell>
+                      <Table.Cell>{`${reservation.roomName}-${reservation.partitionNumber}`}</Table.Cell>
+                      <Table.Cell>
+                        {format(reservation.reservationStartTime, 'HH:mm')}
+                      </Table.Cell>
+                      <Table.Cell>
+                        {format(reservation.reservationEndTime, 'HH:mm')}
+                      </Table.Cell>
+                    </Table.Row>
+                  ),
+                )}
+              </Table.Body>
+            </Table>
+          </div>
         </Popover>
       </div>
       <div className="flex justify-center items-center">

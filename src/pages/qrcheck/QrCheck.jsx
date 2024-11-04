@@ -36,11 +36,14 @@ const QrCheck = () => {
     if (me) {
       if (me.serviceRole === 'ADMIN') {
         setroomId(null);
-        //console.log(roomId);
       } else if (me.name === 'RESIDENT_306') {
         setroomId(1);
       } else if (me.name === 'RESIDENT_428') {
         setroomId(2);
+      } else if (me.name === 'RESIDENT_305') {
+        setroomId(3);
+      } else if (me.name === 'RESIDENT_409') {
+        setroomId(4);
       } else {
         setroomId(null);
         openSnackbar('유효하지 않은 사용자입니다');

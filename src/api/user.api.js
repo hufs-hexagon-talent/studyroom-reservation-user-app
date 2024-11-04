@@ -261,7 +261,7 @@ export const usePartitionsByRoomIds = roomIds => {
 // 노쇼 횟수
 const fetchNoShow = async () => {
   const noshow_res = await apiClient.get('/reservations/me/no-show');
-  return noshow_res.data.data.noShowCount;
+  return noshow_res.data.data;
 };
 
 export const useNoShow = () => {
