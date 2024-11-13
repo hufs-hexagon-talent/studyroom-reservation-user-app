@@ -8,7 +8,7 @@ import { queryClient } from '../index';
 
 // id, pw 확인할 때 쓰려고
 const fetchAllUsers = async () => {
-  const allUser_res = await apiClient.get('/users');
+  const allUser_res = await apiClient.get('/users/search');
   return allUser_res.data.data.items;
 };
 
@@ -377,22 +377,6 @@ export const useSchedules = () => {
   });
 };
 
-// 학번으로 사용자 예약들 조회
-export const fetchSerialReservation = async serial => {
-  const serialReservation_res = await apiClient.get(
-    `/reservations/admin/${serial}`,
-  );
-  return serialReservation_res.data.data.reservationInfoResponses;
-};
-
-export const useSerialReservation = serial => {
-  return useQuery({
-    queryKey: ['serialReservation', serial],
-    queryFn: () => fetchSerialReservation(serial),
-    enabled: false,
-  });
-};
-
 // visited로 변경
 export const useVisitedState = () => {
   return useMutation({
@@ -451,5 +435,52 @@ export const useBlockedUser = () => {
   return useQuery({
     queryKey: ['blockedUser'],
     queryFn: fetchBlockedUser,
+  });
+};
+
+// [관리자] 학번으로 특정 회원 정보 조회
+const fetchUserBySerial = async serial => {
+  const userBySerial_res = await apiClient.get(
+    `/users/search/by-serial?serial=${serial}`,
+  );
+  return userBySerial_res.data;
+};
+
+export const useUserBySerial = serial => {
+  return useQuery({
+    queryKey: ['userBySerial'],
+    queryFn: () => fetchUserBySerial(serial),
+    enabled: false,
+  });
+};
+
+// [관리자] 이름으로 특정 회원 정보 조회
+const fetchUserByName = async name => {
+  const userByName_res = await apiClient.get(
+    `/users/search/by-name?name=${name}`,
+  );
+  return userByName_res.data;
+};
+
+export const useUserByName = name => {
+  return useQuery({
+    queryKey: ['userByName'],
+    queryFn: () => fetchUserByName(name),
+    enabled: false,
+  });
+};
+
+// [관리자] userId로 사용자의 예약들 조회
+const fetchReservationsById = async userId => {
+  const reservationById_res = await apiClient.get(
+    `/reservations/admin/users/${userId}`,
+  );
+  return reservationById_res.data.data.reservationInfoResponses;
+};
+
+export const useReservationsById = userId => {
+  return useQuery({
+    queryKey: ['reservationsById'],
+    queryFn: () => fetchReservationsById(userId),
   });
 };

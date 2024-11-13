@@ -18,8 +18,8 @@ const FetchBlockedUser = () => {
   };
 
   return (
-    <div className="overflow-x-auto">
-      <div className="flex justify-center text-2xl my-20">
+    <div className="overflow-x-auto py-10">
+      <div className="flex justify-center text-2xl mb-10">
         블락 당한 사용자 조회
       </div>
       <Table>
@@ -30,6 +30,9 @@ const FetchBlockedUser = () => {
           <Table.HeadCell>학과</Table.HeadCell>
           <Table.HeadCell>block 시작 날짜</Table.HeadCell>
           <Table.HeadCell>block 종료 날짜</Table.HeadCell>
+          <Table.HeadCell>
+            <span className="sr-only">삭제</span>
+          </Table.HeadCell>
         </Table.Head>
         <Table.Body className="divide-y text-center">
           {paginatedData
@@ -53,6 +56,13 @@ const FetchBlockedUser = () => {
                 </Table.Cell>
                 <Table.Cell>{user.startBlockedDate}</Table.Cell>
                 <Table.Cell>{user.endBlockedDate}</Table.Cell>
+                <Table.Cell>
+                  <a
+                    href="#"
+                    className="font-medium text-cyan-600 hover:underline dark:text-cyan-500">
+                    Edit
+                  </a>
+                </Table.Cell>
               </Table.Row>
             ))}
         </Table.Body>

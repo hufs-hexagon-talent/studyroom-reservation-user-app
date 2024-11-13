@@ -25,7 +25,8 @@ import EmailVerify from './pages/password/EmailVerify';
 import Schedule from './pages/manage/Schedule';
 import DivideAct from './pages/manage/DivideAct';
 import SerialCheck from './pages/manage/SerialCheck';
-import FetchBlockedUser from './pages/manage/FetchBlockedUser';
+import FetchBlockedUser from './pages/manage/FetchBlockedUser';
+import FetchReservations from './pages/manage/FetchReservations';
 
 const RouterComponent = () => {
   const { loggedIn } = useAuth();
@@ -74,6 +75,10 @@ const RouterComponent = () => {
                 <Route path="/schedule" element={<Schedule />} />
                 <Route path="/serialCheck" element={<SerialCheck />} />
                 <Route path="/blocked" element={<FetchBlockedUser />} />
+                <Route
+                  path="/fetchReservations/:id"
+                  element={<FetchReservations />}
+                />
               </>
             )}
             {loggedIn && serviceRole === 'RESIDENT' && (

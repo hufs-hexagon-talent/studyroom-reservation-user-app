@@ -6,9 +6,13 @@ import {
   useReservationsByPartitions,
   usePartition,
   useAdminDeleteReservation,
+  useVisitedState,
+  useNotVisitedState,
+  useProcessedState,
 } from '../../api/user.api';
 import { Button, Table, Modal } from 'flowbite-react';
 import { HiOutlineExclamationCircle } from 'react-icons/hi';
+import { useSnackbar } from 'react-simple-snackbar';
 
 import Inko from 'inko';
 import { format } from 'date-fns';
@@ -22,7 +26,9 @@ const CheckVisit = () => {
   const [error, setError] = useState(null);
   const [fetchParams, setFetchParams] = useState(null);
   const [reservations, setReservations] = useState([]);
-  const [openModal, setOpenModal] = useState(null);
+  const [openDeleteModal, setOpenDeleteModal] = useState(null);
+  const [openEditModal, setOpenEditModal] = useState(null);
+  const [selectedReservationId, setSelectedReservationId] = useState(null);
 
   let inko = new Inko();
 
@@ -44,6 +50,22 @@ const CheckVisit = () => {
     refetch,
     isError: reservationsError,
   } = useReservationsByPartitions(fetchParams || {});
+  const { mutateAsync: visitedState } = useVisitedState();
+  const { mutateAsync: notVisitedState } = useNotVisitedState();
+  const { mutateAsync: processedState } = useProcessedState();
+
+  const [openErrorSnackbar] = useSnackbar({
+    position: 'top-right',
+    style: {
+      backgroundColor: '#FF3333', // 빨간색
+    },
+  });
+  const [openSuccessSnackbar] = useSnackbar({
+    position: 'top-right',
+    style: {
+      backgroundColor: '#4CAF50', // 초록색
+    },
+  });
 
   const partitionId = partitions
     ?.map(partition => partition.roomId)
@@ -107,6 +129,26 @@ const CheckVisit = () => {
     });
   };
 
+  const handleStateChange = async state => {
+    try {
+      if (state === 'notVisited') {
+        const response = await notVisitedState(selectedReservationId);
+        openSuccessSnackbar(response.message, 2500);
+      } else if (state === 'visited') {
+        const response = await visitedState(selectedReservationId);
+        openSuccessSnackbar(response.message, 2500);
+      } else if (state === 'processed') {
+        const response = await processedState(selectedReservationId);
+        openSuccessSnackbar(response.message, 2500);
+      }
+
+      const updatedReservations = await refetch();
+      setOpenEditModal(false); // Close modal after state change
+    } catch (error) {
+      openErrorSnackbar(error.response.data.errorMessage, 2500);
+    }
+  };
+
   return (
     <div className="flex flex-col">
       <div className="p-4">
@@ -136,6 +178,7 @@ const CheckVisit = () => {
           <div className="overflow-x-auto mt-4 mb-3 w-full">
             <Table hoverable className="mt-4 mb-3  text-black text-center">
               <Table.Head className="break-keep">
+                <Table.HeadCell>출석 상태 변경</Table.HeadCell>
                 <Table.HeadCell>출석 유무</Table.HeadCell>
                 <Table.HeadCell>호실</Table.HeadCell>
                 <Table.HeadCell>이름</Table.HeadCell>
@@ -155,13 +198,24 @@ const CheckVisit = () => {
                       key={reservation.reservationId}
                       className={reservation.reservationState === 'VISITED'}>
                       <Table.Cell>
+                        <a
+                          href="#"
+                          onClick={() => {
+                            setSelectedReservationId(reservation.reservationId); // reservationId 설정
+                            setOpenEditModal(true);
+                          }}
+                          className="font-bold text-blue-500 hover:underline dark:text-cyan-500">
+                          수정
+                        </a>
+                      </Table.Cell>
+                      <Table.Cell>
                         {reservation.reservationState === 'VISITED'
                           ? '출석'
                           : reservation.reservationState === 'NOT_VISITED'
                             ? '미출석'
                             : reservation.reservationState === 'PROCESSED'
                               ? '처리됨'
-                              : ''}
+                              : '-'}
                       </Table.Cell>
                       <Table.Cell>
                         {reservation.roomName}-{reservation.partitionNumber}
@@ -180,8 +234,10 @@ const CheckVisit = () => {
                         )}
                       </Table.Cell>
                       <Table.Cell
-                        onClick={() => setOpenModal(reservation.reservationId)}
-                        className="cursor-pointer hover:underline font-bold">
+                        onClick={() =>
+                          setOpenDeleteModal(reservation.reservationId)
+                        }
+                        className="cursor-pointer text-red-600 hover:underline font-bold">
                         삭제
                       </Table.Cell>
                     </Table.Row>
@@ -192,16 +248,17 @@ const CheckVisit = () => {
         )}
       </div>
       <div className="flex justify-center items-center">
+        {/* 예약 삭제 모달 */}
         <Modal
           className="flex justify-center items-center w-full p-4 sm:p-0"
-          show={openModal}
+          show={openDeleteModal}
           size="md"
           style={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
           }}
-          onClose={() => setOpenModal(false)}
+          onClose={() => setOpenDeleteModal(false)}
           popup>
           <Modal.Header />
           <Modal.Body>
@@ -211,20 +268,57 @@ const CheckVisit = () => {
                 해당 예약을 삭제하시겠습니까?
               </h3>
               <div className="flex justify-center gap-4">
-                <Button color="gray" onClick={() => setOpenModal(false)}>
+                <Button color="gray" onClick={() => setOpenDeleteModal(false)}>
                   취소
                 </Button>
                 <Button
                   color="failure"
                   onClick={() => {
-                    handleDelete(openModal);
-                    setOpenModal(null);
+                    handleDelete(setOpenDeleteModal);
+                    setOpenDeleteModal(null);
                   }}>
                   확인
                 </Button>
               </div>
             </div>
           </Modal.Body>
+        </Modal>
+        {/* 출석 상태 변경 모달 */}
+        <Modal
+          show={openEditModal}
+          onClose={() => setOpenEditModal(false)}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}>
+          <Modal.Header className="pr-24">
+            예약 상태 변경 유형 선택
+          </Modal.Header>
+          <Modal.Body>
+            <div className="flex flex-col space-y-6">
+              <p
+                className="inline-block text-lg hover:underline cursor-pointer"
+                onClick={() => handleStateChange('visited')}>
+                출석으로 변경
+              </p>
+              <p
+                className="inline-block text-lg hover:underline cursor-pointer"
+                onClick={() => handleStateChange('notVisited')}>
+                미출석으로 변경
+              </p>
+              <p
+                className="inline-block text-lg hover:underline cursor-pointer"
+                onClick={() => handleStateChange('processed')}>
+                처리됨으로 변경
+              </p>
+            </div>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button color="gray" onClick={() => setOpenDeleteModal(false)}>
+              취소
+            </Button>
+          </Modal.Footer>
         </Modal>
       </div>
     </div>
