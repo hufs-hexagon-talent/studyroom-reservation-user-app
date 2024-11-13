@@ -132,7 +132,7 @@ const FetchReservations = () => {
                     setSelectedReservationId(reservation.reservationId); // reservationId 설정
                     setOpenEditModal(true);
                   }}
-                  className="font-bold text-blue-500 hover:underline dark:text-cyan-500">
+                  className="font-bold text-blue-500 cursor-pointer hover:underline dark:text-cyan-500">
                   수정
                 </a>
               </Table.Cell>

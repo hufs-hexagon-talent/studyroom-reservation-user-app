@@ -438,6 +438,16 @@ export const useBlockedUser = () => {
   });
 };
 
+// [관리자] 블락 당한 사용자 블락 해제
+export const useUnblocked = () => {
+  return useMutation({
+    mutationFn: async userId => {
+      const unblocked_res = await apiClient.post(`/users/unblocked/${userId}`);
+      return unblocked_res.data;
+    },
+  });
+};
+
 // [관리자] 학번으로 특정 회원 정보 조회
 const fetchUserBySerial = async serial => {
   const userBySerial_res = await apiClient.get(

@@ -1,21 +1,46 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Table } from 'flowbite-react';
 import { Pagination } from '@mui/material';
 
-import { useBlockedUser } from '../../api/user.api';
+import { useBlockedUser, useUnblocked } from '../../api/user.api';
 
 const FetchBlockedUser = () => {
   const { data: blocked } = useBlockedUser();
+  const { mutate: doUnblocked } = useUnblocked();
   const [currentPage, setCurrentPage] = useState(1);
+  const [error, setError] = useState(null);
+  const [blockedList, setBlockedList] = useState([]);
   const itemsPerPage = 5;
 
   // 현재 페이지에 해당하는 데이터 추출
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedData = blocked?.slice(startIndex, startIndex + itemsPerPage);
+  const paginatedData = blockedList.slice(
+    startIndex,
+    startIndex + itemsPerPage,
+  );
 
   const handleChangePage = (event, newPage) => {
     setCurrentPage(newPage);
   };
+
+  const handleUnblocked = userId => {
+    doUnblocked(userId, {
+      onSuccess: () => {
+        setBlockedList(prevBlockedList =>
+          prevBlockedList.filter(
+            user => user.userInfoResponse.userId !== userId,
+          ),
+        );
+      },
+      onError: error => setError(error),
+    });
+  };
+
+  useEffect(() => {
+    if (blocked) {
+      setBlockedList(blocked);
+    }
+  }, [blocked]);
 
   return (
     <div className="overflow-x-auto py-10">
@@ -58,9 +83,11 @@ const FetchBlockedUser = () => {
                 <Table.Cell>{user.endBlockedDate}</Table.Cell>
                 <Table.Cell>
                   <a
-                    href="#"
-                    className="font-medium text-cyan-600 hover:underline dark:text-cyan-500">
-                    Edit
+                    onClick={() =>
+                      handleUnblocked(user.userInfoResponse.userId)
+                    }
+                    className="font-medium text-red-600 cursor-pointer hover:underline dark:text-cyan-500">
+                    삭제
                   </a>
                 </Table.Cell>
               </Table.Row>
