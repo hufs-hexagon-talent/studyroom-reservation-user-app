@@ -39,7 +39,7 @@ const SerialCheck = () => {
       const isNumeric = !isNaN(input);
       const response = isNumeric ? await fetchBySerial() : await fetchByName();
 
-      if (response.data.isSuccess) {
+      if (response.data.isSuccess === true) {
         // 응답을 배열 형태로 통일
         const usersData = isNumeric
           ? [response.data.data] // 학번 조회 시 객체를 배열로 감싸기
@@ -47,8 +47,6 @@ const SerialCheck = () => {
 
         setUserInfo(usersData);
         openSuccessSnackbar(response.data.message, 2500);
-      } else {
-        openErrorSnackbar(response.message, 2500);
       }
     } catch (error) {
       openErrorSnackbar(error.message, 2500);
@@ -99,7 +97,7 @@ const SerialCheck = () => {
                       onClick={() =>
                         navigate(`/fetchReservations/${user.userId}`)
                       }
-                      className="font-medium text-blue-500 hover:underline dark:text-cyan-500">
+                      className="font-medium cursor-pointer text-blue-500 hover:underline dark:text-cyan-500">
                       예약 조회
                     </a>
                   </Table.Cell>
