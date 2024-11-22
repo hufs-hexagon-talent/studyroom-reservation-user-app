@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
   Button as MuiButton,
   Popover,
@@ -15,12 +15,14 @@ import {
   useUserReservation,
   useNoShow,
   useMyInfo,
+  useBlockedPeriod,
 } from '../../api/user.api';
 
 const Check = () => {
   const { data: noShow } = useNoShow();
   const { data: reservations } = useUserReservation();
   const { data: me } = useMyInfo();
+  const { data: blockedPeriod } = useBlockedPeriod();
   const { mutate: deleteReservation } = useDeleteReservation();
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -178,6 +180,11 @@ const Check = () => {
           <Typography sx={{ px: 3 }} className="text-red-700">
             (3회 초과 시 세미나실 예약이 1개월 동안 제한 됩니다)
           </Typography>
+          {me?.serviceRole === 'BLOCKED' && (
+            <Typography sx={{ px: 3, py: 1 }}>
+              {`현재 블락 기간 : ${blockedPeriod?.startBlockedDate} ~ ${blockedPeriod?.endBlockedDate}`}
+            </Typography>
+          )}
           <div className="overflow-x-auto">
             <Table>
               <Table.Head className="text-black text-center">

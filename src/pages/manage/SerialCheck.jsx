@@ -89,8 +89,8 @@ const SerialCheck = () => {
                   className="bg-white dark:border-gray-700 dark:bg-gray-800">
                   <Table.Cell>{user.serviceRole}</Table.Cell>
                   <Table.Cell>{user.name}</Table.Cell>
-                  <Table.Cell>{user.serial}</Table.Cell>
-                  <Table.Cell>{user.email}</Table.Cell>
+                  <Table.Cell>{user.serial || '-'}</Table.Cell>
+                  <Table.Cell>{user.email || '-'}</Table.Cell>
                   <Table.Cell>{user.departmentName || '-'}</Table.Cell>
                   <Table.Cell>
                     <a

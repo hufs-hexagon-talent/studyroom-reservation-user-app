@@ -234,9 +234,10 @@ const CheckVisit = () => {
                         )}
                       </Table.Cell>
                       <Table.Cell
-                        onClick={() =>
-                          setOpenDeleteModal(reservation.reservationId)
-                        }
+                        onClick={() => {
+                          setSelectedReservationId(reservation.reservationId);
+                          setOpenDeleteModal(reservation.reservationId);
+                        }}
                         className="cursor-pointer text-red-600 hover:underline font-bold">
                         삭제
                       </Table.Cell>
@@ -274,7 +275,7 @@ const CheckVisit = () => {
                 <Button
                   color="failure"
                   onClick={() => {
-                    handleDelete(setOpenDeleteModal);
+                    handleDelete(selectedReservationId);
                     setOpenDeleteModal(null);
                   }}>
                   확인

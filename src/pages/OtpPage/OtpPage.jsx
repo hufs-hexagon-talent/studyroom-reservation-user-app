@@ -1,9 +1,8 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import QRCode from 'qrcode.react';
 
 import { useOtp, useMyInfo } from '../../api/user.api';
 
-// jhjhjh
 const TimerCircularProgressBar = ({ radius, strokeWidth, progress }) => {
   const center = radius + strokeWidth / 2;
   const circumference = 2 * Math.PI * radius;
@@ -44,6 +43,7 @@ const Qrcode = () => {
 
   useEffect(() => {
     console.log(dataUpdatedAt);
+    console.log(otpValue);
     const intervalId = setInterval(refetch, 30000);
 
     return () => clearInterval(intervalId);
@@ -55,7 +55,7 @@ const Qrcode = () => {
       setRadius(newRadius);
     };
 
-    handleResize();
+    handleResize(1162);
 
     window.addEventListener('resize', handleResize);
 

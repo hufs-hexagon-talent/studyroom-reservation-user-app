@@ -53,14 +53,15 @@ const RouterComponent = () => {
         <div className="flex-grow">
           <Routes>
             <Route path="/" element={<RoomPage />} />
-            {loggedIn && serviceRole === 'USER' && (
-              <>
-                <Route path="/notice" element={<Notice />} />
-                <Route path="/check" element={<Check />} />
-                <Route path="/otp" element={<OtpPage />} />
-                <Route path="/password" element={<LoggedInPassword />} />
-              </>
-            )}
+            {loggedIn &&
+              (serviceRole === 'USER' || serviceRole === 'BLOCKED') && (
+                <>
+                  <Route path="/notice" element={<Notice />} />
+                  <Route path="/check" element={<Check />} />
+                  <Route path="/otp" element={<OtpPage />} />
+                  <Route path="/password" element={<LoggedInPassword />} />
+                </>
+              )}
             {loggedIn && serviceRole === 'ADMIN' && (
               <>
                 <Route path="/notice" element={<Notice />} />

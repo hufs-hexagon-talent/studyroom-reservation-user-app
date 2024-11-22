@@ -153,7 +153,7 @@ export const useUserReservation = () =>
 
 export const fetchOtp = async () => {
   const otp_response = await apiClient.post('/check-in/otp');
-
+  console.log('otp_response.data.data.verificationCode', otp_response.data);
   return otp_response.data.data.verificationCode;
 };
 
@@ -492,5 +492,17 @@ export const useReservationsById = userId => {
   return useQuery({
     queryKey: ['reservationsById'],
     queryFn: () => fetchReservationsById(userId),
+  });
+};
+
+const fetchBlockedPeriod = async () => {
+  const blockedPreiod_res = await apiClient.get('/users/me/blocked-period');
+  return blockedPreiod_res.data.data;
+};
+
+export const useBlockedPeriod = () => {
+  return useQuery({
+    queryKey: ['blockedPeriod'],
+    queryFn: fetchBlockedPeriod,
   });
 };
