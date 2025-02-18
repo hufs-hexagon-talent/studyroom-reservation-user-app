@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAllPartitions } from '../../api/user.api';
 import { useNavigate } from 'react-router-dom';
 import { Button } from 'flowbite-react';
@@ -8,6 +8,10 @@ const SelectRoom = () => {
   const [selectedPartitions, setSelectedPartitions] = useState([]);
   const [isAllSelected, setIsAllSelected] = useState(false);
   const navigate = useNavigate();
+
+  const cesPartitions = partitions?.filter(
+    partition => partition.roomId === 1 || partition.roomId === 2,
+  );
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -36,7 +40,7 @@ const SelectRoom = () => {
       setSelectedPartitions([]);
       setIsAllSelected(false);
     } else {
-      setSelectedPartitions(partitions);
+      setSelectedPartitions(cesPartitions);
       setIsAllSelected(true);
     }
   };
@@ -49,7 +53,7 @@ const SelectRoom = () => {
   };
 
   // roomName별로 그룹화
-  const groupedPartitions = partitions.reduce((acc, partition) => {
+  const groupedPartitions = cesPartitions.reduce((acc, partition) => {
     const roomName = partition.roomName;
     if (!acc[roomName]) {
       acc[roomName] = [];
@@ -63,10 +67,16 @@ const SelectRoom = () => {
       <div className="mt-10 text-2xl text-center">
         예약 조회를 원하는 방을 선택하세요
       </div>
+
       <div className="flex justify-center mt-12">
         <div className="flex flex-col">
-          {Object.entries(groupedPartitions).map(
-            ([roomName, roomPartitions]) => (
+          {Object.entries(groupedPartitions)
+            .filter(([roomName, roomPartitions]) =>
+              roomPartitions.some(
+                partition => partition.roomId === 1 || partition.roomId === 2,
+              ),
+            )
+            .map(([roomName, roomPartitions]) => (
               <div key={roomName} className="mb-6">
                 <div className="text-xl font-bold mb-2">{roomName}호</div>
                 {roomPartitions.map(partition => (
@@ -91,9 +101,7 @@ const SelectRoom = () => {
                   </div>
                 ))}
               </div>
-            ),
-          )}
-
+            ))}
           <div className="flex items-center mb-4">
             <input
               id="select-all"

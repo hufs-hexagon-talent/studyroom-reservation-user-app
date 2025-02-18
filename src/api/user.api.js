@@ -235,6 +235,7 @@ export const useAllPartitions = () =>
         partitionId: partition.roomPartitionId,
         partitionNumber: partition.partitionNumber,
         roomName: partition.roomName,
+        roomId: partition.roomId,
       }));
     },
   });
@@ -384,7 +385,6 @@ export const useVisitedState = () => {
           state: 'VISITED',
         },
       );
-      console.log('ok');
       return changeState_res.data;
     },
   });
