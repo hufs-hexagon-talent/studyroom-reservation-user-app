@@ -102,7 +102,7 @@ const EmailVerify = () => {
       }, 2500);
     }
   };
-
+  // todo : 인증번호 발송 실패했을 때 버튼이 안눌려지는 문제
   return (
     <div className="flex flex-col items-center w-screen p-5">
       <h1

@@ -22,7 +22,8 @@ const Check = () => {
   const { data: noShow } = useNoShow();
   const { data: reservations } = useUserReservation();
   const { data: me } = useMyInfo();
-  const { data: blockedPeriod } = useBlockedPeriod();
+  const { data: blockedPeriod, refetch: fetchBlockedPeriod } =
+    useBlockedPeriod();
   const { mutate: deleteReservation } = useDeleteReservation();
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -30,8 +31,19 @@ const Check = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [openModal, setOpenModal] = useState(null);
 
-  const handleClick = event => {
+  const handleMuiBtnClick = event => {
     setAnchorEl(event.currentTarget);
+  };
+
+  const handlePopoverClick = async e => {
+    if (anchorEl) {
+      // Popover이 열려 있는 경우 닫기만 하고 API를 다시 호출하지 않음
+      setAnchorEl(null);
+    } else {
+      // Popover을 열 때만 API 호출
+      setAnchorEl(e.currentTarget);
+      await fetchBlockedPeriod();
+    }
   };
 
   const handleClose = () => {
@@ -64,7 +76,7 @@ const Check = () => {
   const pageCount = reservations
     ? Math.ceil(reservations.length / itemsPerPage)
     : 0;
-
+  console.log(blockedPeriod?.data.startBlockedDate);
   return (
     <div>
       <div className="flex justify-center text-2xl mt-20">
@@ -162,7 +174,7 @@ const Check = () => {
           }}
           aria-describedby={id}
           variant="contained"
-          onClick={handleClick}>
+          onClick={handleMuiBtnClick}>
           내 노쇼 현황
         </MuiButton>
         <Popover
@@ -170,6 +182,7 @@ const Check = () => {
           open={open}
           anchorEl={anchorEl}
           onClose={handleClose}
+          onClick={handlePopoverClick}
           anchorOrigin={{
             vertical: 'bottom',
             horizontal: 'left',
@@ -180,11 +193,15 @@ const Check = () => {
           <Typography sx={{ px: 3 }} className="text-red-700">
             (3회 초과 시 세미나실 예약이 1개월 동안 제한 됩니다)
           </Typography>
-          {me?.serviceRole === 'BLOCKED' && (
+          {me?.serviceRole === 'BLOCKED' && blockedPeriod?.data && (
             <Typography sx={{ px: 3, py: 1 }}>
-              {`현재 블락 기간 : ${blockedPeriod?.startBlockedDate} ~ ${blockedPeriod?.endBlockedDate}`}
+              {blockedPeriod?.data?.startBlockedDate &&
+              blockedPeriod?.data?.endBlockedDate
+                ? `현재 블락 기간 : ${blockedPeriod.data.startBlockedDate} ~ ${blockedPeriod.data.endBlockedDate}`
+                : '블락 정보가 없습니다.'}
             </Typography>
           )}
+
           <div className="overflow-x-auto">
             <Table>
               <Table.Head className="text-black text-center">

@@ -496,8 +496,16 @@ export const useReservationsById = userId => {
 };
 
 const fetchBlockedPeriod = async () => {
-  const blockedPreiod_res = await apiClient.get('/users/me/blocked-period');
-  return blockedPreiod_res.data.data;
+  try {
+    const blockedPreiod_res = await apiClient.get('/users/me/blocked-period');
+    return blockedPreiod_res.data;
+  } catch (error) {
+    if (error.response && error.response.status === 400) {
+      console.warn('사용자가 블락 상태가 아님:', error.response.data.message);
+      return undefined; // 400 에러 발생 시 undefined 반환
+    }
+    throw error; // 다른 에러는 그대로 throw
+  }
 };
 
 export const useBlockedPeriod = () => {
