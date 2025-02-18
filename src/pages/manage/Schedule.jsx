@@ -23,6 +23,7 @@ const Schedule = () => {
   const [selectedDates, setSelectedDates] = useState([]);
   const [selectedRooms, setSelectedRooms] = useState([]);
   registerLocale('ko', ko);
+  console.log(rooms);
 
   const [openErrorSnackbar, closeErrorSnackbar] = useSnackbar({
     position: 'top-right',
@@ -193,18 +194,20 @@ const Schedule = () => {
         <div className="flex items-center flex-col w-1/2">
           <div className="pt-10 pb-6 font-bold text-lg">호실 선택</div>
           <div>
-            {rooms?.map(room => (
-              <div key={room.roomId} className="flex items-center mb-3">
-                <Checkbox
-                  id={room.roomId}
-                  checked={selectedRooms.includes(room.roomId)}
-                  onChange={() => handleRoomCheckbox(room.roomId)}
-                />
-                <label htmlFor={room.roomId} className="ml-2">
-                  {room.roomName}호
-                </label>
-              </div>
-            ))}
+            {rooms
+              .filter(room => room.departmentId === 1)
+              .map(room => (
+                <div key={room.roomId} className="flex items-center mb-3">
+                  <Checkbox
+                    id={room.roomId}
+                    checked={selectedRooms.includes(room.roomId)}
+                    onChange={() => handleRoomCheckbox(room.roomId)}
+                  />
+                  <label htmlFor={room.roomId} className="ml-2">
+                    {room.roomName}호
+                  </label>
+                </div>
+              ))}
           </div>
         </div>
       </div>

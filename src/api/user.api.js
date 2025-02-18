@@ -50,6 +50,7 @@ export const useServiceRole = () => {
   return useQuery({
     queryKey: ['serviceRole'],
     queryFn: fetchServiceRole,
+    enabled: false,
   });
 };
 
@@ -187,14 +188,10 @@ export const fetchRoom = async roomId => {
   return room_response.data.data;
 };
 
-export const useRooms = roomIds =>
+export const useRooms = roomId =>
   useQuery({
-    queryKey: ['rooms', roomIds],
-    queryFn: async () => {
-      if (!roomIds || roomIds.length === 0) return [];
-      const rooms = await Promise.all(roomIds.map(roomId => fetchRoom(roomId)));
-      return rooms;
-    },
+    queryKey: ['rooms', roomId],
+    queryFn: () => fetchRoom(roomId),
   });
 
 // 체크인 하기

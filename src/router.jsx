@@ -45,11 +45,7 @@ const RouterComponent = () => {
   return (
     <BrowserRouter basename={process.env.REACT_APP_BASEURL || '/'}>
       <div className="min-h-screen flex flex-col">
-        {domain === 'ces' ? (
-          <NavigationBarCes showSnackbar={openSnackbar} />
-        ) : domain === 'ice' ? (
-          <NavigationBarIce showSnackbar={openSnackbar} />
-        ) : null}
+        <NavigationBarCes showSnackbar={openSnackbar} />
         <div className="flex-grow">
           <Routes>
             <Route path="/" element={<RoomPage />} />
@@ -106,11 +102,7 @@ const RouterComponent = () => {
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </div>
-        {domain === 'ces' ? (
-          <FooterCes showSnackbar={openSnackbar} />
-        ) : domain === 'ice' ? (
-          <FooterIce showSnackbar={openSnackbar} />
-        ) : null}
+        <FooterCes showSnackbar={openSnackbar} />
       </div>
     </BrowserRouter>
   );

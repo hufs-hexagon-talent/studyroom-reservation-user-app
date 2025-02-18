@@ -6,10 +6,10 @@ import { useServiceRole } from '../../api/user.api';
 
 const NavigationBarCes = () => {
   const { loggedIn, logout } = useAuth();
-  const { data: serviceRole, refetch } = useServiceRole();
+  const { data: serviceRole, refetch, isFetching } = useServiceRole();
 
   useEffect(() => {
-    if (loggedIn) {
+    if (loggedIn && !isFetching) {
       refetch();
     }
   }, [loggedIn, refetch]);
