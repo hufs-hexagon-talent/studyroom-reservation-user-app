@@ -50,7 +50,6 @@ export const useServiceRole = () => {
   return useQuery({
     queryKey: ['serviceRole'],
     queryFn: fetchServiceRole,
-    enabled: false,
   });
 };
 

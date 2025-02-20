@@ -1,16 +1,10 @@
 import React from 'react';
-import { useDomain } from '../../contexts/DomainContext';
 
 const Notice = () => {
-  const { domain } = useDomain();
-
-  const translatedDomain = domain === 'ces' ? '컴퓨터공학부' : '정보통신공학과';
-  const roomDomain = domain === 'ces' ? ['306', '428'] : ['305', '409'];
-
   return (
     <div className="flex-grow px-8 break-keep">
       <div className="font-bold mt-10 text-2xl text-center break-keep">
-        {translatedDomain} 세미나실 이용 규칙 및 예약 주의 사항
+        컴퓨터공학부 세미나실 이용 규칙 및 예약 주의 사항
       </div>
 
       <div>
@@ -36,9 +30,8 @@ const Notice = () => {
         <div className="mt-6 ml-3">
           <div>
             예약한 시간 (예약 시작 시간의 15분 전 ~ 예약 종료 시간)에 맞추어서
-            해당 세미나실 ({roomDomain[0]}호 또는 {roomDomain[1]}호) 에 방문
-            하여 비치되어 있는 스캐너에 본인의 QR코드를 찍으면 출석 체크가
-            이루어집니다.
+            해당 세미나실 (306호 또는 428호) 에 방문 하여 비치되어 있는 스캐너에
+            본인의 QR코드를 찍으면 출석 체크가 이루어집니다.
           </div>
           <div className="mt-5">
             출석 여부는 &apos;내 신청현황&apos; 의 출석 여부에서 확인하실 수
@@ -68,9 +61,7 @@ const Notice = () => {
             회원 부여를 받지 못한 학생은 학부 사무실로 연락 주시기 바랍니다.
           </div>
         </div>
-        <div className="mb-20">
-          * 사용 관련 건의 및 문의 : {domain}@hufs.ac.kr
-        </div>
+        <div className="mb-20">* 사용 관련 건의 및 문의 : ces@hufs.ac.kr</div>
       </div>
     </div>
   );

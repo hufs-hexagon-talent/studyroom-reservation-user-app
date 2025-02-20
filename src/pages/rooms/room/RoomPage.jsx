@@ -90,10 +90,6 @@ const RoomPage = () => {
     return domain === 'ice' ? 2 : 1;
   });
 
-  useEffect(() => {
-    console.log(departmentId);
-  }, []);
-
   // domain에 따라 departmentId 설정
   useEffect(() => {
     if (!urlDepartmentId) {
@@ -315,7 +311,7 @@ const RoomPage = () => {
       <div id="container">
         <div id="head-container">
           <Typography
-            marginTop="50px"
+            marginTop="70px"
             variant="h5"
             fontWeight={450}
             component="div"
