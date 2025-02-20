@@ -1,11 +1,17 @@
 import React, { useState } from 'react';
 import { Checkbox, Table, Button } from 'flowbite-react';
-import { useAllPolicies, useAllRooms, useSchedules } from '../../api/user.api';
+import {
+  useAllPolicies,
+  useAllRooms,
+  useReservationsById,
+  useSchedules,
+} from '../../api/user.api';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import { ko } from 'date-fns/locale';
 import 'react-datepicker/dist/react-datepicker.css';
 import { format } from 'date-fns';
 import { useSnackbar } from 'react-simple-snackbar';
+import { useParams } from 'react-router-dom';
 
 const Schedule = () => {
   const { data: policies, refetch } = useAllPolicies();
@@ -17,6 +23,7 @@ const Schedule = () => {
   const [selectedDates, setSelectedDates] = useState([]);
   const [selectedRooms, setSelectedRooms] = useState([]);
   registerLocale('ko', ko);
+  console.log(rooms);
 
   const [openErrorSnackbar, closeErrorSnackbar] = useSnackbar({
     position: 'top-right',
@@ -94,8 +101,7 @@ const Schedule = () => {
       }, 3000);
     } catch (error) {
       openErrorSnackbar(
-        error.response?.data?.errorMessage ||
-          '스케줄 주입 중 오류가 발생했습니다.',
+        error.response?.data?.message || '스케줄 주입 중 오류가 발생했습니다.',
       );
       setTimeout(() => {
         closeErrorSnackbar();
@@ -125,18 +131,22 @@ const Schedule = () => {
               <Table.HeadCell>최대 사용 시간(분)</Table.HeadCell>
             </Table.Head>
             <Table.Body className="text-center divide-y">
-              {policies.data.items.map(policy => (
+              {policies.data.operationPolicyInfos.map(policy => (
                 <Table.Row
-                  key={policy.policyId}
+                  key={policy.roomOperationPolicyId}
                   className="bg-white dark:border-gray-700 dark:bg-gray-800">
                   <Table.Cell className="p-4">
                     <Checkbox
-                      checked={selectedPolicyId === policy.policyId}
-                      onChange={() => handlePolicyCheckBox(policy.policyId)}
+                      checked={
+                        selectedPolicyId === policy.roomOperationPolicyId
+                      }
+                      onChange={() =>
+                        handlePolicyCheckBox(policy.roomOperationPolicyId)
+                      }
                     />
                   </Table.Cell>
                   <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                    {policy.policyId}
+                    {policy.roomOperationPolicyId}
                   </Table.Cell>
                   <Table.Cell>{policy.operationStartTime}</Table.Cell>
                   <Table.Cell>{policy.operationEndTime}</Table.Cell>
@@ -184,18 +194,20 @@ const Schedule = () => {
         <div className="flex items-center flex-col w-1/2">
           <div className="pt-10 pb-6 font-bold text-lg">호실 선택</div>
           <div>
-            {rooms?.map(room => (
-              <div key={room.roomId} className="flex items-center mb-3">
-                <Checkbox
-                  id={room.roomId}
-                  checked={selectedRooms.includes(room.roomId)}
-                  onChange={() => handleRoomCheckbox(room.roomId)}
-                />
-                <label htmlFor={room.roomId} className="ml-2">
-                  {room.roomName}호
-                </label>
-              </div>
-            ))}
+            {rooms
+              .filter(room => room.departmentId === 1)
+              .map(room => (
+                <div key={room.roomId} className="flex items-center mb-3">
+                  <Checkbox
+                    id={room.roomId}
+                    checked={selectedRooms.includes(room.roomId)}
+                    onChange={() => handleRoomCheckbox(room.roomId)}
+                  />
+                  <label htmlFor={room.roomId} className="ml-2">
+                    {room.roomName}호
+                  </label>
+                </div>
+              ))}
           </div>
         </div>
       </div>
@@ -212,3 +224,48 @@ const Schedule = () => {
 };
 
 export default Schedule;
+export const fetchReservations = () => {
+  const { id } = useParams();
+  const { data: reservations } = useReservationsById(id);
+  return (
+    <div className="overflow-x-auto">
+      <h1 className="flex justify-center text-2xl m-10">
+        {reservations[0]?.name}님의 예약
+      </h1>
+      <Table className="my-10">
+        <Table.Head className="break-keep text-center">
+          <Table.HeadCell>출석 상태</Table.HeadCell>
+          <Table.HeadCell>예약 ID</Table.HeadCell>
+          <Table.HeadCell>호실</Table.HeadCell>
+          <Table.HeadCell>시작 시간</Table.HeadCell>
+          <Table.HeadCell>종료 시간</Table.HeadCell>
+          todo : 예약 삭제 & 출석 상태 변경
+          <Table.HeadCell>예약 삭제</Table.HeadCell>
+          <Table.HeadCell>출석 상태 변경</Table.HeadCell>
+        </Table.Head>
+        <Table.Body className="divide-y text-center">
+          {reservations?.map(reservation => (
+            <Table.Row
+              key={reservation.reservationId}
+              className="bg-white dark:border-gray-700 dark:bg-gray-800">
+              <Table.Cell>{reservation.reservationState}</Table.Cell>
+              <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
+                {reservation.reservationId}
+              </Table.Cell>
+              <Table.Cell>
+                {reservation.roomName}-{reservation.partitionNumber}
+              </Table.Cell>
+
+              <Table.Cell>
+                {format(new Date(reservation.reservationStartTime), 'HH:mm')}
+              </Table.Cell>
+              <Table.Cell>
+                {format(new Date(reservation.reservationEndTime), 'HH:mm')}
+              </Table.Cell>
+            </Table.Row>
+          ))}
+        </Table.Body>
+      </Table>
+    </div>
+  );
+};

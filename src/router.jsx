@@ -2,9 +2,12 @@ import React from 'react';
 import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
 import { useSnackbar } from 'react-simple-snackbar';
 import { useServiceRole } from './api/user.api';
+import { useDomain } from './contexts/DomainContext';
 
-import Footer from './components/footer/Footer';
-import NavigationBar from './components/Navbar/NavigationBar';
+import FooterCes from './components/footer/FooterCes';
+import FooterIce from './components/footer/FooterIce';
+import NavigationBarCes from './components/Navbar/NavigationBarCes';
+import NavigationBarIce from './components/Navbar/NavigationBarIce';
 import Check from './pages/check/CheckRoom';
 import LoginPage from './pages/login/LoginPage';
 import Notice from './pages/notice/notice';
@@ -22,9 +25,12 @@ import EmailVerify from './pages/password/EmailVerify';
 import Schedule from './pages/manage/Schedule';
 import DivideAct from './pages/manage/DivideAct';
 import SerialCheck from './pages/manage/SerialCheck';
+import FetchBlockedUser from './pages/manage/FetchBlockedUser';
+import FetchReservations from './pages/manage/FetchReservations';
 
 const RouterComponent = () => {
   const { loggedIn } = useAuth();
+  const { domain } = useDomain();
   const { data: serviceRole, isLoading } = useServiceRole();
   const [openSnackbar] = useSnackbar({
     position: 'top-right',
@@ -39,18 +45,19 @@ const RouterComponent = () => {
   return (
     <BrowserRouter basename={process.env.REACT_APP_BASEURL || '/'}>
       <div className="min-h-screen flex flex-col">
-        <NavigationBar />
+        <NavigationBarCes showSnackbar={openSnackbar} />
         <div className="flex-grow">
           <Routes>
             <Route path="/" element={<RoomPage />} />
-            {loggedIn && serviceRole === 'USER' && (
-              <>
-                <Route path="/notice" element={<Notice />} />
-                <Route path="/check" element={<Check />} />
-                <Route path="/otp" element={<OtpPage />} />
-                <Route path="/password" element={<LoggedInPassword />} />
-              </>
-            )}
+            {loggedIn &&
+              (serviceRole === 'USER' || serviceRole === 'BLOCKED') && (
+                <>
+                  <Route path="/notice" element={<Notice />} />
+                  <Route path="/check" element={<Check />} />
+                  <Route path="/otp" element={<OtpPage />} />
+                  <Route path="/password" element={<LoggedInPassword />} />
+                </>
+              )}
             {loggedIn && serviceRole === 'ADMIN' && (
               <>
                 <Route path="/notice" element={<Notice />} />
@@ -64,6 +71,11 @@ const RouterComponent = () => {
                 <Route path="/visit" element={<CheckVisit />} />
                 <Route path="/schedule" element={<Schedule />} />
                 <Route path="/serialCheck" element={<SerialCheck />} />
+                <Route path="/blocked" element={<FetchBlockedUser />} />
+                <Route
+                  path="/fetchReservations/:id"
+                  element={<FetchReservations />}
+                />
               </>
             )}
             {loggedIn && serviceRole === 'RESIDENT' && (
@@ -90,7 +102,7 @@ const RouterComponent = () => {
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </div>
-        <Footer showSnackbar={openSnackbar} />
+        <FooterCes showSnackbar={openSnackbar} />
       </div>
     </BrowserRouter>
   );

@@ -49,12 +49,13 @@ const LoggedOutPassword = () => {
       openSuccessSnackbar('비밀번호가 성공적으로 변경되었습니다.', 2500);
     } catch (error) {
       openErrorSnackbar(
-        '비밀번호 변경에 실패했습니다. 다시 시도해 주세요.',
+        error.response?.data?.message ||
+          '비밀번호 변경에 실패했습니다. 다시 시도해 주세요.',
         2500,
       );
     }
   };
-
+  //todo : 비밀번호 보이게 하는거
   return (
     <div>
       <div className="flex flex-col items-center justify-center">

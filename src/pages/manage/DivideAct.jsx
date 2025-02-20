@@ -18,40 +18,21 @@ const DivideAct = () => {
           스케줄 설정하러 가기 &gt;
         </p>
         <p
-          onClick={() => setOpenModal(true)}
+          onClick={() => navigate('/selectPartition')}
           className="inline-block text-xl hover:underline cursor-pointer pb-10">
-          예약 조회하러 가기 &gt;
+          예약 조회 및 출석 상태 수정 &gt;
+        </p>
+        <p
+          onClick={() => navigate('/serialCheck')}
+          className="inline-block text-xl hover:underline cursor-pointer pb-10">
+          학번으로 사용자 정보 조회 &gt;
+        </p>
+        <p
+          onClick={() => navigate('/blocked')}
+          className="inline-block text-xl hover:underline cursor-pointer pb-10">
+          블락 사용자 조회하러 가기 &gt;
         </p>
       </div>
-      <Modal
-        show={openModal}
-        onClose={() => setOpenModal(false)}
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}>
-        <Modal.Header>예약 조회 방법 선택</Modal.Header>
-        <Modal.Body>
-          <div className="flex flex-col space-y-6">
-            <p
-              onClick={() => navigate('/selectPartition')}
-              className="inline-block text-lg hover:underline cursor-pointer">
-              호실 및 날짜로 예약 조회하러 가기 &gt;
-            </p>
-            <p
-              onClick={() => navigate('/serialCheck')}
-              className="inline-block text-lg hover:underline cursor-pointer">
-              학번으로 예약 조회하러 가기 &gt;
-            </p>
-          </div>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button color="gray" onClick={() => setOpenModal(false)}>
-            취소
-          </Button>
-        </Modal.Footer>
-      </Modal>
     </div>
   );
 };

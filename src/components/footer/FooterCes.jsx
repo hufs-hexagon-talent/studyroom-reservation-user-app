@@ -1,11 +1,11 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useServiceRole } from '../../api/user.api';
 import { useSnackbar } from 'react-simple-snackbar';
 import useAuth from '../../hooks/useAuth';
 import './Footer.css';
 
-const Footer = () => {
+const FooterCes = () => {
   const [openSnackbar, closeSnackbar] = useSnackbar({
     position: 'top-right',
     style: {
@@ -88,4 +88,4 @@ const Footer = () => {
   );
 };
 
-export default Footer;
+export default FooterCes;

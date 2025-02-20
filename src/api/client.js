@@ -10,9 +10,9 @@ const baseUrl =
   process.env.REACT_APP_API_URL || 'https://api.studyroom.computer.hufs.ac.kr';
 
 export const apiClient = axios.create({
-  baseURL: baseUrl,
+baseURL: 'https://api.studyroom-qa.alpaon.net/',
   headers: {
-    Authorization: `Bearer ${getAuthState()?.accessToken}`, // 수정된 부분
+    Authorization: `Bearer ${getAuthState()?.accessToken}`,
   },
 });
 
@@ -54,10 +54,13 @@ apiClient.interceptors.response.use(
 
       try {
         // 리프레시 토큰으로 액세스 토큰 갱신
-        const response = await axios.post(`${baseUrl}/auth/refresh`, {
-          refresh_token: refreshToken, // 올바른 키 사용
-        });
-        const accessToken = response.data.data.access_token;
+const response = await axios.post(
+          'https://api.studyroom-qa.alpaon.net/auth/refresh',
+          {
+            refresh_token: refreshToken, // 올바른 키 사용
+          },
+        );
+        const accessToken = response.data.data.accessToken;
 
         // authState 업데이트
         const updatedAuthState = {

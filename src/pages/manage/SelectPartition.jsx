@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAllPartitions } from '../../api/user.api';
 import { useNavigate } from 'react-router-dom';
 import { Button } from 'flowbite-react';
@@ -6,8 +6,12 @@ import { Button } from 'flowbite-react';
 const SelectRoom = () => {
   const { data: partitions, error, isLoading } = useAllPartitions();
   const [selectedPartitions, setSelectedPartitions] = useState([]);
-  const [isAllSelected, setIsAllSelected] = useState(false); // 전체 선택 상태 추가
+  const [isAllSelected, setIsAllSelected] = useState(false);
   const navigate = useNavigate();
+
+  const cesPartitions = partitions?.filter(
+    partition => partition.roomId === 1 || partition.roomId === 2,
+  );
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -17,7 +21,7 @@ const SelectRoom = () => {
     return <div>Error loading rooms.</div>;
   }
 
-  const handleCheckboxChange = partition => {
+  const handleAllCheckboxChange = partition => {
     setSelectedPartitions(prevSelectedRooms => {
       if (
         prevSelectedRooms.find(r => r.partitionId === partition.partitionId)
@@ -33,12 +37,10 @@ const SelectRoom = () => {
 
   const handleSelectAllChange = () => {
     if (isAllSelected) {
-      // 이미 전체 선택된 상태라면 선택을 모두 해제
       setSelectedPartitions([]);
       setIsAllSelected(false);
     } else {
-      // 전체 선택되지 않은 상태라면 모든 파티션 선택
-      setSelectedPartitions(partitions);
+      setSelectedPartitions(cesPartitions);
       setIsAllSelected(true);
     }
   };
@@ -50,32 +52,56 @@ const SelectRoom = () => {
     navigate(`/visit?partitionIds[]=${selectedPartitionIds.join(',')}`);
   };
 
+  // roomName별로 그룹화
+  const groupedPartitions = cesPartitions.reduce((acc, partition) => {
+    const roomName = partition.roomName;
+    if (!acc[roomName]) {
+      acc[roomName] = [];
+    }
+    acc[roomName].push(partition);
+    return acc;
+  }, {});
+
   return (
     <div className="p-10">
       <div className="mt-10 text-2xl text-center">
         예약 조회를 원하는 방을 선택하세요
       </div>
+
       <div className="flex justify-center mt-12">
         <div className="flex flex-col">
-          {partitions.map((partition, index) => (
-            <div className="flex items-center mb-4" key={index}>
-              <input
-                id={`box-${partition.partitionId}`}
-                type="checkbox"
-                value={partition.partitionId}
-                className="w-4 h-4 bg-gray-100 border-gray-300"
-                checked={selectedPartitions.some(
-                  p => p.partitionId === partition.partitionId,
-                )}
-                onChange={() => handleCheckboxChange(partition)}
-              />
-              <label
-                htmlFor={`box-${partition.partitionId}`}
-                className="ml-2 text-xl">
-                {`${partition.roomName}-${partition.partitionNumber}`}
-              </label>
-            </div>
-          ))}
+          {Object.entries(groupedPartitions)
+            .filter(([roomName, roomPartitions]) =>
+              roomPartitions.some(
+                partition => partition.roomId === 1 || partition.roomId === 2,
+              ),
+            )
+            .map(([roomName, roomPartitions]) => (
+              <div key={roomName} className="mb-6">
+                <div className="text-xl font-bold mb-2">{roomName}호</div>
+                {roomPartitions.map(partition => (
+                  <div
+                    className="flex items-center mb-2"
+                    key={partition.partitionId}>
+                    <input
+                      id={`box-${partition.partitionId}`}
+                      type="checkbox"
+                      value={partition.partitionId}
+                      className="w-4 h-4 bg-gray-100 border-gray-300"
+                      checked={selectedPartitions.some(
+                        p => p.partitionId === partition.partitionId,
+                      )}
+                      onChange={() => handleAllCheckboxChange(partition)}
+                    />
+                    <label
+                      htmlFor={`box-${partition.partitionId}`}
+                      className="ml-2 text-lg">
+                      {`${partition.roomName}-${partition.partitionNumber}`}
+                    </label>
+                  </div>
+                ))}
+              </div>
+            ))}
           <div className="flex items-center mb-4">
             <input
               id="select-all"

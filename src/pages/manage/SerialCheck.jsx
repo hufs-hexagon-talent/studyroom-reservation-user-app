@@ -1,121 +1,68 @@
 import React, { useState } from 'react';
-import { Button, Table, Checkbox, Modal } from 'flowbite-react';
-import {
-  useSerialReservation,
-  useAdminDeleteReservation,
-  useVisitedState,
-  useNotVisitedState,
-  useProcessedState,
-} from '../../api/user.api';
-import { format } from 'date-fns';
+import { Button, Table } from 'flowbite-react';
+import { useUserBySerial, useUserByName } from '../../api/user.api';
 import { useSnackbar } from 'react-simple-snackbar';
+import { useNavigate } from 'react-router-dom';
 
 const SerialCheck = () => {
-  const [openModal, setOpenModal] = useState(false);
-  const [serial, setSerial] = useState('');
-  const [reservation, setReservation] = useState([]);
-  const [selectedReservationId, setSelectedReservationId] = useState(null);
-  const [selectedStateChange, setSelectedStateChange] = useState(null); // New state to track selection
-  const { refetch } = useSerialReservation(serial);
-  const { mutateAsync: visitedState } = useVisitedState();
-  const { mutateAsync: notVisitedState } = useNotVisitedState();
-  const { mutateAsync: processedState } = useProcessedState();
-  const { mutateAsync: deleteReservation } = useAdminDeleteReservation();
-
+  const [input, setInput] = useState('');
+  const [userInfo, setUserInfo] = useState([]);
+  const { refetch: fetchBySerial } = useUserBySerial(input, { enabled: false });
+  const { refetch: fetchByName } = useUserByName(input, { enabled: false });
   const [openErrorSnackbar] = useSnackbar({
     position: 'top-right',
     style: {
-      backgroundColor: '#FF3333', // 빨간색
+      backgroundColor: '#FF3333',
     },
   });
   const [openSuccessSnackbar] = useSnackbar({
     position: 'top-right',
     style: {
-      backgroundColor: '#4CAF50', // 초록색
+      backgroundColor: '#4CAF50',
     },
   });
+  const navigate = useNavigate();
 
-  const changeSerial = e => {
-    setSerial(e.target.value);
+  // input 변경 시 호출
+  const handleChange = e => {
+    setInput(e.target.value);
   };
 
-  const handleKeyPress = e => {
-    if (e.key === 'Enter') {
-      handleFetchBtn();
-    }
-  };
-
+  // 조회 버튼 클릭 시 호출
   const handleFetchBtn = async () => {
-    if (!serial) {
-      openErrorSnackbar('학번을 입력해주세요', 2500);
-    }
-
-    if (serial) {
-      const response = await refetch();
-      setReservation(response.data);
-    }
-  };
-
-  const handlePatchBtn = () => {
-    if (!selectedReservationId) {
-      openErrorSnackbar('선택된 예약이 없습니다.', 2500);
-      return;
-    }
-    setOpenModal(true); // Open modal on button click
-  };
-
-  const handleCheckboxChange = reservationId => {
-    setSelectedReservationId(reservationId);
-  };
-
-  const handleDeleteBtn = async () => {
-    if (!selectedReservationId) {
-      openErrorSnackbar('선택된 예약이 없습니다.', 2500);
+    if (!input) {
+      openErrorSnackbar('학번 또는 이름을 입력해주세요', 2500);
       return;
     }
 
     try {
-      const response = await deleteReservation(selectedReservationId);
-      openSuccessSnackbar(response.message, 2500);
+      const isNumeric = !isNaN(input);
+      const response = isNumeric ? await fetchBySerial() : await fetchByName();
 
-      const updatedReservations = await refetch();
-      setReservation(updatedReservations.data);
-    } catch (error) {
-      openErrorSnackbar(error.response.data.errorMessage, 2500);
-    }
-  };
+      if (response.data.isSuccess === true) {
+        // 응답을 배열 형태로 통일
+        const usersData = isNumeric
+          ? [response.data.data] // 학번 조회 시 객체를 배열로 감싸기
+          : response.data.data.users; // 이름 조회 시 이미 배열 형태
 
-  const handleStateChange = async state => {
-    try {
-      if (state === 'notVisited') {
-        const response = await notVisitedState(selectedReservationId);
-        openSuccessSnackbar(response.message, 2500);
-      } else if (state === 'visited') {
-        const response = await visitedState(selectedReservationId);
-        openSuccessSnackbar(response.message, 2500);
-      } else if (state === 'processed') {
-        const response = await processedState(selectedReservationId);
-        openSuccessSnackbar(response.message, 2500);
+        setUserInfo(usersData);
+        openSuccessSnackbar(response.data.message, 2500);
       }
-
-      const updatedReservations = await refetch();
-      setReservation(updatedReservations.data);
-      setOpenModal(false); // Close modal after state change
     } catch (error) {
-      openErrorSnackbar(error.response.data.errorMessage, 2500);
+      openErrorSnackbar(error.message, 2500);
     }
   };
 
   return (
     <div className="p-6">
       <div className="flex flex-row items-center mb-5">
-        <div className="mr-3">학번 </div>
+        <div className="mr-3">학번 또는 이름 </div>
         <input
           className="border rounded-sm w-32 h-7"
-          onChange={changeSerial}
-          onKeyDown={handleKeyPress}
+          onChange={handleChange}
           type="text"
-          maxLength="9"></input>
+          maxLength="9"
+        />
         <Button
           onClick={handleFetchBtn}
           color="dark"
@@ -127,95 +74,43 @@ const SerialCheck = () => {
       <div className="overflow-x-auto">
         <Table>
           <Table.Head className="text-center">
+            <Table.HeadCell>역할</Table.HeadCell>
+            <Table.HeadCell>이름</Table.HeadCell>
+            <Table.HeadCell>학번</Table.HeadCell>
+            <Table.HeadCell>이메일</Table.HeadCell>
+            <Table.HeadCell>학과</Table.HeadCell>
             <Table.HeadCell></Table.HeadCell>
-            <Table.HeadCell>예약 ID</Table.HeadCell>
-            <Table.HeadCell>호실</Table.HeadCell>
-            <Table.HeadCell>날짜</Table.HeadCell>
-            <Table.HeadCell>예약 시작 시각</Table.HeadCell>
-            <Table.HeadCell>예약 종료 시각</Table.HeadCell>
-            <Table.HeadCell>출석 유무</Table.HeadCell>
           </Table.Head>
           <Table.Body className="divide-y text-center">
-            {reservation?.map(item => (
-              <Table.Row
-                key={item.reservationId}
-                className="bg-white dark:border-gray-700 dark:bg-gray-800">
-                <Table.Cell>
-                  <Checkbox
-                    checked={selectedReservationId === item.reservationId}
-                    onChange={() => handleCheckboxChange(item.reservationId)}
-                  />
-                </Table.Cell>
-                <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                  {item.reservationId}
-                </Table.Cell>
-                <Table.Cell>
-                  {item.roomName}-{item.partitionNumber}
-                </Table.Cell>
-                <Table.Cell>
-                  {format(new Date(item.startDateTime), 'yyyy-MM-dd')}
-                </Table.Cell>
-                <Table.Cell>
-                  {format(new Date(item.startDateTime), 'HH:mm')}
-                </Table.Cell>
-                <Table.Cell>
-                  {format(new Date(item.endDateTime), 'HH:mm')}
-                </Table.Cell>
-                <Table.Cell>
-                  {item.reservationState === 'VISITED'
-                    ? '출석'
-                    : item.reservationState === 'NOT_VISITED'
-                      ? '미출석'
-                      : '처리됨'}
-                </Table.Cell>
+            {userInfo.length > 0 ? (
+              userInfo.map(user => (
+                <Table.Row
+                  key={user.userId}
+                  className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                  <Table.Cell>{user.serviceRole}</Table.Cell>
+                  <Table.Cell>{user.name}</Table.Cell>
+                  <Table.Cell>{user.serial || '-'}</Table.Cell>
+                  <Table.Cell>{user.email || '-'}</Table.Cell>
+                  <Table.Cell>{user.departmentName || '-'}</Table.Cell>
+                  <Table.Cell>
+                    <a
+                      onClick={() =>
+                        navigate(`/fetchReservations/${user.userId}`)
+                      }
+                      className="font-medium cursor-pointer text-blue-500 hover:underline dark:text-cyan-500">
+                      예약 조회
+                    </a>
+                  </Table.Cell>
+                </Table.Row>
+              ))
+            ) : (
+              <Table.Row>
+                <Table.Cell colSpan="6">조회된 결과가 없습니다.</Table.Cell>
               </Table.Row>
-            ))}
+            )}
           </Table.Body>
         </Table>
       </div>
-      <div className="flex space-x-8">
-        <Button onClick={handlePatchBtn} className="mt-10" color="dark">
-          출석 상태 수정
-        </Button>
-        <Button onClick={handleDeleteBtn} className="mt-10" color="failure">
-          예약 삭제
-        </Button>
-      </div>
-      {/* 모달 */}
-      <Modal
-        show={openModal}
-        onClose={() => setOpenModal(false)}
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}>
-        <Modal.Header className="pr-24">예약 상태 변경 유형 선택</Modal.Header>
-        <Modal.Body>
-          <div className="flex flex-col space-y-6">
-            <p
-              className="inline-block text-lg hover:underline cursor-pointer"
-              onClick={() => handleStateChange('visited')}>
-              출석으로 변경
-            </p>
-            <p
-              className="inline-block text-lg hover:underline cursor-pointer"
-              onClick={() => handleStateChange('notVisited')}>
-              미출석으로 변경
-            </p>
-            <p
-              className="inline-block text-lg hover:underline cursor-pointer"
-              onClick={() => handleStateChange('processed')}>
-              처리됨으로 변경
-            </p>
-          </div>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button color="gray" onClick={() => setOpenModal(false)}>
-            취소
-          </Button>
-        </Modal.Footer>
-      </Modal>
     </div>
   );
 };
