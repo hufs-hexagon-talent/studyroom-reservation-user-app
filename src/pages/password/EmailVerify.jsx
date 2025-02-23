@@ -72,6 +72,7 @@ const EmailVerify = () => {
       setTimeout(() => {
         closeErrorSnackbar();
       }, 2500);
+      setDisabled(false);
     }
   };
 
