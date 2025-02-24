@@ -195,7 +195,7 @@ const Schedule = () => {
           <div className="pt-10 pb-6 font-bold text-lg">호실 선택</div>
           <div>
             {rooms
-              .filter(room => room.departmentId === 1)
+              ?.filter(room => room.departmentId === 1)
               .map(room => (
                 <div key={room.roomId} className="flex items-center mb-3">
                   <Checkbox
