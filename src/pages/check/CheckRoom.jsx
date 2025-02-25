@@ -4,7 +4,7 @@ import {
   Popover,
   Typography,
   Pagination,
-  Tooltip, // Tooltip 추가
+  Tooltip,
 } from '@mui/material';
 import { format } from 'date-fns';
 import { Button, Modal, Table } from 'flowbite-react';
@@ -15,12 +15,15 @@ import {
   useUserReservation,
   useNoShow,
   useMyInfo,
+  useBlockedPeriod,
 } from '../../api/user.api';
 
 const Check = () => {
   const { data: noShow } = useNoShow();
   const { data: reservations } = useUserReservation();
   const { data: me } = useMyInfo();
+  const { data: blockedPeriod, refetch: fetchBlockedPeriod } =
+    useBlockedPeriod();
   const { mutate: deleteReservation } = useDeleteReservation();
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -28,8 +31,19 @@ const Check = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [openModal, setOpenModal] = useState(null);
 
-  const handleClick = event => {
+  const handleMuiBtnClick = event => {
     setAnchorEl(event.currentTarget);
+  };
+
+  const handlePopoverClick = async e => {
+    if (anchorEl) {
+      // Popover이 열려 있는 경우 닫기만 하고 API를 다시 호출하지 않음
+      setAnchorEl(null);
+    } else {
+      // Popover을 열 때만 API 호출
+      setAnchorEl(e.currentTarget);
+      await fetchBlockedPeriod();
+    }
   };
 
   const handleClose = () => {
@@ -58,6 +72,11 @@ const Check = () => {
     startIndex + itemsPerPage,
   );
 
+  // count를 계산하고 NaN이 아닐 때만 사용할 수 있도록 안전한 변수를 생성합니다.
+  const pageCount = reservations
+    ? Math.ceil(reservations.length / itemsPerPage)
+    : 0;
+  console.log(blockedPeriod?.data.startBlockedDate);
   return (
     <div>
       <div className="flex justify-center text-2xl mt-20">
@@ -80,8 +99,8 @@ const Check = () => {
           </Table.Head>
           <Table.Body className="divide-y">
             {paginatedReservations?.map((reservation, index) => {
-              const start = new Date(reservation.startDateTime);
-              const end = new Date(reservation.endDateTime);
+              const start = new Date(reservation.reservationStartTime);
+              const end = new Date(reservation.reservationEndTime);
               const isPast = start < new Date();
               return (
                 <Table.Row
@@ -138,7 +157,7 @@ const Check = () => {
       </div>
 
       <Pagination
-        count={Math.ceil(reservations?.length / itemsPerPage)}
+        count={pageCount} // 안전한 pageCount 값을 전달합니다.
         page={currentPage}
         onChange={handlePageChange}
         shape="rounded"
@@ -155,7 +174,7 @@ const Check = () => {
           }}
           aria-describedby={id}
           variant="contained"
-          onClick={handleClick}>
+          onClick={handleMuiBtnClick}>
           내 노쇼 현황
         </MuiButton>
         <Popover
@@ -163,16 +182,65 @@ const Check = () => {
           open={open}
           anchorEl={anchorEl}
           onClose={handleClose}
+          onClick={handlePopoverClick}
           anchorOrigin={{
             vertical: 'bottom',
             horizontal: 'left',
           }}>
-          <Typography sx={{ p: 2 }}>
-            {`* 현재 예약 취소 없이 세미나실을 방문하지 않은 횟수는 ${noShow}번 입니다.`}
-            <div className="text-red-700">
-              (노쇼 3회 시 세미나실 예약이 1개월 동안 제한 됩니다)
-            </div>
+<Typography sx={{ px: 2, py: 1 }}>
+            {`* 현재 예약 취소 없이 세미나실을 방문하지 않은 횟수는 ${noShow?.noShowCount}번 입니다.`}
           </Typography>
+          <Typography sx={{ px: 3 }} className="text-red-700">
+            (3회 초과 시 세미나실 예약이 1개월 동안 제한 됩니다)
+          </Typography>
+          {me?.serviceRole === 'BLOCKED' && blockedPeriod?.data && (
+            <Typography sx={{ px: 3, py: 1 }}>
+              {blockedPeriod?.data?.startBlockedDate &&
+              blockedPeriod?.data?.endBlockedDate
+                ? `현재 블락 기간 : ${blockedPeriod.data.startBlockedDate} ~ ${blockedPeriod.data.endBlockedDate}`
+                : '블락 정보가 없습니다.'}
+            </Typography>
+          )}
+
+          <div className="overflow-x-auto">
+            <Table>
+              <Table.Head className="text-black text-center">
+                <Table.HeadCell>출석 상태</Table.HeadCell>
+                <Table.HeadCell>날짜</Table.HeadCell>
+                <Table.HeadCell>호실</Table.HeadCell>
+                <Table.HeadCell>시작 시간</Table.HeadCell>
+                <Table.HeadCell>종료 시간</Table.HeadCell>
+              </Table.Head>
+              <Table.Body className="divide-y text-center">
+                {noShow?.reservationList.reservationInfoResponses.map(
+                  (reservation, index) => (
+                    <Table.Row
+                      key={index}
+                      className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                      <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
+                        {reservation.reservationState === 'NOT_VISITED'
+                          ? '미출석'
+                          : ''}
+                      </Table.Cell>
+                      <Table.Cell>
+                        {format(
+                          new Date(reservation.reservationStartTime),
+                          'yyyy-MM-dd',
+                        )}
+                      </Table.Cell>
+                      <Table.Cell>{`${reservation.roomName}-${reservation.partitionNumber}`}</Table.Cell>
+                      <Table.Cell>
+                        {format(reservation.reservationStartTime, 'HH:mm')}
+                      </Table.Cell>
+                      <Table.Cell>
+                        {format(reservation.reservationEndTime, 'HH:mm')}
+                      </Table.Cell>
+                    </Table.Row>
+                  ),
+                )}
+              </Table.Body>
+            </Table>
+          </div>
         </Popover>
       </div>
       <div className="flex justify-center items-center">

@@ -10,33 +10,38 @@ const useAuth = () => {
 
   const loggedIn = auth.isAuthenticated;
 
-  const login = useCallback(async ({ id, password }) => {
-    try {
-      const response = await axios.post(
-        'https://api.studyroom.computer.hufs.ac.kr/auth/login',
-        {
-          username: id,
-          password: password,
+  const login = useCallback(
+    async ({ id, password }) => {
+      try {
+        const response = await axios.post(
+          'https://api.studyroom-qa.alpaon.net/auth/login',
+          {
+            username: id,
+            password: password,
+          },
+        );
+        const access_token = response.data.data.accessToken;
+        const refresh_token = response.data.data.refreshToken;
+
+        if (!isTokenValid(access_token) || !isTokenValid(refresh_token)) {
+          throw new Error('유효하지 않는 토큰');
         }
-      );
-      const access_token = response.data.data.access_token;
-      const refresh_token = response.data.data.refresh_token;
 
-      if (!isTokenValid(access_token) || !isTokenValid(refresh_token)) {
-        throw new Error('유효하지 않는 토큰');
+        setAuth({
+          isAuthenticated: true,
+          accessToken: access_token,
+          refreshToken: refresh_token,
+        });
+
+        return true;
+      } catch (error) {
+        throw new Error(
+          error.response?.data?.errorMessage || '로그인에 실패했습니다.',
+        );
       }
-
-      setAuth({
-        isAuthenticated: true,
-        accessToken: access_token,
-        refreshToken: refresh_token,
-      });
-
-      return true;
-    } catch (error) {
-      throw new Error(error.response?.data?.errorMessage || '로그인에 실패했습니다.');
-    }
-  }, [setAuth]);
+    },
+    [setAuth],
+  );
 
   const logout = useCallback(() => {
     setAuth({

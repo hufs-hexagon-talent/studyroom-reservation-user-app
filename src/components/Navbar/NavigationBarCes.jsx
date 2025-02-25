@@ -1,16 +1,15 @@
 import React, { useEffect } from 'react';
 import { Navbar } from 'flowbite-react';
-import Logo from '../../assets/logo.png';
+import Logo from '../../assets/logoCes.png';
 import useAuth from '../../hooks/useAuth';
-import { useServiceRole, useMyInfo } from '../../api/user.api';
-import { Link } from 'react-router-dom';
+import { useServiceRole } from '../../api/user.api';
 
-const NavigationBar = () => {
+const NavigationBarCes = () => {
   const { loggedIn, logout } = useAuth();
-  const { data: serviceRole, refetch } = useServiceRole();
+  const { data: serviceRole, refetch, isFetching } = useServiceRole();
 
   useEffect(() => {
-    if (loggedIn) {
+    if (loggedIn && !isFetching) {
       refetch();
     }
   }, [loggedIn, refetch]);
@@ -72,4 +71,4 @@ const NavigationBar = () => {
   );
 };
 
-export default NavigationBar;
+export default NavigationBarCes;

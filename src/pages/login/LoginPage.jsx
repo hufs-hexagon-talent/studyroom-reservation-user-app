@@ -1,4 +1,4 @@
-// src/components/Login.jsx
+// src/pages/Login.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, TextInput } from 'flowbite-react';
@@ -60,7 +60,7 @@ const LoginPage = () => {
   return (
     <div>
       <div>
-        <h1 className="flex justify-center w-screen text-2xl text-center mt-10 mb-5">
+        <h1 className="flex justify-center w-screen text-2xl text-center mt-20 mb-5">
           로그인
         </h1>
       </div>

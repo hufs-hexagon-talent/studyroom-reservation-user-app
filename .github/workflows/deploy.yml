@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - qa
 
 env:
   ORG_NAME: hufs-hexagon-talent
@@ -37,4 +38,5 @@ jobs:
           tags: |
             ghcr.io/${{ env.ORG_NAME }}/${{ env.PROJECT_NAME }}-${{ env.SERVICE_NAME }}:${{ github.sha }}
             ${{ github.ref == 'refs/heads/main' && format('ghcr.io/{0}/{1}-{2}:latest', env.ORG_NAME, env.PROJECT_NAME, env.SERVICE_NAME) || '' }}
+            ${{ github.ref == 'refs/heads/qa' && format('ghcr.io/{0}/{1}-{2}:qa', env.ORG_NAME, env.PROJECT_NAME, env.SERVICE_NAME) || '' }}
           platforms: linux/amd64 #, linux/arm64/v8

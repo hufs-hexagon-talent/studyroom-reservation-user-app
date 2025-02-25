@@ -68,8 +68,7 @@ const SignUp = () => {
     } catch (error) {
       // 에러 처리
       openErrorSnackbar(
-        error.response?.data?.errorMessage ||
-          '회원 가입 중 오류가 발생했습니다.',
+        error.response?.data?.message || '회원 가입 중 오류가 발생했습니다.',
       );
       setTimeout(() => {
         closeErrorSnackbar();

@@ -36,7 +36,6 @@ const QrCheck = () => {
     if (me) {
       if (me.serviceRole === 'ADMIN') {
         setroomId(null);
-        //console.log(roomId);
       } else if (me.name === 'RESIDENT_306') {
         setroomId(1);
       } else if (me.name === 'RESIDENT_428') {
@@ -56,8 +55,6 @@ const QrCheck = () => {
     me?.serviceRole === 'ADMIN'
       ? useAllRooms()
       : useRooms(roomId ? [roomId] : []);
-  // console.log(roomId);
-  // console.log(rooms);
 
   useEffect(() => {
     const checkAdminStatus = async () => {
@@ -105,7 +102,8 @@ const QrCheck = () => {
       },
       {
         onSuccess: result => {
-          const checkedInReservations = result.data.checkInReservations;
+          const checkedInReservations =
+            result.data.reservationInfoResponses.reservationInfoResponses;
 
           setReservations(prevReservations =>
             prevReservations.map(reservation =>
@@ -128,8 +126,7 @@ const QrCheck = () => {
         },
         onError: error => {
           setErrorMessage(
-            error.response?.data?.errorMessage ||
-              'An unexpected error occurred',
+            error.response?.data?.message || 'An unexpected error occurred',
           );
           setSuccessMessage('');
           setTimeout(() => {
