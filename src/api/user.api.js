@@ -97,10 +97,6 @@ export const useReservationsByPartitions = ({ date, partitionIds }) =>
 // 특정 날짜, 특정 부서가 관리하는 모든 파티션의 예약 상태 조회
 export const fetchReservations = async ({ date, departmentId }) => {
   const url = `/reservations/by-date/${departmentId}?date=${date}`;
-  console.log('departmentId', departmentId);
-  console.log('date', date);
-  console.log('요청 URL:', url); // URL 로깅 추가
-
   const response = await apiClient.get(url);
   const data = response.data.data.partitionReservationInfos;
 
