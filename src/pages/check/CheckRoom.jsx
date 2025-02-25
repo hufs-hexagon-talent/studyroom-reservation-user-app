@@ -62,7 +62,7 @@ const Check = () => {
     setOpenModal(null); // 모달 닫기
   };
 
-  const handlePageChange = (event, value) => {
+  const handlePageChange = value => {
     setCurrentPage(value);
   };
 
@@ -187,7 +187,7 @@ const Check = () => {
             vertical: 'bottom',
             horizontal: 'left',
           }}>
-<Typography sx={{ px: 2, py: 1 }}>
+          <Typography sx={{ px: 2, py: 1 }}>
             {`* 현재 예약 취소 없이 세미나실을 방문하지 않은 횟수는 ${noShow?.noShowCount}번 입니다.`}
           </Typography>
           <Typography sx={{ px: 3 }} className="text-red-700">

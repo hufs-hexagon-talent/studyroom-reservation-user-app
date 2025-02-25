@@ -2,12 +2,9 @@ import React from 'react';
 import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
 import { useSnackbar } from 'react-simple-snackbar';
 import { useServiceRole } from './api/user.api';
-import { useDomain } from './contexts/DomainContext';
 
 import FooterCes from './components/footer/FooterCes';
-import FooterIce from './components/footer/FooterIce';
 import NavigationBarCes from './components/Navbar/NavigationBarCes';
-import NavigationBarIce from './components/Navbar/NavigationBarIce';
 import Check from './pages/check/CheckRoom';
 import LoginPage from './pages/login/LoginPage';
 import Notice from './pages/notice/notice';
@@ -20,8 +17,6 @@ import QrCheck from './pages/qrcheck/QrCheck';
 import LoggedInPassword from './pages/password/LoggedInPassword';
 import LoggedOutPassword from './pages/password/LoggedOutPassword';
 import EmailVerify from './pages/password/EmailVerify';
-//import SignUp from './pages/signup/SignUp';
-//import SelectRoom from './pages/qrcheck/SelectRoom';
 import Schedule from './pages/manage/Schedule';
 import DivideAct from './pages/manage/DivideAct';
 import SerialCheck from './pages/manage/SerialCheck';
@@ -30,7 +25,6 @@ import FetchReservations from './pages/manage/FetchReservations';
 
 const RouterComponent = () => {
   const { loggedIn } = useAuth();
-  const { domain } = useDomain();
   const { data: serviceRole, isLoading } = useServiceRole();
   const [openSnackbar] = useSnackbar({
     position: 'top-right',
@@ -63,7 +57,6 @@ const RouterComponent = () => {
                 <Route path="/notice" element={<Notice />} />
                 <Route path="/qrcheck" element={<QrCheck />} />
                 <Route path="/divide" element={<DivideAct />} />
-                {/* <Route path="/selectRoom" element={<SelectRoom />} /> */}
                 <Route path="/check" element={<Check />} />
                 <Route path="/otp" element={<OtpPage />} />
                 <Route path="/password" element={<LoggedInPassword />} />
@@ -80,7 +73,6 @@ const RouterComponent = () => {
             )}
             {loggedIn && serviceRole === 'RESIDENT' && (
               <>
-                {/* <Route path="/selectRoom" element={<SelectRoom />} /> */}
                 <Route path="/notice" element={<Notice />} />
                 <Route path="/qrcheck" element={<QrCheck />} />
               </>
@@ -96,7 +88,6 @@ const RouterComponent = () => {
                 <Route path="/notice" element={<Notice />} />
                 <Route path="/email" element={<EmailVerify />} />
                 <Route path="/login" element={<LoginPage />} />
-                {/* <Route path="/signup" element={<SignUp />} /> */}
               </>
             )}
             <Route path="*" element={<Navigate to="/" />} />

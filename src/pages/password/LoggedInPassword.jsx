@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useNavigation } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button, Label, TextInput } from 'flowbite-react';
 import { usePassword, useMyInfo } from '../../api/user.api';
 import { useSnackbar } from 'react-simple-snackbar';
@@ -12,7 +12,6 @@ const LoggedInPassword = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [idError, setIdError] = useState('');
   const [passwordError, setPasswordError] = useState('');
-  //const { data: users } = useAllUsers();
   const { data: me } = useMyInfo();
   const { mutateAsync: changePw } = usePassword();
   const navigate = useNavigate();
