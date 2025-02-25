@@ -5,7 +5,7 @@ import { authState } from './authState';
 
 const useAuth = () => {
   const [auth, setAuth] = useRecoilState(authState);
-
+  const baseUrl = process.env.REACT_APP_API_URL;
   const isTokenValid = token => token !== 'undefined' && token !== null;
 
   const loggedIn = auth.isAuthenticated;
@@ -13,8 +13,7 @@ const useAuth = () => {
   const login = useCallback(
     async ({ id, password }) => {
       try {
-        const response = await axios.post(
-          'https://api.studyroom-qa.alpaon.net/auth/login',
+        const response = await axios.post(`${baseUrl}/auth/login`,
           {
             username: id,
             password: password,

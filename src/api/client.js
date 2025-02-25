@@ -6,17 +6,14 @@ const getAuthState = () => {
   return authState ? JSON.parse(authState) : null;
 };
 
-const baseUrl =
-  process.env.REACT_APP_API_URL || 'https://api.studyroom-qa.alpaon.net/';
+const baseUrl = process.env.REACT_APP_API_URL;
 
 export const apiClient = axios.create({
-  baseURL: 'https://api.studyroom-qa.alpaon.net/',
+  baseURL: baseUrl,
   headers: {
     Authorization: `Bearer ${getAuthState()?.accessToken}`,
   },
 });
-
-console.log(apiClient.defaults.baseURL);
 
 apiClient.interceptors.request.use(
   config => {
@@ -57,7 +54,7 @@ apiClient.interceptors.response.use(
       try {
         // 리프레시 토큰으로 액세스 토큰 갱신
         const response = await axios.post(
-          'https://api.studyroom-qa.alpaon.net/auth/refresh',
+          `${baseUrl}/auth/refresh`,
           {
             refreshToken: refreshToken, // 올바른 키 사용
           },
