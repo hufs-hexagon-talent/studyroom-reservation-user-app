@@ -14,7 +14,6 @@ import { Button, Table, Modal } from 'flowbite-react';
 import { HiOutlineExclamationCircle } from 'react-icons/hi';
 import { useSnackbar } from 'react-simple-snackbar';
 
-import Inko from 'inko';
 import { format } from 'date-fns';
 
 registerLocale('ko', ko);
@@ -29,8 +28,6 @@ const CheckVisit = () => {
   const [openDeleteModal, setOpenDeleteModal] = useState(null);
   const [openEditModal, setOpenEditModal] = useState(null);
   const [selectedReservationId, setSelectedReservationId] = useState(null);
-
-  let inko = new Inko();
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -66,10 +63,6 @@ const CheckVisit = () => {
       backgroundColor: '#4CAF50', // 초록색
     },
   });
-
-  const partitionId = partitions
-    ?.map(partition => partition.roomId)
-    .filter((value, index, self) => self.indexOf(value) === index);
 
   // reservations 상태 변경
   useEffect(() => {
@@ -142,7 +135,6 @@ const CheckVisit = () => {
         openSuccessSnackbar(response.message, 2500);
       }
 
-      const updatedReservations = await refetch();
       setOpenEditModal(false); // Close modal after state change
     } catch (error) {
       openErrorSnackbar(error.response.data.errorMessage, 2500);

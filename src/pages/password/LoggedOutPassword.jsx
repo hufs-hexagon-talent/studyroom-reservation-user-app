@@ -11,7 +11,7 @@ const LoggedOutPassword = () => {
   const token = sessionStorage.getItem('pwResetToken');
   const navigate = useNavigate();
 
-  const [openSuccessSnackbar, closeSuccessSnackbar] = useSnackbar({
+  const [openSuccessSnackbar] = useSnackbar({
     position: 'top-right',
     style: {
       backgroundColor: '#4CAF50', // 초록색
@@ -19,7 +19,7 @@ const LoggedOutPassword = () => {
     },
   });
 
-  const [openErrorSnackbar, closeErrorSnackbar] = useSnackbar({
+  const [openErrorSnackbar] = useSnackbar({
     position: 'top-right',
     style: {
       backgroundColor: '#FF3333',

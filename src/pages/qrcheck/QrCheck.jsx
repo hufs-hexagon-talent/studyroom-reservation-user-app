@@ -54,7 +54,10 @@ const QrCheck = () => {
   const { data: rooms } =
     me?.serviceRole === 'ADMIN'
       ? useAllRooms()
-      : useRooms(roomId ? [roomId] : []);
+      : useRooms(roomId ? roomId : null);
+
+  console.log('rooms : ', rooms);
+  console.log('roomId : ', roomId);
 
   useEffect(() => {
     const checkAdminStatus = async () => {
@@ -170,10 +173,13 @@ const QrCheck = () => {
       <div className="mt-5 mb-10 text-center" style={{ color: '#9D9FA2' }}>
         <p>
           현재 선택된 호실 :{' '}
-          {rooms && rooms.length > 0
-            ? rooms.map(room => room.roomName).join(', ') + '호'
+          {rooms
+            ? Array.isArray(rooms)
+              ? rooms.map(room => room.roomName).join(', ') + '호'
+              : rooms.roomName + '호'
             : '선택된 호실이 없음'}
         </p>
+
         <p>본인의 QR코드를 스캐너에 스캔해주세요</p>
       </div>
 

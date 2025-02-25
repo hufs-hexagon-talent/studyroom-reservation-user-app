@@ -1,4 +1,3 @@
-// src/pages/Login.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, TextInput } from 'flowbite-react';
@@ -45,10 +44,6 @@ const LoginPage = () => {
 
   const handlePasword = () => {
     navigate('/email');
-  };
-
-  const handleSignUp = () => {
-    navigate('/signup');
   };
 
   const handleKeyDown = event => {
