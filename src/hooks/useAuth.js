@@ -19,7 +19,11 @@ const response = await axios.post(`${baseUrl}/auth/login`, {
         });
         const accessToken = response.data.data.accessToken;
         const refreshToken = response.data.data.refreshToken;
-        
+        console.log('baseUrl', baseUrl);
+        console.log('accessToken', accessToken);
+        console.log('refreshToken', refreshToken);
+        console.log('isTokenValid(accessToken)', isTokenValid(accessToken));
+        console.log('isTokenValid(refreshToken)', isTokenValid(refreshToken));
         if (!isTokenValid(accessToken) || !isTokenValid(refreshToken)) {
           throw new Error('유효하지 않는 토큰');
         }
