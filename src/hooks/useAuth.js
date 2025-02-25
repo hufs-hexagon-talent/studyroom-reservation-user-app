@@ -6,7 +6,7 @@ import { authState } from './authState';
 const useAuth = () => {
   const [auth, setAuth] = useRecoilState(authState);
   const baseUrl = process.env.REACT_APP_API_URL;
-  const isTokenValid = token => token !== 'undefined' && token !== null;
+  const isTokenValid = token => token !== undefined && token !== null;
 
   const loggedIn = auth.isAuthenticated;
 
@@ -14,12 +14,10 @@ const useAuth = () => {
     async ({ id, password }) => {
       try {
         console.log('baseUrl', baseUrl);
-        const response = await axios.post(`${baseUrl}/auth/login`,
-          {
-            username: id,
-            password: password,
-          },
-        );
+        const response = await axios.post(`${baseUrl}/auth/login`, {
+          username: id,
+          password: password,
+        });
         const accessToken = response.data.data.accessToken;
         const refreshToken = response.data.data.refreshToken;
         console.log('accessToken', accessToken, '|');
