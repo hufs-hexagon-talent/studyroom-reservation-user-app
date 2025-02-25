@@ -16,6 +16,8 @@ export const apiClient = axios.create({
   },
 });
 
+console.log(apiClient.defaults.baseURL);
+
 apiClient.interceptors.request.use(
   config => {
     const authState = getAuthState(); // authState 객체를 가져옵니다.
