@@ -7,7 +7,7 @@ const getAuthState = () => {
 };
 
 const baseUrl =
-  process.env.REACT_APP_API_URL || 'https://api.studyroom.computer.hufs.ac.kr';
+  process.env.REACT_APP_API_URL || 'https://api.studyroom-qa.alpaon.net/';
 
 export const apiClient = axios.create({
   baseURL: 'https://api.studyroom-qa.alpaon.net/',
