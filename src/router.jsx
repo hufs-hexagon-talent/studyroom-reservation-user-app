@@ -37,7 +37,7 @@ const RouterComponent = () => {
   if (isLoading) return <div>Loading...</div>;
 
   return (
-    <BrowserRouter basename={process.env.REACT_APP_BASEURL || '/'}>
+    <BrowserRouter basename={'/'}>
       <div className="min-h-screen flex flex-col">
         <NavigationBarCes showSnackbar={openSnackbar} />
         <div className="flex-grow">
