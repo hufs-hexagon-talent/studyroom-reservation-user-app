@@ -13,17 +13,13 @@ const useAuth = () => {
   const login = useCallback(
     async ({ id, password }) => {
       try {
-        console.log('baseUrl', baseUrl);
         const response = await axios.post(`${baseUrl}/auth/login`, {
           username: id,
           password: password,
         });
         const accessToken = response.data.data.accessToken;
         const refreshToken = response.data.data.refreshToken;
-        console.log('accessToken', accessToken, '|');
-        console.log('refreshToken', refreshToken, '|');
-        console.log('isTokenValid(accessToken)', isTokenValid(accessToken));
-        console.log('isTokenValid(refreshToken)', isTokenValid(refreshToken));
+        
         if (!isTokenValid(accessToken) || !isTokenValid(refreshToken)) {
           throw new Error('유효하지 않는 토큰');
         }
