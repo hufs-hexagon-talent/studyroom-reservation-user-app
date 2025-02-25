@@ -13,7 +13,7 @@ const useAuth = () => {
   const login = useCallback(
     async ({ id, password }) => {
       try {
-        const response = await axios.post(`${baseUrl}/auth/login`, {
+const response = await axios.post(`${baseUrl}/auth/login`, {
           username: id,
           password: password,
         });

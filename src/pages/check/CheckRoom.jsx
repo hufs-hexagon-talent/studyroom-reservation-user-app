@@ -62,7 +62,7 @@ const Check = () => {
     setOpenModal(null); // 모달 닫기
   };
 
-  const handlePageChange = (event, value) => {
+  const handlePageChange = value => {
     setCurrentPage(value);
   };
 

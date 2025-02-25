@@ -9,7 +9,7 @@ const getAuthState = () => {
 const baseUrl = process.env.REACT_APP_API_URL;
 
 export const apiClient = axios.create({
-  baseURL: baseUrl,
+baseURL: baseUrl,
   headers: {
     Authorization: `Bearer ${getAuthState()?.accessToken}`,
   },
@@ -54,7 +54,7 @@ apiClient.interceptors.response.use(
       try {
         // 리프레시 토큰으로 액세스 토큰 갱신
         const response = await axios.post(
-          `${baseUrl}/auth/refresh`,
+`${baseUrl}/auth/refresh`,
           {
             refreshToken: refreshToken, // 올바른 키 사용
           },

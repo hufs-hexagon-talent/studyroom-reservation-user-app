@@ -1,10 +1,7 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
-import axios from 'axios';
 import { apiClient } from './client';
 
 import { queryClient } from '../index';
-//import axios from 'axios';
-//import { arSA } from 'date-fns/locale';
 
 // id, pw 확인할 때 쓰려고
 const fetchAllUsers = async () => {
@@ -193,6 +190,7 @@ export const useRooms = roomId =>
   useQuery({
     queryKey: ['rooms', roomId],
     queryFn: () => fetchRoom(roomId),
+    enabled: roomId !== null && roomId !== undefined,
   });
 
 // 체크인 하기
