@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import {
   Table,
@@ -29,7 +29,6 @@ import 'react-datepicker/dist/react-datepicker.css';
 import { fetchDate, useReservations, useReserve } from '../../../api/user.api';
 import useAuth from '../../../hooks/useAuth';
 import Button from '../../../components/button/Button';
-import { useDomain } from '../../../contexts/DomainContext';
 
 const createTimeTable = config => {
   const { startTime, endTime, intervalMinute } = config;
@@ -82,20 +81,7 @@ const RoomPage = () => {
 
   const navigate = useNavigate();
   const today = new Date();
-  const { departmentId: urlDepartmentId } = useParams();
-  const { domain } = useDomain();
-
-  const [departmentId, setDepartmentId] = useState(() => {
-    if (urlDepartmentId) return Number(urlDepartmentId);
-    return domain === 'ice' ? 2 : 1;
-  });
-
-  // domain에 따라 departmentId 설정
-  useEffect(() => {
-    if (!urlDepartmentId) {
-      setDepartmentId(domain === 'ice' ? 2 : 1);
-    }
-  }, [domain, urlDepartmentId]);
+  const departmentId = process.env.REACT_APP_DEPARTMENT_ID;
 
   const [selectedDate, setSelectedDate] = useUrlQuery(
     'date',

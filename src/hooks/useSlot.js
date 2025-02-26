@@ -1,4 +1,4 @@
-import{ useCallback } from 'react';
+import { useCallback } from 'react';
 
 const useSlot = (
   startTimeIndex,
@@ -10,17 +10,18 @@ const useSlot = (
   formatDate,
   selectedDate,
   times,
-  timeTableConfig
+  timeTableConfig,
 ) => {
   const getSlotSelected = useCallback(
     (partition, timeIndex) => {
       if (!startTimeIndex || !endTimeIndex) return false;
       if (selectedPartition !== partition) return false;
-      if (!(startTimeIndex <= timeIndex && timeIndex <= endTimeIndex)) return false;
+      if (!(startTimeIndex <= timeIndex && timeIndex <= endTimeIndex))
+        return false;
 
       return true;
     },
-    [startTimeIndex, endTimeIndex, selectedPartition]
+    [startTimeIndex, endTimeIndex, selectedPartition],
   );
 
   const toggleSlot = useCallback(
@@ -42,9 +43,12 @@ const useSlot = (
       }
 
       if (startTimeIndex === endTimeIndex) {
-        if (Math.abs(startTimeIndex - timeIndex) + 1 > timeTableConfig.maxReservationSlots) {
+        if (
+          Math.abs(startTimeIndex - timeIndex) + 1 >
+          timeTableConfig.maxReservationSlots
+        ) {
           // 예약 가능한 최대 슬롯 수를 초과한 경우 경고 표시
-          
+
           return;
         }
         if (startTimeIndex === timeIndex) {
@@ -68,14 +72,6 @@ const useSlot = (
       const formattedDate = formatDate(new Date(selectedDate));
       const startDateTime = `${formattedDate}T${times[startTimeIndex]}:00.000Z`;
       const endDateTime = `${formattedDate}T${times[endTimeIndex]}:00.000Z`;
-
-      // console.log({
-      //   partition,
-      //   startDateTime,
-      //   endDateTime,
-      //   isExist,
-      //   selectedDate: formattedDate,
-      // });
     },
     [
       getSlotSelected,
@@ -88,8 +84,8 @@ const useSlot = (
       startTimeIndex,
       endTimeIndex,
       selectedPartition,
-      timeTableConfig
-    ]
+      timeTableConfig,
+    ],
   );
 
   return { getSlotSelected, toggleSlot };

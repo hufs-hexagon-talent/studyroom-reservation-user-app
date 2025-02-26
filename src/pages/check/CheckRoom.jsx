@@ -76,7 +76,6 @@ const Check = () => {
   const pageCount = reservations
     ? Math.ceil(reservations.length / itemsPerPage)
     : 0;
-  console.log(blockedPeriod?.data.startBlockedDate);
   return (
     <div>
       <div className="flex justify-center text-2xl mt-20">

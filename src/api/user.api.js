@@ -148,7 +148,6 @@ export const useUserReservation = () =>
 
 export const fetchOtp = async () => {
   const otp_response = await apiClient.post('/check-in/otp');
-  console.log('otp_response.data.data.verificationCode', otp_response.data);
   return otp_response.data.data.verificationCode;
 };
 
@@ -395,7 +394,6 @@ export const useNotVisitedState = () => {
           state: 'NOT_VISITED',
         },
       );
-      console.log('ok');
       return changeState_res.data;
     },
   });
@@ -411,7 +409,6 @@ export const useProcessedState = () => {
           state: 'PROCESSED',
         },
       );
-      console.log('ok');
       return changeState_res.data;
     },
   });
