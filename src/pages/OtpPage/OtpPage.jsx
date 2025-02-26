@@ -42,8 +42,6 @@ const Qrcode = () => {
   const { data: otpValue, refetch, dataUpdatedAt } = useOtp();
 
   useEffect(() => {
-    console.log(dataUpdatedAt);
-    console.log(otpValue);
     const intervalId = setInterval(refetch, 30000);
 
     return () => clearInterval(intervalId);
