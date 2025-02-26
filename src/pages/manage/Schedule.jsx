@@ -23,7 +23,6 @@ const Schedule = () => {
   const [selectedDates, setSelectedDates] = useState([]);
   const [selectedRooms, setSelectedRooms] = useState([]);
   registerLocale('ko', ko);
-  console.log(rooms);
 
   const [openErrorSnackbar, closeErrorSnackbar] = useSnackbar({
     position: 'top-right',

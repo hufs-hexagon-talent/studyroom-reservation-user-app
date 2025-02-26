@@ -97,10 +97,6 @@ export const useReservationsByPartitions = ({ date, partitionIds }) =>
 // 특정 날짜, 특정 부서가 관리하는 모든 파티션의 예약 상태 조회
 export const fetchReservations = async ({ date, departmentId }) => {
   const url = `/reservations/by-date/${departmentId}?date=${date}`;
-  console.log('departmentId', departmentId);
-  console.log('date', date);
-  console.log('요청 URL:', url); // URL 로깅 추가
-
   const response = await apiClient.get(url);
   const data = response.data.data.partitionReservationInfos;
 
@@ -152,7 +148,6 @@ export const useUserReservation = () =>
 
 export const fetchOtp = async () => {
   const otp_response = await apiClient.post('/check-in/otp');
-  console.log('otp_response.data.data.verificationCode', otp_response.data);
   return otp_response.data.data.verificationCode;
 };
 
@@ -399,7 +394,6 @@ export const useNotVisitedState = () => {
           state: 'NOT_VISITED',
         },
       );
-      console.log('ok');
       return changeState_res.data;
     },
   });
@@ -415,7 +409,6 @@ export const useProcessedState = () => {
           state: 'PROCESSED',
         },
       );
-      console.log('ok');
       return changeState_res.data;
     },
   });

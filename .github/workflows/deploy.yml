@@ -35,6 +35,8 @@ jobs:
         with:
           file: ./Dockerfile
           push: true
+          build-args: |
+            REACT_APP_API_URL=${{ env.REACT_APP_API_URL }}
           tags: |
             ghcr.io/${{ env.ORG_NAME }}/${{ env.PROJECT_NAME }}-${{ env.SERVICE_NAME }}:${{ github.sha }}
             ${{ github.ref == 'refs/heads/main' && format('ghcr.io/{0}/{1}-{2}:latest', env.ORG_NAME, env.PROJECT_NAME, env.SERVICE_NAME) || '' }}

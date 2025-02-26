@@ -56,9 +56,6 @@ const QrCheck = () => {
       ? useAllRooms()
       : useRooms(roomId ? roomId : null);
 
-  console.log('rooms : ', rooms);
-  console.log('roomId : ', roomId);
-
   useEffect(() => {
     const checkAdminStatus = async () => {
       // 관리자 인지 확인
