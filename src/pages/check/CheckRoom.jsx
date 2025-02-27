@@ -16,33 +16,37 @@ import {
   useNoShow,
   useMyInfo,
   useBlockedPeriod,
+  fetchBlockedPeriod,
 } from '../../api/user.api';
 
 const Check = () => {
   const { data: noShow } = useNoShow();
   const { data: reservations } = useUserReservation();
   const { data: me } = useMyInfo();
-  const { data: blockedPeriod, refetch: fetchBlockedPeriod } =
-    useBlockedPeriod();
+  // const { data: blockedPeriod, refetch: fetchBlockedPeriod } =
+  //   useBlockedPeriod();
   const { mutate: deleteReservation } = useDeleteReservation();
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
   const [anchorEl, setAnchorEl] = useState(null);
   const [openModal, setOpenModal] = useState(null);
-
+  const [blockedPeriod, setBlockePeriod] = useState(null);
   const handleMuiBtnClick = event => {
     setAnchorEl(event.currentTarget);
   };
 
   const handlePopoverClick = async e => {
     if (anchorEl) {
-      // Popover이 열려 있는 경우 닫기만 하고 API를 다시 호출하지 않음
-      setAnchorEl(null);
+      // Popover이 열려있을 때
+      const blockedData = await fetchBlockedPeriod();
+      setBlockePeriod(blockedData);
+      console.log(blockedData);
+      console.log(blockedPeriod);
+      setAnchorEl(null); // Popover 닫기
     } else {
-      // Popover을 열 때만 API 호출
-      setAnchorEl(e.currentTarget);
-      await fetchBlockedPeriod();
+      // Popover이 닫혀있을 때
+      setAnchorEl(e.currentTarget); // Popover 열기
     }
   };
 
@@ -62,7 +66,7 @@ const Check = () => {
     setOpenModal(null); // 모달 닫기
   };
 
-  const handlePageChange = value => {
+  const handlePageChange = (event, value) => {
     setCurrentPage(value);
   };
 
@@ -76,12 +80,12 @@ const Check = () => {
   const pageCount = reservations
     ? Math.ceil(reservations.length / itemsPerPage)
     : 0;
+
   return (
     <div>
       <div className="flex justify-center text-2xl mt-20">
         {me?.name}님의 신청 현황
       </div>
-
       <div id="table" className="overflow-x-auto mt-10">
         <Table className="border">
           <Table.Head
@@ -192,13 +196,15 @@ const Check = () => {
           <Typography sx={{ px: 3 }} className="text-red-700">
             (3회 초과 시 세미나실 예약이 1개월 동안 제한 됩니다)
           </Typography>
-          {me?.serviceRole === 'BLOCKED' && blockedPeriod?.data && (
-            <Typography sx={{ px: 3, py: 1 }}>
-              {blockedPeriod?.data?.startBlockedDate &&
-              blockedPeriod?.data?.endBlockedDate
-                ? `현재 블락 기간 : ${blockedPeriod.data.startBlockedDate} ~ ${blockedPeriod.data.endBlockedDate}`
-                : '블락 정보가 없습니다.'}
-            </Typography>
+          {blockedPeriod?.data && (
+            <>
+              <Typography sx={{ px: 3, py: 1 }}>
+                {blockedPeriod?.data?.startBlockedDate &&
+                blockedPeriod?.data?.endBlockedDate
+                  ? `현재 블락 기간 : ${blockedPeriod.data.startBlockedDate} ~ ${blockedPeriod.data.endBlockedDate}`
+                  : '블락 정보가 없습니다.'}
+              </Typography>
+            </>
           )}
 
           <div className="overflow-x-auto">
