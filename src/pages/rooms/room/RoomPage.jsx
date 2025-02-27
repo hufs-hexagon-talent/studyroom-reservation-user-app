@@ -86,8 +86,8 @@ const RoomPage = () => {
   const [selectedDate, setSelectedDate] = useUrlQuery(
     'date',
     format(new Date(), 'yyyy-MM-dd'),
-    departmentId,
   );
+  console.log(selectedDate);
 
   const { mutateAsync: doReserve } = useReserve();
   const { data: reservationsByRooms } = useReservations({
