@@ -283,6 +283,9 @@ const RoomPage = () => {
   // date-picker 설정
   registerLocale('ko', ko);
 
+  console.log('departmentId : ', process.env.REACT_APP_DEPARTMENT_ID);
+  console.log('api url : ', process.env.REACT_APP_API_URL);
+
   // 현재로부터 예약 가능한 방들의 날짜 목록 가져오기
   useEffect(() => {
     const getDate = async () => {
