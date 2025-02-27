@@ -1,7 +1,7 @@
 FROM node:20-alpine AS build-stage
 WORKDIR /app
 
-ENV REACT_APP_APT_URL=APP__REPLACE_ME__REACT_APP_API_URL
+ENV REACT_APP_API_URL=APP__REPLACE_ME__REACT_APP_API_URL
 
 # 의존성 파일 복사 및 설치
 COPY package.json yarn.lock ./
