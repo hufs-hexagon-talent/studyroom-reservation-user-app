@@ -13,7 +13,6 @@ import { DomainProvider } from './contexts/DomainContext';
 
 export const queryClient = new QueryClient();
 
-console.log('[Version]', packagejson.version);
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
