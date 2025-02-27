@@ -91,9 +91,9 @@ const FetchReservations = () => {
           <Table.HeadCell>출석 상태</Table.HeadCell>
           <Table.HeadCell>예약 ID</Table.HeadCell>
           <Table.HeadCell>호실</Table.HeadCell>
+          <Table.HeadCell>날짜</Table.HeadCell>
           <Table.HeadCell>시작 시간</Table.HeadCell>
           <Table.HeadCell>종료 시간</Table.HeadCell>
-          {/* todo : 예약 삭제 & 출석 상태 변경  */}
           <Table.HeadCell>예약 삭제</Table.HeadCell>
           <Table.HeadCell>출석 상태 변경</Table.HeadCell>
         </Table.Head>
@@ -111,7 +111,9 @@ const FetchReservations = () => {
                 <Table.Cell>
                   {reservation.roomName}-{reservation.partitionNumber}
                 </Table.Cell>
-
+                <Table.Cell>
+                  {format(new Date(reservation.reservationStartTime), 'MM-dd')}
+                </Table.Cell>
                 <Table.Cell>
                   {format(new Date(reservation.reservationStartTime), 'HH:mm')}
                 </Table.Cell>
@@ -209,7 +211,7 @@ const FetchReservations = () => {
             </div>
           </Modal.Body>
           <Modal.Footer>
-            <Button color="gray" onClick={() => setOpenDeleteModal(false)}>
+            <Button color="gray" onClick={() => setOpenEditModal(false)}>
               취소
             </Button>
           </Modal.Footer>
