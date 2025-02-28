@@ -81,7 +81,7 @@ const RoomPage = () => {
 
   const navigate = useNavigate();
   const today = new Date();
-  const departmentId = process.env.REACT_APP_DEPARTMENT_ID;
+  const departmentId = 1;
 
   const [selectedDate, setSelectedDate] = useUrlQuery(
     'date',
