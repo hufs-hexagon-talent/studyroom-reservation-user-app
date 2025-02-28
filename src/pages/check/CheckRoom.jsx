@@ -15,7 +15,6 @@ import {
   useUserReservation,
   useNoShow,
   useMyInfo,
-  useBlockedPeriod,
   fetchBlockedPeriod,
 } from '../../api/user.api';
 
@@ -41,8 +40,6 @@ const Check = () => {
       // Popover이 열려있을 때
       const blockedData = await fetchBlockedPeriod();
       setBlockePeriod(blockedData);
-      console.log(blockedData);
-      console.log(blockedPeriod);
       setAnchorEl(null); // Popover 닫기
     } else {
       // Popover이 닫혀있을 때
