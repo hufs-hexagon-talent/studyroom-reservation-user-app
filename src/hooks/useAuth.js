@@ -1,11 +1,10 @@
 import { useCallback } from 'react';
 import { useRecoilState } from 'recoil';
-import axios from 'axios';
 import { authState } from './authState';
+import { apiClient } from '../api/client';
 
 const useAuth = () => {
   const [auth, setAuth] = useRecoilState(authState);
-  const baseUrl = process.env.REACT_APP_API_URL;
   const isTokenValid = token => token !== undefined && token !== null;
 
   const loggedIn = auth.isAuthenticated;
@@ -13,7 +12,7 @@ const useAuth = () => {
   const login = useCallback(
     async ({ id, password }) => {
       try {
-        const response = await axios.post(`${baseUrl}/auth/login`, {
+        const response = await apiClient.post(`/auth/login`, {
           username: id,
           password: password,
         });

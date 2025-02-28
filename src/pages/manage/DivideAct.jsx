@@ -23,7 +23,7 @@ const DivideAct = () => {
         <p
           onClick={() => navigate('/serialCheck')}
           className="inline-block text-xl hover:underline cursor-pointer pb-10">
-          학번으로 사용자 정보 조회 &gt;
+          학번 및 이름으로 사용자 정보 조회 &gt;
         </p>
         <p
           onClick={() => navigate('/blocked')}

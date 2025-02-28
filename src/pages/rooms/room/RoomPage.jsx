@@ -81,12 +81,11 @@ const RoomPage = () => {
 
   const navigate = useNavigate();
   const today = new Date();
-  const departmentId = process.env.REACT_APP_DEPARTMENT_ID;
+  const departmentId = 1;
 
   const [selectedDate, setSelectedDate] = useUrlQuery(
     'date',
     format(new Date(), 'yyyy-MM-dd'),
-    departmentId,
   );
 
   const { mutateAsync: doReserve } = useReserve();
@@ -285,11 +284,11 @@ const RoomPage = () => {
 
   // 현재로부터 예약 가능한 방들의 날짜 목록 가져오기
   useEffect(() => {
-    const getDate = async departmentId => {
+    const getDate = async () => {
       const dates = await fetchDate(departmentId);
       setAvailableDate(dates);
     };
-    getDate(departmentId);
+    getDate();
   }, []);
 
   return (

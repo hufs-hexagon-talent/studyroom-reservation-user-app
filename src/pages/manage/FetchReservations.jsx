@@ -11,6 +11,7 @@ import { format } from 'date-fns';
 import { Button, Table, Modal } from 'flowbite-react';
 import { HiOutlineExclamationCircle } from 'react-icons/hi';
 import { useSnackbar } from 'react-simple-snackbar';
+import { Pagination } from '@mui/material';
 
 const FetchReservations = () => {
   const { mutateAsync: visitedState } = useVisitedState();
@@ -20,11 +21,15 @@ const FetchReservations = () => {
 
   const { id } = useParams();
   const { data: fetchedReservations, refetch } = useReservationsById(id);
+
   const [openDeleteModal, setOpenDeleteModal] = useState(null);
   const [openEditModal, setOpenEditModal] = useState(null);
   const [selectedReservationId, setSelectedReservationId] = useState(null);
   const [error, setError] = useState(null);
   const [reservations, setReservations] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
   const [openErrorSnackbar] = useSnackbar({
     position: 'top-right',
     style: {
@@ -56,6 +61,7 @@ const FetchReservations = () => {
       },
       onError: err => {
         setError('예약 삭제 실패');
+        openErrorSnackbar(error);
         console.error(err);
       },
     });
@@ -75,12 +81,21 @@ const FetchReservations = () => {
         openSuccessSnackbar(response.message, 2500);
       }
 
-      const updatedReservations = await refetch();
-      setOpenEditModal(false); // Close modal after state change
+      await refetch();
+      setOpenEditModal(false);
     } catch (error) {
       openErrorSnackbar(error.response.data.errorMessage, 2500);
     }
   };
+
+  // 현재 페이지의 예약 목록을 가져옴
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedReservations = reservations
+    ?.sort((a, b) => b.reservationId - a.reservationId)
+    .slice(startIndex, startIndex + itemsPerPage);
+
+  const pageCount = Math.ceil(reservations.length / itemsPerPage);
+
   return (
     <div className="overflow-x-auto">
       <h1 className="flex justify-center text-2xl m-10">
@@ -91,14 +106,14 @@ const FetchReservations = () => {
           <Table.HeadCell>출석 상태</Table.HeadCell>
           <Table.HeadCell>예약 ID</Table.HeadCell>
           <Table.HeadCell>호실</Table.HeadCell>
+          <Table.HeadCell>날짜</Table.HeadCell>
           <Table.HeadCell>시작 시간</Table.HeadCell>
           <Table.HeadCell>종료 시간</Table.HeadCell>
-          {/* todo : 예약 삭제 & 출석 상태 변경  */}
           <Table.HeadCell>예약 삭제</Table.HeadCell>
           <Table.HeadCell>출석 상태 변경</Table.HeadCell>
         </Table.Head>
         <Table.Body className="divide-y text-center">
-          {reservations
+          {paginatedReservations
             ?.sort((a, b) => b.reservationId - a.reservationId)
             .map(reservation => (
               <Table.Row
@@ -111,7 +126,12 @@ const FetchReservations = () => {
                 <Table.Cell>
                   {reservation.roomName}-{reservation.partitionNumber}
                 </Table.Cell>
-
+                <Table.Cell>
+                  {format(
+                    new Date(reservation.reservationStartTime),
+                    'yyyy-MM-dd',
+                  )}
+                </Table.Cell>
                 <Table.Cell>
                   {format(new Date(reservation.reservationStartTime), 'HH:mm')}
                 </Table.Cell>
@@ -141,6 +161,15 @@ const FetchReservations = () => {
             ))}
         </Table.Body>
       </Table>
+
+      <Pagination
+        count={pageCount} // 총 페이지 개수
+        page={currentPage} // 현재 페이지
+        onChange={(event, value) => setCurrentPage(value)} // 페이지 변경 핸들러
+        shape="rounded"
+        className="flex justify-center py-8"
+      />
+
       <div className="flex justify-center items-center">
         {/* 예약 삭제 모달 */}
         <Modal
@@ -209,7 +238,7 @@ const FetchReservations = () => {
             </div>
           </Modal.Body>
           <Modal.Footer>
-            <Button color="gray" onClick={() => setOpenDeleteModal(false)}>
+            <Button color="gray" onClick={() => setOpenEditModal(false)}>
               취소
             </Button>
           </Modal.Footer>

@@ -6,7 +6,7 @@ import { useOtp, useMyInfo } from '../../api/user.api';
 const TimerCircularProgressBar = ({ radius, strokeWidth, progress }) => {
   const center = radius + strokeWidth / 2;
   const circumference = 2 * Math.PI * radius;
-  const progressOffset = circumference - (progress / 100) * circumference;
+  const progressOffset = circumference + (progress / 100) * circumference;
 
   return (
     <svg width={radius * 2 + strokeWidth} height={radius * 2 + strokeWidth}>

@@ -13,8 +13,6 @@ import { DomainProvider } from './contexts/DomainContext';
 
 export const queryClient = new QueryClient();
 
-console.log('[Version]', packagejson.version);
-
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
@@ -30,9 +28,4 @@ root.render(
   </React.StrictMode>,
 );
 
-//console.log('REACT_APP_API_URL', process.env.REACT_APP_API_URL);
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();

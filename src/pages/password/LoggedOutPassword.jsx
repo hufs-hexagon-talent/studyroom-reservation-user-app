@@ -43,6 +43,10 @@ const LoggedOutPassword = () => {
       openErrorSnackbar('비밀번호가 일치하지 않습니다.', 2500);
       return;
     }
+    if (newPw === '' || confirmNewPw === '') {
+      openErrorSnackbar('비밀번호를 입력한 후 변경하기를 눌러주세요', 2500);
+      return;
+    }
     try {
       await doPasswordChange({ token: token, newPassword: newPw });
       navigate('/login');
