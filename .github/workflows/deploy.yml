@@ -10,6 +10,8 @@ env:
   ORG_NAME: hufs-hexagon-talent
   PROJECT_NAME: study-room-reservation
   SERVICE_NAME: user-app
+  REACT_APP_API_URL: https://api.studyroom.computer.hufs.ac.kr
+  REACT_APP_DEPARTMENT_ID: 1
 
 jobs:
   build-and-push:
