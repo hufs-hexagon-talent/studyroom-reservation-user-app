@@ -31,8 +31,9 @@ const useAuth = () => {
 
         return true;
       } catch (error) {
+        console.log(error.response?.data?.message);
         throw new Error(
-          error.response?.data?.errorMessage || '로그인에 실패했습니다.',
+          error.response?.data?.message || '로그인에 실패했습니다.',
         );
       }
     },
