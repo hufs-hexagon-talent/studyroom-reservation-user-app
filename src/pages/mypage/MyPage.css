@@ -12,13 +12,29 @@
   padding: 0 6rem;
 }
 
-#menu div {
+.menu-section {
+  margin-bottom: 4rem;
+}
+
+.menu-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.menu-items {
+  display: flex;
+  flex-direction: column;
+}
+
+.menu-item {
   font-size: 1.5rem;
   cursor: pointer;
   border-bottom: 1px solid #ccc;
+  padding: 1rem;
   display: flex;
   align-items: center;
-  padding: 1rem;
 }
 
 #logo {
@@ -32,7 +48,7 @@
     flex-direction: row;
     gap: 2rem;
     text-align: left;
-    padding: 4rem 2.5rem;
+    padding: 3rem 2.5rem;
   }
 
   #info div {
@@ -44,9 +60,17 @@
     margin-bottom: 36px;
   }
 
-  #menu div {
+  .menu-title {
+    font-size: 1.1rem;
+  }
+
+  .menu-item {
     font-size: 1.25rem;
     padding: 0.75rem;
+  }
+
+  .menu-section {
+    margin-bottom: 2rem;
   }
 
   #logo {
