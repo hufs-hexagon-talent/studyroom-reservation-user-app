@@ -44,19 +44,16 @@ const NavigationBarCes = () => {
             )}
             <Navbar.Link href="/">세미나실 예약</Navbar.Link>
             <Navbar.Link
-              href={loggedIn ? '/check' : '#'}
-              className={!loggedIn ? 'pointer-events-none text-gray-400' : ''}>
-              내 신청 현황
-            </Navbar.Link>
-            <Navbar.Link
               href={loggedIn ? '/otp' : '#'}
               className={!loggedIn ? 'pointer-events-none text-gray-400' : ''}>
               내 QR코드
             </Navbar.Link>
+            <Navbar.Link
+              href={loggedIn ? '/mypage' : '#'}
+              className={!loggedIn ? 'pointer-events-none text-gray-400' : ''}>
+              마이페이지
+            </Navbar.Link>
             <Navbar.Link href="/notice">이용 규칙</Navbar.Link>
-            {loggedIn && (
-              <Navbar.Link href="/password">비밀번호 변경</Navbar.Link>
-            )}
             {loggedIn ? (
               <Navbar.Link href="/" onClick={logout}>
                 로그아웃

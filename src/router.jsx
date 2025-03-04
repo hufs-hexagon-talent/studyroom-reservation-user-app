@@ -22,6 +22,8 @@ import DivideAct from './pages/manage/DivideAct';
 import SerialCheck from './pages/manage/SerialCheck';
 import FetchBlockedUser from './pages/manage/FetchBlockedUser';
 import FetchReservations from './pages/manage/FetchReservations';
+import MyPage from './pages/mypage/MyPage';
+import NoShow from './pages/check/NoShow';
 
 const RouterComponent = () => {
   const { loggedIn } = useAuth();
@@ -49,6 +51,8 @@ const RouterComponent = () => {
                   <Route path="/notice" element={<Notice />} />
                   <Route path="/check" element={<Check />} />
                   <Route path="/otp" element={<OtpPage />} />
+                  <Route path="/mypage" element={<MyPage />} />
+                  <Route path="/noshow" element={<NoShow />} />
                   <Route path="/password" element={<LoggedInPassword />} />
                 </>
               )}
@@ -69,6 +73,8 @@ const RouterComponent = () => {
                   path="/fetchReservations/:id"
                   element={<FetchReservations />}
                 />
+                <Route path="/mypage" element={<MyPage />} />
+                <Route path="/noshow" element={<NoShow />} />
               </>
             )}
             {loggedIn && serviceRole === 'RESIDENT' && (
