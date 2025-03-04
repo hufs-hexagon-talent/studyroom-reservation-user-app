@@ -1,0 +1,56 @@
+#info {
+  display: flex;
+  justify-content: left;
+  align-items: center;
+  gap: 4rem;
+  padding: 4rem 6rem;
+  flex-direction: row;
+  font-size: x-large;
+}
+
+#menu {
+  padding: 0 6rem;
+}
+
+#menu div {
+  font-size: 1.5rem;
+  cursor: pointer;
+  border-bottom: 1px solid #ccc;
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+}
+
+#logo {
+  width: 9rem;
+  height: 9rem;
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+  #info {
+    flex-direction: row;
+    gap: 2rem;
+    text-align: left;
+    padding: 4rem 2.5rem;
+  }
+
+  #info div {
+    font-size: 1rem;
+  }
+
+  #menu {
+    padding: 0 2rem;
+    margin-bottom: 36px;
+  }
+
+  #menu div {
+    font-size: 1.25rem;
+    padding: 0.75rem;
+  }
+
+  #logo {
+    width: 6rem;
+    height: 6rem;
+  }
+}
