@@ -6,7 +6,6 @@ import { useSnackbar } from 'react-simple-snackbar';
 import './LoggedInPassword.css';
 
 const LoggedInPassword = () => {
-  const [id, setId] = useState('');
   const [prePassword, setPrePassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -15,12 +14,14 @@ const LoggedInPassword = () => {
   const { data: me } = useMyInfo();
   const { mutateAsync: changePw } = usePassword();
   const navigate = useNavigate();
+
   const [openErrorSnackbar] = useSnackbar({
     position: 'top-right',
     style: {
       backgroundColor: '#FF3333', // 빨간색
     },
   });
+
   const [openSuccessSnackbar] = useSnackbar({
     position: 'top-right',
     style: {
@@ -28,12 +29,6 @@ const LoggedInPassword = () => {
       color: '#FFFFFF',
     },
   });
-
-  // 아이디
-  const handleIdChange = e => {
-    setId(e.target.value);
-    setIdError('');
-  };
 
   // 기존 비밀번호
   const handlePwChange = e => {
@@ -56,16 +51,9 @@ const LoggedInPassword = () => {
     e.preventDefault();
 
     // 모든 필드가 채워져 있는지 확인
-    if (!id || !prePassword || !newPassword || !confirmPassword) {
+    if (!prePassword || !newPassword || !confirmPassword) {
       const errorMessage = '모든 값을 입력해주세요';
       openErrorSnackbar(errorMessage); // 모든 값을 입력하라는 오류 메시지 표시
-      return;
-    }
-
-    if (me.username !== id) {
-      const errorMessage = '본인의 아이디가 아닙니다.';
-      setIdError(errorMessage);
-      openErrorSnackbar(errorMessage); // 직접 문자열을 전달
       return;
     }
 
@@ -75,11 +63,6 @@ const LoggedInPassword = () => {
       openErrorSnackbar(errorMessage); // 직접 문자열을 전달
       return;
     }
-
-    // if (!users || !users.find(user => user.username === id)) {
-    //   setIdError('존재하지 않는 아이디입니다.');
-    //   return;
-    // }
 
     setIdError('');
     setPasswordError('');
@@ -100,18 +83,6 @@ const LoggedInPassword = () => {
         id="form"
         className="flex flex-col max-w-md w-full gap-4"
         onSubmit={handleSubmit}>
-        <div>
-          <div className="mb-2 block">
-            <Label htmlFor="email1" value="아이디" />
-          </div>
-          <TextInput
-            onChange={handleIdChange}
-            id="email1"
-            type="text"
-            placeholder="아이디를 입력해주세요"
-            required
-          />
-        </div>
         <div>
           <div className="mb-2 block">
             <Label htmlFor="password1" value="기존 비밀번호" />
