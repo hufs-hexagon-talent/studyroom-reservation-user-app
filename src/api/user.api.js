@@ -2,6 +2,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { apiClient } from './client';
 
 import { queryClient } from '../index';
+import axios from 'axios';
 
 // id, pw 확인할 때 쓰려고
 const fetchAllUsers = async () => {
@@ -500,5 +501,31 @@ export const useBlockedPeriod = () => {
   return useQuery({
     queryKey: ['blockedPeriod'],
     queryFn: fetchBlockedPeriod,
+  });
+};
+
+// 로그인 후, 자신의 이메일 수정 요청
+export const useNewEmailSend = () => {
+  return useMutation({
+    mutationFn: async ({ password, newEmail }) => {
+      const newEmailSend_res = await apiClient.post('/users/me/mail/send', {
+        password,
+        newEmail,
+      });
+      return newEmailSend_res.data;
+    },
+  });
+};
+
+// 로그인 후, 인증 코드 검증 후, 이메일 수정 처리
+export const useNewEmailVerify = () => {
+  return useMutation({
+    mutationFn: async ({ email, verifyCode }) => {
+      const newEmailVerify_res = await apiClient.post('/users/me/mail/verify', {
+        email,
+        verifyCode,
+      });
+      return newEmailVerify_res.data;
+    },
   });
 };
