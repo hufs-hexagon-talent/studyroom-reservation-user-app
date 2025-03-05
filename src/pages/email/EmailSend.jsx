@@ -15,6 +15,7 @@ const EmailSend = () => {
   const [timerDisplay, setTimerDisplay] = useState('');
   const [disabled, setDisabled] = useState(false);
   const [isEmailSendSuccess, setIsEmailSendSuccess] = useState(false);
+  const [isPassword, setIsPassword] = useState(false);
 
   const navigate = useNavigate();
 
@@ -94,7 +95,6 @@ const EmailSend = () => {
       );
     }
   };
-  // todo : 인증번호 발송 실패했을 때 버튼이 안눌려지는 문제
   return (
     <div className="flex flex-col items-center w-screen p-5">
       <h1
@@ -115,8 +115,11 @@ const EmailSend = () => {
       <div className="flex items-center justify-center border rounded-lg p-2 mb-5 w-full max-w-md">
         <div className="relative flex-grow">
           <input
-            onChange={e => setPassword(e.target.value)}
-            type="text"
+            onChange={e => {
+              setPassword(e.target.value);
+              setIsPassword(e.target.value.trim().length > 0);
+            }}
+            type="password"
             className="focus:outline-none w-full p-2 text-sm border-none"
             placeholder="비밀번호 입력"
             value={password}
@@ -128,7 +131,7 @@ const EmailSend = () => {
         <div className="relative flex-grow">
           <input
             onChange={e => setNewEmail(e.target.value)}
-            type="text"
+            type="email"
             className="focus:outline-none w-full p-2 text-sm border-none"
             placeholder="새 이메일 입력"
             value={newEmail}
@@ -142,9 +145,9 @@ const EmailSend = () => {
         <button
           id="button"
           onClick={handleSendCode}
-          className={`text-white p-2 rounded-lg ml-2 ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+          className={`text-white p-2 rounded-lg ml-2 ${disabled || !isPassword ? 'opacity-50 cursor-not-allowed' : ''}`}
           style={{ backgroundColor: '#1e2332' }}
-          disabled={disabled}>
+          disabled={disabled || !isPassword}>
           인증 코드 발송
         </button>
       </div>

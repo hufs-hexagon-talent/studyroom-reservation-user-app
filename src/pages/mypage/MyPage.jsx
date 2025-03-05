@@ -36,6 +36,9 @@ const MyPage = () => {
         <div className="menu-section">
           <div className="menu-title">내 예약 관리</div>
           <div className="menu-items">
+            <div className="menu-item" onClick={() => navigate('/otp')}>
+              내 QR코드
+            </div>
             <div className="menu-item" onClick={() => navigate('/check')}>
               신청 현황 조회
             </div>
@@ -47,9 +50,6 @@ const MyPage = () => {
                 )
               }>
               예약 정정 요청
-            </div>
-            <div className="menu-item" onClick={() => navigate('/otp')}>
-              내 QR코드
             </div>
           </div>
         </div>
