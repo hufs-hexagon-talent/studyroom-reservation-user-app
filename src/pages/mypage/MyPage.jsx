@@ -29,10 +29,16 @@ const MyPage = () => {
           <div className="menu-item" onClick={() => navigate('/password')}>
             비밀번호 변경
           </div>
+          <div className="menu-item" onClick={() => navigate('/emailSend')}>
+            이메일 변경
+          </div>
         </div>
         <div className="menu-section">
           <div className="menu-title">내 예약 관리</div>
           <div className="menu-items">
+            <div className="menu-item" onClick={() => navigate('/otp')}>
+              내 QR코드
+            </div>
             <div className="menu-item" onClick={() => navigate('/check')}>
               신청 현황 조회
             </div>
