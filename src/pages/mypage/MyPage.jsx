@@ -29,6 +29,9 @@ const MyPage = () => {
           <div className="menu-item" onClick={() => navigate('/password')}>
             비밀번호 변경
           </div>
+          <div className="menu-item" onClick={() => navigate('/emailSend')}>
+            이메일 변경
+          </div>
         </div>
         <div className="menu-section">
           <div className="menu-title">내 예약 관리</div>
@@ -44,6 +47,9 @@ const MyPage = () => {
                 )
               }>
               예약 정정 요청
+            </div>
+            <div className="menu-item" onClick={() => navigate('/otp')}>
+              내 QR코드
             </div>
           </div>
         </div>
