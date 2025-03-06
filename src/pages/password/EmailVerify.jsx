@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSnackbar } from 'react-simple-snackbar';
 import './EmailVerify.css';
-import { useEmailSend, useEmailVerify } from '../../api/user.api';
+import { useEmailSend, useEmailVerify } from '../../api/auth.api';
 import { Button } from 'flowbite-react';
 
 const EmailVerify = () => {

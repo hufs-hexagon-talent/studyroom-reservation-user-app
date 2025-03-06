@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { useAllPartitions } from '../../api/user.api';
 import { useNavigate } from 'react-router-dom';
 import { Button } from 'flowbite-react';
+import { useAllPartitions } from '../../api/roomPartition.api';
 
 const SelectRoom = () => {
   const { data: partitions, error, isLoading } = useAllPartitions();

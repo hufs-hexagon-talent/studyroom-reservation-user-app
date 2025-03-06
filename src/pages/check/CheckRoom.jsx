@@ -9,21 +9,19 @@ import {
 import { format } from 'date-fns';
 import { Button, Modal, Table } from 'flowbite-react';
 import { HiOutlineExclamationCircle } from 'react-icons/hi';
-
 import {
+  useNoShow,
+  useLatestReservation,
   useDeleteReservation,
   useUserReservation,
-  useNoShow,
-  useMyInfo,
-  fetchBlockedPeriod,
-} from '../../api/user.api';
+} from '../../api/reservation.api';
+import { useMyInfo, fetchBlockedPeriod } from '../../api/user.api';
 
 const Check = () => {
   const { data: noShow } = useNoShow();
   const { data: reservations } = useUserReservation();
   const { data: me } = useMyInfo();
-  // const { data: blockedPeriod, refetch: fetchBlockedPeriod } =
-  //   useBlockedPeriod();
+  const { data: latest } = useLatestReservation();
   const { mutate: deleteReservation } = useDeleteReservation();
 
   const [currentPage, setCurrentPage] = useState(1);

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useAllRooms } from '../../api/user.api';
+import { useAllRooms } from '../../api/room.api';
 import { useNavigate } from 'react-router-dom';
 import { Button } from 'flowbite-react';
 import { useSnackbar } from 'react-simple-snackbar';
