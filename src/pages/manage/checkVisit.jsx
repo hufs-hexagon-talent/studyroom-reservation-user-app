@@ -4,12 +4,12 @@ import DatePicker, { registerLocale } from 'react-datepicker';
 import ko from 'date-fns/locale/ko';
 import {
   useReservationsByPartitions,
-  usePartition,
   useAdminDeleteReservation,
   useVisitedState,
   useNotVisitedState,
   useProcessedState,
-} from '../../api/user.api';
+} from '../../api/reservation.api';
+import { usePartition } from '../../api/roomPartition.api';
 import { Button, Table, Modal } from 'flowbite-react';
 import { HiOutlineExclamationCircle } from 'react-icons/hi';
 import { useSnackbar } from 'react-simple-snackbar';

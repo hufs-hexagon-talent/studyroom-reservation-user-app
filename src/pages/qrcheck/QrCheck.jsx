@@ -1,12 +1,9 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import Inko from 'inko';
-import {
-  useCheckIn,
-  useRooms,
-  useAllRooms,
-  fetchServiceRole,
-  useMyInfo,
-} from '../../api/user.api';
+import { fetchServiceRole, useMyInfo } from '../../api/user.api';
+import { useCheckIn } from '../../api/checkin.api';
+import { useRooms, useAllRooms } from '../../api/room.api';
+
 import { convertToEnglish } from '../../api/convertToEnglish';
 import { useNavigate } from 'react-router-dom';
 import useAuth from '../../hooks/useAuth';

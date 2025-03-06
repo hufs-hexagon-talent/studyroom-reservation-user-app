@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Button as MuiButton, Popover, Typography } from '@mui/material';
-import { useNoShow, fetchBlockedPeriod } from '../../api/user.api';
+import { fetchBlockedPeriod } from '../../api/user.api';
+import { useNoShow } from '../../api/reservation.api';
+
 import { Table } from 'flowbite-react';
 import { format } from 'date-fns';
 
