@@ -2,11 +2,18 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import Logo from '../../assets/logoCes.png';
 import { useMyInfo } from '../../api/user.api';
+import { useLatestReservation } from '../../api/reservation.api';
+import { format } from 'date-fns';
 import './MyPage.css';
+import useIsMobile from '../../hooks/useIsMobile';
+import ClockGreen from '../../assets/clock Green.png';
+import ClockGray from '../../assets/clock gray.png';
 
 const MyPage = () => {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const { data: me } = useMyInfo();
+  const { data: latest } = useLatestReservation();
   const department = '컴퓨터공학부';
 
   return (
@@ -18,7 +25,75 @@ const MyPage = () => {
           <div>
             {me?.serial} | {department}
           </div>
-          <div>{me?.email}</div>
+          <div className="pb-1">{me?.email}</div>
+          {latest?.length > 0 ? (
+            <div>
+              {isMobile ? (
+                <div className="flex flex-row border-t-2 pt-1">
+                  <img className="w-4 h-4 mt-1" src={ClockGreen} />
+                  <div>
+                    <div
+                      style={{ fontSize: 15 }}
+                      className="whitespace-normal break-keep ml-2">
+                      {`${format(latest[0].reservationStartTime, 'MM월 dd일 HH:mm')} ~ ${format(latest[0].reservationEndTime, 'HH:mm')}`}
+                    </div>
+                    <div
+                      style={{ fontSize: 15 }}
+                      className="whitespace-normal break-keep ml-2">
+                      {`${latest[0].roomName}-${latest[0].partitionNumber}호`}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex flex-row justify-center items-center border-t-2 pt-2">
+                  <div className="flex flex-row items-start bg-[#dfebde] px-2 py-1 rounded-2xl">
+                    <div className="bg-[#6d9711] w-2 h-2 inline-block mr-2 mt-1.5 ml-1 rounded-full aspect-square"></div>
+                    <div
+                      style={{ fontSize: 14 }}
+                      className="whitespace-normal break-keep text-left">
+                      현재 예약
+                    </div>
+                  </div>
+                  <div
+                    style={{ fontSize: 15 }}
+                    className="whitespace-normal break-keep ml-2">
+                    {`${latest[0].roomName}-${latest[0].partitionNumber}호 / ${format(latest[0].reservationStartTime, 'MM월 dd일 HH:mm')} ~ ${format(latest[0].reservationEndTime, 'HH:mm')}`}
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <>
+              {isMobile ? (
+                <div className="flex flex-row border-t-2 pt-1">
+                  <img className="w-4 h-4 mt-1" src={ClockGray} />
+                  <div
+                    style={{ fontSize: 15 }}
+                    className="whitespace-normal break-keep ml-2">
+                    현재 출석 해야 할 예약이 없습니다.
+                  </div>
+                </div>
+              ) : (
+                <div className="flex flex-row justify-center items-center border-t-2 pt-2">
+                  <div className="inline-block bg-gray-300 px-2 py-0.5 rounded-2xl">
+                    <div className="flex flex-row items-start">
+                      <div className="bg-gray-500 w-2 h-2 inline-block mr-2 mt-1.5 ml-1 rounded-full aspect-square "></div>
+                      <div
+                        className="whitespace-normal break-keep"
+                        style={{ fontSize: 14 }}>
+                        현재 예약
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    style={{ fontSize: 15 }}
+                    className="whitespace-normal break-keep ml-2">
+                    현재 출석 해야 할 예약이 없습니다.
+                  </div>
+                </div>
+              )}
+            </>
+          )}
         </div>
       </div>
 
