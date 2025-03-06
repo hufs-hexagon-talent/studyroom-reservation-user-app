@@ -9,7 +9,7 @@ import {
 import { format } from 'date-fns';
 import { Button, Modal, Table } from 'flowbite-react';
 import { HiOutlineExclamationCircle } from 'react-icons/hi';
-import { useNoShow } from '../../api/reservation.api';
+import { useNoShow, useLatestReservation } from '../../api/reservation.api';
 import { useMyInfo, fetchBlockedPeriod } from '../../api/user.api';
 
 import {
@@ -21,6 +21,7 @@ const Check = () => {
   const { data: noShow } = useNoShow();
   const { data: reservations } = useUserReservation();
   const { data: me } = useMyInfo();
+  const { data: latest } = useLatestReservation();
   const { mutate: deleteReservation } = useDeleteReservation();
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -74,18 +75,30 @@ const Check = () => {
   const pageCount = reservations
     ? Math.ceil(reservations.length / itemsPerPage)
     : 0;
-
+  console.log(latest);
   return (
     <div>
       <div className="flex justify-center text-2xl mt-20">
         {me?.name}님의 신청 현황
       </div>
-      <div className="inline-block bg-[#dfebde] px-2 py-1 rounded-2xl m-2">
-        <div className="flex flex-row justify-center items-center">
-          <div className="bg-[#6d9711] w-4 h-4 inline-block mr-2 rounded-full"></div>
-          <div>현재 예약 : </div>
+      {latest?.length > 0 ? (
+        <div className="inline-block bg-[#dfebde] px-2 py-1 rounded-2xl mt-10 mb-3 mx-2">
+          <div className="flex flex-row justify-center items-center">
+            <div className="bg-[#6d9711] w-4 h-4 inline-block mr-2 rounded-full"></div>
+            <div>
+              {`현재 예약 : ${latest[0].roomName}-${latest[0].partitionNumber}호 / ${format(latest[0].reservationStartTime, 'MM월 dd일 HH:mm')} ~ ${format(latest[0].reservationEndTime, 'MM월 dd일 HH:mm')}`}
+            </div>
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="inline-block bg-gray-300 px-2 py-1 rounded-2xl mt-10 mb-3 mx-2">
+          <div className="flex flex-row justify-center items-center">
+            <div className="bg-gray-500 w-4 h-4 inline-block mr-2 rounded-full"></div>
+            <div>현재 출석해야 할 예약이 존재하지 않습니다.</div>
+          </div>
+        </div>
+      )}
+
       <div id="table" className="overflow-x-auto">
         <Table className="border">
           <Table.Head

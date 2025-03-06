@@ -1,6 +1,7 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { apiClient } from './client';
 import { queryClient } from '../index';
+import axios from 'axios';
 
 // 자신의 예약 생성
 export const useReserve = () => {
@@ -156,5 +157,34 @@ export const useReservationsById = userId => {
   return useQuery({
     queryKey: ['reservationsById'],
     queryFn: () => fetchReservationsById(userId),
+  });
+};
+
+// 자신이 현재 체크인 해야하는 예약 조회
+const fetchLatestReservation = async () => {
+  // 로컬스토리지에서 authState 가져오기
+  const authState = JSON.parse(localStorage.getItem('authState') || '{}');
+  const accessToken = authState?.accessToken;
+
+  if (!accessToken) {
+    throw new Error('Access token is missing');
+  }
+
+  const latest_res = await axios.get(
+    'https://api.studyroom-qa.alpaon.net/reservations/me/latest',
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+    },
+  );
+  return latest_res.data.data.reservationInfoResponses;
+};
+
+export const useLatestReservation = () => {
+  return useQuery({
+    queryKey: ['latest'],
+    queryFn: () => fetchLatestReservation(),
   });
 };
