@@ -6,7 +6,7 @@ import {
   useVisitedState,
   useProcessedState,
   useAdminDeleteReservation,
-} from '../../api/user.api';
+} from '../../api/reservation.api';
 import { format } from 'date-fns';
 import { Button, Table, Modal } from 'flowbite-react';
 import { HiOutlineExclamationCircle } from 'react-icons/hi';

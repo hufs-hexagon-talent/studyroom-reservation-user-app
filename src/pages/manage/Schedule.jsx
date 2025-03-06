@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { Checkbox, Table, Button } from 'flowbite-react';
-import {
-  useAllPolicies,
-  useAllRooms,
-  useReservationsById,
-  useSchedules,
-} from '../../api/user.api';
+
+import { useAllPolicies } from '../../api/roomOperationPolicy.api';
+import { useAllRooms } from '../../api/room.api';
+import { useReservationsById } from '../../api/reservation.api';
+import { useSchedules } from '../../api/policySchedule.api';
+
 import DatePicker, { registerLocale } from 'react-datepicker';
 import { ko } from 'date-fns/locale';
 import 'react-datepicker/dist/react-datepicker.css';

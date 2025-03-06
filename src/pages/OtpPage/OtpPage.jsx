@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import QRCode from 'qrcode.react';
 
-import { useOtp, useMyInfo } from '../../api/user.api';
+import { useMyInfo } from '../../api/user.api';
+import { useOtp } from '../../api/checkin.api';
 
 const TimerCircularProgressBar = ({ radius, strokeWidth, progress }) => {
   const center = radius + strokeWidth / 2;

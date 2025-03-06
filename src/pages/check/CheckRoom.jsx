@@ -9,21 +9,18 @@ import {
 import { format } from 'date-fns';
 import { Button, Modal, Table } from 'flowbite-react';
 import { HiOutlineExclamationCircle } from 'react-icons/hi';
+import { useNoShow } from '../../api/reservation.api';
+import { useMyInfo, fetchBlockedPeriod } from '../../api/user.api';
 
 import {
   useDeleteReservation,
   useUserReservation,
-  useNoShow,
-  useMyInfo,
-  fetchBlockedPeriod,
-} from '../../api/user.api';
+} from '../../api/reservation.api';
 
 const Check = () => {
   const { data: noShow } = useNoShow();
   const { data: reservations } = useUserReservation();
   const { data: me } = useMyInfo();
-  // const { data: blockedPeriod, refetch: fetchBlockedPeriod } =
-  //   useBlockedPeriod();
   const { mutate: deleteReservation } = useDeleteReservation();
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -83,7 +80,13 @@ const Check = () => {
       <div className="flex justify-center text-2xl mt-20">
         {me?.name}님의 신청 현황
       </div>
-      <div id="table" className="overflow-x-auto mt-10">
+      <div className="inline-block bg-[#dfebde] px-2 py-1 rounded-2xl m-2">
+        <div className="flex flex-row justify-center items-center">
+          <div className="bg-[#6d9711] w-4 h-4 inline-block mr-2 rounded-full"></div>
+          <div>현재 예약 : </div>
+        </div>
+      </div>
+      <div id="table" className="overflow-x-auto">
         <Table className="border">
           <Table.Head
             style={{ fontSize: 15 }}

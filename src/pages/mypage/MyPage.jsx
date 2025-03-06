@@ -24,15 +24,7 @@ const MyPage = () => {
 
       {/* 메뉴 */}
       <div id="menu">
-        <div className="menu-section">
-          <div className="menu-title">내 계정 관리</div>
-          <div className="menu-item" onClick={() => navigate('/password')}>
-            비밀번호 변경
-          </div>
-          <div className="menu-item" onClick={() => navigate('/emailSend')}>
-            이메일 변경
-          </div>
-        </div>
+        {/* 내 예약 관리 */}
         <div className="menu-section">
           <div className="menu-title">내 예약 관리</div>
           <div className="menu-items">
@@ -53,6 +45,17 @@ const MyPage = () => {
             </div>
           </div>
         </div>
+        {/* 내 계정 관리 */}
+        <div className="menu-section">
+          <div className="menu-title">내 계정 관리</div>
+          <div className="menu-item" onClick={() => navigate('/password')}>
+            비밀번호 변경
+          </div>
+          <div className="menu-item" onClick={() => navigate('/emailSend')}>
+            이메일 변경
+          </div>
+        </div>
+        {/* 문의 및 건의 */}
         <div className="menu-section">
           <div className="menu-title">문의 및 건의</div>
           <div
@@ -60,8 +63,8 @@ const MyPage = () => {
             onClick={() =>
               window.open(
                 'https://hwangbbang.notion.site/ebd/1ac6628bcfd1807a93a1eed927f37595',
-                '_blank', // 새 탭에서 열기
-                'noopener,noreferrer', // 보안 속성 추가
+                '_blank',
+                'noopener,noreferrer',
               )
             }>
             의견 보내기

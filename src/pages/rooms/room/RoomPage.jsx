@@ -25,8 +25,9 @@ import { ko } from 'date-fns/locale';
 import { useSnackbar } from 'react-simple-snackbar';
 
 import 'react-datepicker/dist/react-datepicker.css';
+import { fetchDate } from '../../../api/policySchedule.api';
+import { useReservations, useReserve } from '../../../api/reservation.api';
 
-import { fetchDate, useReservations, useReserve } from '../../../api/user.api';
 import useAuth from '../../../hooks/useAuth';
 import Button from '../../../components/button/Button';
 
