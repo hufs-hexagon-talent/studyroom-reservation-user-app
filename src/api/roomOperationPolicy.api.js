@@ -1,6 +1,5 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { apiClient } from './client';
-import { queryClient } from '../index';
 
 // 모든 roomPolicy 조회
 export const fetchAllPolicies = async () => {

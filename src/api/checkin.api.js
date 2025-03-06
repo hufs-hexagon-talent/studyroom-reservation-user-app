@@ -1,6 +1,5 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { apiClient } from './client';
-import { queryClient } from '../index';
 
 export const fetchOtp = async () => {
   const otp_response = await apiClient.post('/check-in/otp');

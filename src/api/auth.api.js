@@ -1,6 +1,5 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { apiClient } from './client';
-import { queryClient } from '../index';
 
 // 이메일 전송
 export const useEmailSend = () => {

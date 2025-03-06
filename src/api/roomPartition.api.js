@@ -1,6 +1,5 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { apiClient } from './client';
-import { queryClient } from '../index';
 
 // partition 조회
 export const fetchPartiiton = async partitonId => {

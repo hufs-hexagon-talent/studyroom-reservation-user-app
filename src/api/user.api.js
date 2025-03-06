@@ -1,6 +1,5 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { apiClient } from './client';
-import { queryClient } from '../index';
 
 // id, pw 확인할 때 쓰려고
 const fetchAllUsers = async () => {
