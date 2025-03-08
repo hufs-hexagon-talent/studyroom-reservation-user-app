@@ -68,7 +68,7 @@ const LoggedInPassword = () => {
     setPasswordError('');
     try {
       const response = await changePw({ prePassword, newPassword });
-      openSuccessSnackbar(response.message);
+      openSuccessSnackbar('비밀번호가 성공적으로 변경되었습니다.');
       navigate('/');
     } catch (error) {
       console.error('Failed to change password:', error);
