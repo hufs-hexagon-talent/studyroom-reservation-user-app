@@ -25,6 +25,7 @@ import FetchReservations from './pages/manage/FetchReservations';
 import MyPage from './pages/mypage/MyPage';
 import NoShow from './pages/check/NoShow';
 import EmailSend from './pages/email/EmailSend';
+import UploadBanner from './pages/manage/UploadBanner';
 
 const RouterComponent = () => {
   const { loggedIn } = useAuth();
@@ -78,6 +79,7 @@ const RouterComponent = () => {
                 <Route path="/mypage" element={<MyPage />} />
                 <Route path="/noshow" element={<NoShow />} />
                 <Route path="/emailSend" element={<EmailSend />} />
+                <Route path="/banner" element={<UploadBanner />} />
               </>
             )}
             {loggedIn && serviceRole === 'RESIDENT' && (

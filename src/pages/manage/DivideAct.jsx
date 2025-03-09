@@ -30,6 +30,11 @@ const DivideAct = () => {
           className="inline-block text-xl hover:underline cursor-pointer pb-10">
           블락 사용자 조회하러 가기 &gt;
         </p>
+        <p
+          onClick={() => navigate('/banner')}
+          className="inline-block text-xl hover:underline cursor-pointer pb-10">
+          배너 업로드하러 가기 &gt;
+        </p>
       </div>
     </div>
   );
