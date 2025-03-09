@@ -1,13 +1,13 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import Logo from '../../assets/logoCes.png';
+import Logo from '../../assets/logo/logoCes.png';
 import { useMyInfo } from '../../api/user.api';
 import { useLatestReservation } from '../../api/reservation.api';
 import { format } from 'date-fns';
 import './MyPage.css';
 import useIsMobile from '../../hooks/useIsMobile';
-import ClockGreen from '../../assets/clock Green.png';
-import ClockGray from '../../assets/clock gray.png';
+import ClockGreen from '../../assets/clock_icon/clock Green.png';
+import ClockGray from '../../assets/clock_icon/clock gray.png';
 
 const MyPage = () => {
   const navigate = useNavigate();
