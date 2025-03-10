@@ -90,6 +90,32 @@ export const useDeleteBanner = () => {
   });
 };
 
+// [관리자] 배너 수정
+export const useEditBanner = () => {
+  return useMutation({
+    mutationFn: async ({ bannerId, bannerType, imageUrl, linkUrl, active }) => {
+      const authState = JSON.parse(localStorage.getItem('authState'));
+      const accessToken = authState?.accessToken;
+
+      const editBanner_res = await axios.patch(
+        `https://api.studyroom-qa.alpaon.net/banners/${bannerId}`,
+        {
+          bannerType,
+          imageUrl,
+          linkUrl,
+          active,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
+      );
+      return editBanner_res.data.data;
+    },
+  });
+};
+
 // 활성화 배너 조회
 const fetchActivatedBanner = async () => {
   const authState = JSON.parse(localStorage.getItem('authState'));

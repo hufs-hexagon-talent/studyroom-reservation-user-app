@@ -18,8 +18,11 @@ const BannerDelete = ({ activatedBanner, refetch }) => {
     style: { backgroundColor: '#FF3333' },
   });
 
-  const handleCheckboxChange = bannerId => {
-    setBannerId(bannerId);
+  const handleCheckboxChange = selectedBannerId => {
+    // 같은 배너를 다시 클릭하면 선택 해제
+    setBannerId(prevId =>
+      prevId === selectedBannerId ? null : selectedBannerId,
+    );
   };
 
   const deleteBanner = async () => {
@@ -39,7 +42,7 @@ const BannerDelete = ({ activatedBanner, refetch }) => {
   };
 
   return (
-    <div className="flex flex-col items-center w-full mt-20">
+    <div className="flex flex-col items-center w-full mt-20 md:mt-10">
       <h3 className="text-2xl text-center mb-10">배너 삭제하기</h3>
       <div className="w-1/3 min-w-[300px] flex flex-col items-center gap-4">
         {activatedBanner?.map((banner, index) => (
