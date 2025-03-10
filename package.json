@@ -34,6 +34,7 @@
     "react-simple-snackbar": "^1.1.11",
     "recoil": "^0.7.7",
     "styled-components": "^6.1.11",
+    "swiper": "^11.2.5",
     "web-vitals": "^4.0.1"
   },
   "devDependencies": {
