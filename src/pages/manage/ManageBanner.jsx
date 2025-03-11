@@ -8,7 +8,7 @@ const UploadBanner = () => {
   const { data: activatedBanner, refetch } = useActivatedBanner();
 
   return (
-    <div className="flex flex-col md:flex-row mb-10 items-center">
+    <div className="flex flex-col md:flex-row mb-10 justify-center items-start gap-10 w-full px-10 mt-10">
       <BannerUpload refetch={refetch} />
       <BannerDelete activatedBanner={activatedBanner} refetch={refetch} />
       <BannerEdit refetch={refetch} />
