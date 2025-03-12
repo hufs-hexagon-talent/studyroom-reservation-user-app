@@ -8,6 +8,7 @@ import { useActivatedBanner } from '../../api/banner.api';
 const Banner = () => {
   const notionUrl = 'https://hwangbbang.notion.site/';
   const siteUrl = 'https://studyroom.computer.hufs.ac.kr/';
+  const qaUrl = 'https://studyroom-qa.alpaon.net/';
 
   const navigate = useNavigate();
   const { data: banners = [] } = useActivatedBanner();
@@ -24,6 +25,9 @@ const Banner = () => {
                     window.open(banner.linkUrl, '_blank');
                   } else if (banner.linkUrl.startsWith(siteUrl)) {
                     const path = banner.linkUrl.replace(siteUrl, '');
+                    navigate(path);
+                  } else if (banner.linkUrl.startsWith(qaUrl)) {
+                    const path = banner.linkUrl.replace(qaUrl, '');
                     navigate(path);
                   }
                 }
