@@ -107,17 +107,9 @@ const MyPage = () => {
               내 QR코드
             </div>
             <div className="menu-item" onClick={() => navigate('/check')}>
-              신청 현황 조회
+              내 예약 조회
             </div>
-            <div
-              className="menu-item"
-              onClick={() =>
-                window.open(
-                  'https://hwangbbang.notion.site/1ac6628bcfd1802aa2fef92695b8b378',
-                )
-              }>
-              예약 정정 요청
-            </div>
+            
           </div>
         </div>
         {/* 내 계정 관리 */}
@@ -133,6 +125,15 @@ const MyPage = () => {
         {/* 문의 및 건의 */}
         <div className="menu-section">
           <div className="menu-title">문의 및 건의</div>
+          <div
+              className="menu-item"
+              onClick={() =>
+                window.open(
+                  'https://hwangbbang.notion.site/1ac6628bcfd1802aa2fef92695b8b378',
+                )
+              }>
+              정정 요청
+            </div>
           <div
             className="menu-item"
             onClick={() =>
