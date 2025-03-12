@@ -5,6 +5,8 @@ import { Autoplay } from 'swiper/modules';
 import { useActivatedBanner } from '../../api/banner.api';
 
 const Banner = () => {
+  const notionUrl = 'https://hwangbbang.notion.site/';
+  const siteUrl = 'https://studyroom.computer.hufs.ac.kr/';
   const { data: banners = [] } = useActivatedBanner();
 
   return (
@@ -15,7 +17,11 @@ const Banner = () => {
             <img
               onClick={() => {
                 if (banner.linkUrl) {
-                  window.open(banner.linkUrl, '_blank', 'noopener,noreferrer');
+                  if (banner.linkUrl.startsWith(notionUrl)) {
+                    window.open(banner.linkUrl, '_blank');
+                  } else if (banner.linkUrl.startsWith(siteUrl)) {
+                    window.location.href = banner.linkUrl;
+                  }
                 }
               }}
               src={banner.imageUrl}

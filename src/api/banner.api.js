@@ -137,6 +137,3 @@ export const useActivatedBanner = () => {
     queryFn: fetchActivatedBanner,
   });
 };
-
-// https://i.ibb.co/y2DMdzy/banner-2.png
-// https://i.ibb.co/zTPK3rbt/banner-1.png
