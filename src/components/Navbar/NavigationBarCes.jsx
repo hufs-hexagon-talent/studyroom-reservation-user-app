@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Navbar } from 'flowbite-react';
-import Logo from '../../assets/logoCes.png';
+import Logo from '../../assets/logo/logoCes.png';
 import useAuth from '../../hooks/useAuth';
 import { useServiceRole } from '../../api/user.api';
 
