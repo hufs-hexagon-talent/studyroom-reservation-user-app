@@ -1,18 +1,9 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
-import axios from 'axios';
+import { apiClient } from './client';
 
 // [관리자] 모든 배너 조회
 const fetchAllBanners = async () => {
-  const authState = JSON.parse(localStorage.getItem('authState'));
-  const accessToken = authState?.accessToken;
-  const allBanners_res = await axios.get(
-    'https://api.studyroom-qa.alpaon.net/banners',
-    {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    },
-  );
+  const allBanners_res = await apiClient.get('/banners');
   return allBanners_res.data.data.bannerInfoResponses;
 };
 
@@ -25,23 +16,13 @@ export const useAllBanners = () => {
 
 // [관리자] 배너 생성
 export const usePostBanner = () => {
-  const authState = JSON.parse(localStorage.getItem('authState'));
-  const accessToken = authState?.accessToken;
   return useMutation({
     mutationFn: async ({ bannerType, imageUrl, linkUrl }) => {
-      const postBanner_res = await axios.post(
-        'https://api.studyroom-qa.alpaon.net/banners',
-        {
-          bannerType,
-          imageUrl,
-          linkUrl,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        },
-      );
+      const postBanner_res = await apiClient.post('/banners', {
+        bannerType,
+        imageUrl,
+        linkUrl,
+      });
       return postBanner_res.data.data;
     },
   });
@@ -49,16 +30,7 @@ export const usePostBanner = () => {
 
 // [관리자] 배너 ID로 조회
 const fetchBannerById = async bannerId => {
-  const authState = JSON.parse(localStorage.getItem('authState'));
-  const accessToken = authState?.accessToken;
-  const allBanners_res = await axios.get(
-    `https://api.studyroom-qa.alpaon.net/banners/${bannerId}`,
-    {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    },
-  );
+  const allBanners_res = await apiClient.get(`/banners/${bannerId}`);
   return allBanners_res.data.data.bannerInfoResponses;
 };
 
@@ -73,17 +45,7 @@ export const useBannerById = () => {
 export const useDeleteBanner = () => {
   return useMutation({
     mutationFn: async bannerId => {
-      const authState = JSON.parse(localStorage.getItem('authState'));
-      const accessToken = authState?.accessToken;
-
-      const deleteBanner_res = await axios.delete(
-        `https://api.studyroom-qa.alpaon.net/banners/${bannerId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        },
-      );
+      const deleteBanner_res = await apiClient.delete(`/banners/${bannerId}`);
 
       return deleteBanner_res.data;
     },
@@ -94,23 +56,12 @@ export const useDeleteBanner = () => {
 export const useEditBanner = () => {
   return useMutation({
     mutationFn: async ({ bannerId, bannerType, imageUrl, linkUrl, active }) => {
-      const authState = JSON.parse(localStorage.getItem('authState'));
-      const accessToken = authState?.accessToken;
-
-      const editBanner_res = await axios.patch(
-        `https://api.studyroom-qa.alpaon.net/banners/${bannerId}`,
-        {
-          bannerType,
-          imageUrl,
-          linkUrl,
-          active,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        },
-      );
+      const editBanner_res = await apiClient.patch(`/banners/${bannerId}`, {
+        bannerType,
+        imageUrl,
+        linkUrl,
+        active,
+      });
       return editBanner_res.data.data;
     },
   });
@@ -118,16 +69,7 @@ export const useEditBanner = () => {
 
 // 활성화 배너 조회
 const fetchActivatedBanner = async () => {
-  const authState = JSON.parse(localStorage.getItem('authState'));
-  const accessToken = authState?.accessToken;
-  const response = await axios.get(
-    'https://api.studyroom-qa.alpaon.net/banners/active',
-    {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    },
-  );
+  const response = await apiClient.get('/banners/active');
   return response.data.data.bannerInfoResponses;
 };
 
