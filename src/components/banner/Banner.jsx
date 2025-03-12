@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import { Autoplay } from 'swiper/modules';
@@ -7,6 +8,8 @@ import { useActivatedBanner } from '../../api/banner.api';
 const Banner = () => {
   const notionUrl = 'https://hwangbbang.notion.site/';
   const siteUrl = 'https://studyroom.computer.hufs.ac.kr/';
+
+  const navigate = useNavigate();
   const { data: banners = [] } = useActivatedBanner();
 
   return (
@@ -20,7 +23,8 @@ const Banner = () => {
                   if (banner.linkUrl.startsWith(notionUrl)) {
                     window.open(banner.linkUrl, '_blank');
                   } else if (banner.linkUrl.startsWith(siteUrl)) {
-                    window.location.href = banner.linkUrl;
+                    const path = banner.linkUrl.replace(siteUrl, '');
+                    navigate(path);
                   }
                 }
               }}
