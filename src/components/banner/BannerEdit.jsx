@@ -7,6 +7,7 @@ const BannerEdit = ({ refetch }) => {
   const [editBannerType, setEditBannerType] = useState('');
   const [editImageUrl, setEditImageUrl] = useState('');
   const [editLinkUrl, setEditLinkUrl] = useState('');
+  const [editBannerId, setEditBannerId] = useState(null);
   const [isActive, setIsActive] = useState(false);
   const { mutateAsync: doEditBanner } = useEditBanner();
 
@@ -29,6 +30,7 @@ const BannerEdit = ({ refetch }) => {
   const editBanner = async () => {
     try {
       await doEditBanner({
+        bannerId: editBannerId,
         bannerType: editBannerType,
         imageUrl: editImageUrl,
         linkUrl: editLinkUrl,
@@ -46,10 +48,19 @@ const BannerEdit = ({ refetch }) => {
   };
 
   return (
-    <div className="w-1/3 min-w-[300px] flex flex-col items-center gap-4 mt-20 md:mt-10">
+    <div className="w-full max-w-[400px] flex flex-col items-center gap-6">
       <div>
         <h3 className="text-2xl text-center mb-10">배너 수정</h3>
       </div>
+      <TextInput
+        onChange={e => setEditBannerId(e.target.value)}
+        value={editBannerId}
+        id="bannerId"
+        type="text"
+        placeholder="수정될 배너의 아이디를 입력하세요"
+        className="w-full"
+        required
+      />
       <TextInput
         onChange={e => setEditBannerType(e.target.value)}
         value={editBannerType}

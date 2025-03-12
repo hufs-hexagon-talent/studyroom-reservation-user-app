@@ -42,7 +42,7 @@ const BannerDelete = ({ activatedBanner, refetch }) => {
   };
 
   return (
-    <div className="flex flex-col items-center w-full mt-20 md:mt-10">
+    <div className="w-full max-w-[400px] flex flex-col items-center gap-6">
       <h3 className="text-2xl text-center mb-10">배너 삭제하기</h3>
       <div className="w-1/3 min-w-[300px] flex flex-col items-center gap-4">
         {activatedBanner?.map((banner, index) => (
