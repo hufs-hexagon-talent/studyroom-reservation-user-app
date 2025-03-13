@@ -50,7 +50,7 @@ const MyPage = () => {
                     <div className="bg-[#6d9711] w-2 h-2 inline-block mr-2 mt-1.5 ml-1 rounded-full aspect-square"></div>
                     <div
                       style={{ fontSize: 14 }}
-                      className="whitespace-normal break-keep text-left">
+                      className="whitespace-normal break-keep pr-2">
                       현재 예약
                     </div>
                   </div>
@@ -79,7 +79,7 @@ const MyPage = () => {
                     <div className="flex flex-row items-start">
                       <div className="bg-gray-500 w-2 h-2 inline-block mr-2 mt-1.5 ml-1 rounded-full aspect-square "></div>
                       <div
-                        className="whitespace-normal break-keep"
+                        className="whitespace-normal break-keep pr-2"
                         style={{ fontSize: 14 }}>
                         현재 예약
                       </div>
@@ -109,7 +109,6 @@ const MyPage = () => {
             <div className="menu-item" onClick={() => navigate('/check')}>
               내 예약 조회
             </div>
-            
           </div>
         </div>
         {/* 내 계정 관리 */}
@@ -126,14 +125,14 @@ const MyPage = () => {
         <div className="menu-section">
           <div className="menu-title">문의 및 건의</div>
           <div
-              className="menu-item"
-              onClick={() =>
-                window.open(
-                  'https://hwangbbang.notion.site/1ac6628bcfd1802aa2fef92695b8b378',
-                )
-              }>
-              정정 요청
-            </div>
+            className="menu-item"
+            onClick={() =>
+              window.open(
+                'https://hwangbbang.notion.site/1ac6628bcfd1802aa2fef92695b8b378',
+              )
+            }>
+            정정 요청
+          </div>
           <div
             className="menu-item"
             onClick={() =>
