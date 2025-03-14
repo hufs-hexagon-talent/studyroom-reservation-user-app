@@ -3,6 +3,7 @@ import { useAllRooms } from '../../api/room.api';
 import { useNavigate } from 'react-router-dom';
 import { Button } from 'flowbite-react';
 import { useSnackbar } from 'react-simple-snackbar';
+import FadeLoader from 'react-spinners/FadeLoader';
 
 const SelectRoom = () => {
   const { data: rooms, error, isLoading } = useAllRooms();
@@ -16,7 +17,11 @@ const SelectRoom = () => {
   });
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <FadeLoader />
+      </div>
+    );
   }
 
   if (error) {

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from 'flowbite-react';
 import { useAllPartitions } from '../../api/roomPartition.api';
+import FadeLoader from 'react-spinners/FadeLoader';
 
 const SelectRoom = () => {
   const { data: partitions, error, isLoading } = useAllPartitions();
@@ -14,7 +15,11 @@ const SelectRoom = () => {
   );
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <FadeLoader />
+      </div>
+    );
   }
 
   if (error) {
