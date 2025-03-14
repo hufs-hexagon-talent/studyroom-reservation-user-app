@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
 import { useSnackbar } from 'react-simple-snackbar';
 import { useServiceRole } from './api/user.api';
+import FadeLoader from 'react-spinners/FadeLoader';
 
 import FooterCes from './components/footer/FooterCes';
 import NavigationBarCes from './components/Navbar/NavigationBarCes';
@@ -38,7 +39,12 @@ const RouterComponent = () => {
   });
   const pwResetToken = sessionStorage.getItem('pwResetToken');
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading)
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <FadeLoader />
+      </div>
+    );
 
   return (
     <BrowserRouter basename={'/'}>
