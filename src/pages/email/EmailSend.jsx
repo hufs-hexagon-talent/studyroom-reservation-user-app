@@ -11,6 +11,7 @@ const EmailSend = () => {
   const [password, setPassword] = useState('');
   const [newEmail, setNewEmail] = useState('');
   const [verificationCode, setVerificationCode] = useState('');
+  const [verificationId, setVerificationId] = useState('');
   const [timer, setTimer] = useState(null);
   const [timerDisplay, setTimerDisplay] = useState('');
   const [disabled, setDisabled] = useState(false);
@@ -61,6 +62,7 @@ const EmailSend = () => {
     try {
       setDisabled(true);
       const response = await doEmailSend({ password, newEmail });
+      setVerificationId(response.data.verificationId);
       setIsEmailSendSuccess(true);
       openSuccessSnackbar(response.message, 2500);
       setTimer(300);
@@ -83,7 +85,7 @@ const EmailSend = () => {
   const handleButton = async () => {
     try {
       const response = await doEmailVerify({
-        verificationId: newEmail,
+        verificationId: verificationId,
         verifyCode: verificationCode,
       });
       openSuccessSnackbar(response.message, 2500);
@@ -95,6 +97,7 @@ const EmailSend = () => {
       );
     }
   };
+
   return (
     <div className="flex flex-col items-center w-screen p-5">
       <h1
