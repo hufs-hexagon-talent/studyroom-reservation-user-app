@@ -83,7 +83,7 @@ const EmailSend = () => {
   const handleButton = async () => {
     try {
       const response = await doEmailVerify({
-        email: newEmail,
+        verificationId: newEmail,
         verifyCode: verificationCode,
       });
       openSuccessSnackbar(response.message, 2500);
