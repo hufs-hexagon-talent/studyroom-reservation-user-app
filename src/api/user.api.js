@@ -188,9 +188,9 @@ export const useNewEmailSend = () => {
 // 로그인 후, 인증 코드 검증 후, 이메일 수정 처리
 export const useNewEmailVerify = () => {
   return useMutation({
-    mutationFn: async ({ email, verifyCode }) => {
+    mutationFn: async ({ verificationId, verifyCode }) => {
       const newEmailVerify_res = await apiClient.post('/users/me/mail/verify', {
-        email,
+        verificationId,
         verifyCode,
       });
       return newEmailVerify_res.data;
