@@ -16,9 +16,9 @@ export const useEmailSend = () => {
 // 이메일 검증
 export const useEmailVerify = () => {
   return useMutation({
-    mutationFn: async ({ email, verifyCode }) => {
+    mutationFn: async ({ verificationId, verifyCode }) => {
       const verify_res = await apiClient.post('/auth/mail/verify', {
-        email,
+        verificationId,
         verifyCode,
       });
       return verify_res.data;
