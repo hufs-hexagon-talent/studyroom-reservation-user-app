@@ -9,7 +9,7 @@ const EmailVerify = () => {
   const [username, setUsername] = useState('');
   const { mutateAsync: doEmailSend } = useEmailSend();
   const { mutateAsync: doEmailVerify } = useEmailVerify();
-  const [email, setEmail] = useState('');
+  const [verificationId, setVerificationId] = useState('');
   const [verificationCode, setVerificationCode] = useState('');
   const [timer, setTimer] = useState(null);
   const [timerDisplay, setTimerDisplay] = useState(''); // 타이머 표시 상태
@@ -60,7 +60,7 @@ const EmailVerify = () => {
     try {
       setDisabled(true);
       const response = await doEmailSend(username);
-      setEmail(response.email);
+      setVerificationId(response.verificationId);
 
       openSuccessSnackbar('인증 코드 발송에 성공하였습니다.');
       setTimeout(() => {
@@ -85,7 +85,7 @@ const EmailVerify = () => {
   const handleButton = async () => {
     try {
       const response = await doEmailVerify({
-        email: email,
+        verificationId: verificationId,
         verifyCode: verificationCode,
       });
       const passwordResetToken = response.data.passwordResetToken;
