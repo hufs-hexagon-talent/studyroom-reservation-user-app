@@ -10,13 +10,13 @@ const ShortCut = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="mt-16 max-w-screen-xl mx-auto flex gap-10">
+    <div className="mt-16 max-w-screen-xl mx-3 flex gap-2">
       <div onClick={() => navigate('/schedule')} className="cursor-pointer">
         <img
-          className="flex justify-center items-center w-32 h-32 mx-auto"
+          className="flex justify-center items-center w-16 h-16 mx-auto"
           src={Calender}
         />
-        <p className="p-4 font-bold text-center inline-block">
+        <p className="text-xs p-4 font-bold text-center inline-block">
           스케줄 설정하러 가기
         </p>
       </div>
@@ -24,37 +24,39 @@ const ShortCut = () => {
         onClick={() => navigate('/selectPartition')}
         className="cursor-pointer">
         <img
-          className="flex justify-center items-center w-32 h-32 mx-auto"
+          className="flex justify-center items-center w-16 h-16 mx-auto"
           src={Check}
         />
-        <p className="inline-block text-center font-bold p-4 break-words">
+        <p className="text-xs inline-block text-center font-bold p-4 break-words">
           예약 조회 및 출석 상태 관리
         </p>
       </div>
       <div onClick={() => navigate('/serialCheck')} className="cursor-pointer">
         <img
-          className="flex justify-center items-center w-32 h-32 mx-auto"
+          className="flex justify-center items-center w-16 h-16 mx-auto"
           src={Search}
         />
-        <p className="inline-block text-center font-bold p-4 break-words">
+        <p className="text-xs inline-block text-center font-bold p-4 break-words">
           학번 및 이름으로 사용자 정보 조회
         </p>
       </div>
       <div onClick={() => navigate('/blocked')} className="cursor-pointer">
         <img
-          className="flex justify-center items-center w-32 h-32 mx-auto"
+          className="flex justify-center items-center w-16 h-16 mx-auto"
           src={Block}
         />
-        <p className="inline-block text-center font-bold p-4 break-words">
+        <p className="text-xs inline-block text-center font-bold p-4 break-words">
           블락 사용자 조회하러 가기
         </p>
       </div>
       <div onClick={() => navigate('/banner')} className="cursor-pointer">
         <img
-          className="flex justify-center items-center w-32 h-32 mx-auto"
+          className="flex justify-center items-center w-16 h-16 mx-auto"
           src={Banner}
         />
-        <p className="font-bold text-center p-4 break-words">배너 관리</p>
+        <p className="text-xs font-bold text-center p-4 break-words">
+          배너 관리
+        </p>
       </div>
     </div>
   );
