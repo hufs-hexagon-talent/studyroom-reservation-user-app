@@ -10,7 +10,7 @@ const ShortCut = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="mt-16 max-w-screen-xl mx-3 flex gap-2">
+    <div className="mt-8 max-w-screen-xl mx-3 flex gap-2">
       <div onClick={() => navigate('/schedule')} className="cursor-pointer">
         <img
           className="flex justify-center items-center w-16 h-16 mx-auto"
