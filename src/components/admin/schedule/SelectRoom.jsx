@@ -74,7 +74,7 @@ const SelectRoom = () => {
             .map(room => (
               <div key={room.roomId} className="flex items-center mb-3">
                 <Checkbox
-                  className="rounded-none"
+                  className="rounded-none cursor-pointer"
                   id={room.roomId}
                   checked={selectedRooms.includes(room.roomId)}
                   onChange={() => handleRoomCheckbox(room.roomId)}
@@ -87,7 +87,9 @@ const SelectRoom = () => {
         </div>
       </div>
       <div>
-        <div onClick={handleButton} className="text-blue-600 cursor-pointer">
+        <div
+          onClick={handleButton}
+          className="text-blue-600 cursor-pointer hover:underline">
           주입하기↗
         </div>
       </div>
