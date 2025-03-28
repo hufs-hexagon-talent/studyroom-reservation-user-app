@@ -5,7 +5,7 @@ import DashBoard from '../../components/admin/dashboard/DashBoard';
 
 const DivideAct = () => {
   return (
-    <div className="bg-gray-100">
+    <div className="bg-gray-100 min-h-screen">
       {/* 상단 */}
       <TopText />
       {/* 바로가기 */}

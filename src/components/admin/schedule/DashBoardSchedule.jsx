@@ -23,11 +23,11 @@ const DashBoardSchedule = () => {
     };
     getDate();
   }, []);
-
+  
   return (
     <div className="flex flex-row gap-x-6">
       {/* 스케줄 설정 */}
-      <div className="bg-white inline-block rounded-xl mb-8 shadow-xl scale-95 hover:scale-100 transition-transform duration-200 ease-in-out">
+      <div className="bg-white inline-block rounded-xl hover:shadow-2xl">
         <div className="flex justify-center items-center font-bold py-6">
           스케줄 설정
         </div>
@@ -38,7 +38,7 @@ const DashBoardSchedule = () => {
         </div>
       </div>
       {/* 현재 운영 정책이 설정된 날짜 */}
-      <div className="bg-white rounded-xl mb-8 shadow-xl scale-95 hover:scale-100 transition-transform duration-200 ease-in-out">
+      <div className="bg-white rounded-xl mb-8 hover:shadow-2xl">
         <div className="flex justify-center text-center items-center font-bold py-6 px-10">
           현재 운영 정책이 설정된 날짜
         </div>
@@ -57,7 +57,7 @@ const DashBoardSchedule = () => {
         </div>
       </div>
       {/* 스케줄 삭제 */}
-      <div className="bg-white inline-block rounded-xl mb-8 shadow-xl scale-95 hover:scale-100 transition-transform duration-200 ease-in-out">
+      <div className="bg-white inline-block rounded-xl mb-8 hover:shadow-2xl">
         <div className="flex justify-center items-center font-bold py-6">
           스케줄 삭제
         </div>
