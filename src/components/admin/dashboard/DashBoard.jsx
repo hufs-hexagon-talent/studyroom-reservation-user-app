@@ -9,10 +9,16 @@ const DashBoard = () => {
   const [showSchedule, setShowSchedule] = useState(true);
   const [showReservation, setShowReservation] = useState(true);
   const [showStatics, setShowStatics] = useState(true);
+  const [showSearchUser, setShowSearchUser] = useState(true);
+  const [showBlocked, setShowBlocked] = useState(true);
+  const [showBanner, setShowBanner] = useState(true);
 
   const toggleSchedule = () => setShowSchedule(prev => !prev);
   const toggleReservation = () => setShowReservation(prev => !prev);
   const toggleStatics = () => setShowStatics(prev => !prev);
+  const toggleSearchUser = () => setShowSearchUser(prev => !prev);
+  const toggleBlocked = () => setShowBlocked(prev => !prev);
+  const toggleBanner = () => setShowBanner(prev => !prev);
 
   return (
     <div>
@@ -93,6 +99,63 @@ const DashBoard = () => {
           <DashBoardReservation />
         </div>
       )}
+
+      {/* 사용자 조회 영역 */}
+      <div
+        onClick={toggleSearchUser}
+        className="inline-flex flex-row pl-8 pb-2 items-center gap-x-2">
+        <div className="cursor-pointer font-bold text-2xl text-gray-700">
+          Search User
+        </div>
+        <img
+          className={`w-6 h-4 mt-1 cursor-pointer transition-transform duration-200 ${
+            showSearchUser ? 'rotate-0' : 'rotate-180'
+          }`}
+          src={underArrow}
+        />
+      </div>
+      {/* 구분선 */}
+      <div className="px-6">
+        <div className="w-full border-t border-gray-300 my-2" />
+      </div>
+
+      {/* 블락 사용자 조회 영역 */}
+      <div
+        onClick={toggleBlocked}
+        className="inline-flex flex-row pl-8 pb-2 items-center gap-x-2">
+        <div className="cursor-pointer font-bold text-2xl text-gray-700">
+          Blocked
+        </div>
+        <img
+          className={`w-6 h-4 mt-1 cursor-pointer transition-transform duration-200 ${
+            showBlocked ? 'rotate-0' : 'rotate-180'
+          }`}
+          src={underArrow}
+        />
+      </div>
+      {/* 구분선 */}
+      <div className="px-6">
+        <div className="w-full border-t border-gray-300 my-2" />
+      </div>
+
+      {/* 배너 관리 영역 */}
+      <div
+        onClick={toggleBanner}
+        className="inline-flex flex-row pl-8 pb-2 items-center gap-x-2">
+        <div className="cursor-pointer font-bold text-2xl text-gray-700">
+          Banner
+        </div>
+        <img
+          className={`w-6 h-4 mt-1 cursor-pointer transition-transform duration-200 ${
+            showBanner ? 'rotate-0' : 'rotate-180'
+          }`}
+          src={underArrow}
+        />
+      </div>
+      {/* 구분선 */}
+      <div className="px-6">
+        <div className="w-full border-t border-gray-300 my-2" />
+      </div>
     </div>
   );
 };

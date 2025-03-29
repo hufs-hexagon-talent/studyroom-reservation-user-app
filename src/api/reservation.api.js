@@ -175,12 +175,12 @@ export const useLatestReservation = () => {
 };
 
 // [관리자] 금일 예약들 통계 조회
-const fetchStatics = async () => {
+const fetchStatics = async date => {
   const authState = JSON.parse(localStorage.getItem('authState') || '{}');
   const accessToken = authState?.accessToken;
 
   const statics_res = await axios.get(
-    'https://api.studyroom-qa.alpaon.net/reservations/admin/statics',
+    `https://api.studyroom-qa.alpaon.net/reservations/admin/statics/by-date?date=${date}`,
     {
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -190,9 +190,9 @@ const fetchStatics = async () => {
   return statics_res.data.data;
 };
 
-export const useStatics = () => {
+export const useStatics = date => {
   return useQuery({
-    queryKey: ['statics'],
-    queryFn: fetchStatics,
+    queryKey: ['statics', date],
+    queryFn: () => fetchStatics(date),
   });
 };
