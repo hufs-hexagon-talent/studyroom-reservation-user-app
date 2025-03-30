@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
+
 import DashBoardSchedule from '../schedule/DashBoardSchedule';
 import DashBoardReservation from '../reservation management/DashBoardReservation';
 import DashBoardStatics from '../statics/DashBoardStatics';
+import DashBoardBanner from '../../banner/DashBoardBanner';
+import SerialCheck from '../../../pages/manage/SerialCheck';
+import FetchBlockedUser from '../../../pages/manage/FetchBlockedUser';
 
 import underArrow from '../../../assets/icons/under_arrow.png';
 
@@ -100,7 +104,7 @@ const DashBoard = () => {
         </div>
       )}
 
-      {/* 사용자 조회 영역 */}
+      {/* Search User 영역 */}
       <div
         onClick={toggleSearchUser}
         className="inline-flex flex-row pl-8 pb-2 items-center gap-x-2">
@@ -118,8 +122,16 @@ const DashBoard = () => {
       <div className="px-6">
         <div className="w-full border-t border-gray-300 my-2" />
       </div>
+      {/* Search User 컴포넌트들 */}
+      {showSearchUser && (
+        <div className="p-6">
+          <div className="bg-white rounded-xl hover:shadow-2xl">
+            <SerialCheck />
+          </div>
+        </div>
+      )}
 
-      {/* 블락 사용자 조회 영역 */}
+      {/* Blocked 영역 */}
       <div
         onClick={toggleBlocked}
         className="inline-flex flex-row pl-8 pb-2 items-center gap-x-2">
@@ -137,6 +149,14 @@ const DashBoard = () => {
       <div className="px-6">
         <div className="w-full border-t border-gray-300 my-2" />
       </div>
+      {/* Blocked 컴포넌트들 */}
+      {showBlocked && (
+        <div className="p-6">
+          <div className="bg-white rounded-xl hover:shadow-2xl">
+            <FetchBlockedUser />
+          </div>
+        </div>
+      )}
 
       {/* 배너 관리 영역 */}
       <div
@@ -156,6 +176,12 @@ const DashBoard = () => {
       <div className="px-6">
         <div className="w-full border-t border-gray-300 my-2" />
       </div>
+      {/* Banner 컴포넌트들 */}
+      {showBanner && (
+        <div className="p-6">
+          <DashBoardBanner />
+        </div>
+      )}
     </div>
   );
 };

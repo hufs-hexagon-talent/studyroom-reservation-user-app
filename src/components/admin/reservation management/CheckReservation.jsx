@@ -55,7 +55,7 @@ const CheckReservation = () => {
 
   return (
     <div>
-      <div className="bg-white p-4 inline-block rounded-xl mb-8 shadow-xl scale-95 hover:scale-100 transition-transform duration-200 ease-in-out">
+      <div className="bg-white p-4 inline-block rounded-xl mb-8 hover:shadow-2xl">
         <div className="flex justify-center items-center font-bold">
           예약 조회
         </div>

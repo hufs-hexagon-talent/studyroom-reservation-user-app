@@ -65,8 +65,7 @@ const SerialCheck = () => {
         />
         <Button
           onClick={handleFetchBtn}
-          color="dark"
-          className="ml-4 items-center h-8">
+          className="ml-4 bg-blue-500 rounded-full items-center h-8">
           조회
         </Button>
       </div>
