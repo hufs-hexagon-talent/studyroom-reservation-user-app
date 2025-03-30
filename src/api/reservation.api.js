@@ -1,6 +1,7 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { apiClient } from './client';
 import { queryClient } from '../index';
+import axios from 'axios';
 
 // 자신의 예약 생성
 export const useReserve = () => {
@@ -170,5 +171,28 @@ export const useLatestReservation = () => {
   return useQuery({
     queryKey: ['latest'],
     queryFn: () => fetchLatestReservation(),
+  });
+};
+
+// [관리자] 금일 예약들 통계 조회
+const fetchStatics = async date => {
+  const authState = JSON.parse(localStorage.getItem('authState') || '{}');
+  const accessToken = authState?.accessToken;
+
+  const statics_res = await axios.get(
+    `https://api.studyroom-qa.alpaon.net/reservations/admin/statics/by-date?date=${date}`,
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    },
+  );
+  return statics_res.data.data;
+};
+
+export const useStatics = date => {
+  return useQuery({
+    queryKey: ['statics', date],
+    queryFn: () => fetchStatics(date),
   });
 };

@@ -1,10 +1,10 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { apiClient } from './client';
 
-// id, pw 확인할 때 쓰려고
+// [관리자] 모든 회원 정보 조회
 const fetchAllUsers = async () => {
   const allUser_res = await apiClient.get('/users/search');
-  return allUser_res.data.data.items;
+  return allUser_res.data.data.users;
 };
 
 export const useAllUsers = () => {
@@ -153,6 +153,7 @@ export const useUserByName = name => {
   });
 };
 
+// 자신의 블락 기간 조회
 export const fetchBlockedPeriod = async () => {
   try {
     const blockedPreiod_res = await apiClient.get('/users/me/blocked-period');

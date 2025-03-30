@@ -49,9 +49,7 @@ const BannerEdit = ({ refetch }) => {
 
   return (
     <div className="w-full max-w-[400px] flex flex-col items-center gap-6">
-      <div>
-        <h3 className="text-2xl text-center mb-10">배너 수정</h3>
-      </div>
+      <div></div>
       <TextInput
         onChange={e => setEditBannerId(e.target.value)}
         value={editBannerId}
@@ -96,7 +94,7 @@ const BannerEdit = ({ refetch }) => {
           onChange={handleCheckboxChange}
         />
       </div>
-      <Button onClick={editBanner} type="submit" className="bg-blue-900 w-full">
+      <Button onClick={editBanner} type="submit" className="bg-blue-500 w-full">
         배너 업로드
       </Button>
     </div>

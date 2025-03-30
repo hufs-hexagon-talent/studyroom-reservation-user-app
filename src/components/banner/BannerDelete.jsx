@@ -43,7 +43,6 @@ const BannerDelete = ({ activatedBanner, refetch }) => {
 
   return (
     <div className="w-full max-w-[400px] flex flex-col items-center gap-6">
-      <h3 className="text-2xl text-center mb-10">배너 삭제하기</h3>
       <div className="w-1/3 min-w-[300px] flex flex-col items-center gap-4">
         {activatedBanner?.map((banner, index) => (
           <div key={index} className="flex items-center gap-4">
@@ -62,7 +61,7 @@ const BannerDelete = ({ activatedBanner, refetch }) => {
       <Button
         onClick={deleteBanner}
         type="submit"
-        className="bg-blue-900 mt-10 w-2/3">
+        className="bg-blue-500 mt-10 w-2/3">
         배너 삭제
       </Button>
     </div>
