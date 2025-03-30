@@ -5,7 +5,7 @@ import DashBoardReservation from '../reservation management/DashBoardReservation
 import DashBoardStatics from '../statics/DashBoardStatics';
 import DashBoardBanner from '../../banner/DashBoardBanner';
 import SerialCheck from '../../../pages/manage/SerialCheck';
-import FetchBlockedUser from '../../../pages/manage/FetchBlockedUser';
+import FetchBlocked from '../../blocked/FetchBlocked';
 
 import underArrow from '../../../assets/icons/under_arrow.png';
 
@@ -125,7 +125,7 @@ const DashBoard = () => {
       {/* Search User 컴포넌트들 */}
       {showSearchUser && (
         <div className="p-6">
-          <div className="bg-white rounded-xl hover:shadow-2xl">
+          <div className="bg-white  w-full lg:w-2/3 rounded-xl hover:shadow-2xl">
             <SerialCheck />
           </div>
         </div>
@@ -152,8 +152,8 @@ const DashBoard = () => {
       {/* Blocked 컴포넌트들 */}
       {showBlocked && (
         <div className="p-6">
-          <div className="bg-white rounded-xl hover:shadow-2xl">
-            <FetchBlockedUser />
+          <div className="bg-white w-full lg:w-2/3 rounded-xl hover:shadow-2xl p-6">
+            <FetchBlocked />
           </div>
         </div>
       )}

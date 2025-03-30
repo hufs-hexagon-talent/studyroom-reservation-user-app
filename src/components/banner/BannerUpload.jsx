@@ -37,7 +37,6 @@ const BannerUpload = ({ refetch }) => {
 
   return (
     <div className="w-full max-w-[400px] flex flex-col items-center gap-6">
-      <h3 className="text-2xl text-center mb-10">배너 업로드</h3>
       <div className="w-1/3 min-w-[300px] flex flex-col items-center gap-4">
         <TextInput
           onChange={e => setBannerType(e.target.value)}
@@ -69,7 +68,7 @@ const BannerUpload = ({ refetch }) => {
         <Button
           onClick={uploadBanner}
           type="submit"
-          className="bg-blue-900 w-full">
+          className="bg-blue-500 w-full">
           배너 업로드
         </Button>
       </div>
