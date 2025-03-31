@@ -23,7 +23,7 @@ const DashBoardSchedule = () => {
     };
     getDate();
   }, []);
-  
+
   return (
     <div className="flex flex-row gap-x-6">
       {/* 스케줄 설정 */}
