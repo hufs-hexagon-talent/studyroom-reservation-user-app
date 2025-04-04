@@ -99,7 +99,7 @@ const DashBoard = () => {
       </div>
       {/* Reservation 컴포넌트들 */}
       {showReservation && (
-        <div className="px-4 py-4">
+        <div className="px-4">
           <DashBoardReservation />
         </div>
       )}

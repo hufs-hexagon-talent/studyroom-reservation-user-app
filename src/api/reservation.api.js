@@ -176,16 +176,8 @@ export const useLatestReservation = () => {
 
 // [관리자] 금일 예약들 통계 조회
 const fetchStatics = async date => {
-  const authState = JSON.parse(localStorage.getItem('authState') || '{}');
-  const accessToken = authState?.accessToken;
-
   const statics_res = await axios.get(
-    `https://api.studyroom-qa.alpaon.net/reservations/admin/statics/by-date?date=${date}`,
-    {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    },
+    `/reservations/admin/statics/by-date?date=${date}`,
   );
   return statics_res.data.data;
 };

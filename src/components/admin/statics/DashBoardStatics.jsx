@@ -17,8 +17,7 @@ import { format } from 'date-fns';
 const COLORS = ['#3b82f6', '#82ca9d', '#ffc658'];
 
 const DashBoardStatics = () => {
-  const today = '2024-10-20';
-  //const today = format(new Date(), 'yyyy-MM-dd');
+  const today = format(new Date(), 'yyyy-MM-dd');
   const { data: allUsers = [] } = useAllUsers();
   const { data: statics } = useStatics(today);
 
