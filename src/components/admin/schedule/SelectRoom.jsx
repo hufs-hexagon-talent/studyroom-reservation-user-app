@@ -5,12 +5,14 @@ import { Checkbox, Button } from 'flowbite-react';
 import { useSnackbar } from 'react-simple-snackbar';
 import { format } from 'date-fns';
 
-const SelectRoom = () => {
+const SelectRoom = ({
+  selectedRooms,
+  setSelectedRooms,
+  selectedDates,
+  selectedPolicyId,
+}) => {
   const { data: rooms } = useAllRooms();
   const { mutateAsync: doSchedule } = useSchedules();
-  const [selectedRooms, setSelectedRooms] = useState([]);
-  const [selectedPolicyId, setSelectedPolicyId] = useState(null);
-  const [selectedDates, setSelectedDates] = useState([]);
 
   const [openErrorSnackbar, closeErrorSnackbar] = useSnackbar({
     position: 'top-right',

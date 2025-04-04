@@ -175,7 +175,7 @@ const DashBoardStatics = () => {
             </div>
           </div>
 
-          {/* # 월간 호실 별 예약 수 */}
+          {/* #7 월간 호실 별 예약 수 */}
           <div className="bg-white shadow-md rounded-2xl px-6 py-4">
             <div className="text-lg font-semibold mb-2">
               월간 호실 별 예약 수
@@ -198,7 +198,7 @@ const DashBoardStatics = () => {
         </div>
       </div>
 
-      {/* 파이 차트 */}
+      {/* #8 파이 차트 */}
       <div className="bg-white shadow-md rounded-2xl p-4">
         <h2 className="text-lg font-semibold mb-2">월간 호실 사용 시간</h2>
         {/* 차트를 부모 컨테이너 크기에 맞게 반응형으로 보여줌 */}
@@ -236,7 +236,7 @@ const DashBoardStatics = () => {
         </ResponsiveContainer>
       </div>
 
-      {/* 막대 차트 */}
+      {/* #9 막대 차트 */}
       <div className="bg-white shadow-md rounded-2xl p-4">
         <h2 className="text-lg font-semibold mb-2">예약 비교</h2>
         <ResponsiveContainer width="100%" height={250}>

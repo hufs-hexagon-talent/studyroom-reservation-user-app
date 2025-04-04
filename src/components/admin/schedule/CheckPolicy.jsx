@@ -3,11 +3,10 @@ import { Table, Checkbox } from 'flowbite-react';
 
 import { useAllPolicies } from '../../../api/roomOperationPolicy.api';
 
-const CheckPolicy = () => {
+const CheckPolicy = ({ selectedPolicyId, setSelectedPolicyId }) => {
   const { data: policies, refetch } = useAllPolicies();
   const [isFetched, setIsFetched] = useState(false);
   const [isTableVisible, setIsTableVisible] = useState(false);
-  const [selectedPolicyId, setSelectedPolicyId] = useState(null);
 
   const handleFetchPolicies = () => {
     refetch().then(() => {
