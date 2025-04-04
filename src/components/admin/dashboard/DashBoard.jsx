@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import DashBoardSchedule from '../schedule/DashBoardSchedule';
+import DashBoardSchedule from '../schedule/DashBoardSchedule';
 import DashBoardReservation from '../reservation management/DashBoardReservation';
 import DashBoardStatics from '../statics/DashBoardStatics';
 import DashBoardBanner from '../../banner/DashBoardBanner';
