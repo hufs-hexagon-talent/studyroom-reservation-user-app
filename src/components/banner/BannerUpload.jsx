@@ -22,6 +22,11 @@ const BannerUpload = ({ refetch }) => {
 
   // 배너 업로드
   const uploadBanner = async () => {
+    if (bannerType == '' || imageUrl == '' || linkUrl == '') {
+      openErrorSnackbar('배너 값을 입력하세요');
+      return;
+    }
+
     await doPostBanner(
       {
         bannerType: bannerType,
@@ -37,7 +42,7 @@ const BannerUpload = ({ refetch }) => {
           refetch();
         },
         onError: error => {
-          console.error(error?.response?.data?.errors?.[0]?.message);
+          console.error(error);
           openErrorSnackbar('배너 업로드 실패!', 2500);
         },
       },
