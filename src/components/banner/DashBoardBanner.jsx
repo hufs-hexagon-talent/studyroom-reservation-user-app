@@ -25,7 +25,7 @@ const DashBoardBanner = () => {
       {/* 삭제 */}
       <div className="bg-white rounded-xl p-4 hover:shadow-2xl w-full max-w-sm">
         <div className="font-bold text-xl p-4">배너 삭제</div>
-        <BannerDelete activatedBanner={activatedBanner} />
+        <BannerDelete refetch={refetch} activatedBanner={activatedBanner} />
       </div>
     </div>
   );
