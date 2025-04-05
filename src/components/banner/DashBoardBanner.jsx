@@ -6,14 +6,14 @@ import BannerEdit from './BannerEdit';
 import BannerDelete from './BannerDelete';
 
 const DashBoardBanner = () => {
-  const { data: activatedBanner } = useActivatedBanner();
+  const { data: activatedBanner, refetch } = useActivatedBanner();
 
   return (
     <div className="flex flex-row gap-x-6">
       {/* 업로드 */}
       <div className="bg-white rounded-xl p-4 hover:shadow-2xl w-full max-w-sm">
         <div className="font-bold text-xl p-4">배너 업로드</div>
-        <BannerUpload />
+        <BannerUpload refetch={refetch} />
       </div>
 
       {/* 수정 */}

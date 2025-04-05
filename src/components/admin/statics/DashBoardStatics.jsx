@@ -1,6 +1,8 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { useAllUsers } from '../../../api/user.api';
 import { useStatics } from '../../../api/reservation.api';
+import { parseStatics } from '../../../utils/statics.utils';
+import { format } from 'date-fns';
 import {
   PieChart,
   Pie,
@@ -12,59 +14,30 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
-import { format } from 'date-fns';
 
 const COLORS = ['#3b82f6', '#82ca9d', '#ffc658'];
 
 const DashBoardStatics = () => {
-  const today = format(new Date(), 'yyyy-MM-dd');
-  const { data: allUsers = [] } = useAllUsers();
+  const today = '2024-10-20';
+  //const today = format(new Date(), 'yyyy-MM-dd');
   const { data: statics } = useStatics(today);
+  const { data: allUsers = [] } = useAllUsers();
 
-  const totalReservations = statics?.totalReservations; // 총 예약 수
-
-  const todayReservations = statics?.todayReservations; // 오늘 총 예약 수
-  const weeklyReservations = statics?.weeklyReservations; // 주간 총 예약 수
-  const monthlyReservations = statics?.monthlyReservations; // 월간 총 예약 수
-
-  const room1TodayReservations = statics?.partitionStatsToday
-    .filter(p => p.partitionId >= 1 && p.partitionId <= 4)
-    .reduce((sum, cur) => sum + cur.reservationCount, 0); // 306호 오늘 총 예약 수
-  const room2TodayReservtions = statics?.partitionStatsToday
-    .filter(p => p.partitionId === 5 || p.partitionId === 6)
-    .reduce((sum, cur) => sum + cur.reservationCount, 0); // 428호 오늘 총 예약 수
-
-  const room1WeeklyReservations = statics?.partitionStatsWeekly
-    .filter(p => p.partitionId >= 1 && p.partitionId <= 4)
-    .reduce((sum, cur) => sum + cur.reservationCount, 0); // 306호 주간 총 예약 수
-  const room2WeeklyReservations = statics?.partitionStatsWeekly
-    .filter(p => p.partitionId === 5 || p.partitionId === 6)
-    .reduce((sum, cur) => sum + cur.reservationCount, 0); // 428호 주간 총 예약 수
-
-  const room1MonthlyReservations = statics?.partitionStatsMonthly
-    .filter(p => p.partitionId >= 1 && p.partitionId <= 4)
-    .reduce((sum, cur) => sum + cur.reservationCount, 0); // 306호 월간 총 예약 수
-  const room2MonthlyReservations = statics?.partitionStatsMonthly
-    .filter(p => p.partitionId === 5 || p.partitionId === 6)
-    .reduce((sum, cur) => sum + cur.reservationCount, 0); // 428호 월간 총 예약 수
-
-  const room1MonthlyReservationMinutes = statics?.partitionStatsMonthly
-    .filter(p => p.partitionId >= 1 && p.partitionId <= 4)
-    .reduce((sum, cur) => sum + cur.totalReservationMinutes, 0); // 306호 월간 총 사용시간
-  const room2MonthlyReservationMinutes = statics?.partitionStatsMonthly
-    .filter(p => p.partitionId === 5 || p.partitionId === 6)
-    .reduce((sum, cur) => sum + cur.totalReservationMinutes, 0); // 428호 월간 총 사용시간
-
-  const todayRate = ((todayReservations / totalReservations) * 100).toFixed(2);
-  const weeklyRate = ((weeklyReservations / totalReservations) * 100).toFixed(
-    2,
-  );
-  const monthlyRate = ((monthlyReservations / totalReservations) * 100).toFixed(
-    2,
-  );
-  const avgReservationsPerUser = (totalReservations / allUsers.length).toFixed(
-    2,
-  );
+  const {
+    totalReservations,
+    todayReservations,
+    weeklyReservations,
+    monthlyReservations,
+    room1TodayReservations,
+    room2TodayReservations,
+    room1WeeklyReservations,
+    room2WeeklyReservations,
+    room1MonthlyReservations,
+    room2MonthlyReservations,
+    room1MonthlyReservationMinutes,
+    room2MonthlyReservationMinutes,
+    avgReservationsPerUser,
+  } = parseStatics(statics, allUsers);
 
   const pieData = [
     { name: '306', value: room1MonthlyReservationMinutes },
@@ -84,9 +57,15 @@ const DashBoardStatics = () => {
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 ">
       <div className="col-span-1 md:col-span-2 grid grid-cols-2 gap-4">
         {/* #1 전체 이용자 통계 */}
-        <div className="bg-white shadow-md rounded-2xl px-6 py-4">
-          <div className="text-gray-500 text-sm">전체 이용자 수</div>
-          <div className="text-2xl font-bold">{allUsers.length}</div>
+        <div className="flex flex-row text-center items-center justify-center gap-x-20 bg-white shadow-md rounded-2xl px-6 py-4">
+          <div>
+            <div className="text-gray-500 text-sm">전체 이용자 수</div>
+            <div className="text-2xl font-bold">{allUsers.length}</div>
+          </div>
+          <div>
+            <div className="text-gray-500 text-sm">1인당 평균 예약 수</div>
+            <div className="text-2xl font-bold">{avgReservationsPerUser}</div>
+          </div>
         </div>
         {/* #2 예약 수 통계 */}
         <div className="flex flex-row bg-white shadow-md rounded-2xl px-6 py-4 gap-x-10 text-center">
@@ -107,27 +86,8 @@ const DashBoardStatics = () => {
             <div className="text-2xl font-bold">{monthlyReservations}</div>
           </div>
         </div>
-        {/* #3 1인 평균 예약 통계 */}
-        <div className="bg-white shadow-md rounded-2xl px-6 py-4">
-          <div className="text-gray-500 text-sm">1인당 평균 예약 수</div>
-          <div className="text-2xl font-bold">{avgReservationsPerUser}</div>
-        </div>
-        {/* #4 평균 예약 통계 */}
-        <div className="flex flex-row bg-white shadow-md rounded-2xl px-6 py-4 gap-x-10 text-center">
-          <div>
-            <div className="text-gray-500 text-sm">오늘 평균 예약</div>
-            <div className="text-2xl font-bold">{todayRate}</div>
-          </div>
-          <div>
-            <div className="text-gray-500 text-sm">주간 평균 예약</div>
-            <div className="text-2xl font-bold">{weeklyRate}</div>
-          </div>
-          <div>
-            <div className="text-gray-500 text-sm">월간 평균 예약</div>
-            <div className="text-2xl font-bold">{monthlyRate}</div>
-          </div>
-        </div>
-        {/* #5 오늘 호실 별 예약 수 */}
+
+        {/* #3 오늘 호실 별 예약 수 */}
         <div className="bg-white shadow-md rounded-2xl p-4">
           <h2 className="text-lg font-semibold mb-2">
             호실 별 예약 수 (Today)
@@ -141,7 +101,7 @@ const DashBoardStatics = () => {
                 },
                 {
                   name: '428호',
-                  count: room2TodayReservtions,
+                  count: room2TodayReservations,
                 },
               ]}>
               <XAxis dataKey="name" />
@@ -153,7 +113,7 @@ const DashBoardStatics = () => {
         </div>
 
         <div className="grid grid-rows-2 gap-6 ">
-          {/* #6 주간 호실 별 예약 수 */}
+          {/* #4 주간 호실 별 예약 수 */}
           <div className="bg-white shadow-md rounded-2xl px-6 py-4">
             <div className="text-lg font-semibold mb-2">
               주간 호실 별 예약 수
@@ -174,7 +134,7 @@ const DashBoardStatics = () => {
             </div>
           </div>
 
-          {/* #7 월간 호실 별 예약 수 */}
+          {/* #5 월간 호실 별 예약 수 */}
           <div className="bg-white shadow-md rounded-2xl px-6 py-4">
             <div className="text-lg font-semibold mb-2">
               월간 호실 별 예약 수
@@ -197,7 +157,7 @@ const DashBoardStatics = () => {
         </div>
       </div>
 
-      {/* #8 파이 차트 */}
+      {/* #6 파이 차트 */}
       <div className="bg-white shadow-md rounded-2xl p-4">
         <h2 className="text-lg font-semibold mb-2">월간 호실 사용 시간</h2>
         {/* 차트를 부모 컨테이너 크기에 맞게 반응형으로 보여줌 */}
@@ -235,7 +195,7 @@ const DashBoardStatics = () => {
         </ResponsiveContainer>
       </div>
 
-      {/* #9 막대 차트 */}
+      {/* #7 막대 차트 */}
       <div className="bg-white shadow-md rounded-2xl p-4">
         <h2 className="text-lg font-semibold mb-2">예약 비교</h2>
         <ResponsiveContainer width="100%" height={250}>
