@@ -19,7 +19,7 @@ const DashBoardBanner = () => {
       {/* 수정 */}
       <div className="bg-white rounded-xl p-4 hover:shadow-2xl w-full max-w-sm">
         <div className="font-bold text-xl p-4">배너 수정</div>
-        <BannerEdit />
+        <BannerEdit refetch={refetch} />
       </div>
 
       {/* 삭제 */}
