@@ -4,9 +4,8 @@ import { useSnackbar } from 'react-simple-snackbar';
 import { useDeleteBanner } from '../../api/banner.api';
 
 const BannerDelete = ({ activatedBanner, refetch }) => {
-  const [bannerId, setBannerId] = useState(null);
-
   const { mutateAsync: doDeleteBanner } = useDeleteBanner();
+  const [bannerId, setBannerId] = useState(null);
 
   const [openSuccessSnackbar] = useSnackbar({
     position: 'top-right',
@@ -30,15 +29,16 @@ const BannerDelete = ({ activatedBanner, refetch }) => {
       openErrorSnackbar('삭제할 배너를 선택하세요.', 2500);
       return;
     }
-
-    try {
-      await doDeleteBanner(bannerId);
-      openSuccessSnackbar('배너 삭제 성공!', 2500);
-      setBannerId(null);
-      refetch();
-    } catch (error) {
-      openErrorSnackbar('배너 삭제 실패!', 2500);
-    }
+    await doDeleteBanner(bannerId, {
+      onSuccess: () => {
+        openSuccessSnackbar('배너 삭제 성공!', 2500);
+        setBannerId(null);
+        refetch();
+      },
+      onError: () => {
+        openErrorSnackbar('배너 삭제 실패!', 2500);
+      },
+    });
   };
 
   return (

@@ -28,23 +28,38 @@ const BannerEdit = ({ refetch }) => {
 
   // 배너 수정
   const editBanner = async () => {
-    try {
-      await doEditBanner({
+    if (
+      editBannerId === '' ||
+      editBannerType === '' ||
+      editImageUrl === '' ||
+      editLinkUrl === '' ||
+      isActive === ''
+    ) {
+      openErrorSnackbar('배너 값을 입력하세요.');
+      return;
+    }
+    await doEditBanner(
+      {
         bannerId: editBannerId,
         bannerType: editBannerType,
         imageUrl: editImageUrl,
         linkUrl: editLinkUrl,
         active: isActive,
-      });
-      openSuccessSnackbar('배너 수정 성공', 2500);
-      setEditImageUrl('');
-      setEditBannerType('');
-      setEditLinkUrl('');
-      refetch();
-    } catch (error) {
-      console.error(error?.response?.data?.errors?.[0]?.message);
-      openErrorSnackbar('배너 수정 실패!', 2500);
-    }
+      },
+      {
+        onSuccess: () => {
+          openSuccessSnackbar('배너 수정 성공', 2500);
+          setEditImageUrl('');
+          setEditBannerType('');
+          setEditLinkUrl('');
+          refetch();
+        },
+        onError: error => {
+          console.error(error?.response?.data?.errors?.[0]?.message);
+          openErrorSnackbar('배너 수정 실패!', 2500);
+        },
+      },
+    );
   };
 
   return (
@@ -95,7 +110,7 @@ const BannerEdit = ({ refetch }) => {
         />
       </div>
       <Button onClick={editBanner} type="submit" className="bg-blue-500 w-full">
-        배너 업로드
+        배너 수정
       </Button>
     </div>
   );

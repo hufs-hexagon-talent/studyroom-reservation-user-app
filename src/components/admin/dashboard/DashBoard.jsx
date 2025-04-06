@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import DashBoardSchedule from '../schedule/DashBoardSchedule';
+import DashBoardSchedule from '../schedule/DashBoardSchedule';
 import DashBoardReservation from '../reservation management/DashBoardReservation';
 import DashBoardStatics from '../statics/DashBoardStatics';
 import DashBoardBanner from '../../banner/DashBoardBanner';
@@ -99,7 +99,7 @@ const DashBoard = () => {
       </div>
       {/* Reservation 컴포넌트들 */}
       {showReservation && (
-        <div className="px-4 py-4">
+        <div className="px-4">
           <DashBoardReservation />
         </div>
       )}

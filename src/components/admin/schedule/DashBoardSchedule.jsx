@@ -12,6 +12,9 @@ import { format } from 'date-fns';
 const DashBoardSchedule = () => {
   const DEPARTMENT_ID = 1;
   const [availableDate, setAvailableDate] = useState([]);
+  const [selectedRooms, setSelectedRooms] = useState([]);
+  const [selectedDates, setSelectedDates] = useState([]);
+  const [selectedPolicyId, setSelectedPolicyId] = useState(null);
 
   const { data: policies } = useAllPolicies();
 
@@ -23,7 +26,7 @@ const DashBoardSchedule = () => {
     };
     getDate();
   }, []);
-  
+
   return (
     <div className="flex flex-row gap-x-6">
       {/* 스케줄 설정 */}
@@ -32,9 +35,20 @@ const DashBoardSchedule = () => {
           스케줄 설정
         </div>
         <div className="px-4 pb-2">
-          <SelectRoom />
-          <MyDatePicker />
-          <CheckPolicy />
+          <SelectRoom
+            selectedRooms={selectedRooms}
+            setSelectedRooms={setSelectedRooms}
+            selectedDates={selectedDates}
+            selectedPolicyId={selectedPolicyId}
+          />
+          <MyDatePicker
+            selectedDates={selectedDates}
+            setSelectedDates={setSelectedDates}
+          />
+          <CheckPolicy
+            selectedPolicyId={selectedPolicyId}
+            setSelectedPolicyId={setSelectedPolicyId}
+          />
         </div>
       </div>
       {/* 현재 운영 정책이 설정된 날짜 */}

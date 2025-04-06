@@ -4,11 +4,8 @@ import DatePicker, { registerLocale } from 'react-datepicker';
 import { ko } from 'date-fns/locale';
 import 'react-datepicker/dist/react-datepicker.css';
 import { format } from 'date-fns';
-import { useSnackbar } from 'react-simple-snackbar';
-import { useParams } from 'react-router-dom';
 
-const MyDatePicker = () => {
-  const [selectedDates, setSelectedDates] = useState([]);
+const MyDatePicker = ({ selectedDates, setSelectedDates }) => {
   registerLocale('ko', ko);
 
   const handleDateChange = date => {

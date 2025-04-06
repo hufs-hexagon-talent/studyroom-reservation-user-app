@@ -22,17 +22,31 @@ const BannerUpload = ({ refetch }) => {
 
   // 배너 업로드
   const uploadBanner = async () => {
-    try {
-      await doPostBanner({ bannerType, imageUrl, linkUrl });
-      openSuccessSnackbar('배너 업로드 성공!', 2500);
-      setBannerType('');
-      setImageUrl('');
-      setLinkUrl('');
-      refetch();
-    } catch (error) {
-      console.error(error?.response?.data?.errors?.[0]?.message);
-      openErrorSnackbar('배너 업로드 실패!', 2500);
+    if (bannerType == '' || imageUrl == '' || linkUrl == '') {
+      openErrorSnackbar('배너 값을 입력하세요');
+      return;
     }
+
+    await doPostBanner(
+      {
+        bannerType: bannerType,
+        imageUrl: imageUrl,
+        linkUrl: linkUrl,
+      },
+      {
+        onSuccess: () => {
+          openSuccessSnackbar('배너 업로드 성공!', 2500);
+          setBannerType('');
+          setImageUrl('');
+          setLinkUrl('');
+          refetch();
+        },
+        onError: error => {
+          console.error(error);
+          openErrorSnackbar('배너 업로드 실패!', 2500);
+        },
+      },
+    );
   };
 
   return (

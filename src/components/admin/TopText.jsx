@@ -21,42 +21,40 @@ const TopText = () => {
           </div>
         </h3>
         {/* 이동하기 */}
-        <div className="flex flex-row gap-x-8">
-          <div>
-            <div className="flex flex-row">
-              <img className="w-8 h-8 mr-3" src={Github} />
-              <div>
-                <div className="mb-1 text-xs">
-                  Github Repository로 가고 싶다면 ?
-                </div>
-                <div
-                  onClick={() => window.open(githubUrl, '_blank')}
-                  className="text-blue-500 text-xs font-medium cursor-pointer">
-                  Github로 이동하기 &gt;
-                </div>
+        <div className="flex flex-col gap-y-2">
+          <div className="flex flex-row">
+            <img className="w-8 h-8 mr-3" src={Github} />
+            <div>
+              <div className="mb-1 text-xs">
+                Github Repository로 가고 싶다면 ?
+              </div>
+              <div
+                onClick={() => window.open(githubUrl, '_blank')}
+                className="text-blue-500 text-xs font-medium cursor-pointer">
+                Github로 이동하기 &gt;
               </div>
             </div>
-            <div className="flex flex-row items-center cursor-pointer">
-              <img className="w-8 h-8 mr-3" src={requestNotion} />
-              <div className="flex flex-row items-center">
-                <div
-                  onClick={() => window.open(notionRequestUrl, '_blank')}
-                  className="text-xs">
-                  예약 정정 요청 응답을 확인해보세요
-                </div>
-                <div className="text-sm ml-1 text-blue-600">↗</div>
+          </div>
+          <div className="flex flex-row items-center cursor-pointer">
+            <img className="w-8 h-8 mr-3" src={requestNotion} />
+            <div className="flex flex-row items-center">
+              <div
+                onClick={() => window.open(notionRequestUrl, '_blank')}
+                className="text-xs">
+                예약 정정 요청 응답을 확인해보세요
               </div>
+              <div className="text-sm ml-1 text-blue-600">↗</div>
             </div>
-            <div className="flex flex-row justify-center items-center cursor-pointer">
-              <img className="w-8 h-8 mr-3" src={FeedBackNotion} />
-              <div className="flex flex-row items-center">
-                <div
-                  onClick={() => window.open(notionFeedbackUrl, '_blank')}
-                  className="text-xs">
-                  사용자들이 제출한 피드백을 읽어보세요
-                </div>
-                <div className="text-sm ml-1 text-blue-600">↗</div>
+          </div>
+          <div className="flex flex-row justify-center items-center cursor-pointer">
+            <img className="w-8 h-8 mr-3" src={FeedBackNotion} />
+            <div className="flex flex-row items-center">
+              <div
+                onClick={() => window.open(notionFeedbackUrl, '_blank')}
+                className="text-xs">
+                사용자들이 제출한 피드백을 읽어보세요
               </div>
+              <div className="text-sm ml-1 text-blue-600">↗</div>
             </div>
           </div>
         </div>
