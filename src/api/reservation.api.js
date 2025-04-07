@@ -175,7 +175,7 @@ export const useLatestReservation = () => {
 };
 
 // [관리자] 금일 예약들 통계 조회
-const fetchStatics = async date => {
+const fetchReservationStatics = async date => {
   const authState = JSON.parse(localStorage.getItem('authState'));
   const accessToken = authState?.accessToken;
 
@@ -190,9 +190,9 @@ const fetchStatics = async date => {
   return statics_res.data.data;
 };
 
-export const useStatics = date => {
+export const useReservationStatics = date => {
   return useQuery({
     queryKey: ['statics', date],
-    queryFn: () => fetchStatics(date),
+    queryFn: () => fetchReservationStatics(date),
   });
 };
