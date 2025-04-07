@@ -83,18 +83,6 @@ const DashBoardStatics = () => {
               {userStatics?.expiredUserCount}
             </div>
           </div>
-          <div>
-            <div className="text-gray-500 text-sm">만료된 이용자 수</div>
-            <div className="text-2xl font-bold">
-              {userStatics?.expiredUserCount}
-            </div>
-          </div>
-          <div>
-            <div className="text-gray-500 text-sm">만료된 이용자 수</div>
-            <div className="text-2xl font-bold">
-              {userStatics?.expiredUserCount}
-            </div>
-          </div>
         </div>
         {/* #2 예약 수 통계 */}
         <div className="flex flex-row text-center items-center justify-center bg-white shadow-md rounded-2xl px-6 py-4 gap-x-10">
