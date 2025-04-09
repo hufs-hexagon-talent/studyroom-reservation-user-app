@@ -1,5 +1,6 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { apiClient } from './client';
+import axios from 'axios';
 
 // [관리자] 모든 회원 정보 조회
 const fetchAllUsers = async () => {
@@ -196,5 +197,28 @@ export const useNewEmailVerify = () => {
       });
       return newEmailVerify_res.data;
     },
+  });
+};
+
+// [관리자] 사용자 통계 조회
+const fetchUserStatics = async () => {
+  const authState = JSON.parse(localStorage.getItem('authState'));
+  const accessToken = authState?.accessToken;
+
+  const userStatics = await axios.get(
+    'https://api.studyroom-qa.alpaon.net/users/statics',
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    },
+  );
+  return userStatics.data.data;
+};
+
+export const useUserStatics = () => {
+  return useQuery({
+    queryKey: ['userStatics'],
+    queryFn: fetchUserStatics,
   });
 };

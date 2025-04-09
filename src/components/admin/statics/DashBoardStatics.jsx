@@ -1,6 +1,6 @@
 import React from 'react';
-import { useAllUsers } from '../../../api/user.api';
-import { useStatics } from '../../../api/reservation.api';
+import { useAllUsers, useUserStatics } from '../../../api/user.api';
+import { useReservationStatics } from '../../../api/reservation.api';
 import { parseStatics } from '../../../utils/statics.utils';
 import { format } from 'date-fns';
 import {
@@ -20,7 +20,8 @@ const COLORS = ['#3b82f6', '#82ca9d', '#ffc658'];
 const DashBoardStatics = () => {
   const today = '2024-10-20';
   //const today = format(new Date(), 'yyyy-MM-dd');
-  const { data: statics } = useStatics(today);
+  const { data: reservationStatics } = useReservationStatics(today);
+  const { data: userStatics } = useUserStatics();
   const { data: allUsers = [] } = useAllUsers();
 
   const {
@@ -37,7 +38,7 @@ const DashBoardStatics = () => {
     room1MonthlyReservationMinutes,
     room2MonthlyReservationMinutes,
     avgReservationsPerUser,
-  } = parseStatics(statics, allUsers);
+  } = parseStatics(reservationStatics, allUsers);
 
   const pieData = [
     { name: '306', value: room1MonthlyReservationMinutes },
@@ -57,18 +58,34 @@ const DashBoardStatics = () => {
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 ">
       <div className="col-span-1 md:col-span-2 grid grid-cols-2 gap-4">
         {/* #1 전체 이용자 통계 */}
-        <div className="flex flex-row text-center items-center justify-center gap-x-20 bg-white shadow-md rounded-2xl px-6 py-4">
+        <div className="flex flex-row text-center items-center justify-center gap-x-6 bg-white shadow-md rounded-2xl px-6 py-4">
           <div>
             <div className="text-gray-500 text-sm">전체 이용자 수</div>
-            <div className="text-2xl font-bold">{allUsers.length}</div>
+            <div className="text-2xl font-bold">
+              {userStatics?.totalUserCount}
+            </div>
           </div>
           <div>
-            <div className="text-gray-500 text-sm">1인당 평균 예약 수</div>
-            <div className="text-2xl font-bold">{avgReservationsPerUser}</div>
+            <div className="text-gray-500 text-sm">활성화 된 이용자 수</div>
+            <div className="text-2xl font-bold">
+              {userStatics?.activeUserCount}
+            </div>
+          </div>
+          <div>
+            <div className="text-gray-500 text-sm">Blocked 이용자 수</div>
+            <div className="text-2xl font-bold">
+              {userStatics?.bannedUserCount}
+            </div>
+          </div>
+          <div>
+            <div className="text-gray-500 text-sm">만료된 이용자 수</div>
+            <div className="text-2xl font-bold">
+              {userStatics?.expiredUserCount}
+            </div>
           </div>
         </div>
         {/* #2 예약 수 통계 */}
-        <div className="flex flex-row bg-white shadow-md rounded-2xl px-6 py-4 gap-x-10 text-center">
+        <div className="flex flex-row text-center items-center justify-center bg-white shadow-md rounded-2xl px-6 py-4 gap-x-10">
           <div>
             <div className="text-gray-500 text-sm">총 예약 수</div>
             <div className="text-2xl font-bold">{totalReservations}</div>

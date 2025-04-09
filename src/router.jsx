@@ -5,7 +5,7 @@ import { useServiceRole } from './api/user.api';
 import FadeLoader from 'react-spinners/FadeLoader';
 
 import FooterCes from './components/footer/FooterCes';
-import NavigationBarCes from './components/Navbar/NavigationBarCes';
+import NavigationBarCes from './components/navbar/NavigationBarCes';
 import Check from './pages/check/CheckRoom';
 import LoginPage from './pages/login/LoginPage';
 import Notice from './pages/notice/notice';
@@ -50,6 +50,7 @@ const RouterComponent = () => {
     <BrowserRouter basename={'/'}>
       <div className="min-h-screen flex flex-col">
         <NavigationBarCes showSnackbar={openSnackbar} />
+
         <div className="flex-grow">
           <Routes>
             <Route path="/" element={<RoomPage />} />
