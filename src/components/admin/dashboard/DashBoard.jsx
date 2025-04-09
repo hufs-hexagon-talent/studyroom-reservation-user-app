@@ -31,6 +31,7 @@ const DashBoard = () => {
 
       {/* Statics 영역 */}
       <div
+        id="statics"
         onClick={toggleStatics}
         className="inline-flex flex-row pl-8 pb-2 items-center gap-x-2">
         <div className="font-bold text-2xl text-gray-700 cursor-pointer">
@@ -56,6 +57,7 @@ const DashBoard = () => {
 
       {/* Schedule 영역 */}
       <div
+        id="schedule"
         onClick={toggleSchedule}
         className="inline-flex flex-row pl-8 pb-2 items-center gap-x-2">
         <div className="font-bold text-2xl text-gray-700 cursor-pointer">
@@ -79,8 +81,9 @@ const DashBoard = () => {
         </div>
       )}
 
-      {/* Reservation 영역 */}
+      {/* Manage Reservation 영역 */}
       <div
+        id="manage-reservation"
         onClick={toggleReservation}
         className="inline-flex flex-row pl-8 pb-2 items-center gap-x-2">
         <div className="cursor-pointer font-bold text-2xl text-gray-700">
@@ -106,6 +109,7 @@ const DashBoard = () => {
 
       {/* Search User 영역 */}
       <div
+        id="search-user"
         onClick={toggleSearchUser}
         className="inline-flex flex-row pl-8 pb-2 items-center gap-x-2">
         <div className="cursor-pointer font-bold text-2xl text-gray-700">
@@ -133,6 +137,7 @@ const DashBoard = () => {
 
       {/* Blocked 영역 */}
       <div
+        id="blocked"
         onClick={toggleBlocked}
         className="inline-flex flex-row pl-8 pb-2 items-center gap-x-2">
         <div className="cursor-pointer font-bold text-2xl text-gray-700">
@@ -160,6 +165,7 @@ const DashBoard = () => {
 
       {/* 배너 관리 영역 */}
       <div
+        id="banner"
         onClick={toggleBanner}
         className="inline-flex flex-row pl-8 pb-2 items-center gap-x-2">
         <div className="cursor-pointer font-bold text-2xl text-gray-700">
