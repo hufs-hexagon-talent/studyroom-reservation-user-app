@@ -54,8 +54,9 @@ const SerialCheck = () => {
   };
 
   return (
-    <div className="p-6">
-      <div className="flex flex-row items-center mb-5">
+    <div>
+      <div className="font-bold text-3xl text-black px-4 py-8">Search User</div>
+      <div className="flex flex-row items-center m-5">
         <div className="mr-3">학번 또는 이름 </div>
         <input
           className="border rounded-sm w-32 h-7"
