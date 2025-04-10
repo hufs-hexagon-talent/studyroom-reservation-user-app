@@ -21,12 +21,16 @@ import EmailVerify from './pages/password/EmailVerify';
 import Schedule from './pages/manage/Schedule';
 import DivideAct from './pages/manage/DivideAct';
 import SerialCheck from './pages/manage/SerialCheck';
-import FetchBlockedUser from './pages/manage/FetchBlockedUser';
+import FetchBlocked from './components/blocked/FetchBlocked';
 import FetchReservations from './pages/manage/FetchReservations';
 import MyPage from './pages/mypage/MyPage';
 import NoShow from './pages/check/NoShow';
 import EmailSend from './pages/email/EmailSend';
 import ManageBanner from './pages/manage/ManageBanner';
+import DashBoard from './components/admin/dashboard/DashBoard';
+import DashBoardSchedule from './components/admin/schedule/DashBoardSchedule';
+import DashBoardReservation from './components/admin/reservation management/DashBoardReservation';
+import DashBoardBanner from './components/banner/DashBoardBanner';
 
 const RouterComponent = () => {
   const { loggedIn } = useAuth();
@@ -70,15 +74,13 @@ const RouterComponent = () => {
               <>
                 <Route path="/notice" element={<Notice />} />
                 <Route path="/qrcheck" element={<QrCheck />} />
-                <Route path="/divide" element={<DivideAct />} />
+
                 <Route path="/check" element={<Check />} />
                 <Route path="/otp" element={<OtpPage />} />
                 <Route path="/password" element={<LoggedInPassword />} />
                 <Route path="/selectPartition" element={<SelectPartition />} />
                 <Route path="/visit" element={<CheckVisit />} />
                 <Route path="/schedule" element={<Schedule />} />
-                <Route path="/serialCheck" element={<SerialCheck />} />
-                <Route path="/blocked" element={<FetchBlockedUser />} />
                 <Route
                   path="/fetchReservations/:id"
                   element={<FetchReservations />}
@@ -87,6 +89,18 @@ const RouterComponent = () => {
                 <Route path="/noshow" element={<NoShow />} />
                 <Route path="/emailSend" element={<EmailSend />} />
                 <Route path="/banner" element={<ManageBanner />} />
+                {/* 어드민 */}
+                <Route path="/divide" element={<DivideAct />}>
+                  <Route path="dashboard" element={<DashBoard />} />
+                  <Route path="schedule" element={<DashBoardSchedule />} />
+                  <Route
+                    path="manage-reservation"
+                    element={<DashBoardReservation />}
+                  />
+                  <Route path="serialCheck" element={<SerialCheck />} />
+                  <Route path="blocked" element={<FetchBlocked />} />
+                  <Route path="banner" element={<DashBoardBanner />} />
+                </Route>
               </>
             )}
             {loggedIn && serviceRole === 'RESIDENT' && (

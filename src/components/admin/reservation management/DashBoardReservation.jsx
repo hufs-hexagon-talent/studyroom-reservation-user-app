@@ -17,6 +17,9 @@ const DashBoardReservation = () => {
 
   return (
     <div>
+      <div className="font-bold text-3xl text-black px-4 py-8">
+        Manage Reservation
+      </div>
       <div className="py-4">
         <DatePicker
           selected={selectedDate}

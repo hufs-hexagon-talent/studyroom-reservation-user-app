@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Table } from 'flowbite-react';
 import { Pagination } from '@mui/material';
-
 import { useBlockedUser, useUnblocked } from '../../api/user.api';
 
 const FetchBlocked = () => {
@@ -44,6 +43,7 @@ const FetchBlocked = () => {
 
   return (
     <div className="overflow-x-auto">
+      <div className="font-bold text-3xl text-black p-8">Blocked</div>
       <Table>
         <Table.Head className="text-center">
           <Table.HeadCell>User Id</Table.HeadCell>
