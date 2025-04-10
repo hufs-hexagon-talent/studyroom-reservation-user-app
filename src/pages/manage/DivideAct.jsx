@@ -1,7 +1,6 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
-import DashBoard from '../../components/admin/dashboard/DashBoard';
-import SideBar from '../../components/sidebar/Sidebar';
+import SideBar from '../../components/sidebar/SideBar';
 
 const DivideAct = () => {
   return (
