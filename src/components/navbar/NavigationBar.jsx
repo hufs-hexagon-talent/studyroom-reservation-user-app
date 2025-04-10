@@ -4,7 +4,7 @@ import Logo from '../../assets/logo/logoCes.png';
 import useAuth from '../../hooks/useAuth';
 import { useServiceRole } from '../../api/user.api';
 
-const NavigationBarCes = () => {
+const NavigationBar = () => {
   const { loggedIn, logout } = useAuth();
   const { data: serviceRole, refetch, isFetching } = useServiceRole();
 
@@ -68,4 +68,4 @@ const NavigationBarCes = () => {
   );
 };
 
-export default NavigationBarCes;
+export default NavigationBar;

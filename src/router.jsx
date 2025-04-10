@@ -4,8 +4,8 @@ import { useSnackbar } from 'react-simple-snackbar';
 import { useServiceRole } from './api/user.api';
 import FadeLoader from 'react-spinners/FadeLoader';
 
-import FooterCes from './components/footer/FooterCes';
-import NavigationBarCes from './components/navbar/NavigationBarCes';
+import Footer from './components/footer/Footer';
+import NavigationBar from './components/navbar/NavigationBar';
 import Check from './pages/check/CheckRoom';
 import LoginPage from './pages/login/LoginPage';
 import Notice from './pages/notice/notice';
@@ -53,7 +53,7 @@ const RouterComponent = () => {
   return (
     <BrowserRouter basename={'/'}>
       <div className="min-h-screen flex flex-col">
-        <NavigationBarCes showSnackbar={openSnackbar} />
+        <NavigationBar showSnackbar={openSnackbar} />
 
         <div className="flex-grow">
           <Routes>
@@ -125,7 +125,7 @@ const RouterComponent = () => {
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </div>
-        <FooterCes showSnackbar={openSnackbar} />
+        <Footer showSnackbar={openSnackbar} />
       </div>
     </BrowserRouter>
   );
