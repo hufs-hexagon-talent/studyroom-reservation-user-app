@@ -5,7 +5,7 @@ import { useSnackbar } from 'react-simple-snackbar';
 import useAuth from '../../hooks/useAuth';
 import './Footer.css';
 
-const FooterIce = () => {
+const Footer = () => {
   const [openSnackbar, closeSnackbar] = useSnackbar({
     position: 'top-right',
     style: {
@@ -18,7 +18,7 @@ const FooterIce = () => {
 
   const handleAdminClick = async () => {
     if (loggedIn && serviceRole === 'ADMIN') {
-      navigate('/divide');
+      navigate('/divide/dashboard');
     } else {
       openSnackbar('관리자 외에는 접근 권한이 없습니다.');
       setTimeout(() => {
@@ -49,17 +49,17 @@ const FooterIce = () => {
                   글로벌캠퍼스{' '}
                 </b>
                 17035 경기도 용인시 처인구 모현읍 외대로 81 한국외국어대학교
-                글로벌캠퍼스 (공학관 204-1호)
+                글로벌캠퍼스 (공학관 205호)
               </span>
             </p>
             <p className="block  mx-0 leading-2">
               <span className="inline-block font-normal">
                 <b className="font-bormal text-footertextbrown">TEL. </b>
-                031-330-4255
+                031-330-4268
               </span>
               <span>
                 <b className="font-bormal text-footertextbrown"> Email. </b>
-                <a href="mailto:ces@hufs.ac.kr">ice@hufs.ac.kr</a>
+                <a href="mailto:ces@hufs.ac.kr">ces@hufs.ac.kr</a>
               </span>
             </p>
             <p className="block leading-2">
@@ -69,8 +69,8 @@ const FooterIce = () => {
                 </b>
                 <a
                   className="inline hover:underline"
-                  href="https://ice.hufs.ac.kr">
-                  https://ice.hufs.ac.kr
+                  href="https://computer.hufs.ac.kr">
+                  https://computer.hufs.ac.kr
                 </a>
               </span>
             </p>
@@ -88,4 +88,4 @@ const FooterIce = () => {
   );
 };
 
-export default FooterIce;
+export default Footer;
