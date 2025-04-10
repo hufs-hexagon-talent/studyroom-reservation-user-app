@@ -1,6 +1,6 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
-import SideBar from '../../components/sidebar/SideBar';
+import SideBar from '../../components/sidebar/SideBar'; // build error ?
 
 const DivideAct = () => {
   return (
