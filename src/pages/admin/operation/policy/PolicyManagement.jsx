@@ -2,15 +2,7 @@ import React, { useState } from 'react';
 import DatePicker from 'react-datepicker';
 import { format } from 'date-fns';
 import 'react-datepicker/dist/react-datepicker.css';
-import {
-  Button,
-  Table,
-  TableHead,
-  TableRow,
-  TableHeadCell,
-  TableBody,
-  TableCell,
-} from 'flowbite-react';
+import { Button, Table, TableBody } from 'flowbite-react';
 import {
   useCreatePolicy,
   useAllPolicies,

@@ -1,6 +1,19 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { apiClient } from './client';
 
+// [관리자] room 생성
+export const useCreateRoom = () => {
+  return useMutation({
+    mutationFn: async ({ roomName, departmentId }) => {
+      const createRoom_res = await apiClient.post('/rooms/room', {
+        roomName,
+        departmentId,
+      });
+      return createRoom_res.data.data;
+    },
+  });
+};
+
 // room 조회
 export const fetchRoom = async roomId => {
   const room_response = await apiClient.get(`/rooms/${roomId}`);

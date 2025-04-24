@@ -87,7 +87,7 @@ const ScheduleManagement = () => {
                 <Table.HeadCell>최대 사용 시간(분)</Table.HeadCell>
               </Table.Head>
               <Table.Body className="text-center divide-y">
-                {policies?.data.operationPolicyInfos.map(policy => (
+                {policies?.map(policy => (
                   <Table.Row
                     key={policy.roomOperationPolicyId}
                     className="bg-white dark:border-gray-700 dark:bg-gray-800">

@@ -59,7 +59,7 @@ const CustomSidebar = () => {
       <SidebarSection icon={HiCalendar} label="운영 관리">
         <SidebarItem to="/divide/policy">정책 관리</SidebarItem>
         <SidebarItem to="/divide/schedule">운영 시간 관리</SidebarItem>
-        <SidebarItem to="#">시설 관리</SidebarItem>
+        <SidebarItem to="/divide/facility">시설 관리</SidebarItem>
       </SidebarSection>
 
       <SidebarSection icon={HiFilm} label="배너 관리">
