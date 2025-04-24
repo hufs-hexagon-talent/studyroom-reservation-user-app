@@ -1,8 +1,24 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { apiClient } from './client';
 
+// [관리자] Room의 Partition 생성
+export const useCreatePartition = () => {
+  return useMutation({
+    mutationFn: async ({ roomId, partitionNumber }) => {
+      const createPartition_res = await apiClient.post(
+        '/partitions/partition',
+        {
+          roomId,
+          partitionNumber,
+        },
+      );
+      return createPartition_res.data;
+    },
+  });
+};
+
 // partition 조회
-export const fetchPartiiton = async partitonId => {
+const fetchPartiiton = async partitonId => {
   const partition_res = await apiClient.get(`/partitions/${partitonId}`);
   return partition_res.data.data;
 };
@@ -20,7 +36,7 @@ export const usePartition = partitionIds =>
   });
 
 // 모든 partition 조회
-export const fetchAllPartitions = async () => {
+const fetchAllPartitions = async () => {
   const all_partitions_response = await apiClient.get('/partitions');
   return all_partitions_response.data.data.partitions;
 };
@@ -40,7 +56,7 @@ export const useAllPartitions = () =>
   });
 
 // roomId로 partition들 조회
-export const fetchPartitionsByRoomIds = async roomIds => {
+const fetchPartitionsByRoomIds = async roomIds => {
   const partitions = await Promise.all(
     roomIds.map(roomId => apiClient.get(`/partitions/rooms/${roomId}`)),
   );

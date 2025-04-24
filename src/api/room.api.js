@@ -9,7 +9,7 @@ export const useCreateRoom = () => {
         roomName,
         departmentId,
       });
-      return createRoom_res.data.data;
+      return createRoom_res.data;
     },
   });
 };
@@ -27,6 +27,16 @@ export const useRooms = roomId =>
     enabled: roomId !== null && roomId !== undefined,
   });
 
+// [관리자] room 삭제
+export const useDeleteRoom = () => {
+  return useMutation({
+    mutationFn: async ({ roomId }) => {
+      const deleteRoom_res = await apiClient.delete(`/rooms/${roomId}`);
+      return deleteRoom_res.data;
+    },
+  });
+};
+
 // 모든 room 조회
 export const fetchAllRooms = async () => {
   const all_rooms_response = await apiClient.get('/rooms');
@@ -37,5 +47,19 @@ export const useAllRooms = () => {
   return useQuery({
     queryKey: ['allRooms'],
     queryFn: fetchAllRooms,
+  });
+};
+
+// [관리자] roomID로 partition들 조회
+const fetchPartitionsByRoomId = async roomId => {
+  const partitionsByRoomId_res = await apiClient.get(`/rooms/rooms/${roomId}`);
+  return partitionsByRoomId_res.data;
+};
+
+export const usePartitionsByRoomId = roomId => {
+  return useQuery({
+    queryKey: ['roomId', roomId],
+    queryFn: () => fetchPartitionsByRoomId(roomId),
+    enabled: !!roomId,
   });
 };

@@ -40,7 +40,7 @@ const CustomSidebar = () => {
       animate={{ x: 0, opacity: 1 }}
       exit={{ x: -300, opacity: 0 }}
       transition={{ type: 'spring', stiffness: 200, damping: 30 }}
-      className="w-64 h-full border-r bg-white py-4">
+      className="w-64 h-full bg-white py-4">
       <SidebarSection icon={HiChartPie} label="통계 및 현황">
         <SidebarItem to="/divide/user-statics">사용자 통계</SidebarItem>
         <SidebarItem to="/divide/reservation-statics">예약 통계</SidebarItem>
