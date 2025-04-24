@@ -1,20 +1,29 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
-import SideBar from '../../components/sidebar/SideBar'; // build error ?
+import { AnimatePresence } from 'framer-motion';
+import CustomSidebar from '../../components/sidebar/SideBar';
 
 const DivideAct = () => {
-  return (
-    <div className="min-h-screen flex flex-col">
-      <div className="flex flex-grow">
-        {/* 왼쪽 사이드바 */}
-        <div className="w-64">
-          <SideBar />
-        </div>
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
-        {/* 오른쪽 메인 콘텐츠 */}
-        <div className="flex-grow p-6 bg-gray-50">
-          <Outlet />
-        </div>
+  useEffect(() => {
+    const handleKeyDown = e => {
+      if (e.metaKey && e.key.toLowerCase() === 'b') {
+        e.preventDefault();
+        setIsSidebarOpen(prev => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  return (
+    <div className="min-h-screen flex">
+      <AnimatePresence>
+        {isSidebarOpen && <CustomSidebar key="sidebar" />}
+      </AnimatePresence>
+      <div className="flex-grow p-6 bg-gray-50">
+        <Outlet />
       </div>
     </div>
   );

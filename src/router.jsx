@@ -27,10 +27,13 @@ import MyPage from './pages/mypage/MyPage';
 import NoShow from './pages/check/NoShow';
 import EmailSend from './pages/email/EmailSend';
 import ManageBanner from './pages/manage/ManageBanner';
-import DashBoard from './components/admin/dashboard/DashBoard';
-import DashBoardSchedule from './components/admin/schedule/DashBoardSchedule';
-import DashBoardReservation from './components/admin/reservation management/DashBoardReservation';
+import PolicyManagement from './pages/admin/operation/policy/PolicyManagement';
+import ScheduleManagement from './pages/admin/operation/schedule/ScheduleManagement';
+import ReservationList from './pages/admin/reservation management/ReservationList';
+import ReservationState from './pages/admin/reservation management/ReservationState';
 import DashBoardBanner from './components/banner/DashBoardBanner';
+import UserStatics from './pages/admin/statics/UserStatics';
+import ReservationStatics from './pages/admin/statics/ReservationStatics';
 
 const RouterComponent = () => {
   const { loggedIn } = useAuth();
@@ -91,14 +94,28 @@ const RouterComponent = () => {
                 <Route path="/banner" element={<ManageBanner />} />
                 {/* 어드민 */}
                 <Route path="/divide" element={<DivideAct />}>
-                  <Route path="dashboard" element={<DashBoard />} />
-                  <Route path="schedule" element={<DashBoardSchedule />} />
+                  {/* 통계 */}
+                  <Route path="user-statics" element={<UserStatics />} />
                   <Route
-                    path="manage-reservation"
-                    element={<DashBoardReservation />}
+                    path="reservation-statics"
+                    element={<ReservationStatics />}
                   />
+                  {/* 사용자 관리 */}
                   <Route path="serialCheck" element={<SerialCheck />} />
                   <Route path="blocked" element={<FetchBlocked />} />
+                  {/* 예약 관리 */}
+                  <Route
+                    path="reservation-list"
+                    element={<ReservationList />}
+                  />
+                  <Route
+                    path="reservation-state"
+                    element={<ReservationState />}
+                  />
+                  {/* 운영 관리 */}
+                  <Route path="policy" element={<PolicyManagement />} />
+                  <Route path="schedule" element={<ScheduleManagement />} />
+
                   <Route path="banner" element={<DashBoardBanner />} />
                 </Route>
               </>
