@@ -9,7 +9,7 @@ const FetchBlocked = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [error, setError] = useState(null);
   const [blockedList, setBlockedList] = useState([]);
-  const itemsPerPage = 5;
+  const itemsPerPage = 10;
 
   // 현재 페이지에 해당하는 데이터 추출
   const startIndex = (currentPage - 1) * itemsPerPage;

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Table, Checkbox } from 'flowbite-react';
-
+import UnderArrow from '../../../../assets/icons/under_arrow_black.png';
 import { useAllPolicies } from '../../../../api/roomOperationPolicy.api';
 
 const CheckPolicy = ({ selectedPolicyId, setSelectedPolicyId }) => {
@@ -28,9 +28,9 @@ const CheckPolicy = ({ selectedPolicyId, setSelectedPolicyId }) => {
       <div className="flex flex-row items-center">
         <div>모든 room Policy 조회 및 선택</div>
         <button
-          className="bg-blue-500 text-white px-3 py-2 ml-8 text-xs rounded-full"
+          className="bg-gray-300 text-white px-3 py-2 ml-8 text-xs rounded-full"
           onClick={handleFetchPolicies}>
-          조회
+          <img className="w-4 h-4" src={UnderArrow} />
         </button>
       </div>
       {isFetched && isTableVisible && policies && (
@@ -44,7 +44,7 @@ const CheckPolicy = ({ selectedPolicyId, setSelectedPolicyId }) => {
               <Table.HeadCell>최대 사용 시간(분)</Table.HeadCell>
             </Table.Head>
             <Table.Body className="text-center divide-y">
-              {policies.data.operationPolicyInfos.map(policy => (
+              {policies?.map(policy => (
                 <Table.Row
                   key={policy.roomOperationPolicyId}
                   className="bg-white dark:border-gray-700 dark:bg-gray-800">
@@ -69,7 +69,7 @@ const CheckPolicy = ({ selectedPolicyId, setSelectedPolicyId }) => {
             </Table.Body>
           </Table>
           <div
-            className="mt-2 text-sm text-blue-600 cursor-pointer"
+            className="mt-2 text-sm cursor-pointer"
             onClick={handleTableVisibility}>
             간략히 &gt;
           </div>

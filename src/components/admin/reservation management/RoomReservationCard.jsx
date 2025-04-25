@@ -77,7 +77,8 @@ const RoomReservationCard = ({ room, partitionIds, selectedDate }) => {
         openSuccessSnackbar(response.message, 2500);
       }
 
-      setOpenEditModal(false); // Close modal after state change
+      setOpenEditModal(false); // 상태 변경 후 모달 닫기
+      await refetch();
     } catch (error) {
       openErrorSnackbar(error.response.data.errorMessage, 2500);
     }
@@ -86,12 +87,13 @@ const RoomReservationCard = ({ room, partitionIds, selectedDate }) => {
   // 예약 삭제
   const handleDelete = reservationId => {
     doDelete(reservationId, {
-      onSuccess: () => {
+      onSuccess: async () => {
         setReservations(prevReservations =>
           prevReservations.filter(
             reservation => reservation.reservationId !== reservationId,
           ),
         );
+        await refetch();
       },
       onError: err => {
         setError('예약 삭제 실패');
@@ -132,7 +134,7 @@ const RoomReservationCard = ({ room, partitionIds, selectedDate }) => {
                 )
                 .map(reservation => (
                   <Table.Row key={reservation.reservationId}>
-                    <Table.Cell>
+                    <Table.Cell className="flex justify-center items-center">
                       <img
                         src={Edit}
                         alt="edit"
@@ -140,7 +142,7 @@ const RoomReservationCard = ({ room, partitionIds, selectedDate }) => {
                           setSelectedReservationId(reservation.reservationId);
                           setOpenEditModal(true);
                         }}
-                        className="cursor-pointer w-6 h-6 flex justify-center items-center"
+                        className="cursor-pointer w-6 h-6"
                       />
                     </Table.Cell>
                     <Table.Cell>

@@ -31,7 +31,7 @@ import PolicyManagement from './pages/admin/operation/policy/PolicyManagement';
 import ScheduleManagement from './pages/admin/operation/schedule/ScheduleManagement';
 import ReservationList from './pages/admin/reservation management/ReservationList';
 import ReservationState from './pages/admin/reservation management/ReservationState';
-import DashBoardBanner from './components/banner/DashBoardBanner';
+import BannerManagement from './pages/admin/banner/BannerManagement';
 import UserStatics from './pages/admin/statics/UserStatics';
 import ReservationStatics from './pages/admin/statics/ReservationStatics';
 import FacilityManagement from './pages/admin/operation/facility/FacilityManagement';
@@ -117,8 +117,8 @@ const RouterComponent = () => {
                   <Route path="policy" element={<PolicyManagement />} />
                   <Route path="schedule" element={<ScheduleManagement />} />
                   <Route path="facility" element={<FacilityManagement />} />
-                  <Route path="banner" element={<DashBoardBanner />} />
                   {/* 배너 관리 */}
+                  <Route path="banner" element={<BannerManagement />} />
                 </Route>
               </>
             )}

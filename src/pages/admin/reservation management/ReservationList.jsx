@@ -15,10 +15,10 @@ const ReservationList = () => {
   // 룸 - 파티션 매핑
   const roomPartitionMap = roomName?.reduce((acc, name) => {
     const matchedPartitions = partitions
-      .filter(p => p.roomName === name)
+      ?.filter(p => p.roomName === name)
       .map(p => p.partitionNumber);
 
-    if (matchedPartitions.length > 0) {
+    if (matchedPartitions?.length > 0) {
       acc[name] = matchedPartitions;
     }
 

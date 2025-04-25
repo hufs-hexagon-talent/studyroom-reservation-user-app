@@ -1,8 +1,8 @@
 import React from 'react';
 import { useActivatedBanner } from '../../api/banner.api';
-import BannerUpload from '../../components/banner/BannerUpload';
-import BannerDelete from '../../components/banner/BannerDelete';
-import BannerEdit from '../../components/banner/BannerEdit';
+import BannerUpload from '../admin/banner/BannerUpload';
+import BannerDelete from '../admin/banner/BannerDelete';
+import BannerEdit from '../admin/banner/BannerEdit';
 
 const UploadBanner = () => {
   const { data: activatedBanner, refetch } = useActivatedBanner();
