@@ -1,101 +1,43 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Table, Modal } from 'flowbite-react';
+import { Table } from 'flowbite-react';
 import { format } from 'date-fns';
-import { useSnackbar } from 'react-simple-snackbar';
+import { Pagination } from '@mui/material';
 
-import {
-  useReservationsByPartitions,
-  useVisitedState,
-  useNotVisitedState,
-  useProcessedState,
-  useAdminDeleteReservation,
-} from '../../../api/reservation.api';
-import { HiOutlineExclamationCircle } from 'react-icons/hi';
+import { useReservationsByPartitions } from '../../../api/reservation.api';
 
 const RoomReservationCard = ({ room, partitionIds, selectedDate }) => {
   const [reservations, setReservations] = useState([]);
-  const [selectedReservationId, setSelectedReservationId] = useState(null);
-  const [openEditModal, setOpenEditModal] = useState(null);
-  const [openDeleteModal, setOpenDeleteModal] = useState(null);
-  const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1); // 현재 페이지
+  const itemsPerPage = 5; // 페이지 당 보여줄 개수
 
-  const [openErrorSnackbar] = useSnackbar({
-    position: 'top-right',
-    style: {
-      backgroundColor: '#FF3333', // 빨간색
-    },
-  });
-  const [openSuccessSnackbar] = useSnackbar({
-    position: 'top-right',
-    style: {
-      backgroundColor: '#4CAF50', // 초록색
-    },
-  });
+  const { data: fetchedReservations, isError: reservationsError } =
+    useReservationsByPartitions({
+      date: format(selectedDate, 'yyyy-MM-dd'),
+      partitionIds,
+    });
 
-  const {
-    data: fetchedReservations,
-    refetch,
-    isError: reservationsError,
-  } = useReservationsByPartitions({
-    date: format(selectedDate, 'yyyy-MM-dd'),
-    partitionIds,
-  });
-  const { mutate: doDelete } = useAdminDeleteReservation();
-
-  const { mutateAsync: visitedState } = useVisitedState();
-  const { mutateAsync: notVisitedState } = useNotVisitedState();
-  const { mutateAsync: processedState } = useProcessedState();
-
+  // 예약 불러오는 함수
   useEffect(() => {
     if (fetchedReservations) {
       setReservations(fetchedReservations);
     }
   }, [fetchedReservations]);
 
-  const handleFetchReservations = () => {
-    try {
-      refetch();
-    } catch (err) {
-      setError('예약 불러오기 실패');
-    }
+  // 페이지 바뀔때 마다 상태 변경
+  const handlePageChange = (event, value) => {
+    setCurrentPage(value);
   };
 
-  // 출석 상태 변경
-  const handleStateChange = async state => {
-    try {
-      if (state === 'notVisited') {
-        const response = await notVisitedState(selectedReservationId);
-        openSuccessSnackbar(response.message, 2500);
-      } else if (state === 'visited') {
-        const response = await visitedState(selectedReservationId);
-        openSuccessSnackbar(response.message, 2500);
-      } else if (state === 'processed') {
-        const response = await processedState(selectedReservationId);
-        openSuccessSnackbar(response.message, 2500);
-      }
+  // Pagination 계산
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedReservations = reservations
+    ?.sort(
+      (a, b) =>
+        new Date(a.reservationStartTime) - new Date(b.reservationStartTime),
+    )
+    ?.slice(startIndex, startIndex + itemsPerPage);
 
-      setOpenEditModal(false); // Close modal after state change
-    } catch (error) {
-      openErrorSnackbar(error.response.data.errorMessage, 2500);
-    }
-  };
-
-  // 예약 삭제
-  const handleDelete = reservationId => {
-    doDelete(reservationId, {
-      onSuccess: () => {
-        setReservations(prevReservations =>
-          prevReservations.filter(
-            reservation => reservation.reservationId !== reservationId,
-          ),
-        );
-      },
-      onError: err => {
-        setError('예약 삭제 실패');
-        console.error(err);
-      },
-    });
-  };
+  const pageCount = Math.ceil(reservations.length / itemsPerPage);
 
   return (
     <div className="bg-white p-4 inline-block rounded-xl mb-8 hover:shadow-2xl w-full">
@@ -103,7 +45,6 @@ const RoomReservationCard = ({ room, partitionIds, selectedDate }) => {
         {room.roomName}호 예약 조회
       </div>
 
-      {error && <div style={{ color: 'red' }}>{error}</div>}
       {reservationsError ? (
         <div>Error fetching reservations</div>
       ) : reservations.length === 0 ? (
@@ -119,7 +60,7 @@ const RoomReservationCard = ({ room, partitionIds, selectedDate }) => {
               <Table.HeadCell>종료 시간</Table.HeadCell>
             </Table.Head>
             <Table.Body className="divide-y">
-              {reservations
+              {paginatedReservations
                 .sort(
                   (a, b) =>
                     new Date(a.reservationStartTime) -
@@ -160,80 +101,13 @@ const RoomReservationCard = ({ room, partitionIds, selectedDate }) => {
           </Table>
         </div>
       )}
-      <div className="flex justify-center items-center">
-        {/* 예약 삭제 모달 */}
-        <Modal
-          className="flex justify-center items-center w-full p-4 sm:p-0"
-          show={openDeleteModal}
-          size="md"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-          onClose={() => setOpenDeleteModal(false)}
-          popup>
-          <Modal.Header />
-          <Modal.Body>
-            <div className="text-center">
-              <HiOutlineExclamationCircle className="mx-auto mb-4 h-14 w-14 text-gray-400 dark:text-gray-200" />
-              <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
-                해당 예약을 삭제하시겠습니까?
-              </h3>
-              <div className="flex justify-center gap-4">
-                <Button color="gray" onClick={() => setOpenDeleteModal(false)}>
-                  취소
-                </Button>
-                <Button
-                  color="failure"
-                  onClick={() => {
-                    handleDelete(selectedReservationId);
-                    setOpenDeleteModal(null);
-                  }}>
-                  확인
-                </Button>
-              </div>
-            </div>
-          </Modal.Body>
-        </Modal>
-        {/* 출석 상태 변경 모달 */}
-        <Modal
-          show={openEditModal}
-          onClose={() => setOpenEditModal(false)}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}>
-          <Modal.Header className="pr-24">
-            예약 상태 변경 유형 선택
-          </Modal.Header>
-          <Modal.Body>
-            <div className="flex flex-col space-y-6">
-              <p
-                className="inline-block text-lg hover:underline cursor-pointer"
-                onClick={() => handleStateChange('visited')}>
-                출석으로 변경
-              </p>
-              <p
-                className="inline-block text-lg hover:underline cursor-pointer"
-                onClick={() => handleStateChange('notVisited')}>
-                미출석으로 변경
-              </p>
-              <p
-                className="inline-block text-lg hover:underline cursor-pointer"
-                onClick={() => handleStateChange('processed')}>
-                처리됨으로 변경
-              </p>
-            </div>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button color="gray" onClick={() => setOpenDeleteModal(false)}>
-              취소
-            </Button>
-          </Modal.Footer>
-        </Modal>
-      </div>
+      <Pagination
+        count={pageCount}
+        page={currentPage}
+        onChange={handlePageChange}
+        shape="rounded"
+        className="flex justify-center mt-4"
+      />
     </div>
   );
 };

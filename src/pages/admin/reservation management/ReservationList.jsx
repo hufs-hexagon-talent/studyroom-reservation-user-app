@@ -1,20 +1,31 @@
 import React, { useState } from 'react';
 import DatePicker from 'react-datepicker';
 import { useAllRooms } from '../../../api/room.api';
+import { useAllPartitions } from '../../../api/roomPartition.api';
 import RoomReservationCard from './RoomReservationCard';
 
 const ReservationList = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const { data: rooms, isLoading } = useAllRooms();
+  const { data: rooms } = useAllRooms();
+  const { data: partitions } = useAllPartitions();
 
-  // 각 방에 대한 partition 매핑
-  const roomPartitionMap = {
-    306: [1, 2, 3, 4],
-    428: [5, 6],
-  };
+  // 호실명 배열
+  const roomName = rooms?.map(room => room.roomName);
 
-  if (isLoading) return <div>로딩 중...</div>;
+  // 룸 - 파티션 매핑
+  const roomPartitionMap = roomName?.reduce((acc, name) => {
+    const matchedPartitions = partitions
+      .filter(p => p.roomName === name)
+      .map(p => p.partitionNumber);
 
+    if (matchedPartitions.length > 0) {
+      acc[name] = matchedPartitions;
+    }
+
+    return acc;
+  }, {});
+
+  console.log('roomPartitionMap : ', roomPartitionMap);
   return (
     <div>
       <div className="font-bold text-3xl text-black px-4 py-8">

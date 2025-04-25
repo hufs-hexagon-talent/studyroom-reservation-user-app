@@ -23,6 +23,7 @@ const ReservationStatics = () => {
   const { data: allUsers = [] } = useAllUsers();
 
   const {
+    totalReservations,
     todayReservations,
     weeklyReservations,
     monthlyReservations,
@@ -55,8 +56,26 @@ const ReservationStatics = () => {
       <div className="font-bold text-3xl text-black p-8">
         Reservation Statics
       </div>
+      <div className="flex flex-row text-center items-center justify-center bg-white shadow-md rounded-2xl px-6 py-4 gap-x-10">
+        <div>
+          <div className="text-gray-500 text-sm">총 예약 수</div>
+          <div className="text-2xl font-bold">{totalReservations}</div>
+        </div>
+        <div>
+          <div className="text-gray-500 text-sm">오늘 예약 수</div>
+          <div className="text-2xl font-bold">{todayReservations}</div>
+        </div>
+        <div>
+          <div className="text-gray-500 text-sm">주간 예약 수</div>
+          <div className="text-2xl font-bold">{weeklyReservations}</div>
+        </div>
+        <div>
+          <div className="text-gray-500 text-sm">월간 예약 수</div>
+          <div className="text-2xl font-bold">{monthlyReservations}</div>
+        </div>
+      </div>
       <div className="col-span-1 md:col-span-2 grid grid-cols-2 gap-4">
-        {/* #3 오늘 호실 별 예약 수 */}
+        {/* 오늘 호실 별 예약 수 */}
         <div className="bg-white shadow-md rounded-2xl p-4">
           <h2 className="text-lg font-semibold mb-2">
             호실 별 예약 수 (Today)
@@ -82,7 +101,7 @@ const ReservationStatics = () => {
         </div>
 
         <div className="grid grid-rows-2 gap-6 ">
-          {/* #4 주간 호실 별 예약 수 */}
+          {/* 주간 호실 별 예약 수 */}
           <div className="bg-white shadow-md rounded-2xl px-6 py-4">
             <div className="text-lg font-semibold mb-2">
               주간 호실 별 예약 수
@@ -103,7 +122,7 @@ const ReservationStatics = () => {
             </div>
           </div>
 
-          {/* #5 월간 호실 별 예약 수 */}
+          {/* 월간 호실 별 예약 수 */}
           <div className="bg-white shadow-md rounded-2xl px-6 py-4">
             <div className="text-lg font-semibold mb-2">
               월간 호실 별 예약 수
@@ -126,7 +145,7 @@ const ReservationStatics = () => {
         </div>
       </div>
 
-      {/* #6 파이 차트 */}
+      {/* 파이 차트 */}
       <div className="bg-white shadow-md rounded-2xl p-4">
         <h2 className="text-lg font-semibold mb-2">월간 호실 사용 시간</h2>
         {/* 차트를 부모 컨테이너 크기에 맞게 반응형으로 보여줌 */}
@@ -164,7 +183,7 @@ const ReservationStatics = () => {
         </ResponsiveContainer>
       </div>
 
-      {/* #7 막대 차트 */}
+      {/* 막대 차트 */}
       <div className="bg-white shadow-md rounded-2xl p-4">
         <h2 className="text-lg font-semibold mb-2">예약 비교</h2>
         <ResponsiveContainer width="100%" height={250}>

@@ -21,7 +21,7 @@ const Check = () => {
   const { data: noShow } = useNoShow();
   const { data: reservations } = useUserReservation();
   const { data: me } = useMyInfo();
-  const { data: latest } = useLatestReservation();
+
   const { mutate: deleteReservation } = useDeleteReservation();
 
   const [currentPage, setCurrentPage] = useState(1);
