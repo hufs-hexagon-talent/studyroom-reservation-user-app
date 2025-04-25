@@ -10,6 +10,8 @@ import { useSnackbar } from 'react-simple-snackbar';
 import Delete from '../../../../assets/icons/delete.png';
 import { Modal } from 'flowbite-react';
 import { Button, Table, TableBody } from 'flowbite-react';
+import Create from '../../../../assets/icons/create.png';
+import UnderArrow from '../../../../assets/icons/under_arrow_black.png';
 
 const FacilityManagement = () => {
   const [roomName, setRoomName] = useState('');
@@ -82,7 +84,14 @@ const FacilityManagement = () => {
         {/* Room 생성 */}
         <div className="bg-white p-4 inline-block rounded-xl mb-8 hover:shadow-lg w-full">
           {/* Room 선택 */}
-          <div className="font-bold text-xl p-3">Room 생성</div>
+          <div className="flex flex-row items-center gap-x-6">
+            <div className="font-bold text-xl p-3">Room 생성</div>
+            <img
+              src={Create}
+              onClick={createRoom}
+              className="w-6 h-6 cursor-pointer hover:scale-125"
+            />
+          </div>
           <div className="flex flex-row p-4">
             <div>호실 이름 : </div>
             <input
@@ -102,19 +111,16 @@ const FacilityManagement = () => {
               className="mx-4 border rounded-sm"
             />
           </div>
-          <Button onClick={createRoom} className="bg-blue-500 mt-8">
-            호실 생성
-          </Button>
         </div>
         {/* 모든 Room 조회 */}
         <div className="bg-white p-4 mb-8 inline-block rounded-xl hover:shadow-lg w-full">
-          <div className="flex flex-row items-center px-6 pt-3 pb-6">
+          <div className="flex flex-row items-center gap-x-4 px-6 pt-3 pb-6">
             <div className="font-bold text-xl">모든 Room 조회</div>
-            <Button
-              onClick={() => setIsGetRooms(true)}
-              className="ml-4 bg-blue-500 cursor-pointer">
-              조회
-            </Button>
+            <img
+              src={UnderArrow}
+              onClick={() => setIsGetRooms(!isGetRooms)}
+              className={`w-6 h-6 cursor-pointer transition-transform duration-300 hover:scale-125 ${isGetRooms ? 'rotate-180' : ''}`}
+            />
           </div>
           {isGetRooms && (
             <div>
@@ -148,11 +154,6 @@ const FacilityManagement = () => {
                   ))}
                 </TableBody>
               </Table>
-              <div
-                onClick={() => setIsGetRooms(false)}
-                className="ml-3 cursor-pointer hover:underline">
-                간략히 &gt;
-              </div>
             </div>
           )}
         </div>
@@ -165,15 +166,15 @@ const FacilityManagement = () => {
           <div className="flex flex-row items-center gap-x-6">
             <div className="font-bold text-xl p-3">Partition 생성</div>
             {/* Partition 생성 버튼 */}
-            <Button
+            <img
+              src={Create}
               onClick={createPartition}
-              className="bg-gray-300 rounded-full text-black mt-8 m-3">
-              파티션 생성
-            </Button>
+              className="cursor-pointer hover:scale-125 w-6 h-6"
+            />
           </div>
           {/* RoomId */}
           <div className="flex flex-row items-center p-3">
-            <div>Room Id : </div>
+            <div>호실 ID : </div>
             <input
               onChange={e => setRoomId(e.target.value)}
               value={roomId}
@@ -182,7 +183,7 @@ const FacilityManagement = () => {
           </div>
           {/* PartitionNumber */}
           <div className="flex flex-row items-center p-3">
-            <div>Partition Number : </div>
+            <div>파티션 번호 : </div>
             <input
               onChange={e => setPartitionNumber(e.target.value)}
               value={partitionNumber}

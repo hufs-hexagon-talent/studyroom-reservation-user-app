@@ -5,35 +5,23 @@ import { useAllPolicies } from '../../../../api/roomOperationPolicy.api';
 
 const CheckPolicy = ({ selectedPolicyId, setSelectedPolicyId }) => {
   const { data: policies, refetch } = useAllPolicies();
-  const [isFetched, setIsFetched] = useState(false);
   const [isTableVisible, setIsTableVisible] = useState(false);
-
-  const handleFetchPolicies = () => {
-    refetch().then(() => {
-      setIsFetched(true);
-      setIsTableVisible(true);
-    });
-  };
 
   const handlePolicyCheckBox = policyId => {
     setSelectedPolicyId(policyId === selectedPolicyId ? null : policyId);
   };
 
-  const handleTableVisibility = () => {
-    setIsTableVisible(!isTableVisible);
-  };
-
   return (
     <div>
-      <div className="flex flex-row items-center">
+      <div className="flex flex-row items-center gap-x-2">
         <div>모든 room Policy 조회 및 선택</div>
-        <button
-          className="bg-gray-300 text-white px-3 py-2 ml-8 text-xs rounded-full"
-          onClick={handleFetchPolicies}>
-          <img className="w-4 h-4" src={UnderArrow} />
-        </button>
+        <img
+          onClick={() => setIsTableVisible(!isTableVisible)}
+          className={`w-6 h-6 cursor-pointer transition-transform duration-300 hover:scale-125 ${isTableVisible ? 'rotate-180' : ''}`}
+          src={UnderArrow}
+        />
       </div>
-      {isFetched && isTableVisible && policies && (
+      {isTableVisible && policies && (
         <div className="overflow-x-auto mt-4">
           <Table>
             <Table.Head className="text-center">
@@ -68,11 +56,6 @@ const CheckPolicy = ({ selectedPolicyId, setSelectedPolicyId }) => {
               ))}
             </Table.Body>
           </Table>
-          <div
-            className="mt-2 text-sm cursor-pointer"
-            onClick={handleTableVisibility}>
-            간략히 &gt;
-          </div>
         </div>
       )}
     </div>

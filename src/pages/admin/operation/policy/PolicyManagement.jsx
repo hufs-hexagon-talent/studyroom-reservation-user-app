@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import DatePicker from 'react-datepicker';
 import { format } from 'date-fns';
 import 'react-datepicker/dist/react-datepicker.css';
-import { Button, Table, TableBody } from 'flowbite-react';
+import { Table, TableBody } from 'flowbite-react';
 import {
   useCreatePolicy,
   useAllPolicies,
 } from '../../../../api/roomOperationPolicy.api';
 import { useSnackbar } from 'react-simple-snackbar';
-import RightArrow from '../../../../assets/icons/right_arrow.png';
+import Create from '../../../../assets/icons/create.png';
 import UnderArrow from '../../../../assets/icons/under_arrow_black.png';
 
 const PolicyManagement = () => {
@@ -16,6 +16,7 @@ const PolicyManagement = () => {
   const [endTime, setEndTime] = useState(new Date());
   const [eachMaxMinute, setEachMaxMinute] = useState(60);
   const [isGetPolicies, setIsGetPolicies] = useState(false);
+
   const { mutateAsync: doCreatePolicy } = useCreatePolicy();
   const { data: policies } = useAllPolicies();
 
@@ -65,13 +66,13 @@ const PolicyManagement = () => {
       </div>
 
       <div className="bg-white p-8 inline-block rounded-xl mb-8 hover:shadow-lg w-full">
-        <div className="flex flex-row items-center px-4 pb-8">
+        <div className="flex flex-row gap-x-6 items-center px-4 pb-8">
           <div className="text-xl font-bold">정책 생성</div>
-          <Button
+          <img
             onClick={createPolicy}
-            className="ml-4 bg-gray-300 cursor-pointer">
-            <img className="w-4 h-4" src={RightArrow} />
-          </Button>
+            className="w-6 h-6 cursor-pointer hover:scale-125"
+            src={Create}
+          />
         </div>
         <div className="space-y-8 px-4">
           {/* 시작 시각 */}
@@ -118,11 +119,11 @@ const PolicyManagement = () => {
       <div className="bg-white p-4 inline-block rounded-xl mb-8 hover:shadow-lg w-full">
         <div className="flex flex-row items-center">
           <div className="text-xl p-6 font-bold">모든 정책 조회</div>
-          <Button
-            onClick={getPolicy}
-            className="my-8 ml-4 bg-gray-300 text-black cursor-pointer">
-            <img className="w-4 h-4" src={UnderArrow} />
-          </Button>
+          <img
+            onClick={() => setIsGetPolicies(!isGetPolicies)}
+            className={`w-6 h-6 cursor-pointer transition-transform duration-300 hover:scale-125 ${isGetPolicies ? 'rotate-180' : ''}`}
+            src={UnderArrow}
+          />
         </div>
         {isGetPolicies && (
           <div>
@@ -144,11 +145,6 @@ const PolicyManagement = () => {
                 ))}
               </TableBody>
             </Table>
-            <div
-              onClick={() => setIsGetPolicies(false)}
-              className="cursor-pointer hover:underline">
-              간략히
-            </div>
           </div>
         )}
       </div>

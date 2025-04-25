@@ -4,6 +4,7 @@ import { useSchedules } from '../../../../api/policySchedule.api';
 import { Checkbox } from 'flowbite-react';
 import { useSnackbar } from 'react-simple-snackbar';
 import { format } from 'date-fns';
+import Create from '../../../../assets/icons/create.png';
 
 const SelectRoom = ({
   selectedRooms,
@@ -68,7 +69,7 @@ const SelectRoom = ({
   };
 
   return (
-    <div className="flex justify-between">
+    <div className="flex flex-row gap-x-20">
       <div>
         <div className="flex flex-row gap-3">
           {rooms
@@ -88,13 +89,11 @@ const SelectRoom = ({
             ))}
         </div>
       </div>
-      <div>
-        <div
-          onClick={handleButton}
-          className="text-blue-600 cursor-pointer hover:underline">
-          주입하기↗
-        </div>
-      </div>
+      <img
+        src={Create}
+        onClick={handleButton}
+        className="w-6 h-6 cursor-pointer hover:scale-125"
+      />
     </div>
   );
 };

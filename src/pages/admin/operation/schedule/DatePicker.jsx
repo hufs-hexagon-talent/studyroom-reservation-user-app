@@ -26,7 +26,7 @@ const MyDatePicker = ({ selectedDates, setSelectedDates }) => {
 
   return (
     <div>
-      <div className="w-1/2 pb-2">
+      <div className="pb-2">
         <div className="text-sm pb-3">
           선택된 날짜 :{' '}
           {selectedDates
@@ -35,7 +35,7 @@ const MyDatePicker = ({ selectedDates, setSelectedDates }) => {
             .join(', ')}
         </div>
 
-        <div className="flex justify-center">
+        <div>
           <div className="w-full max-w-md md:max-w-xs">
             <DatePicker
               locale={ko}
