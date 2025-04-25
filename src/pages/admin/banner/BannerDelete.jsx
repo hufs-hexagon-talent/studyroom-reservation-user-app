@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Checkbox, Label } from 'flowbite-react';
+import { Checkbox, Label } from 'flowbite-react';
 import { useSnackbar } from 'react-simple-snackbar';
 import { useDeleteBanner } from '../../../api/banner.api';
 import Delete from '../../../assets/icons/delete.png';

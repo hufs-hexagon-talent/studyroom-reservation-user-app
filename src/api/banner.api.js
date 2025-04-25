@@ -19,9 +19,9 @@ const fetchAllBanners = async () => {
 };
 
 export const useAllBanners = () => {
-  useQuery({
+  return useQuery({
     queryKey: ['banners'],
-    queryFn: () => fetchAllBanners(),
+    queryFn: fetchAllBanners,
   });
 };
 
