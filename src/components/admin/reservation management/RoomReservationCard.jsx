@@ -18,8 +18,8 @@ import { HiOutlineExclamationCircle } from 'react-icons/hi';
 const RoomReservationCard = ({ room, partitionIds, selectedDate }) => {
   const [reservations, setReservations] = useState([]);
   const [selectedReservationId, setSelectedReservationId] = useState(null);
-  const [openEditModal, setOpenEditModal] = useState(null);
-  const [openDeleteModal, setOpenDeleteModal] = useState(null);
+  const [openEditModal, setOpenEditModal] = useState(false);
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [error, setError] = useState(null);
 
   const [openErrorSnackbar] = useSnackbar({

@@ -48,7 +48,7 @@ const CustomSidebar = () => {
 
       <SidebarSection icon={HiUser} label="사용자 관리">
         <SidebarItem to="/divide/serialCheck">사용자 목록</SidebarItem>
-        <SidebarItem to="/divide/blocked">사용자 상태 관리</SidebarItem>
+        <SidebarItem to="/divide/user-state">사용자 상태 관리</SidebarItem>
       </SidebarSection>
 
       <SidebarSection icon={HiClipboardCheck} label="예약 관리">

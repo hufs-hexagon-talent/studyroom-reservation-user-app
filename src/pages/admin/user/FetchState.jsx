@@ -1,0 +1,208 @@
+import React, { useEffect, useState } from 'react';
+import { Checkbox, Modal, Table } from 'flowbite-react';
+import { Pagination } from '@mui/material';
+import {
+  useUnblocked,
+  useAllUsers,
+  useBlockedUser,
+} from '../../../api/user.api';
+import { useSnackbar } from 'react-simple-snackbar';
+
+const FetchState = () => {
+  const { data: allUsers } = useAllUsers();
+  const { data: blocked } = useBlockedUser();
+  const { mutate: doUnblocked, refetch } = useUnblocked();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [openBlockedModal, setOpenBlockedModal] = useState(false);
+  const [selectedBlockedInfo, setSelectedBlockedInfo] = useState(null);
+  const [userList, setUserList] = useState([]);
+  const [selectedRole, setSelectedRole] = useState('');
+  const itemsPerPage = 17;
+
+  const [openSuccessSnackbar] = useSnackbar({
+    position: 'top-right',
+    style: { backgroundColor: '#4CAF50', color: '#FFFFFF' },
+  });
+
+  const [openErrorSnackbar] = useSnackbar({
+    position: 'top-right',
+    style: { backgroundColor: '#FF3333' },
+  });
+
+  const handlePage = (event, newPage) => {
+    setCurrentPage(newPage);
+  };
+
+  // 블락 해제 함수
+  const handleUnblocked = async userId => {
+    await doUnblocked(userId, {
+      onSuccess: () => {
+        openSuccessSnackbar('블락 해제 되었습니다.', 3000);
+        refetch();
+      },
+      onError: error => {
+        openErrorSnackbar(
+          error?.response?.data?.errors?.[0]?.message ||
+            error?.response?.data?.message,
+          3000,
+        );
+      },
+    });
+  };
+
+  const handleRoleSelect = role => {
+    setCurrentPage(1); // 체크 변경시 페이지도 1페이지로
+    if (selectedRole === role) {
+      // 이미 선택된 거 누르면 선택 해제
+      setSelectedRole('');
+    } else {
+      setSelectedRole(role);
+    }
+  };
+
+  // serviceRole에 따라 필터링
+  const filteredUsers = selectedRole
+    ? userList.filter(user => user.serviceRole === selectedRole)
+    : userList;
+
+  // 현재 페이지에 해당하는 데이터 추출
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedData = filteredUsers.slice(
+    startIndex,
+    startIndex + itemsPerPage,
+  );
+
+  useEffect(() => {
+    if (allUsers) {
+      setUserList(allUsers);
+    }
+  }, [allUsers]);
+
+  console.log('selectedBlockedInfo', selectedBlockedInfo);
+
+  return (
+    <div className="overflow-x-auto">
+      {/* Blocked User List */}
+      <div>
+        <div className="font-bold text-3xl text-black p-8">Users State</div>
+        {/* State Checkbox */}
+        <div className="flex flex-row gap-x-6 items-center px-4 pb-8">
+          {['ADMIN', 'RESIDENT', 'USER', 'BLOCKED', 'EXPIRED'].map(role => (
+            <div key={role} className="flex flex-row gap-x-2 items-center">
+              <Checkbox
+                checked={selectedRole === role}
+                onChange={() => handleRoleSelect(role)}
+                className="rounded-none"
+              />
+              <div>{role}</div>
+            </div>
+          ))}
+        </div>
+        {/* Users Table */}
+        <Table>
+          <Table.Head className="text-center">
+            <Table.HeadCell>User Id</Table.HeadCell>
+            <Table.HeadCell>Service Role</Table.HeadCell>
+            <Table.HeadCell>학번</Table.HeadCell>
+            <Table.HeadCell>이름</Table.HeadCell>
+            <Table.HeadCell>학과</Table.HeadCell>
+            <Table.HeadCell>이메일</Table.HeadCell>
+            {selectedRole === 'BLOCKED' && (
+              <Table.HeadCell>
+                <span className="sr-only">삭제</span>
+              </Table.HeadCell>
+            )}
+          </Table.Head>
+          <Table.Body className="divide-y text-center">
+            {paginatedData?.map((user, index) => (
+              <Table.Row
+                key={index}
+                className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                <Table.Cell
+                  onClick={() => {
+                    if (selectedRole === 'BLOCKED') {
+                      const blockedInfo = blocked?.find(
+                        b => b.userInfoResponse.userId === user.userId,
+                      );
+                      setSelectedBlockedInfo(blockedInfo);
+                      setOpenBlockedModal(true);
+                    }
+                  }}
+                  className={`whitespace-nowrap font-medium text-gray-900 dark:text-white
+                    ${selectedRole === 'BLOCKED' ? 'cursor-pointer hover:underline' : ''}
+                  `}>
+                  {user.userId}
+                </Table.Cell>
+
+                <Table.Cell>{user.serviceRole}</Table.Cell>
+                <Table.Cell>{user.serial ? user.serial : '-'}</Table.Cell>
+                <Table.Cell>{user.name}</Table.Cell>
+                <Table.Cell>
+                  {user.departmentId === 1 ? '컴퓨터공학부' : '정보통신공학과'}
+                </Table.Cell>
+
+                <Table.Cell>{user.email ? user.email : '-'}</Table.Cell>
+                {selectedRole === 'BLOCKED' && (
+                  <Table.Cell>
+                    <a
+                      onClick={() => handleUnblocked(user.userId)}
+                      className="font-medium text-red-600 cursor-pointer hover:underline dark:text-cyan-500">
+                      삭제
+                    </a>
+                  </Table.Cell>
+                )}
+              </Table.Row>
+            ))}
+          </Table.Body>
+        </Table>
+        {/* Pagination */}
+        <div className="flex justify-center mt-4">
+          <Pagination
+            count={Math.ceil((filteredUsers?.length || 0) / itemsPerPage)}
+            page={currentPage}
+            onChange={handlePage}
+            shape="rounded"
+          />
+        </div>
+
+        <Modal
+          className="flex justify-center items-center w-full"
+          show={openBlockedModal}
+          onClose={() => {
+            setOpenBlockedModal(false);
+            setSelectedBlockedInfo(null);
+          }}>
+          <Modal.Header>Blocked Period</Modal.Header>
+          <Modal.Body>
+            <Table>
+              <Table.Head className="text-center text-md">
+                <Table.HeadCell>User Id</Table.HeadCell>
+                <Table.HeadCell>이름</Table.HeadCell>
+                <Table.HeadCell>블락 시작일</Table.HeadCell>
+                <Table.HeadCell>블락 종료일</Table.HeadCell>
+              </Table.Head>
+              <Table.Body className="divide-y text-center text-lg">
+                <Table.Row
+                  key={selectedBlockedInfo?.userInfoResponse.userId}
+                  className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                  <Table.Cell>
+                    {selectedBlockedInfo?.userInfoResponse.userId}
+                  </Table.Cell>
+                  <Table.Cell>
+                    {selectedBlockedInfo?.userInfoResponse.name}
+                  </Table.Cell>
+                  <Table.Cell>
+                    {selectedBlockedInfo?.startBlockedDate}
+                  </Table.Cell>
+                  <Table.Cell>{selectedBlockedInfo?.endBlockedDate}</Table.Cell>
+                </Table.Row>
+              </Table.Body>
+            </Table>
+          </Modal.Body>
+        </Modal>
+      </div>
+    </div>
+  );
+};
+
+export default FetchState;
