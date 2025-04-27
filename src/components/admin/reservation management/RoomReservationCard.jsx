@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Button, Table, Modal } from 'flowbite-react';
 import { format } from 'date-fns';
 import { useSnackbar } from 'react-simple-snackbar';
-
+import { Pagination } from '@mui/material';
 import {
   useReservationsByPartitions,
   useVisitedState,
@@ -21,6 +21,8 @@ const RoomReservationCard = ({ room, partitionIds, selectedDate }) => {
   const [openEditModal, setOpenEditModal] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1); // ✅ 추가
+  const itemsPerPage = 10;
 
   const [openErrorSnackbar] = useSnackbar({
     position: 'top-right',
@@ -102,6 +104,12 @@ const RoomReservationCard = ({ room, partitionIds, selectedDate }) => {
     });
   };
 
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedReservations = reservations.slice(
+    startIndex,
+    startIndex + itemsPerPage,
+  );
+
   return (
     <div className="bg-white p-4 inline-block rounded-xl mb-8 hover:shadow-2xl w-full">
       <div className="flex justify-center items-center text-xl py-6">
@@ -117,16 +125,16 @@ const RoomReservationCard = ({ room, partitionIds, selectedDate }) => {
         <div className="overflow-x-auto mt-4 mb-3 w-full">
           <Table hoverable className="text-black text-center">
             <Table.Head className="break-keep">
-              <Table.HeadCell>출석 상태 변경</Table.HeadCell>
               <Table.HeadCell>출석 유무</Table.HeadCell>
               <Table.HeadCell>호실</Table.HeadCell>
               <Table.HeadCell>이름</Table.HeadCell>
               <Table.HeadCell>시작 시간</Table.HeadCell>
               <Table.HeadCell>종료 시간</Table.HeadCell>
+              <Table.HeadCell>출석 상태 변경</Table.HeadCell>
               <Table.HeadCell></Table.HeadCell>
             </Table.Head>
             <Table.Body className="divide-y">
-              {reservations
+              {paginatedReservations
                 .sort(
                   (a, b) =>
                     new Date(a.reservationStartTime) -
@@ -134,17 +142,6 @@ const RoomReservationCard = ({ room, partitionIds, selectedDate }) => {
                 )
                 .map(reservation => (
                   <Table.Row key={reservation.reservationId}>
-                    <Table.Cell className="flex justify-center items-center">
-                      <img
-                        src={Edit}
-                        alt="edit"
-                        onClick={() => {
-                          setSelectedReservationId(reservation.reservationId);
-                          setOpenEditModal(true);
-                        }}
-                        className="cursor-pointer w-6 h-6"
-                      />
-                    </Table.Cell>
                     <Table.Cell>
                       {reservation.reservationState === 'VISITED' ? (
                         <div className="text-blue-600">출석</div>
@@ -172,6 +169,17 @@ const RoomReservationCard = ({ room, partitionIds, selectedDate }) => {
                         'HH:mm',
                       )}
                     </Table.Cell>
+                    <Table.Cell className="flex justify-center items-center">
+                      <img
+                        src={Edit}
+                        alt="edit"
+                        onClick={() => {
+                          setSelectedReservationId(reservation.reservationId);
+                          setOpenEditModal(true);
+                        }}
+                        className="cursor-pointer w-6 h-6"
+                      />
+                    </Table.Cell>
                     <Table.Cell>
                       <img
                         src={Delete}
@@ -186,6 +194,14 @@ const RoomReservationCard = ({ room, partitionIds, selectedDate }) => {
                 ))}
             </Table.Body>
           </Table>
+          <div className="flex justify-center mt-4">
+            <Pagination
+              count={Math.ceil(reservations.length / itemsPerPage)}
+              page={currentPage}
+              onChange={(event, value) => setCurrentPage(value)}
+              shape="rounded"
+            />
+          </div>
         </div>
       )}
       <div className="flex justify-center items-center">
