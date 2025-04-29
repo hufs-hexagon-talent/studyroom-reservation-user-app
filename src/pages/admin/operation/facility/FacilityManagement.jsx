@@ -9,7 +9,7 @@ import { useCreatePartition } from '../../../../api/roomPartition.api';
 import { useSnackbar } from 'react-simple-snackbar';
 import Delete from '../../../../assets/icons/delete.png';
 import { Modal } from 'flowbite-react';
-import { Button, Table, TableBody } from 'flowbite-react';
+import { Table, TableBody } from 'flowbite-react';
 import Create from '../../../../assets/icons/create.png';
 import UnderArrow from '../../../../assets/icons/under_arrow_black.png';
 

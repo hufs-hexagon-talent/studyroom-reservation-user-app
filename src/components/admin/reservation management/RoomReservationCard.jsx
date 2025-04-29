@@ -21,7 +21,7 @@ const RoomReservationCard = ({ room, partitionIds, selectedDate }) => {
   const [openEditModal, setOpenEditModal] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [error, setError] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1); // ✅ 추가
+  const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
   const [openErrorSnackbar] = useSnackbar({
@@ -56,14 +56,6 @@ const RoomReservationCard = ({ room, partitionIds, selectedDate }) => {
       setReservations(fetchedReservations);
     }
   }, [fetchedReservations]);
-
-  const handleFetchReservations = () => {
-    try {
-      refetch();
-    } catch (err) {
-      setError('예약 불러오기 실패');
-    }
-  };
 
   // 출석 상태 변경
   const handleStateChange = async state => {
