@@ -9,20 +9,12 @@ export const useCreatePolicy = () => {
       operationEndTime,
       eachMaxMinute,
     }) => {
-      try {
-        const createPolicy_res = await apiClient.post('/policies/policy', {
-          operationStartTime,
-          operationEndTime,
-          eachMaxMinute,
-        });
-        return createPolicy_res.data.data;
-      } catch (error) {
-        // 에러 발생 시 에러 응답을 반환
-        if (error.response && error.response.data) {
-          throw new Error(error.response.data.message);
-        }
-        throw error;
-      }
+      const createPolicy_res = await apiClient.post('/policies/policy', {
+        operationStartTime,
+        operationEndTime,
+        eachMaxMinute,
+      });
+      return createPolicy_res.data;
     },
   });
 };
@@ -37,5 +29,15 @@ export const useAllPolicies = () => {
   return useQuery({
     queryKey: ['allPolicies'],
     queryFn: fetchAllPolicies,
+  });
+};
+
+// [관리자] RoomOperationPolicy 삭제
+export const useDeletePolicy = () => {
+  return useMutation({
+    mutationFn: async policyId => {
+      const deletePolicy_res = await apiClient.delete(`/policies/${policyId}`);
+      return deletePolicy_res.data;
+    },
   });
 };

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import { Autoplay } from 'swiper/modules';
-import { useActivatedBanner } from '../../api/banner.api';
+import { useActivatedBanner } from '../../../api/banner.api';
 
 const Banner = () => {
   const notionUrl = 'https://hwangbbang.notion.site/';

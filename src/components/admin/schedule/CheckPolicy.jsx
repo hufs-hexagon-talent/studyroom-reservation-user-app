@@ -28,7 +28,7 @@ const CheckPolicy = ({ selectedPolicyId, setSelectedPolicyId }) => {
       <div className="flex flex-row items-center">
         <div>모든 room Policy 조회 및 선택</div>
         <button
-          className="bg-blue-500 text-white px-3 py-2 ml-8 text-xs rounded-full"
+          className="bg-gray-300 text-black text-white px-3 py-2 ml-8 text-xs rounded-full"
           onClick={handleFetchPolicies}>
           조회
         </button>

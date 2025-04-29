@@ -19,7 +19,7 @@ import {
   areIntervalsOverlapping,
 } from 'date-fns';
 
-import Banner from '../../../components/banner/Banner';
+import Banner from '../../admin/banner/Banner';
 import { ko } from 'date-fns/locale';
 import { useSnackbar } from 'react-simple-snackbar';
 import 'react-datepicker/dist/react-datepicker.css';

@@ -40,7 +40,7 @@ const CustomSidebar = () => {
       animate={{ x: 0, opacity: 1 }}
       exit={{ x: -300, opacity: 0 }}
       transition={{ type: 'spring', stiffness: 200, damping: 30 }}
-      className="w-64 h-full border-r bg-white py-4">
+      className="w-64 h-full bg-white py-4">
       <SidebarSection icon={HiChartPie} label="통계 및 현황">
         <SidebarItem to="/divide/user-statics">사용자 통계</SidebarItem>
         <SidebarItem to="/divide/reservation-statics">예약 통계</SidebarItem>
@@ -48,7 +48,7 @@ const CustomSidebar = () => {
 
       <SidebarSection icon={HiUser} label="사용자 관리">
         <SidebarItem to="/divide/serialCheck">사용자 목록</SidebarItem>
-        <SidebarItem to="/divide/blocked">사용자 상태 관리</SidebarItem>
+        <SidebarItem to="/divide/user-state">사용자 상태 관리</SidebarItem>
       </SidebarSection>
 
       <SidebarSection icon={HiClipboardCheck} label="예약 관리">
@@ -59,7 +59,7 @@ const CustomSidebar = () => {
       <SidebarSection icon={HiCalendar} label="운영 관리">
         <SidebarItem to="/divide/policy">정책 관리</SidebarItem>
         <SidebarItem to="/divide/schedule">운영 시간 관리</SidebarItem>
-        <SidebarItem to="#">시설 관리</SidebarItem>
+        <SidebarItem to="/divide/facility">시설 관리</SidebarItem>
       </SidebarSection>
 
       <SidebarSection icon={HiFilm} label="배너 관리">

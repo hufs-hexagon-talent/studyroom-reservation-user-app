@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Button, TextInput } from 'flowbite-react';
 import { useSnackbar } from 'react-simple-snackbar';
-import { usePostBanner } from '../../api/banner.api';
+import { usePostBanner } from '../../../api/banner.api';
+import UpLoad from '../../../assets/icons/upload.png';
 
 const BannerUpload = ({ refetch }) => {
   const [bannerType, setBannerType] = useState('');
@@ -50,8 +51,17 @@ const BannerUpload = ({ refetch }) => {
   };
 
   return (
-    <div className="w-full max-w-[400px] flex flex-col items-center gap-6">
-      <div className="w-1/3 min-w-[300px] flex flex-col items-center gap-4">
+    <div className="w-full max-w-[400px] flex flex-col gap-6">
+      <div className="flex flex-row items-center">
+        <div className="font-bold text-xl p-4">배너 업로드</div>
+        <img
+          onClick={uploadBanner}
+          type="submit"
+          className="w-4 h-4 cursor-pointer hover:scale-125"
+          src={UpLoad}
+        />
+      </div>
+      <div className=" flex flex-col items-center gap-4">
         <TextInput
           onChange={e => setBannerType(e.target.value)}
           value={bannerType}
@@ -76,15 +86,9 @@ const BannerUpload = ({ refetch }) => {
           id="linkUrl"
           type="text"
           placeholder="배너 링크 URL을 입력하세요"
-          className="w-full"
+          className="w-full mb-6"
           required
         />
-        <Button
-          onClick={uploadBanner}
-          type="submit"
-          className="bg-blue-500 w-full">
-          배너 업로드
-        </Button>
       </div>
     </div>
   );

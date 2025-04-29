@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import {
   useReservationsById,
   useNotVisitedState,
   useVisitedState,
   useProcessedState,
   useAdminDeleteReservation,
-} from '../../api/reservation.api';
+} from '../../../api/reservation.api';
 import { format } from 'date-fns';
 import { Button, Table, Modal } from 'flowbite-react';
 import { HiOutlineExclamationCircle } from 'react-icons/hi';
@@ -14,14 +14,14 @@ import { useSnackbar } from 'react-simple-snackbar';
 import { Pagination } from '@mui/material';
 
 const FetchReservations = () => {
+  const { id } = useParams();
   const { mutateAsync: visitedState } = useVisitedState();
   const { mutateAsync: notVisitedState } = useNotVisitedState();
   const { mutateAsync: processedState } = useProcessedState();
   const { mutate: doDelete } = useAdminDeleteReservation();
-
-  const { id } = useParams();
   const { data: fetchedReservations, refetch } = useReservationsById(id);
 
+  const navigate = useNavigate();
   const [openDeleteModal, setOpenDeleteModal] = useState(null);
   const [openEditModal, setOpenEditModal] = useState(null);
   const [selectedReservationId, setSelectedReservationId] = useState(null);
@@ -96,6 +96,7 @@ const FetchReservations = () => {
 
   const pageCount = Math.ceil(reservations.length / itemsPerPage);
 
+  console.log(reservations);
   return (
     <div className="overflow-x-auto">
       <h1 className="flex justify-center text-2xl m-10">

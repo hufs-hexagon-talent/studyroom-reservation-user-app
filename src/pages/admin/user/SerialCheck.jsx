@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button, Table } from 'flowbite-react';
-import { useUserBySerial, useUserByName } from '../../api/user.api';
+import { useUserBySerial, useUserByName } from '../../../api/user.api';
 import { useSnackbar } from 'react-simple-snackbar';
 import { useNavigate } from 'react-router-dom';
 
@@ -66,7 +66,7 @@ const SerialCheck = () => {
         />
         <Button
           onClick={handleFetchBtn}
-          className="ml-4 bg-blue-500 rounded-full items-center h-8">
+          className="ml-4 bg-gray-300 text-black rounded-full items-center h-8">
           조회
         </Button>
       </div>
@@ -95,7 +95,7 @@ const SerialCheck = () => {
                   <Table.Cell>
                     <a
                       onClick={() =>
-                        navigate(`/fetchReservations/${user.userId}`)
+                        navigate(`/divide/fetchReservations/${user.userId}`)
                       }
                       className="font-medium cursor-pointer text-blue-500 hover:underline dark:text-cyan-500">
                       예약 조회

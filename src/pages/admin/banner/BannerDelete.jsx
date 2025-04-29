@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Button, Checkbox, Label } from 'flowbite-react';
+import { Checkbox, Label } from 'flowbite-react';
 import { useSnackbar } from 'react-simple-snackbar';
-import { useDeleteBanner } from '../../api/banner.api';
+import { useDeleteBanner } from '../../../api/banner.api';
+import Delete from '../../../assets/icons/delete.png';
 
 const BannerDelete = ({ activatedBanner, refetch }) => {
   const { mutateAsync: doDeleteBanner } = useDeleteBanner();
@@ -42,8 +43,16 @@ const BannerDelete = ({ activatedBanner, refetch }) => {
   };
 
   return (
-    <div className="w-full max-w-[400px] flex flex-col items-center gap-6">
-      <div className="w-1/3 min-w-[300px] flex flex-col items-center gap-4">
+    <div className="max-w-[400px] flex flex-col gap-6">
+      <div className="flex flex-row items-center">
+        <div className="font-bold text-xl p-4">배너 삭제</div>
+        <img
+          onClick={deleteBanner}
+          className="w-5 h-6 cursor-pointer hover:scale-125"
+          src={Delete}
+        />
+      </div>
+      <div className="flex flex-col items-center gap-4">
         {activatedBanner?.map((banner, index) => (
           <div key={index} className="flex items-center gap-4">
             <Checkbox
@@ -58,12 +67,6 @@ const BannerDelete = ({ activatedBanner, refetch }) => {
           </div>
         ))}
       </div>
-      <Button
-        onClick={deleteBanner}
-        type="submit"
-        className="bg-blue-500 mt-10 w-2/3">
-        배너 삭제
-      </Button>
     </div>
   );
 };

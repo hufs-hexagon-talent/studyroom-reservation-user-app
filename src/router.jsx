@@ -20,9 +20,9 @@ import LoggedOutPassword from './pages/password/LoggedOutPassword';
 import EmailVerify from './pages/password/EmailVerify';
 import Schedule from './pages/manage/Schedule';
 import DivideAct from './pages/manage/DivideAct';
-import SerialCheck from './pages/manage/SerialCheck';
-import FetchBlocked from './components/blocked/FetchBlocked';
-import FetchReservations from './pages/manage/FetchReservations';
+import SerialCheck from './pages/admin/user/SerialCheck';
+import FetchState from './pages/admin/user/FetchState';
+import FetchReservations from './pages/admin/user/FetchReservations';
 import MyPage from './pages/mypage/MyPage';
 import NoShow from './pages/check/NoShow';
 import EmailSend from './pages/email/EmailSend';
@@ -31,9 +31,10 @@ import PolicyManagement from './pages/admin/operation/policy/PolicyManagement';
 import ScheduleManagement from './pages/admin/operation/schedule/ScheduleManagement';
 import ReservationList from './pages/admin/reservation management/ReservationList';
 import ReservationState from './pages/admin/reservation management/ReservationState';
-import DashBoardBanner from './components/banner/DashBoardBanner';
+import BannerManagement from './pages/admin/banner/BannerManagement';
 import UserStatics from './pages/admin/statics/UserStatics';
 import ReservationStatics from './pages/admin/statics/ReservationStatics';
+import FacilityManagement from './pages/admin/operation/facility/FacilityManagement';
 
 const RouterComponent = () => {
   const { loggedIn } = useAuth();
@@ -84,10 +85,7 @@ const RouterComponent = () => {
                 <Route path="/selectPartition" element={<SelectPartition />} />
                 <Route path="/visit" element={<CheckVisit />} />
                 <Route path="/schedule" element={<Schedule />} />
-                <Route
-                  path="/fetchReservations/:id"
-                  element={<FetchReservations />}
-                />
+
                 <Route path="/mypage" element={<MyPage />} />
                 <Route path="/noshow" element={<NoShow />} />
                 <Route path="/emailSend" element={<EmailSend />} />
@@ -102,7 +100,7 @@ const RouterComponent = () => {
                   />
                   {/* 사용자 관리 */}
                   <Route path="serialCheck" element={<SerialCheck />} />
-                  <Route path="blocked" element={<FetchBlocked />} />
+                  <Route path="user-state" element={<FetchState />} />
                   {/* 예약 관리 */}
                   <Route
                     path="reservation-list"
@@ -112,11 +110,16 @@ const RouterComponent = () => {
                     path="reservation-state"
                     element={<ReservationState />}
                   />
+                  <Route
+                    path="fetchReservations/:id"
+                    element={<FetchReservations />}
+                  />
                   {/* 운영 관리 */}
                   <Route path="policy" element={<PolicyManagement />} />
                   <Route path="schedule" element={<ScheduleManagement />} />
-
-                  <Route path="banner" element={<DashBoardBanner />} />
+                  <Route path="facility" element={<FacilityManagement />} />
+                  {/* 배너 관리 */}
+                  <Route path="banner" element={<BannerManagement />} />
                 </Route>
               </>
             )}
