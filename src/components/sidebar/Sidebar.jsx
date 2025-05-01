@@ -77,7 +77,10 @@ const CustomSidebar = () => {
       </SidebarSection>
 
       <SidebarSection icon={HiFilm} label="배너 관리">
-        <SidebarItem to="/divide/banner">배너 설정</SidebarItem>
+        <SidebarItem to="/divide/banner/create">배너 생성</SidebarItem>
+        <SidebarItem to="/divide/banner/fetch">배너 조회</SidebarItem>
+        <SidebarItem to="/divide/banner/edit">배너 수정</SidebarItem>
+        <SidebarItem to="/divide/banner/delete">배너 삭제</SidebarItem>
       </SidebarSection>
     </motion.div>
   );

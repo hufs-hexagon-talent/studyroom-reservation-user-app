@@ -4,7 +4,7 @@ import { useSnackbar } from 'react-simple-snackbar';
 import { useEditBanner } from '../../../api/banner.api';
 import Edit from '../../../assets/icons/edit.png';
 
-const BannerEdit = ({ refetch }) => {
+const BannerEdit = () => {
   const [editBannerType, setEditBannerType] = useState('');
   const [editImageUrl, setEditImageUrl] = useState('');
   const [editLinkUrl, setEditLinkUrl] = useState('');
@@ -53,7 +53,6 @@ const BannerEdit = ({ refetch }) => {
           setEditImageUrl('');
           setEditBannerType('');
           setEditLinkUrl('');
-          refetch();
         },
         onError: error => {
           console.error(error?.response?.data?.errors?.[0]?.message);
@@ -64,13 +63,13 @@ const BannerEdit = ({ refetch }) => {
   };
 
   return (
-    <div className="w-full max-w-[400px] flex flex-col gap-6">
-      <div className="flex flex-row items-center gap-x-4">
-        <div className="font-bold text-xl p-4">배너 수정</div>
+    <div className="w-full max-w-[400px] flex flex-col px-4 gap-6">
+      <div className="flex flex-row items-center gap-x-4 pt-8">
+        <div className="font-bold text-3xl text-black px-4">Edit Banner</div>
         <img
           onClick={editBanner}
           type="submit"
-          className="w-4 h-4 cursor-pointer hover:scale-125"
+          className="w-5 h-5 cursor-pointer hover:scale-125"
           src={Edit}
         />
       </div>

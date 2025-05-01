@@ -1,12 +1,24 @@
 import React, { useState } from 'react';
-import { useCreateRoom } from '../../../../../api/room.api';
+import {
+  useCreateRoom,
+  useAllRooms,
+  useDeleteRoom,
+  usePartitionsByRoomId,
+} from '../../../../../api/room.api';
 import { useSnackbar } from 'react-simple-snackbar';
+import { Table, TableBody, Modal } from 'flowbite-react';
 import Create from '../../../../../assets/icons/create.png';
+import Delete from '../../../../../assets/icons/delete.png';
 
 const CreateRoom = () => {
   const [roomName, setRoomName] = useState('');
   const [departmentId, setDepartmentId] = useState(null);
+  const [openPartitionsModal, setOpenPartitionsModal] = useState(null);
   const { mutateAsync: doCreateRoom } = useCreateRoom();
+  const { mutateAsync: doDeleteRoom } = useDeleteRoom();
+  const { data: roomPartitions } = usePartitionsByRoomId(openPartitionsModal);
+
+  const { data: rooms, refetch } = useAllRooms();
 
   const [openSuccessSnackbar] = useSnackbar({
     position: 'top-right',
@@ -35,8 +47,19 @@ const CreateRoom = () => {
     }
   };
 
+  // 호실 삭제
+  const deleteRoom = async roomId => {
+    try {
+      const response = await doDeleteRoom(roomId);
+      openSuccessSnackbar(response?.message);
+      await refetch();
+    } catch (error) {
+      openErrorSnackbar(error?.response.data.message, 3000);
+    }
+  };
+
   return (
-    <div>
+    <div className="p-4">
       <div className="font-bold text-3xl text-gray-600 mb-6">Room</div>
       {/* Room 생성 */}
       <div className="bg-white p-4 inline-block rounded-xl mb-8 hover:shadow-lg w-full">
@@ -68,6 +91,82 @@ const CreateRoom = () => {
             className="mx-4 border rounded-sm"
           />
         </div>
+      </div>
+      {/* 모든 Room 조회 */}
+      <div className="bg-white p-4 mb-8 inline-block rounded-xl hover:shadow-lg w-full">
+        <div className="flex flex-row items-center gap-x-4 px-6 pt-3 pb-6">
+          <div className="font-bold text-xl">모든 Room 조회</div>
+        </div>
+        <div>
+          <Table className="text-center">
+            <Table.Head>
+              <Table.HeadCell>호실 ID</Table.HeadCell>
+              <Table.HeadCell>호실명</Table.HeadCell>
+              <Table.HeadCell>부서명</Table.HeadCell>
+              <Table.HeadCell></Table.HeadCell>
+            </Table.Head>
+            <TableBody>
+              {rooms?.map(room => (
+                <Table.Row key={room.roomId}>
+                  <Table.Cell
+                    onClick={() => setOpenPartitionsModal(room.roomId)}
+                    className="cursor-pointer hover:underline">
+                    {room.roomId}
+                  </Table.Cell>
+                  <Table.Cell>{room.roomName}</Table.Cell>
+                  <Table.Cell>{room ? room.departmentName : '-'}</Table.Cell>
+                  <Table.Cell>
+                    <img
+                      onClick={() => deleteRoom({ roomId: room.roomId })}
+                      className="w-6 h-6 cursor-pointer"
+                      src={Delete}
+                    />
+                  </Table.Cell>
+                </Table.Row>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      </div>
+      {/* Room별 Partitions 조회 모달 */}
+      <div className="flex justify-center items-center">
+        <Modal
+          className="flex justify-center items-center w-full p-6"
+          show={openPartitionsModal}
+          size="md"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+          onClose={() => setOpenPartitionsModal(false)}
+          popup>
+          <Modal.Header />
+          <Modal.Body>
+            <div className="text-center">
+              <Table>
+                <Table.Head className="break-keep">
+                  <Table.HeadCell>호실명</Table.HeadCell>
+                  <Table.HeadCell>파티션</Table.HeadCell>
+                </Table.Head>
+                <Table.Body>
+                  <Table.Row>
+                    <Table.Cell>
+                      {roomPartitions?.data?.partitions[0]?.roomName}
+                    </Table.Cell>
+                    <Table.Cell>
+                      {roomPartitions?.data?.partitions
+                        ?.map(
+                          room => `${room?.roomName}-${room?.partitionNumber}`,
+                        )
+                        .join(', ')}
+                    </Table.Cell>
+                  </Table.Row>
+                </Table.Body>
+              </Table>
+            </div>
+          </Modal.Body>
+        </Modal>
       </div>
     </div>
   );

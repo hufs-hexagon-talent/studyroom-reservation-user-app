@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { Button, TextInput } from 'flowbite-react';
+import { TextInput } from 'flowbite-react';
 import { useSnackbar } from 'react-simple-snackbar';
 import { usePostBanner } from '../../../api/banner.api';
 import UpLoad from '../../../assets/icons/upload.png';
 
-const BannerUpload = ({ refetch }) => {
+const BannerUpload = () => {
   const [bannerType, setBannerType] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [linkUrl, setLinkUrl] = useState('');
@@ -40,7 +40,6 @@ const BannerUpload = ({ refetch }) => {
           setBannerType('');
           setImageUrl('');
           setLinkUrl('');
-          refetch();
         },
         onError: error => {
           console.error(error);
@@ -51,9 +50,11 @@ const BannerUpload = ({ refetch }) => {
   };
 
   return (
-    <div className="w-full max-w-[400px] flex flex-col gap-6">
-      <div className="flex flex-row items-center">
-        <div className="font-bold text-xl p-4">배너 업로드</div>
+    <div className="w-full max-w-[400px] flex flex-col px-4 gap-6">
+      <div className="flex flex-row gap-x-6 items-center">
+        <div className="font-bold text-3xl text-black px-4 py-8">
+          Upload Banner
+        </div>
         <img
           onClick={uploadBanner}
           type="submit"
