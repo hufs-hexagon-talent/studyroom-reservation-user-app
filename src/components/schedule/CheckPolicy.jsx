@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Table, Checkbox } from 'flowbite-react';
-import UnderArrow from '../../../../assets/icons/under_arrow_black.png';
-import { useAllPolicies } from '../../../../api/roomOperationPolicy.api';
+import UnderArrow from '../../assets/icons/under_arrow_black.png';
+import { useAllPolicies } from '../../api/roomOperationPolicy.api';
 
 const CheckPolicy = ({ selectedPolicyId, setSelectedPolicyId }) => {
   const { data: policies, refetch } = useAllPolicies();
@@ -38,6 +38,7 @@ const CheckPolicy = ({ selectedPolicyId, setSelectedPolicyId }) => {
                   className="bg-white dark:border-gray-700 dark:bg-gray-800">
                   <Table.Cell className="p-4">
                     <Checkbox
+                      className="rounded-none text-[#f97316] focus:ring-[#f97316] cursor-pointer"
                       checked={
                         selectedPolicyId === policy.roomOperationPolicyId
                       }

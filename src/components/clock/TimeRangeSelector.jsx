@@ -38,7 +38,7 @@ const TimeSelector = ({ setStartTime, setEndTime }) => {
         } else {
           setEndSelectedTime(time); // 종료 시간 설정
 
-          // 부모로 시작/종료 시간 전달
+          // 부모로 시작-종료 시간 전달
           if (setStartTime && setEndTime) {
             setStartTime(startSelectedTime);
             setEndTime(time);

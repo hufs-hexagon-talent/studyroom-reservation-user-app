@@ -28,13 +28,16 @@ import NoShow from './pages/check/NoShow';
 import EmailSend from './pages/email/EmailSend';
 import ManageBanner from './pages/manage/ManageBanner';
 import PolicyManagement from './pages/admin/operation/policy/PolicyManagement';
-import ScheduleManagement from './pages/admin/operation/schedule/ScheduleManagement';
+import ScheduleCreate from './pages/admin/operation/schedule/ScheduleCreate';
+import ScheduleDelete from './pages/admin/operation/schedule/ScheduleDelete';
+import ScheduleFetch from './pages/admin/operation/schedule/ScheduleFetch';
 import ReservationList from './pages/admin/reservation management/ReservationList';
 import ReservationState from './pages/admin/reservation management/ReservationState';
 import BannerManagement from './pages/admin/banner/BannerManagement';
 import UserStatics from './pages/admin/statics/UserStatics';
 import ReservationStatics from './pages/admin/statics/ReservationStatics';
 import FacilityManagement from './pages/admin/operation/facility/FacilityManagement';
+import CreateRoom from './pages/admin/operation/facility/room/CreateRoom';
 
 const RouterComponent = () => {
   const { loggedIn } = useAuth();
@@ -116,8 +119,10 @@ const RouterComponent = () => {
                   />
                   {/* 운영 관리 */}
                   <Route path="policy" element={<PolicyManagement />} />
-                  <Route path="schedule" element={<ScheduleManagement />} />
-                  <Route path="facility" element={<FacilityManagement />} />
+                  <Route path="schedule/create" element={<ScheduleCreate />} />
+                  <Route path="schedule/delete" element={<ScheduleDelete />} />
+                  <Route path="schedule/fetch" element={<ScheduleFetch />} />
+                  <Route path="facility/room" element={<CreateRoom />} />
                   {/* 배너 관리 */}
                   <Route path="banner" element={<BannerManagement />} />
                 </Route>

@@ -25,6 +25,13 @@ const SidebarSection = ({ icon: Icon, label, children }) => {
   );
 };
 
+const SidebarSubSection = ({ label, children }) => (
+  <div className="ml-4">
+    <div className="px-4 py-2 text-sm text-gray-800">{label}</div>
+    <div className="ml-2">{children}</div>
+  </div>
+);
+
 const SidebarItem = ({ to, children }) => (
   <Link
     to={to}
@@ -58,8 +65,15 @@ const CustomSidebar = () => {
 
       <SidebarSection icon={HiCalendar} label="운영 관리">
         <SidebarItem to="/divide/policy">정책 관리</SidebarItem>
-        <SidebarItem to="/divide/schedule">운영 시간 관리</SidebarItem>
-        <SidebarItem to="/divide/facility">시설 관리</SidebarItem>
+        <SidebarSubSection label="운영 시간 관리">
+          <SidebarItem to="/divide/schedule/create">스케줄 생성</SidebarItem>
+          <SidebarItem to="/divide/schedule/delete">스케줄 삭제</SidebarItem>
+          <SidebarItem to="/divide/schedule/fetch">스케줄 조회</SidebarItem>
+        </SidebarSubSection>
+        <SidebarSubSection label="시설 관리">
+          <SidebarItem to="/divide/facility/room">Room</SidebarItem>
+          <SidebarItem to="/divide/facility/partition">Partition</SidebarItem>
+        </SidebarSubSection>
       </SidebarSection>
 
       <SidebarSection icon={HiFilm} label="배너 관리">
