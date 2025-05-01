@@ -3,9 +3,11 @@ import { Checkbox, Label } from 'flowbite-react';
 import { useSnackbar } from 'react-simple-snackbar';
 import { useDeleteBanner } from '../../../api/banner.api';
 import Delete from '../../../assets/icons/delete.png';
+import { useActivatedBanner } from '../../../api/banner.api';
 
-const BannerDelete = ({ activatedBanner, refetch }) => {
+const BannerDelete = () => {
   const { mutateAsync: doDeleteBanner } = useDeleteBanner();
+  const { data: activatedBanner, refetch } = useActivatedBanner();
   const [bannerId, setBannerId] = useState(null);
 
   const [openSuccessSnackbar] = useSnackbar({
@@ -43,12 +45,14 @@ const BannerDelete = ({ activatedBanner, refetch }) => {
   };
 
   return (
-    <div className="max-w-[400px] flex flex-col gap-6">
-      <div className="flex flex-row items-center">
-        <div className="font-bold text-xl p-4">배너 삭제</div>
+    <div className="max-w-[400px] flex flex-col px-4 gap-6">
+      <div className="flex flex-row items-center gap-x-6">
+        <div className="font-bold text-3xl text-black px-4 py-8">
+          Delete Banner
+        </div>
         <img
           onClick={deleteBanner}
-          className="w-5 h-6 cursor-pointer hover:scale-125"
+          className="w-6 h-7 cursor-pointer hover:scale-125"
           src={Delete}
         />
       </div>

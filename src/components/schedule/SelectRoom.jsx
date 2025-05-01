@@ -1,10 +1,10 @@
 import React from 'react';
-import { useAllRooms } from '../../../../api/room.api';
-import { useSchedules } from '../../../../api/policySchedule.api';
+import { useAllRooms } from '../../api/room.api';
+import { useSchedules } from '../../api/policySchedule.api';
 import { Checkbox } from 'flowbite-react';
 import { useSnackbar } from 'react-simple-snackbar';
 import { format } from 'date-fns';
-import Create from '../../../../assets/icons/create.png';
+import Create from '../../assets/icons/create.png';
 
 const SelectRoom = ({
   selectedRooms,
@@ -69,7 +69,7 @@ const SelectRoom = ({
   };
 
   return (
-    <div className="flex flex-row gap-x-20">
+    <div className="flex justify-between items-centerpb-8">
       <div>
         <div className="flex flex-row gap-3">
           {rooms
@@ -77,7 +77,7 @@ const SelectRoom = ({
             .map(room => (
               <div key={room.roomId} className="flex items-center mb-3">
                 <Checkbox
-                  className="rounded-none cursor-pointer"
+                  className="rounded-none text-[#f97316] focus:ring-[#f97316] cursor-pointer"
                   id={room.roomId}
                   checked={selectedRooms.includes(room.roomId)}
                   onChange={() => handleRoomCheckbox(room.roomId)}
@@ -92,7 +92,7 @@ const SelectRoom = ({
       <img
         src={Create}
         onClick={handleButton}
-        className="w-6 h-6 cursor-pointer hover:scale-125"
+        className="w-7 h-7 cursor-pointer hover:scale-125"
       />
     </div>
   );
