@@ -5,18 +5,20 @@ import {
   useUnblocked,
   useAllUsers,
   useBlockedUser,
+  useUserRoleList,
 } from '../../../api/user.api';
 import { useSnackbar } from 'react-simple-snackbar';
 
 const FetchState = () => {
   const { data: allUsers } = useAllUsers();
   const { data: blocked } = useBlockedUser();
+  const { data: userRoleList } = useUserRoleList();
   const { mutate: doUnblocked, refetch } = useUnblocked();
   const [currentPage, setCurrentPage] = useState(1);
   const [openBlockedModal, setOpenBlockedModal] = useState(false);
   const [selectedBlockedInfo, setSelectedBlockedInfo] = useState(null);
   const [userList, setUserList] = useState([]);
-  const [selectedRole, setSelectedRole] = useState('');
+  const [selectedRoles, setSelectedRoles] = useState([]);
   const itemsPerPage = 17;
 
   const [openSuccessSnackbar] = useSnackbar({
@@ -51,19 +53,20 @@ const FetchState = () => {
   };
 
   const handleRoleSelect = role => {
-    setCurrentPage(1); // 체크 변경시 페이지도 1페이지로
-    if (selectedRole === role) {
-      // 이미 선택된 거 누르면 선택 해제
-      setSelectedRole('');
-    } else {
-      setSelectedRole(role);
-    }
+    setCurrentPage(1);
+    setSelectedRoles(
+      prev =>
+        prev.includes(role)
+          ? prev.filter(r => r !== role) // 제거
+          : [...prev, role], // 추가
+    );
   };
 
   // serviceRole에 따라 필터링
-  const filteredUsers = selectedRole
-    ? userList.filter(user => user.serviceRole === selectedRole)
-    : userList;
+  const filteredUsers =
+    selectedRoles.length > 0
+      ? userList.filter(user => selectedRoles.includes(user.serviceRole))
+      : userList;
 
   // 현재 페이지에 해당하는 데이터 추출
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -78,8 +81,6 @@ const FetchState = () => {
     }
   }, [allUsers]);
 
-  console.log('selectedBlockedInfo', selectedBlockedInfo);
-
   return (
     <div className="overflow-x-auto">
       {/* Blocked User List */}
@@ -87,10 +88,10 @@ const FetchState = () => {
         <div className="font-bold text-3xl text-black p-8">Users State</div>
         {/* State Checkbox */}
         <div className="flex flex-row gap-x-6 items-center px-4 pb-8">
-          {['ADMIN', 'RESIDENT', 'USER', 'BLOCKED', 'EXPIRED'].map(role => (
+          {userRoleList?.map(role => (
             <div key={role} className="flex flex-row gap-x-2 items-center">
               <Checkbox
-                checked={selectedRole === role}
+                checked={selectedRoles.includes(role)}
                 onChange={() => handleRoleSelect(role)}
                 className="rounded-none"
               />
@@ -107,7 +108,7 @@ const FetchState = () => {
             <Table.HeadCell>이름</Table.HeadCell>
             <Table.HeadCell>학과</Table.HeadCell>
             <Table.HeadCell>이메일</Table.HeadCell>
-            {selectedRole === 'BLOCKED' && (
+            {filteredUsers.some(user => user.serviceRole === 'BLOCKED') && (
               <Table.HeadCell>
                 <span className="sr-only">삭제</span>
               </Table.HeadCell>
@@ -118,9 +119,10 @@ const FetchState = () => {
               <Table.Row
                 key={index}
                 className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                {/* Blocked일때만 눌렀을 때 Modal 열리게 */}
                 <Table.Cell
                   onClick={() => {
-                    if (selectedRole === 'BLOCKED') {
+                    if (user.serviceRole === 'BLOCKED') {
                       const blockedInfo = blocked?.find(
                         b => b.userInfoResponse.userId === user.userId,
                       );
@@ -129,11 +131,10 @@ const FetchState = () => {
                     }
                   }}
                   className={`whitespace-nowrap font-medium text-gray-900 dark:text-white
-                    ${selectedRole === 'BLOCKED' ? 'cursor-pointer hover:underline' : ''}
-                  `}>
+                  ${user.serviceRole === 'BLOCKED' ? 'cursor-pointer hover:underline' : ''}
+                `}>
                   {user.userId}
                 </Table.Cell>
-
                 <Table.Cell>{user.serviceRole}</Table.Cell>
                 <Table.Cell>{user.serial ? user.serial : '-'}</Table.Cell>
                 <Table.Cell>{user.name}</Table.Cell>
@@ -142,7 +143,7 @@ const FetchState = () => {
                 </Table.Cell>
 
                 <Table.Cell>{user.email ? user.email : '-'}</Table.Cell>
-                {selectedRole === 'BLOCKED' && (
+                {user.serviceRole === 'BLOCKED' ? (
                   <Table.Cell>
                     <a
                       onClick={() => handleUnblocked(user.userId)}
@@ -150,6 +151,10 @@ const FetchState = () => {
                       삭제
                     </a>
                   </Table.Cell>
+                ) : (
+                  filteredUsers.some(u => u.serviceRole === 'BLOCKED') && (
+                    <Table.Cell />
+                  )
                 )}
               </Table.Row>
             ))}

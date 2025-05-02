@@ -154,6 +154,19 @@ export const useUserByName = name => {
   });
 };
 
+// [관리자] 사용자 역할 리스트 조회
+const fetchUserRoleList = async () => {
+  const userRoleList_res = await apiClient.get('/users/roles');
+  return userRoleList_res.data.data;
+};
+
+export const useUserRoleList = () => {
+  return useQuery({
+    queryKey: ['userRoleList'],
+    queryFn: fetchUserRoleList,
+  });
+};
+
 // 자신의 블락 기간 조회
 export const fetchBlockedPeriod = async () => {
   try {
