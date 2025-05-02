@@ -1,29 +1,17 @@
 import React, { useState } from 'react';
 import {
-  useCreateRoom,
-  useAllRooms,
-  useDeleteRoom,
-  usePartitionsByRoomId,
-} from '../../../../../api/room.api';
-import { useCreatePartition } from '../../../../../api/roomPartition.api';
+  useCreatePartition,
+  useAllPartitions,
+} from '../../../../../api/roomPartition.api';
+import { Input } from '@mui/material';
 import { useSnackbar } from 'react-simple-snackbar';
-import Delete from '../../../../../assets/icons/delete.png';
-import { Modal } from 'flowbite-react';
-import { Table, TableBody } from 'flowbite-react';
 import Create from '../../../../../assets/icons/create.png';
-import UnderArrow from '../../../../../assets/icons/under_arrow_black.png';
+import { Table } from 'flowbite-react';
 
 const CreatePartition = () => {
-  const [roomName, setRoomName] = useState('');
-  const [departmentId, setDepartmentId] = useState(null);
-  const [isGetRooms, setIsGetRooms] = useState(false);
   const [roomId, setRoomId] = useState(null);
   const [partitionNumber, setPartitionNumber] = useState(null);
-  const [openPartitionsModal, setOpenPartitionsModal] = useState(null);
-  const { mutateAsync: doCreateRoom } = useCreateRoom();
-  const { mutateAsync: doDeleteRoom } = useDeleteRoom();
-  const { data: rooms, refetch } = useAllRooms();
-  const { data: RoomPartitions } = usePartitionsByRoomId(openPartitionsModal);
+  const { data: partitions } = useAllPartitions();
   const { mutateAsync: doCreatePartition } = useCreatePartition();
 
   const [openSuccessSnackbar] = useSnackbar({
@@ -40,30 +28,12 @@ const CreatePartition = () => {
     },
   });
 
-  // 호실 생성
-  const createRoom = async () => {
-    try {
-      const response = await doCreateRoom({
-        roomName,
-        departmentId,
-      });
-      openSuccessSnackbar(response.message, 3000);
-      await refetch();
-    } catch (error) {
-      openErrorSnackbar(error?.response.data.message, 3000);
-    }
-  };
-
-  // 호실 삭제
-  const deleteRoom = async roomId => {
-    try {
-      const response = await doDeleteRoom(roomId);
-      openSuccessSnackbar(response?.message);
-      await refetch();
-    } catch (error) {
-      openErrorSnackbar(error?.response.data.message, 3000);
-    }
-  };
+  const groupedPartitions = partitions.reduce((acc, cur) => {
+    const key = cur.roomName;
+    if (!acc[key]) acc[key] = [];
+    acc[key].push(`${cur.roomName}-${cur.partitionNumber}`);
+    return acc;
+  }, {});
 
   // 파티션 생성
   const createPartition = async () => {
@@ -82,7 +52,7 @@ const CreatePartition = () => {
         Partition
       </div>
       {/* 파티션 생성 */}
-      <div className="bg-white p-4 mb-8 inline-block rounded-xl hover:shadow-lg w-full">
+      <div className="bg-white p-4 mb-8 inline-block rounded-xl w-full">
         <div className="flex flex-row items-center gap-x-6">
           <div className="font-bold text-xl p-3">Partition 생성</div>
           {/* Partition 생성 버튼 */}
@@ -95,20 +65,44 @@ const CreatePartition = () => {
         {/* RoomId */}
         <div className="flex flex-row items-center p-3">
           <div>호실 ID : </div>
-          <input
+          <Input
             onChange={e => setRoomId(e.target.value)}
             value={roomId}
             type="number"
-            className="rounded mx-2"></input>
+            className="rounded mx-2"
+          />
         </div>
         {/* PartitionNumber */}
         <div className="flex flex-row items-center p-3">
           <div>파티션 번호 : </div>
-          <input
+          <Input
             onChange={e => setPartitionNumber(e.target.value)}
             value={partitionNumber}
             type="number"
-            className="rounded mx-2"></input>
+            className="rounded mx-2"
+          />
+        </div>
+      </div>
+      {/* 파티션 조회 */}
+      <div className="bg-white p-4 mb-8 inline-block rounded-xl w-full">
+        <div className="font-bold text-xl p-3">Partition 조회</div>
+        <div>
+          <Table className="text-lg">
+            <Table.Head className="text-lg">
+              <Table.HeadCell>호실명</Table.HeadCell>
+              <Table.HeadCell>파티션명</Table.HeadCell>
+            </Table.Head>
+            <Table.Body className="divide-y">
+              {Object.entries(groupedPartitions).map(
+                ([roomName, partitionList]) => (
+                  <Table.Row key={roomName}>
+                    <Table.Cell>{roomName}</Table.Cell>
+                    <Table.Cell>{partitionList.join(', ')}</Table.Cell>
+                  </Table.Row>
+                ),
+              )}
+            </Table.Body>
+          </Table>
         </div>
       </div>
     </div>

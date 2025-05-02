@@ -7,6 +7,8 @@ import {
 } from '../../../../../api/room.api';
 import { useSnackbar } from 'react-simple-snackbar';
 import { Table, TableBody, Modal } from 'flowbite-react';
+import { Input } from '@mui/material';
+
 import Create from '../../../../../assets/icons/create.png';
 import Delete from '../../../../../assets/icons/delete.png';
 
@@ -62,7 +64,7 @@ const CreateRoom = () => {
     <div className="p-4">
       <div className="font-bold text-3xl text-gray-600 mb-6">Room</div>
       {/* Room 생성 */}
-      <div className="bg-white p-4 inline-block rounded-xl mb-8 hover:shadow-lg w-full">
+      <div className="bg-white p-4 inline-block rounded-xl mb-8 w-full">
         {/* Room 선택 */}
         <div className="flex flex-row items-center gap-x-6">
           <div className="font-bold text-xl p-3">Room 생성</div>
@@ -74,26 +76,26 @@ const CreateRoom = () => {
         </div>
         <div className="flex flex-row p-4">
           <div>호실 이름 : </div>
-          <input
+          <Input
             value={roomName}
             onChange={e => setRoomName(e.target.value)}
             type="string"
-            className="mx-4 border rounded-sm"
+            className="mx-4 rounded-sm"
           />
         </div>
         {/* 부서 선택 */}
         <div className="flex flex-row p-4">
           <div>부서 ID : </div>
-          <input
+          <Input
             value={departmentId}
             onChange={e => setDepartmentId(e.target.value)}
             type="string"
-            className="mx-4 border rounded-sm"
+            className="mx-4 rounded-sm"
           />
         </div>
       </div>
       {/* 모든 Room 조회 */}
-      <div className="bg-white p-4 mb-8 inline-block rounded-xl hover:shadow-lg w-full">
+      <div className="bg-white p-4 mb-8 inline-block rounded-xl w-full">
         <div className="flex flex-row items-center gap-x-4 px-6 pt-3 pb-6">
           <div className="font-bold text-xl">모든 Room 조회</div>
         </div>

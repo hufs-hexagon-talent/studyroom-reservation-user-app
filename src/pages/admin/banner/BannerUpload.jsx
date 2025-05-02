@@ -3,6 +3,7 @@ import { TextInput } from 'flowbite-react';
 import { useSnackbar } from 'react-simple-snackbar';
 import { usePostBanner } from '../../../api/banner.api';
 import UpLoad from '../../../assets/icons/upload.png';
+import { Input } from '@mui/material';
 
 const BannerUpload = () => {
   const [bannerType, setBannerType] = useState('');
@@ -62,34 +63,57 @@ const BannerUpload = () => {
           src={UpLoad}
         />
       </div>
-      <div className=" flex flex-col items-center gap-4">
-        <TextInput
-          onChange={e => setBannerType(e.target.value)}
-          value={bannerType}
-          id="bannerType"
-          type="text"
-          placeholder="배너 타입을 입력하세요"
-          className="w-full"
-          required
-        />
-        <TextInput
-          onChange={e => setImageUrl(e.target.value)}
-          value={imageUrl}
-          id="imageUrl"
-          type="text"
-          placeholder="배너 이미지 URL을 입력하세요"
-          className="w-full"
-          required
-        />
-        <TextInput
-          onChange={e => setLinkUrl(e.target.value)}
-          value={linkUrl}
-          id="linkUrl"
-          type="text"
-          placeholder="배너 링크 URL을 입력하세요"
-          className="w-full mb-6"
-          required
-        />
+
+      {/* 배너 타입 업로드 */}
+      <div className="flex flex-row text-center">
+        <div className="border bg-gray-200 rounded-l-lg text-lg w-1/4 flex justify-center items-center">
+          type
+        </div>
+        <div className="border bg-white w-full rounded-r-lg p-4">
+          <input
+            onChange={e => setBannerType(e.target.value)}
+            required
+            value={bannerType}
+            id="bannerType"
+            type="text"
+            placeholder="배너 타입을 입력하세요"
+            className="w-full border-none focus:outline-none focus:ring-0 focus:border-transparent"
+          />
+        </div>
+      </div>
+      {/* 배너 이미지 url 업로드 */}
+      <div className="flex flex-row text-center">
+        <div className="border bg-gray-200 rounded-l-lg text-lg w-1/4 flex justify-center items-center">
+          img
+        </div>
+        <div className="border bg-white w-full rounded-r-lg p-4">
+          <input
+            onChange={e => setImageUrl(e.target.value)}
+            required
+            value={imageUrl}
+            id="imageUrl"
+            type="text"
+            placeholder="배너 이미지 URL을 입력하세요"
+            className="w-full border-none focus:outline-none focus:ring-0 focus:border-transparent"
+          />
+        </div>
+      </div>
+      {/* 배너 링크 url 업로드 */}
+      <div className="flex flex-row text-center">
+        <div className="border bg-gray-200 rounded-l-lg text-lg w-1/4 flex justify-center items-center">
+          link
+        </div>
+        <div className="border bg-white w-full rounded-r-lg p-4">
+          <input
+            onChange={e => setLinkUrl(e.target.value)}
+            required
+            value={linkUrl}
+            id="linkUrl"
+            type="text"
+            placeholder="배너 링크 URL을 입력하세요"
+            className="w-full border-none focus:outline-none focus:ring-0 focus:border-transparent"
+          />
+        </div>
       </div>
     </div>
   );
