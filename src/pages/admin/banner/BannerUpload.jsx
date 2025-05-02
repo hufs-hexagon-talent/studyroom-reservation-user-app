@@ -66,10 +66,10 @@ const BannerUpload = () => {
 
       {/* 배너 타입 업로드 */}
       <div className="flex flex-row text-center">
-        <div className="border bg-gray-200 rounded-l-lg text-lg w-1/4 flex justify-center items-center">
+        <div className="border bg-gray-200 text-gray-600 font-bold rounded-l-lg text-lg w-1/4 flex justify-center items-center">
           type
         </div>
-        <div className="border bg-white w-full rounded-r-lg p-4">
+        <div className="border bg-white w-full rounded-r-lg p-2">
           <input
             onChange={e => setBannerType(e.target.value)}
             required
@@ -83,10 +83,10 @@ const BannerUpload = () => {
       </div>
       {/* 배너 이미지 url 업로드 */}
       <div className="flex flex-row text-center">
-        <div className="border bg-gray-200 rounded-l-lg text-lg w-1/4 flex justify-center items-center">
+        <div className="border bg-gray-200 rounded-l-lg text-lg text-gray-600 font-bold w-1/4 flex justify-center items-center">
           img
         </div>
-        <div className="border bg-white w-full rounded-r-lg p-4">
+        <div className="border bg-white w-full rounded-r-lg p-2">
           <input
             onChange={e => setImageUrl(e.target.value)}
             required
@@ -100,10 +100,10 @@ const BannerUpload = () => {
       </div>
       {/* 배너 링크 url 업로드 */}
       <div className="flex flex-row text-center">
-        <div className="border bg-gray-200 rounded-l-lg text-lg w-1/4 flex justify-center items-center">
+        <div className="border bg-gray-200 rounded-l-lg text-gray-600 font-bold text-lg w-1/4 flex justify-center items-center">
           link
         </div>
-        <div className="border bg-white w-full rounded-r-lg p-4">
+        <div className="border bg-white w-full rounded-r-lg p-2">
           <input
             onChange={e => setLinkUrl(e.target.value)}
             required

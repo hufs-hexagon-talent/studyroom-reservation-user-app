@@ -73,51 +73,85 @@ const BannerEdit = () => {
           src={Edit}
         />
       </div>
-      <div className="flex flex-col gap-y-4 px-4 pb-6">
-        <div className="flex flex-row gap-6 px-1">
-          <Label htmlFor="file" value="active" />
+      <div className="space-y-6">
+        {/* 배너 활성화 체크박스 */}
+        <div className="flex flex-row items-center gap-6 px-1 pt-4">
+          <div className="text-lg">Active</div>
           <Checkbox
+            className="rounded-none p-2"
             id="active"
             checked={isActive}
             onChange={handleCheckboxChange}
           />
         </div>
-        <TextInput
-          onChange={e => setEditBannerId(e.target.value)}
-          value={editBannerId}
-          id="bannerId"
-          type="text"
-          placeholder="수정될 배너의 아이디를 입력하세요"
-          className="w-full"
-          required
-        />
-        <TextInput
-          onChange={e => setEditBannerType(e.target.value)}
-          value={editBannerType}
-          id="bannerType"
-          type="text"
-          placeholder="수정될 배너의 타입을 입력하세요"
-          className="w-full"
-          required
-        />
-        <TextInput
-          onChange={e => setEditImageUrl(e.target.value)}
-          value={editImageUrl}
-          id="imageUrl"
-          type="text"
-          placeholder="수정될 배너 이미지 URL을 입력하세요"
-          className="w-full"
-          required
-        />
-        <TextInput
-          onChange={e => setEditLinkUrl(e.target.value)}
-          value={editLinkUrl}
-          id="linkUrl"
-          type="text"
-          placeholder="수정될 배너 링크 URL을 입력하세요"
-          className="w-full"
-          required
-        />
+        {/* 배너 타입 업로드 */}
+        <div className="flex flex-row text-center">
+          <div className="border bg-gray-200 rounded-l-lg text-gray-600 font-bold text-lg w-1/4 flex justify-center items-center">
+            id
+          </div>
+          <div className="border bg-white w-full rounded-r-lg p-2">
+            <input
+              onChange={e => setEditBannerId(e.target.value)}
+              required
+              value={editBannerId}
+              id="bannerId"
+              type="text"
+              placeholder="수정될 배너의 아이디를 입력하세요"
+              className="w-full border-none focus:outline-none focus:ring-0 focus:border-transparent"
+            />
+          </div>
+        </div>
+        {/* 배너 타입 업로드 */}
+        <div className="flex flex-row text-center">
+          <div className="border bg-gray-200 rounded-l-lg text-gray-600 font-bold text-lg w-1/4 flex justify-center items-center">
+            type
+          </div>
+          <div className="border bg-white w-full rounded-r-lg p-2">
+            <input
+              onChange={e => setEditBannerType(e.target.value)}
+              required
+              value={editBannerType}
+              id="bannerType"
+              type="text"
+              placeholder="수정될 배너의 타입을 입력하세요"
+              className="w-full border-none focus:outline-none focus:ring-0 focus:border-transparent"
+            />
+          </div>
+        </div>
+        {/* 이미지 URL 업로드 */}
+        <div className="flex flex-row text-center">
+          <div className="border bg-gray-200 rounded-l-lg text-gray-600 font-bold text-lg w-1/4 flex justify-center items-center">
+            img
+          </div>
+          <div className="border bg-white w-full rounded-r-lg p-2">
+            <input
+              onChange={e => setEditImageUrl(e.target.value)}
+              required
+              value={editImageUrl}
+              id="imageUrl"
+              type="text"
+              placeholder="수정될 배너 이미지 URL을 입력하세요"
+              className="w-full border-none focus:outline-none focus:ring-0 focus:border-transparent"
+            />
+          </div>
+        </div>
+        {/* 링크 URL 업로드 */}
+        <div className="flex flex-row text-center">
+          <div className="border bg-gray-200 rounded-l-lg text-gray-600 font-bold text-lg w-1/4 flex justify-center items-center">
+            link
+          </div>
+          <div className="border bg-white w-full rounded-r-lg p-2">
+            <input
+              onChange={e => setEditLinkUrl(e.target.value)}
+              required
+              value={editLinkUrl}
+              id="linkUrl"
+              type="text"
+              placeholder="수정될 배너 링크 URL을 입력하세요"
+              className="w-full border-none focus:outline-none focus:ring-0 focus:border-transparent"
+            />
+          </div>
+        </div>
       </div>
     </div>
   );

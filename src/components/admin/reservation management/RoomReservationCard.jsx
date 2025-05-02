@@ -14,7 +14,6 @@ import {
 import { useAllPartitions } from '../../../api/roomPartition.api';
 import Edit from '../../../assets/icons/edit.png';
 import Delete from '../../../assets/icons/delete.png';
-import { HiOutlineExclamationCircle } from 'react-icons/hi';
 
 const RoomReservationCard = ({ room, partitionIds, selectedDate }) => {
   const [reservations, setReservations] = useState([]);

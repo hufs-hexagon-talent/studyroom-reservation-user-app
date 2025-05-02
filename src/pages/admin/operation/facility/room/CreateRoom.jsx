@@ -97,11 +97,11 @@ const CreateRoom = () => {
       {/* 모든 Room 조회 */}
       <div className="bg-white p-4 mb-8 inline-block rounded-xl w-full">
         <div className="flex flex-row items-center gap-x-4 px-6 pt-3 pb-6">
-          <div className="font-bold text-xl">모든 Room 조회</div>
+          <div className="font-bold text-xl">모든 Room 조회 및 삭제</div>
         </div>
         <div>
-          <Table className="text-center">
-            <Table.Head>
+          <Table className="text-lg text-center">
+            <Table.Head className="text-lg">
               <Table.HeadCell>호실 ID</Table.HeadCell>
               <Table.HeadCell>호실명</Table.HeadCell>
               <Table.HeadCell>부서명</Table.HeadCell>
@@ -146,13 +146,13 @@ const CreateRoom = () => {
           <Modal.Header />
           <Modal.Body>
             <div className="text-center">
-              <Table>
-                <Table.Head className="break-keep">
+              <Table className="text-lg">
+                <Table.Head className="break-keep text-lg">
                   <Table.HeadCell>호실명</Table.HeadCell>
                   <Table.HeadCell>파티션</Table.HeadCell>
                 </Table.Head>
                 <Table.Body>
-                  <Table.Row>
+                  <Table.Row className="break-keep">
                     <Table.Cell>
                       {roomPartitions?.data?.partitions[0]?.roomName}
                     </Table.Cell>
