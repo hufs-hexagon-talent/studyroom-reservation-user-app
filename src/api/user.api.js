@@ -154,19 +154,6 @@ export const useUserByName = name => {
   });
 };
 
-// [관리자] 사용자 역할 리스트 조회
-const fetchUserRoleList = async () => {
-  const userRoleList_res = await apiClient.get('/users/roles');
-  return userRoleList_res.data.data;
-};
-
-export const useUserRoleList = () => {
-  return useQuery({
-    queryKey: ['userRoleList'],
-    queryFn: fetchUserRoleList,
-  });
-};
-
 // 자신의 블락 기간 조회
 export const fetchBlockedPeriod = async () => {
   try {
@@ -215,17 +202,7 @@ export const useNewEmailVerify = () => {
 
 // [관리자] 사용자 통계 조회
 const fetchUserStatics = async () => {
-  const authState = JSON.parse(localStorage.getItem('authState'));
-  const accessToken = authState?.accessToken;
-
-  const userStatics = await axios.get(
-    'https://api.studyroom-qa.alpaon.net/users/statics',
-    {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    },
-  );
+  const userStatics = await apiClient.get('/users/statics');
   return userStatics.data.data;
 };
 
@@ -233,5 +210,52 @@ export const useUserStatics = () => {
   return useQuery({
     queryKey: ['userStatics'],
     queryFn: fetchUserStatics,
+  });
+};
+
+// [관리자] 사용자 정보 Excel 내보내기
+export const exportUserExcel = async roles => {
+  const authState = JSON.parse(localStorage.getItem('authState'));
+  const accessToken = authState.accessToken;
+
+  const response = await axios.get(
+    `https://api.studyroom-qa.alpaon.net/users/export/excel?roles=${roles}`,
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+      responseType: 'blob', // 중요!
+    },
+  );
+
+  // 파일 저장 처리
+  const url = window.URL.createObjectURL(new Blob([response.data]));
+  const link = document.createElement('a');
+  link.href = url;
+  link.setAttribute('download', 'users.xlsx'); // 파일명 지정
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+};
+
+// [관리자] 사용자 역할 리스트 조회
+const fetchUserRoleList = async () => {
+  const authState = JSON.parse(localStorage.getItem('authState'));
+  const accessToken = authState.accessToken;
+  const userRoleList_res = await axios.get(
+    'https://api.studyroom-qa.alpaon.net/users/roles',
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    },
+  );
+  return userRoleList_res.data.data;
+};
+
+export const useUserRoleList = () => {
+  return useQuery({
+    queryKey: ['userRoleList'],
+    queryFn: fetchUserRoleList,
   });
 };
