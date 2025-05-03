@@ -11,9 +11,9 @@ import {
   useProcessedState,
   useAdminDeleteReservation,
 } from '../../../api/reservation.api';
+import { useAllPartitions } from '../../../api/roomPartition.api';
 import Edit from '../../../assets/icons/edit.png';
 import Delete from '../../../assets/icons/delete.png';
-import { HiOutlineExclamationCircle } from 'react-icons/hi';
 
 const RoomReservationCard = ({ room, partitionIds, selectedDate }) => {
   const [reservations, setReservations] = useState([]);
@@ -45,11 +45,16 @@ const RoomReservationCard = ({ room, partitionIds, selectedDate }) => {
     date: format(selectedDate, 'yyyy-MM-dd'),
     partitionIds,
   });
-  const { mutate: doDelete } = useAdminDeleteReservation();
+  const { data: allPartitions } = useAllPartitions();
 
+  const { mutate: doDelete } = useAdminDeleteReservation();
   const { mutateAsync: visitedState } = useVisitedState();
   const { mutateAsync: notVisitedState } = useNotVisitedState();
   const { mutateAsync: processedState } = useProcessedState();
+
+  const partitions = allPartitions?.map(partition => partition.partitionId);
+  console.log(partitions);
+  //console.log('partitions : ', partitions);
 
   useEffect(() => {
     if (fetchedReservations) {
@@ -91,7 +96,7 @@ const RoomReservationCard = ({ room, partitionIds, selectedDate }) => {
       },
       onError: err => {
         setError('예약 삭제 실패');
-        console.error(err);
+        openErrorSnackbar(error);
       },
     });
   };

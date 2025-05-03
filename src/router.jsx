@@ -31,7 +31,7 @@ import PolicyManagement from './pages/admin/operation/policy/PolicyManagement';
 import ScheduleCreate from './pages/admin/operation/schedule/ScheduleCreate';
 import ScheduleDelete from './pages/admin/operation/schedule/ScheduleDelete';
 import ScheduleFetch from './pages/admin/operation/schedule/ScheduleFetch';
-import ReservationList from './pages/admin/reservation management/ReservationList';
+
 import ReservationState from './pages/admin/reservation management/ReservationState';
 import BannerUpload from './pages/admin/banner/BannerUpload';
 import UserStatics from './pages/admin/statics/UserStatics';
@@ -108,10 +108,6 @@ const RouterComponent = () => {
                   <Route path="serialCheck" element={<SerialCheck />} />
                   <Route path="user-state" element={<FetchState />} />
                   {/* 예약 관리 */}
-                  <Route
-                    path="reservation-list"
-                    element={<ReservationList />}
-                  />
                   <Route
                     path="reservation-state"
                     element={<ReservationState />}

@@ -59,7 +59,6 @@ const CustomSidebar = () => {
       </SidebarSection>
 
       <SidebarSection icon={HiClipboardCheck} label="예약 관리">
-        <SidebarItem to="/divide/reservation-list">예약 목록</SidebarItem>
         <SidebarItem to="/divide/reservation-state">예약 상태 관리</SidebarItem>
       </SidebarSection>
 

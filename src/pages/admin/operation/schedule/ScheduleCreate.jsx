@@ -1,12 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Pagination } from '@mui/material';
-import { Table } from 'flowbite-react';
 import { fetchDate } from '../../../../api/policySchedule.api';
-import { useAllPolicies } from '../../../../api/roomOperationPolicy.api';
 import MyDatePicker from '../../../../components/schedule/MyDatePicker';
 import SelectRoom from '../../../../components/schedule/SelectRoom';
 import CheckPolicy from '../../../../components/schedule/CheckPolicy';
-import { format } from 'date-fns';
 
 const ScheduleCreate = () => {
   const DEPARTMENT_ID = 1;
@@ -14,10 +10,6 @@ const ScheduleCreate = () => {
   const [selectedRooms, setSelectedRooms] = useState([]);
   const [selectedDates, setSelectedDates] = useState([]);
   const [selectedPolicyId, setSelectedPolicyId] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
-
-  const { data: policies } = useAllPolicies();
 
   // 현재로부터 예약 가능한 방들의 날짜 목록 가져오기
   useEffect(() => {
@@ -27,18 +19,6 @@ const ScheduleCreate = () => {
     };
     getDate();
   }, []);
-
-  // 페이지네이션
-  const handlePageChange = (event, value) => {
-    setCurrentPage(value);
-  };
-
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedDates = availableDate?.slice(
-    startIndex,
-    startIndex + itemsPerPage,
-  );
-  const totalPages = Math.ceil(availableDate.length / itemsPerPage);
 
   return (
     <div>

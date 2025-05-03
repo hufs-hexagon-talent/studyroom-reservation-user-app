@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import {
   useReservationsById,
   useNotVisitedState,
@@ -21,7 +21,6 @@ const FetchReservations = () => {
   const { mutate: doDelete } = useAdminDeleteReservation();
   const { data: fetchedReservations, refetch } = useReservationsById(id);
 
-  const navigate = useNavigate();
   const [openDeleteModal, setOpenDeleteModal] = useState(null);
   const [openEditModal, setOpenEditModal] = useState(null);
   const [selectedReservationId, setSelectedReservationId] = useState(null);
@@ -96,7 +95,6 @@ const FetchReservations = () => {
 
   const pageCount = Math.ceil(reservations.length / itemsPerPage);
 
-  console.log(reservations);
   return (
     <div className="overflow-x-auto">
       <h1 className="flex justify-center text-2xl m-10">

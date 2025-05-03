@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Checkbox, Modal, Table } from 'flowbite-react';
+import { Button, Checkbox, Modal, Table } from 'flowbite-react';
 import { Pagination } from '@mui/material';
 import {
   useUnblocked,
   useAllUsers,
   useBlockedUser,
   useUserRoleList,
+  exportUserExcel,
 } from '../../../api/user.api';
 import { useSnackbar } from 'react-simple-snackbar';
 
@@ -52,6 +53,7 @@ const FetchState = () => {
     });
   };
 
+  // serviceRole 선택
   const handleRoleSelect = role => {
     setCurrentPage(1);
     setSelectedRoles(
@@ -81,23 +83,39 @@ const FetchState = () => {
     }
   }, [allUsers]);
 
+  console.log(selectedRoles);
+
   return (
     <div className="overflow-x-auto">
       {/* Blocked User List */}
       <div>
         <div className="font-bold text-3xl text-black p-8">Users State</div>
-        {/* State Checkbox */}
-        <div className="flex flex-row gap-x-6 items-center px-4 pb-8">
-          {userRoleList?.map(role => (
-            <div key={role} className="flex flex-row gap-x-2 items-center">
-              <Checkbox
-                checked={selectedRoles.includes(role)}
-                onChange={() => handleRoleSelect(role)}
-                className="rounded-none"
-              />
-              <div>{role}</div>
-            </div>
-          ))}
+        <div className="flex justify-between items-center">
+          {/* State Checkbox */}
+          <div className="flex flex-row gap-x-6 items-center px-4 pb-8">
+            {userRoleList?.map(role => (
+              <div key={role} className="flex flex-row gap-x-2 items-center">
+                <Checkbox
+                  checked={selectedRoles.includes(role)}
+                  onChange={() => handleRoleSelect(role)}
+                  className="rounded-none"
+                />
+                <div>{role}</div>
+              </div>
+            ))}
+          </div>
+          {/* Export Excel */}
+          <Button
+            color="dark"
+            onClick={() => {
+              if (selectedRoles.length === 0) {
+                openErrorSnackbar('역할을 하나 이상 선택해주세요.');
+                return;
+              }
+              exportUserExcel(selectedRoles);
+            }}>
+            내보내기
+          </Button>
         </div>
         {/* Users Table */}
         <Table>

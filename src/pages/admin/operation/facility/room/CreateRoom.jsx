@@ -7,6 +7,8 @@ import {
 } from '../../../../../api/room.api';
 import { useSnackbar } from 'react-simple-snackbar';
 import { Table, TableBody, Modal } from 'flowbite-react';
+import { Input } from '@mui/material';
+
 import Create from '../../../../../assets/icons/create.png';
 import Delete from '../../../../../assets/icons/delete.png';
 
@@ -62,7 +64,7 @@ const CreateRoom = () => {
     <div className="p-4">
       <div className="font-bold text-3xl text-gray-600 mb-6">Room</div>
       {/* Room 생성 */}
-      <div className="bg-white p-4 inline-block rounded-xl mb-8 hover:shadow-lg w-full">
+      <div className="bg-white p-4 inline-block rounded-xl mb-8 w-full">
         {/* Room 선택 */}
         <div className="flex flex-row items-center gap-x-6">
           <div className="font-bold text-xl p-3">Room 생성</div>
@@ -74,32 +76,32 @@ const CreateRoom = () => {
         </div>
         <div className="flex flex-row p-4">
           <div>호실 이름 : </div>
-          <input
+          <Input
             value={roomName}
             onChange={e => setRoomName(e.target.value)}
             type="string"
-            className="mx-4 border rounded-sm"
+            className="mx-4 rounded-sm"
           />
         </div>
         {/* 부서 선택 */}
         <div className="flex flex-row p-4">
           <div>부서 ID : </div>
-          <input
+          <Input
             value={departmentId}
             onChange={e => setDepartmentId(e.target.value)}
             type="string"
-            className="mx-4 border rounded-sm"
+            className="mx-4 rounded-sm"
           />
         </div>
       </div>
       {/* 모든 Room 조회 */}
-      <div className="bg-white p-4 mb-8 inline-block rounded-xl hover:shadow-lg w-full">
+      <div className="bg-white p-4 mb-8 inline-block rounded-xl w-full">
         <div className="flex flex-row items-center gap-x-4 px-6 pt-3 pb-6">
-          <div className="font-bold text-xl">모든 Room 조회</div>
+          <div className="font-bold text-xl">모든 Room 조회 및 삭제</div>
         </div>
         <div>
-          <Table className="text-center">
-            <Table.Head>
+          <Table className="text-lg text-center">
+            <Table.Head className="text-lg">
               <Table.HeadCell>호실 ID</Table.HeadCell>
               <Table.HeadCell>호실명</Table.HeadCell>
               <Table.HeadCell>부서명</Table.HeadCell>
@@ -144,13 +146,13 @@ const CreateRoom = () => {
           <Modal.Header />
           <Modal.Body>
             <div className="text-center">
-              <Table>
-                <Table.Head className="break-keep">
+              <Table className="text-lg">
+                <Table.Head className="break-keep text-lg">
                   <Table.HeadCell>호실명</Table.HeadCell>
                   <Table.HeadCell>파티션</Table.HeadCell>
                 </Table.Head>
                 <Table.Body>
-                  <Table.Row>
+                  <Table.Row className="break-keep">
                     <Table.Cell>
                       {roomPartitions?.data?.partitions[0]?.roomName}
                     </Table.Cell>
