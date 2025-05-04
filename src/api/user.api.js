@@ -215,21 +215,12 @@ export const useUserStatics = () => {
 
 // [관리자] 사용자 정보 Excel 내보내기
 export const exportUserExcel = async roles => {
-  const authState = JSON.parse(localStorage.getItem('authState'));
-  const accessToken = authState.accessToken;
-
-  const response = await axios.get(
-    `https://api.studyroom-qa.alpaon.net/users/export/excel?roles=${roles}`,
-    {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-      responseType: 'blob', // 중요!
-    },
-  );
+  const userExcel = await apiClient.get(`/users/export/excel?roles=${roles}`, {
+    responseType: 'blob', // 중요!
+  });
 
   // 파일 저장 처리
-  const url = window.URL.createObjectURL(new Blob([response.data]));
+  const url = window.URL.createObjectURL(new Blob([userExcel.data]));
   const link = document.createElement('a');
   link.href = url;
   link.setAttribute('download', 'users.xlsx'); // 파일명 지정
@@ -240,16 +231,7 @@ export const exportUserExcel = async roles => {
 
 // [관리자] 사용자 역할 리스트 조회
 const fetchUserRoleList = async () => {
-  const authState = JSON.parse(localStorage.getItem('authState'));
-  const accessToken = authState.accessToken;
-  const userRoleList_res = await axios.get(
-    'https://api.studyroom-qa.alpaon.net/users/roles',
-    {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    },
-  );
+  const userRoleList_res = await apiClient.get('/users/roles', {});
   return userRoleList_res.data.data;
 };
 

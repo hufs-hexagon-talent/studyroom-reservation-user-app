@@ -12,11 +12,14 @@ import {
   useNotVisitedState,
   useProcessedState,
   useAdminDeleteReservation,
+  useExportReservationExcel,
 } from '../../../api/reservation.api';
 import { Table, Checkbox, Modal, Button } from 'flowbite-react';
 import Edit from '../../../assets/icons/edit.png';
 import Delete from '../../../assets/icons/delete.png';
 import { HiOutlineExclamationCircle } from 'react-icons/hi';
+import 'react-datepicker/dist/react-datepicker.css';
+import { FaFileExcel } from 'react-icons/fa6';
 
 const ReservationState = () => {
   const navigate = useNavigate();
@@ -25,8 +28,13 @@ const ReservationState = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedRooms, setSelectedRooms] = useState([]);
   const [selectedReservationId, setSelectedReservationId] = useState(null);
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [selectedRoles, setSelectedRoles] = useState([]);
+
   const [openEditModal, setOpenEditModal] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [openExportModal, setOpenExportModal] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
@@ -43,6 +51,7 @@ const ReservationState = () => {
   const { mutateAsync: notVisitedState } = useNotVisitedState();
   const { mutateAsync: processedState } = useProcessedState();
 
+  const serviceRoles = ['NOT_VISITED', 'VISITED', 'PROCESSED'];
   const roomNameList = rooms?.map(room => room.roomName);
 
   const [openErrorSnackbar] = useSnackbar({
@@ -57,6 +66,18 @@ const ReservationState = () => {
       backgroundColor: '#4CAF50', // 초록색
     },
   });
+
+  // 선택된 serviceRoles 관리
+  const toggleRole = role => {
+    setSelectedRoles(prev =>
+      prev.includes(role) ? prev.filter(r => r !== role) : [...prev, role],
+    );
+  };
+
+  // UTC 변환 함수
+  const toISODateUTC = date => {
+    return format(date, "yyyy-MM-dd'T'00:00:00'Z'");
+  };
 
   // 출석 상태 변경
   const handleStateChange = async state => {
@@ -147,17 +168,29 @@ const ReservationState = () => {
           className="border border-gray-300 p-2 rounded"
         />
       </div>
-      {/* Filtering Checkbox */}
-      <div className="flex flex-row gap-x-6 items-center pt-4 pb-8">
-        {roomNameList?.map(room => (
-          <div key={room} className="flex flex-row gap-x-2 items-center">
-            <Checkbox
-              onChange={() => handleRoomSelect(room)}
-              className="rounded-none"
-            />
-            <div>{room}호</div>
+      <div className="flex flex-row items-center justify-between">
+        {/* Filtering Checkbox */}
+        <div className="flex flex-row gap-x-6 items-center pt-4 pb-8">
+          {roomNameList?.map(room => (
+            <div key={room} className="flex flex-row gap-x-2 items-center">
+              <Checkbox
+                onChange={() => handleRoomSelect(room)}
+                className="rounded-none"
+              />
+              <div>{room}호</div>
+            </div>
+          ))}
+        </div>
+        {/* Export Excel */}
+        <Button
+          onClick={setOpenExportModal}
+          className="cursor-pointer"
+          color="dark">
+          <div className="flex flex-row items-center gap-x-3">
+            <FaFileExcel />
+            <div>내보내기</div>
           </div>
-        ))}
+        </Button>
       </div>
       <div className="bg-white p-4 inline-block rounded-xl mb-8 hover:shadow-2xl w-full">
         <Table>
@@ -256,6 +289,65 @@ const ReservationState = () => {
             shape="rounded"
           />
         </div>
+      </div>
+
+      {/* 엑셀 내보내기 모달 */}
+      <div className="flex justify-center items-center">
+        <Modal
+          show={openExportModal}
+          onClose={() => setOpenExportModal(false)}
+          className="flex justify-center items-center w-full p-4 sm:p-0">
+          <Modal.Header>시작/종료 날짜 선택</Modal.Header>
+          <Modal.Body>
+            <div className="flex flex-col gap-y-6">
+              <div className="flex flex-row gap-x-3">
+                {serviceRoles.map(serviceRole => (
+                  <div
+                    key={serviceRole}
+                    className="flex items-center gap-2 mb-2">
+                    <Checkbox
+                      className="rounded-none"
+                      checked={selectedRoles.includes(serviceRole)}
+                      onChange={() => toggleRole(serviceRole)}
+                    />
+                    <div>{serviceRole}</div>
+                  </div>
+                ))}
+              </div>
+              <DatePicker
+                selectsRange
+                startDate={startDate}
+                endDate={endDate}
+                onChange={dates => {
+                  const [start, end] = dates;
+                  setStartDate(start);
+                  setEndDate(end);
+                }}
+                className="w-1/2"
+                dateFormat="yyyy년 MM월 dd일"
+                placeholderText="날짜를 선택하세요"
+                withPortal
+              />
+            </div>
+            <div className="flex justify-end">
+              <Button
+                color="dark"
+                onClick={() => {
+                  const params = {
+                    states: selectedRoles,
+                    startDateTime: startDate
+                      ? toISODateUTC(startDate)
+                      : undefined,
+                    endDateTime: endDate ? toISODateUTC(endDate) : undefined,
+                  };
+                  useExportReservationExcel(params); // 엑셀 내보내기 API 호출
+                  setOpenExportModal(false);
+                }}>
+                Export
+              </Button>
+            </div>
+          </Modal.Body>
+        </Modal>
       </div>
 
       <div className="flex justify-center items-center">

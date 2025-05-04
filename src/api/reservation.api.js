@@ -196,3 +196,29 @@ export const useReservationStatics = date => {
     queryFn: () => fetchReservationStatics(date),
   });
 };
+
+// [관리자] 예약 정보 Excel 내보내기
+export const useExportReservationExcel = async ({
+  states,
+  startDateTime,
+  endDateTime,
+}) => {
+  const params = new URLSearchParams();
+  states.forEach(state => params.append('states', state));
+  if (startDateTime) params.append('startDateTime', startDateTime);
+  if (endDateTime) params.append('endDateTime', endDateTime);
+
+  const reservationExcel = await apiClient.get(
+    `/reservations/export/excel?${params.toString()}`,
+    { responseType: 'blob' },
+  );
+
+  // 파일 저장 처리
+  const url = window.URL.createObjectURL(new Blob([reservationExcel.data]));
+  const link = document.createElement('a');
+  link.href = url;
+  link.setAttribute('download', 'reservations.xlsx'); // 파일명 지정
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+};
