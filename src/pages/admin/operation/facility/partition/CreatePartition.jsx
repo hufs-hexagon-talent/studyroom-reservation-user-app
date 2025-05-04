@@ -28,7 +28,7 @@ const CreatePartition = () => {
     },
   });
 
-  const groupedPartitions = partitions.reduce((acc, cur) => {
+  const groupedPartitions = partitions?.reduce((acc, cur) => {
     const key = cur.roomName;
     if (!acc[key]) acc[key] = [];
     acc[key].push(`${cur.roomName}-${cur.partitionNumber}`);
@@ -93,14 +93,15 @@ const CreatePartition = () => {
               <Table.HeadCell>파티션명</Table.HeadCell>
             </Table.Head>
             <Table.Body className="divide-y">
-              {Object.entries(groupedPartitions).map(
-                ([roomName, partitionList]) => (
-                  <Table.Row key={roomName}>
-                    <Table.Cell>{roomName}</Table.Cell>
-                    <Table.Cell>{partitionList.join(', ')}</Table.Cell>
-                  </Table.Row>
-                ),
-              )}
+              {groupedPartitions &&
+                Object.entries(groupedPartitions).map(
+                  ([roomName, partitionList]) => (
+                    <Table.Row key={roomName}>
+                      <Table.Cell>{roomName}</Table.Cell>
+                      <Table.Cell>{partitionList.join(', ')}</Table.Cell>
+                    </Table.Row>
+                  ),
+                )}
             </Table.Body>
           </Table>
         </div>
