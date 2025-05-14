@@ -70,3 +70,13 @@ export const usePartitionsByRoomIds = roomIds => {
     enabled: !!roomIds.length, // roomIds가 비어있지 않을 때만 쿼리 실행
   });
 };
+
+// [관리자] partition 삭제
+export const useDeletePartition = () => {
+  return useMutation({
+    mutationFn: async partitionId => {
+      const response = await apiClient.delete(`/partitions/${partitionId}`);
+      return response.data;
+    },
+  });
+};

@@ -213,11 +213,26 @@ export const useExportReservationExcel = async ({
     { responseType: 'blob' },
   );
 
-  // 파일 저장 처리
+  const formatDateForFilename = iso => {
+    if (!iso) return 'unknown';
+    const date = new Date(iso);
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}.${m}.${d}`;
+  };
+
+  const start = formatDateForFilename(startDateTime);
+  const end = formatDateForFilename(endDateTime);
+  const statePart = states.length > 0 ? states.join('&') : 'ALL';
+
+  const fileName = `${start}-${end}_${statePart}-Reservations.xlsx`;
+
+  // 파일 다운로드 처리
   const url = window.URL.createObjectURL(new Blob([reservationExcel.data]));
   const link = document.createElement('a');
   link.href = url;
-  link.setAttribute('download', 'reservations.xlsx'); // 파일명 지정
+  link.setAttribute('download', fileName);
   document.body.appendChild(link);
   link.click();
   link.remove();

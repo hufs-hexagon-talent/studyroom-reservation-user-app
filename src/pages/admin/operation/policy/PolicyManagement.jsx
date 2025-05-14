@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { format } from 'date-fns';
 import 'react-datepicker/dist/react-datepicker.css';
-import { Button, Table, TableBody, Modal } from 'flowbite-react';
+import { Button, Table, TableBody, Modal, Checkbox } from 'flowbite-react';
 
 import {
   useCreatePolicy,
@@ -9,7 +9,6 @@ import {
   useDeletePolicy,
 } from '../../../../api/roomOperationPolicy.api';
 import { useSnackbar } from 'react-simple-snackbar';
-import Delete from '../../../../assets/icons/delete.png';
 import UnderArrow from '../../../../assets/icons/under_arrow_black.png';
 import TimeSelector from '../../../../components/clock/TimeRangeSelector';
 import TimeSlider from '../../../../components/clock/TimeSlider';
@@ -19,6 +18,7 @@ const PolicyManagement = () => {
   const [endTime, setEndTime] = useState(new Date());
   const [eachMaxMinute, setEachMaxMinute] = useState(60);
   const [isGetPolicies, setIsGetPolicies] = useState(false);
+  const [selectedPolicyId, setSelectedPolicyId] = useState(null);
   const [openDeleteModal, setOpenDeleteModal] = useState(null);
   const { mutateAsync: doCreatePolicy } = useCreatePolicy();
   const { mutateAsync: doDeletePolicy } = useDeletePolicy();
@@ -101,7 +101,7 @@ const PolicyManagement = () => {
           <div className="flex justify-end pt-8">
             <Button
               onClick={createPolicy}
-              className=" bg-gray-600 px-6 hover:bg-gray-700 text-white rounded disabled:bg-gray-200">
+              className=" bg-gray-800 px-6 hover:bg-gray-700 text-white rounded disabled:bg-gray-200">
               생성
             </Button>
           </div>
@@ -110,46 +110,55 @@ const PolicyManagement = () => {
 
       {/* 모든 정책 조회 */}
       <div className="bg-white p-4 inline-block rounded-xl mb-8 hover:shadow-lg w-full">
-        <div className="flex flex-row items-center">
+        <div className="flex flex-row items-center justify-between">
           <div className="text-xl p-6 font-bold">모든 정책 조회</div>
-          <img
-            onClick={() => setIsGetPolicies(!isGetPolicies)}
-            className={`w-6 h-6 cursor-pointer transition-transform duration-300 hover:scale-125 ${isGetPolicies ? 'rotate-180' : ''}`}
-            src={UnderArrow}
-          />
-        </div>
-        {isGetPolicies && (
           <div>
-            <Table className="text-center">
-              <Table.Head>
-                <Table.HeadCell>정책 ID</Table.HeadCell>
-                <Table.HeadCell>시작 시각</Table.HeadCell>
-                <Table.HeadCell>종료 시각</Table.HeadCell>
-                <Table.HeadCell>최대 이용 시간</Table.HeadCell>
-                <Table.HeadCell></Table.HeadCell>
-              </Table.Head>
-              <TableBody>
-                {policies?.map(policy => (
-                  <Table.Row key={policy.roomOperationPolicyId}>
-                    <Table.Cell>{policy.roomOperationPolicyId}</Table.Cell>
-                    <Table.Cell>{policy.operationStartTime}</Table.Cell>
-                    <Table.Cell>{policy.operationEndTime}</Table.Cell>
-                    <Table.Cell>{policy.eachMaxMinute}</Table.Cell>
-                    <Table.Cell>
-                      <img
-                        onClick={() =>
-                          setOpenDeleteModal(policy.roomOperationPolicyId)
-                        }
-                        className="w-5 h-6 cursor-pointer"
-                        src={Delete}
-                      />
-                    </Table.Cell>
-                  </Table.Row>
-                ))}
-              </TableBody>
-            </Table>
+            {selectedPolicyId && (
+              <Button
+                onClick={() => setOpenDeleteModal(selectedPolicyId)}
+                color="dark"
+                className="hover:bg-gray-700 text-white rounded">
+                삭제
+              </Button>
+            )}
           </div>
-        )}
+        </div>
+        <div>
+          <Table className="text-center">
+            <Table.Head>
+              <Table.HeadCell></Table.HeadCell>
+              <Table.HeadCell>정책 ID</Table.HeadCell>
+              <Table.HeadCell>시작 시각</Table.HeadCell>
+              <Table.HeadCell>종료 시각</Table.HeadCell>
+              <Table.HeadCell>최대 이용 시간</Table.HeadCell>
+            </Table.Head>
+            <TableBody>
+              {policies?.map(policy => (
+                <Table.Row key={policy.roomOperationPolicyId}>
+                  <Table.Cell>
+                    <Checkbox
+                      className="rounded-none"
+                      checked={
+                        selectedPolicyId === policy.roomOperationPolicyId
+                      }
+                      onChange={() => {
+                        setSelectedPolicyId(prev =>
+                          prev === policy.roomOperationPolicyId
+                            ? null
+                            : policy.roomOperationPolicyId,
+                        );
+                      }}
+                    />
+                  </Table.Cell>
+                  <Table.Cell>{policy.roomOperationPolicyId}</Table.Cell>
+                  <Table.Cell>{policy.operationStartTime}</Table.Cell>
+                  <Table.Cell>{policy.operationEndTime}</Table.Cell>
+                  <Table.Cell>{policy.eachMaxMinute}</Table.Cell>
+                </Table.Row>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </div>
 
       <div className="flex justify-center items-center">

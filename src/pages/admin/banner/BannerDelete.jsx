@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import { Checkbox, Label } from 'flowbite-react';
+import { Button, Checkbox, Label } from 'flowbite-react';
 import { useSnackbar } from 'react-simple-snackbar';
 import { useDeleteBanner } from '../../../api/banner.api';
-import Delete from '../../../assets/icons/delete.png';
 import { useActivatedBanner } from '../../../api/banner.api';
 
 const BannerDelete = () => {
@@ -46,20 +45,26 @@ const BannerDelete = () => {
 
   return (
     <div className="max-w-[400px] flex flex-col px-4 gap-6">
-      <div className="flex flex-row items-center gap-x-6">
+      <div className="flex flex-row items-center justify-between">
         <div className="font-bold text-3xl text-black px-4 py-8">
           Delete Banner
         </div>
-        <img
-          onClick={deleteBanner}
-          className="w-6 h-7 cursor-pointer hover:scale-125"
-          src={Delete}
-        />
+        {bannerId && (
+          <div className="flex justify-end pr-4">
+            <Button
+              onClick={deleteBanner}
+              color="dark"
+              className="text-white rounded hover:bg-gray-600 transition">
+              삭제
+            </Button>
+          </div>
+        )}
       </div>
       <div className="flex flex-col items-center gap-4">
         {activatedBanner?.map((banner, index) => (
           <div key={index} className="flex items-center gap-4">
             <Checkbox
+              className="rounded-none"
               id={`checkbox-${index}`}
               checked={bannerId === banner.bannerId}
               onChange={() => handleCheckboxChange(banner.bannerId)}

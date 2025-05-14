@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   useCreateRoom,
   useAllRooms,
@@ -6,20 +7,20 @@ import {
   usePartitionsByRoomId,
 } from '../../../../../api/room.api';
 import { useSnackbar } from 'react-simple-snackbar';
-import { Table, TableBody, Modal } from 'flowbite-react';
+import { Table, TableBody, Modal, Checkbox, Button } from 'flowbite-react';
 import { Input } from '@mui/material';
 
 import Create from '../../../../../assets/icons/create.png';
-import Delete from '../../../../../assets/icons/delete.png';
 
 const CreateRoom = () => {
+  const navigate = useNavigate();
   const [roomName, setRoomName] = useState('');
   const [departmentId, setDepartmentId] = useState(null);
+  const [selectedRoomId, setSelectedRoomId] = useState(null);
   const [openPartitionsModal, setOpenPartitionsModal] = useState(null);
   const { mutateAsync: doCreateRoom } = useCreateRoom();
   const { mutateAsync: doDeleteRoom } = useDeleteRoom();
   const { data: roomPartitions } = usePartitionsByRoomId(openPartitionsModal);
-
   const { data: rooms, refetch } = useAllRooms();
 
   const [openSuccessSnackbar] = useSnackbar({
@@ -96,34 +97,53 @@ const CreateRoom = () => {
       </div>
       {/* 모든 Room 조회 */}
       <div className="bg-white p-4 mb-8 inline-block rounded-xl w-full">
-        <div className="flex flex-row items-center gap-x-4 px-6 pt-3 pb-6">
+        <div className="flex flex-row justify-between items-center gap-x-4 px-6 pt-3 pb-6">
           <div className="font-bold text-xl">모든 Room 조회 및 삭제</div>
+          {selectedRoomId && (
+            <Button
+              color="dark"
+              onClick={() => {
+                deleteRoom(selectedRoomId);
+                setSelectedRoomId(null);
+              }}>
+              삭제
+            </Button>
+          )}
         </div>
         <div>
           <Table className="text-lg text-center">
             <Table.Head className="text-lg">
-              <Table.HeadCell>호실 ID</Table.HeadCell>
-              <Table.HeadCell>호실명</Table.HeadCell>
-              <Table.HeadCell>부서명</Table.HeadCell>
-              <Table.HeadCell></Table.HeadCell>
+              <Table.HeadCell className="bg-gray-200"></Table.HeadCell>
+              <Table.HeadCell className="bg-gray-200">호실 ID</Table.HeadCell>
+              <Table.HeadCell className="bg-gray-200">호실명</Table.HeadCell>
+              <Table.HeadCell className="bg-gray-200">부서명</Table.HeadCell>
             </Table.Head>
             <TableBody>
               {rooms?.map(room => (
-                <Table.Row key={room.roomId}>
+                <Table.Row
+                  className="cursor-pointer hover:bg-gray-50"
+                  key={room.roomId}>
+                  <Table.Cell>
+                    <Checkbox
+                      className="rounded-none"
+                      checked={selectedRoomId === room.roomId}
+                      onChange={() => {
+                        setSelectedRoomId(prev =>
+                          prev === room.roomId ? null : room.roomId,
+                        );
+                      }}
+                    />
+                  </Table.Cell>
                   <Table.Cell
-                    onClick={() => setOpenPartitionsModal(room.roomId)}
+                    onClick={() => {
+                      navigate(`/divide/facility/room/${room.roomId}`);
+                      setOpenPartitionsModal(room.roomId);
+                    }}
                     className="cursor-pointer hover:underline">
                     {room.roomId}
                   </Table.Cell>
                   <Table.Cell>{room.roomName}</Table.Cell>
                   <Table.Cell>{room ? room.departmentName : '-'}</Table.Cell>
-                  <Table.Cell>
-                    <img
-                      onClick={() => deleteRoom({ roomId: room.roomId })}
-                      className="w-6 h-6 cursor-pointer"
-                      src={Delete}
-                    />
-                  </Table.Cell>
                 </Table.Row>
               ))}
             </TableBody>

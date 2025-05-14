@@ -8,7 +8,7 @@ import {
   useAdminDeleteReservation,
 } from '../../../api/reservation.api';
 import { format } from 'date-fns';
-import { Button, Table, Modal } from 'flowbite-react';
+import { Button, Checkbox, Table, Modal } from 'flowbite-react';
 import { HiOutlineExclamationCircle } from 'react-icons/hi';
 import { useSnackbar } from 'react-simple-snackbar';
 import { Pagination } from '@mui/material';
@@ -20,7 +20,8 @@ const FetchReservations = () => {
   const { mutateAsync: processedState } = useProcessedState();
   const { mutate: doDelete } = useAdminDeleteReservation();
   const { data: fetchedReservations, refetch } = useReservationsById(id);
-
+  const [selectedReservationIdForDelete, setSelectedReservationIdForDelete] =
+    useState(null);
   const [openDeleteModal, setOpenDeleteModal] = useState(null);
   const [openEditModal, setOpenEditModal] = useState(null);
   const [selectedReservationId, setSelectedReservationId] = useState(null);
@@ -57,6 +58,7 @@ const FetchReservations = () => {
             reservation => reservation.reservationId !== reservationId,
           ),
         );
+        openSuccessSnackbar('예약 삭제 성공', 3000);
       },
       onError: err => {
         setError('예약 삭제 실패');
@@ -97,18 +99,30 @@ const FetchReservations = () => {
 
   return (
     <div className="overflow-x-auto">
-      <h1 className="flex justify-center text-2xl m-10">
-        {reservations[0]?.name}님의 예약
-      </h1>
+      <div className="flex justify-between items-center pt-8">
+        <h1 className="text-3xl mx-4">
+          <strong>{reservations[0]?.name}</strong>님의 예약
+        </h1>
+        {selectedReservationIdForDelete && (
+          <Button
+            color="dark"
+            onClick={() => {
+              setSelectedReservationId(selectedReservationIdForDelete); // 삭제 대상 설정
+              setOpenDeleteModal(true); // 모달만 열기
+            }}>
+            삭제
+          </Button>
+        )}
+      </div>
       <Table className="my-10">
         <Table.Head className="break-keep text-center">
+          <Table.HeadCell></Table.HeadCell>
           <Table.HeadCell>출석 상태</Table.HeadCell>
           <Table.HeadCell>예약 ID</Table.HeadCell>
           <Table.HeadCell>호실</Table.HeadCell>
           <Table.HeadCell>날짜</Table.HeadCell>
           <Table.HeadCell>시작 시간</Table.HeadCell>
           <Table.HeadCell>종료 시간</Table.HeadCell>
-          <Table.HeadCell>예약 삭제</Table.HeadCell>
           <Table.HeadCell>출석 상태 변경</Table.HeadCell>
         </Table.Head>
         <Table.Body className="divide-y text-center">
@@ -118,6 +132,22 @@ const FetchReservations = () => {
               <Table.Row
                 key={reservation.reservationId}
                 className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                <Table.Cell>
+                  <Checkbox
+                    className="rounded-none"
+                    checked={
+                      selectedReservationIdForDelete ===
+                      reservation.reservationId
+                    }
+                    onChange={() => {
+                      setSelectedReservationIdForDelete(prev =>
+                        prev === reservation.reservationId
+                          ? null
+                          : reservation.reservationId,
+                      );
+                    }}
+                  />
+                </Table.Cell>
                 <Table.Cell>{reservation.reservationState}</Table.Cell>
                 <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
                   {reservation.reservationId}
@@ -136,14 +166,6 @@ const FetchReservations = () => {
                 </Table.Cell>
                 <Table.Cell>
                   {format(new Date(reservation.reservationEndTime), 'HH:mm')}
-                </Table.Cell>
-                <Table.Cell
-                  onClick={() => {
-                    setSelectedReservationId(reservation.reservationId);
-                    setOpenDeleteModal(true);
-                  }}
-                  className="cursor-pointer text-red-600 hover:underline font-bold">
-                  삭제
                 </Table.Cell>
                 <Table.Cell>
                   <a
