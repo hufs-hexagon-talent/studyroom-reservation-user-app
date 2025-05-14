@@ -47,12 +47,6 @@ const PolicyManagement = () => {
         eachMaxMinute: eachMaxMinute,
       });
       refetch();
-      console.log(
-        response?.data.roomOperationPolicyId,
-        response?.data.operationStartTime,
-        response?.data.operationEndTime,
-        response?.data.eachMaxMinute,
-      );
       openSuccessSnackbar(response?.message, 3000);
     } catch (error) {
       openErrorSnackbar(
