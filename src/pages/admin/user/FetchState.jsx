@@ -9,6 +9,7 @@ import {
   exportUserExcel,
 } from '../../../api/user.api';
 import { useSnackbar } from 'react-simple-snackbar';
+import { FaFileExcel } from 'react-icons/fa6';
 
 const FetchState = () => {
   const { data: allUsers } = useAllUsers();
@@ -98,7 +99,7 @@ const FetchState = () => {
                 <Checkbox
                   checked={selectedRoles.includes(role)}
                   onChange={() => handleRoleSelect(role)}
-                  className="rounded-none"
+                  className="rounded-none text-[#1D2430] focus:ring-[#1D2430]"
                 />
                 <div>{role}</div>
               </div>
@@ -114,7 +115,10 @@ const FetchState = () => {
               }
               exportUserExcel(selectedRoles);
             }}>
-            내보내기
+            <div className="flex flex-row gap-x-3 items-center">
+              <FaFileExcel />
+              <div>내보내기</div>
+            </div>
           </Button>
         </div>
         {/* Users Table */}

@@ -29,7 +29,7 @@ const ScheduleDelete = () => {
         <Button color="dark">삭제</Button>
       </div>
       <div className="bg-white rounded-xl">
-        <div>hi</div>
+        <div>todo</div>
       </div>
     </div>
   );

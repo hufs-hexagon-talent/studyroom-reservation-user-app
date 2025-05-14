@@ -84,7 +84,7 @@ const PolicyManagement = () => {
         Policy Management
       </div>
       {/* 정책 생성 */}
-      <div className="bg-white p-8 inline-block rounded-xl mb-8 hover:shadow-lg w-full">
+      <div className="bg-white p-8 inline-block rounded-xl mb-8 shadow-md w-full">
         <div className="text-2xl font-semibold">정책 생성</div>
         <div className="w-2/3 space-y-2 px-4">
           <div className="flex flex-row items-center justify-between">
@@ -109,7 +109,7 @@ const PolicyManagement = () => {
       </div>
 
       {/* 모든 정책 조회 */}
-      <div className="bg-white p-4 inline-block rounded-xl mb-8 hover:shadow-lg w-full">
+      <div className="bg-white p-4 inline-block rounded-xl mb-8 shadow-md w-full">
         <div className="flex flex-row items-center justify-between">
           <div className="text-xl p-6 font-bold">모든 정책 조회</div>
           <div>
@@ -137,7 +137,7 @@ const PolicyManagement = () => {
                 <Table.Row key={policy.roomOperationPolicyId}>
                   <Table.Cell>
                     <Checkbox
-                      className="rounded-none"
+                      className="rounded-none text-[#1D2430] focus:ring-[#1D2430]"
                       checked={
                         selectedPolicyId === policy.roomOperationPolicyId
                       }

@@ -48,7 +48,7 @@ const EditRoom = () => {
         )}
       </div>
 
-      <Table>
+      <Table className="shadow-md">
         <Table.Head className="text-lg break-keep">
           <Table.HeadCell className="bg-gray-200"></Table.HeadCell>
           <Table.HeadCell className="bg-gray-200">파티션ID</Table.HeadCell>
@@ -61,7 +61,7 @@ const EditRoom = () => {
               key={roomPartition.roomPartitionId}>
               <Table.Cell>
                 <Checkbox
-                  className="rounded-none"
+                  className="rounded-none text-[#1D2430] focus:ring-[#1D2430]"
                   checked={
                     selectedPartitionId === roomPartition.roomPartitionId
                   }

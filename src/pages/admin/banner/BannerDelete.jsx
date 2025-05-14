@@ -64,7 +64,7 @@ const BannerDelete = () => {
         {activatedBanner?.map((banner, index) => (
           <div key={index} className="flex items-center gap-4">
             <Checkbox
-              className="rounded-none"
+              className="rounded-none text-[#1D2430] focus:ring-[#1D2430]"
               id={`checkbox-${index}`}
               checked={bannerId === banner.bannerId}
               onChange={() => handleCheckboxChange(banner.bannerId)}

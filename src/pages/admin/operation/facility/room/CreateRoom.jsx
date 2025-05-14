@@ -71,12 +71,12 @@ const CreateRoom = () => {
   };
 
   return (
-    <div className="p-4">
-      <div className="font-bold text-3xl text-gray-600 mb-6">Room</div>
+    <div className="p-4 flex flex-col">
+      <div className="font-bold text-3xl mb-6">Room</div>
       {/* Room 생성 */}
-      <div className="bg-white p-4 inline-block rounded-xl mb-8 w-full">
+      <div className="bg-white xl:w-1/2 p-4 shadow-md inline-block rounded-xl mb-8 w-full">
         {/* Room 선택 */}
-        <div className="flex flex-row items-center justify-between">
+        <div className="flex flex-row items-center">
           <div className="font-bold text-xl p-3">Room 생성</div>
           <img
             src={Create}
@@ -110,7 +110,7 @@ const CreateRoom = () => {
                   }>
                   <Table.Cell>
                     <Checkbox
-                      className="rounded-none"
+                      className="rounded-none text-[#1D2430] focus:ring-[#1D2430]"
                       checked={departmentId === department.departmentId}
                       onChange={() =>
                         setDepartmentId(prev =>
@@ -130,7 +130,7 @@ const CreateRoom = () => {
         </div>
       </div>
       {/* 모든 Room 조회 */}
-      <div className="bg-white p-4 mb-8 inline-block rounded-xl w-full">
+      <div className="bg-white xl:w-1/2 shadow-md p-4 mb-8 inline-block rounded-xl w-full">
         <div className="flex flex-row justify-between items-center gap-x-4 px-6 pt-3 pb-6">
           <div className="font-bold text-xl">모든 Room 조회 및 삭제</div>
           {/* 삭제 버튼 */}
@@ -158,9 +158,10 @@ const CreateRoom = () => {
                 <Table.Row
                   className="cursor-pointer hover:bg-gray-50"
                   key={room.roomId}>
+                  {/* className="rounded-none text-[#f97316] focus:ring-[#f97316] cursor-pointer" */}
                   <Table.Cell>
                     <Checkbox
-                      className="rounded-none"
+                      className="rounded-none text-[#1D2430] focus:ring-[#1D2430]"
                       checked={selectedRoomId === room.roomId}
                       onChange={() => {
                         setSelectedRoomId(prev =>

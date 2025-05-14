@@ -55,7 +55,7 @@ const ScheduleFetch = () => {
       <div className="font-bold text-3xl text-black px-4 py-8">
         Fetch Schedule
       </div>
-      <div className="bg-white p-8 lg:w-1/2 rounded-xl ">
+      <div className="bg-white shadow-md p-8 lg:w-1/2 rounded-xl ">
         <div className="font-bold text-xl">현재 운영 정책이 설정된 날짜</div>
         <div className="mt-8">
           <Table className="mx-auto">

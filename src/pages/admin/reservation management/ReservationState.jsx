@@ -16,7 +16,6 @@ import {
 } from '../../../api/reservation.api';
 import { Table, Checkbox, Modal, Button } from 'flowbite-react';
 import Edit from '../../../assets/icons/edit.png';
-import Delete from '../../../assets/icons/delete.png';
 import { HiOutlineExclamationCircle } from 'react-icons/hi';
 import 'react-datepicker/dist/react-datepicker.css';
 import { FaFileExcel } from 'react-icons/fa6';
@@ -176,7 +175,7 @@ const ReservationState = () => {
             <div key={room} className="flex flex-row gap-x-2 items-center">
               <Checkbox
                 onChange={() => handleRoomSelect(room)}
-                className="rounded-none"
+                className="rounded-none text-[#1D2430] focus:ring-[#1D2430]"
               />
               <div>{room}호</div>
             </div>
@@ -208,7 +207,7 @@ const ReservationState = () => {
           </Button>
         </div>
       </div>
-      <div className="bg-white p-4 inline-block rounded-xl mb-8 hover:shadow-2xl w-full">
+      <div className="bg-white p-4 inline-block rounded-xl mb-8 shadow-md w-full">
         <Table>
           <Table.Head className="break-keep text-center">
             <Table.HeadCell></Table.HeadCell>
@@ -235,7 +234,7 @@ const ReservationState = () => {
                 <Table.Row key={reservation.reservationId}>
                   <Table.Cell>
                     <Checkbox
-                      className="rounded-none"
+                      className="rounded-none text-[#1D2430] focus:ring-[#1D2430]"
                       checked={
                         selectedReservationIdForDelete ===
                         reservation.reservationId
