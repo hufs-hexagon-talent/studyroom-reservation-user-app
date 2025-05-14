@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import {
   HiChartPie,
   HiUser,
@@ -8,9 +7,103 @@ import {
   HiCalendar,
   HiFilm,
 } from 'react-icons/hi';
+import { AnimatePresence, motion } from 'framer-motion';
 
-const SidebarSection = ({ icon: Icon, label, children }) => {
+const menuData = [
+  {
+    label: '통계 및 현황',
+    icon: HiChartPie,
+    children: [
+      { label: '사용자 통계', to: '/divide/user-statics' },
+      { label: '예약 통계', to: '/divide/reservation-statics' },
+    ],
+  },
+  {
+    label: '사용자 관리',
+    icon: HiUser,
+    children: [
+      { label: '사용자 목록', to: '/divide/serialCheck' },
+      { label: '사용자 상태 관리', to: '/divide/user-state' },
+    ],
+  },
+  {
+    label: '예약 관리',
+    icon: HiClipboardCheck,
+    children: [{ label: '예약 상태 관리', to: '/divide/reservation-state' }],
+  },
+  {
+    label: '운영 관리',
+    icon: HiCalendar,
+    children: [
+      { label: '정책 관리', to: '/divide/policy' },
+      {
+        label: '운영 시간 관리',
+        children: [
+          { label: '스케줄 생성', to: '/divide/schedule/create' },
+          { label: '스케줄 삭제', to: '/divide/schedule/delete' },
+          { label: '스케줄 조회', to: '/divide/schedule/fetch' },
+        ],
+      },
+      {
+        label: '시설 관리',
+        children: [
+          { label: 'Room', to: '/divide/facility/room' },
+          { label: 'Partition', to: '/divide/facility/partition' },
+        ],
+      },
+    ],
+  },
+  {
+    label: '배너 관리',
+    icon: HiFilm,
+    children: [
+      { label: '배너 생성', to: '/divide/banner/create' },
+      { label: '배너 조회', to: '/divide/banner/fetch' },
+      { label: '배너 수정', to: '/divide/banner/edit' },
+      { label: '배너 삭제', to: '/divide/banner/delete' },
+    ],
+  },
+];
+
+const SidebarItem = ({ item, depth = 1 }) => {
   const [open, setOpen] = useState(false);
+  const hasChildren = Array.isArray(item.children) && item.children.length > 0;
+  const padding = `pl-${depth * 4}`;
+
+  return (
+    <li className={`${padding} py-2`}>
+      {hasChildren ? (
+        <button className="w-full text-left" onClick={() => setOpen(!open)}>
+          {item.label}
+        </button>
+      ) : item.to ? (
+        <Link to={item.to} className="block">
+          {item.label}
+        </Link>
+      ) : (
+        <span className="block text-gray-400 cursor-not-allowed">
+          {item.label}
+        </span>
+      )}
+
+      {hasChildren && open && (
+        <motion.ul
+          initial={{ height: 0, opacity: 0 }}
+          animate={{ height: 'auto', opacity: 1 }}
+          exit={{ height: 0, opacity: 0 }}
+          className="mt-1">
+          {item.children.map((child, index) => (
+            <SidebarItem key={index} item={child} depth={depth + 1} />
+          ))}
+        </motion.ul>
+      )}
+    </li>
+  );
+};
+
+const SidebarSection = ({ section }) => {
+  const [open, setOpen] = useState(false);
+  const Icon = section.icon;
 
   return (
     <div>
@@ -18,70 +111,47 @@ const SidebarSection = ({ icon: Icon, label, children }) => {
         className="w-full flex items-center px-4 py-2 hover:bg-gray-200"
         onClick={() => setOpen(!open)}>
         <Icon className="mr-2" />
-        <span>{label}</span>
+        <span>{section.label}</span>
       </button>
-      {open && <div className="ml-6">{children}</div>}
+      {open && (
+        <div className="ml-4">
+          <ul>
+            {section.children.map((child, index) => (
+              <SidebarItem key={index} item={child} />
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 };
 
-const SidebarSubSection = ({ label, children }) => (
-  <div className="ml-4">
-    <div className="px-4 py-2 text-sm text-gray-800">{label}</div>
-    <div className="ml-2">{children}</div>
-  </div>
-);
-
-const SidebarItem = ({ to, children }) => (
-  <Link
-    to={to}
-    className="block px-4 py-2 text-sm hover:bg-gray-100 text-gray-800">
-    {children}
-  </Link>
-);
-
-const CustomSidebar = () => {
+const CustomSidebar = ({ isVisible = true }) => {
   return (
-    <motion.div
-      initial={{ x: -300, opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      exit={{ x: -300, opacity: 0 }}
-      transition={{ type: 'spring', stiffness: 200, damping: 30 }}
-      className="w-64 h-full bg-white py-4">
-      <SidebarSection icon={HiChartPie} label="통계 및 현황">
-        <SidebarItem to="/divide/user-statics">사용자 통계</SidebarItem>
-        <SidebarItem to="/divide/reservation-statics">예약 통계</SidebarItem>
-      </SidebarSection>
-
-      <SidebarSection icon={HiUser} label="사용자 관리">
-        <SidebarItem to="/divide/serialCheck">사용자 목록</SidebarItem>
-        <SidebarItem to="/divide/user-state">사용자 상태 관리</SidebarItem>
-      </SidebarSection>
-
-      <SidebarSection icon={HiClipboardCheck} label="예약 관리">
-        <SidebarItem to="/divide/reservation-state">예약 상태 관리</SidebarItem>
-      </SidebarSection>
-
-      <SidebarSection icon={HiCalendar} label="운영 관리">
-        <SidebarItem to="/divide/policy">정책 관리</SidebarItem>
-        <SidebarSubSection label="운영 시간 관리">
-          <SidebarItem to="/divide/schedule/create">스케줄 생성</SidebarItem>
-          <SidebarItem to="/divide/schedule/delete">스케줄 삭제</SidebarItem>
-          <SidebarItem to="/divide/schedule/fetch">스케줄 조회</SidebarItem>
-        </SidebarSubSection>
-        <SidebarSubSection label="시설 관리">
-          <SidebarItem to="/divide/facility/room">Room</SidebarItem>
-          <SidebarItem to="/divide/facility/partition">Partition</SidebarItem>
-        </SidebarSubSection>
-      </SidebarSection>
-
-      <SidebarSection icon={HiFilm} label="배너 관리">
-        <SidebarItem to="/divide/banner/create">배너 생성</SidebarItem>
-        <SidebarItem to="/divide/banner/fetch">배너 조회</SidebarItem>
-        <SidebarItem to="/divide/banner/edit">배너 수정</SidebarItem>
-        <SidebarItem to="/divide/banner/delete">배너 삭제</SidebarItem>
-      </SidebarSection>
-    </motion.div>
+    <AnimatePresence mode="wait">
+      {isVisible && (
+        <motion.div
+          key="sidebar"
+          initial={{ x: -300, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          exit={{ x: -300, opacity: 0 }}
+          transition={{ type: 'spring', stiffness: 200, damping: 30 }}
+          className="w-64 h-full bg-white overflow-y-auto">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.1 }} // 빠르게 같이 사라지게
+            className="py-4">
+            <div className="mt-4">
+              {menuData.map((section, index) => (
+                <SidebarSection key={index} section={section} />
+              ))}
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 };
 
