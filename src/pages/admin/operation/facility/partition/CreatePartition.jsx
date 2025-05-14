@@ -1,17 +1,21 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   useCreatePartition,
   useAllPartitions,
 } from '../../../../../api/roomPartition.api';
+import { useAllRooms } from '../../../../../api/room.api';
 import { Input } from '@mui/material';
 import { useSnackbar } from 'react-simple-snackbar';
 import Create from '../../../../../assets/icons/create.png';
 import { Table } from 'flowbite-react';
 
 const CreatePartition = () => {
+  const navigate = useNavigate();
   const [roomId, setRoomId] = useState(null);
   const [partitionNumber, setPartitionNumber] = useState(null);
-  const { data: partitions } = useAllPartitions();
+  const { data: partitions, refetch } = useAllPartitions();
+  const { data: rooms } = useAllRooms();
   const { mutateAsync: doCreatePartition } = useCreatePartition();
 
   const [openSuccessSnackbar] = useSnackbar({
@@ -39,6 +43,7 @@ const CreatePartition = () => {
   const createPartition = async () => {
     try {
       const response = await doCreatePartition({ roomId, partitionNumber });
+      await refetch();
       openSuccessSnackbar(response?.message, 3000);
     } catch (error) {
       openErrorSnackbar(error.response.data.message, 3000);
@@ -46,13 +51,11 @@ const CreatePartition = () => {
   };
 
   return (
-    <div>
+    <div className="flex flex-col">
       {/* Partition */}
-      <div className="font-bold text-3xl text-gray-600 mt-10 mb-6">
-        Partition
-      </div>
+      <div className="font-bold text-3xl mt-10 mb-6">Partition</div>
       {/* 파티션 생성 */}
-      <div className="bg-white p-4 mb-8 inline-block rounded-xl w-full">
+      <div className="bg-white  xl:w-1/2 p-4 mb-8 inline-block shadow-md rounded-xl w-full">
         <div className="flex flex-row items-center gap-x-6">
           <div className="font-bold text-xl p-3">Partition 생성</div>
           {/* Partition 생성 버튼 */}
@@ -84,23 +87,35 @@ const CreatePartition = () => {
         </div>
       </div>
       {/* 파티션 조회 */}
-      <div className="bg-white p-4 mb-8 inline-block rounded-xl w-full">
+      <div className="bg-white xl:w-1/2  p-4 mb-8 inline-block shadow-md rounded-xl w-full">
         <div className="font-bold text-xl p-3">Partition 조회</div>
         <div>
           <Table className="text-lg">
             <Table.Head className="text-lg">
-              <Table.HeadCell>호실명</Table.HeadCell>
-              <Table.HeadCell>파티션명</Table.HeadCell>
+              <Table.HeadCell className="bg-gray-200">호실명</Table.HeadCell>
+              <Table.HeadCell className="bg-gray-200">파티션명</Table.HeadCell>
             </Table.Head>
             <Table.Body className="divide-y">
               {groupedPartitions &&
                 Object.entries(groupedPartitions).map(
-                  ([roomName, partitionList]) => (
-                    <Table.Row key={roomName}>
-                      <Table.Cell>{roomName}</Table.Cell>
-                      <Table.Cell>{partitionList.join(', ')}</Table.Cell>
-                    </Table.Row>
-                  ),
+                  ([roomName, partitionList]) => {
+                    const matchedRoom = rooms?.find(
+                      room => room.roomName === roomName,
+                    );
+                    const matchedRoomId = matchedRoom?.roomId;
+
+                    return (
+                      <Table.Row
+                        onClick={() => {
+                          navigate(`/divide/facility/room/${matchedRoomId}`);
+                        }}
+                        key={roomName}
+                        className="cursor-pointer hover:bg-gray-50">
+                        <Table.Cell>{roomName}</Table.Cell>
+                        <Table.Cell>{partitionList.join(', ')}</Table.Cell>
+                      </Table.Row>
+                    );
+                  },
                 )}
             </Table.Body>
           </Table>

@@ -77,7 +77,7 @@ const SelectRoom = ({
             .map(room => (
               <div key={room.roomId} className="flex items-center mb-3">
                 <Checkbox
-                  className="rounded-none text-[#f97316] focus:ring-[#f97316] cursor-pointer"
+                  className="rounded-none text-[#1D2430] focus:ring-[#1D2430] cursor-pointer"
                   id={room.roomId}
                   checked={selectedRooms.includes(room.roomId)}
                   onChange={() => handleRoomCheckbox(room.roomId)}

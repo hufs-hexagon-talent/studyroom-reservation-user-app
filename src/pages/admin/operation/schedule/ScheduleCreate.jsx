@@ -27,9 +27,10 @@ const ScheduleCreate = () => {
       </div>
       <div className="flex flex-col gap-y-6">
         {/* 스케줄 설정 */}
-        <div className="bg-white rounded-xl hover:shadow-2xl px-6 pt-4 pb-8">
+        <div className="bg-white rounded-xl shadow-md px-6 pt-4 pb-8">
           <div className="font-bold py-6 px-6 text-xl">스케줄 설정</div>
           <div className="px-4 pb-2">
+            {/* todo: 스케줄 설정 옆에 놓게 */}
             <SelectRoom
               selectedRooms={selectedRooms}
               setSelectedRooms={setSelectedRooms}

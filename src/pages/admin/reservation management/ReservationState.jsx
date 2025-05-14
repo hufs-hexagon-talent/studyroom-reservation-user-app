@@ -16,7 +16,6 @@ import {
 } from '../../../api/reservation.api';
 import { Table, Checkbox, Modal, Button } from 'flowbite-react';
 import Edit from '../../../assets/icons/edit.png';
-import Delete from '../../../assets/icons/delete.png';
 import { HiOutlineExclamationCircle } from 'react-icons/hi';
 import 'react-datepicker/dist/react-datepicker.css';
 import { FaFileExcel } from 'react-icons/fa6';
@@ -31,7 +30,8 @@ const ReservationState = () => {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [selectedRoles, setSelectedRoles] = useState([]);
-
+  const [selectedReservationIdForDelete, setSelectedReservationIdForDelete] =
+    useState(null);
   const [openEditModal, setOpenEditModal] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [openExportModal, setOpenExportModal] = useState(false);
@@ -175,33 +175,48 @@ const ReservationState = () => {
             <div key={room} className="flex flex-row gap-x-2 items-center">
               <Checkbox
                 onChange={() => handleRoomSelect(room)}
-                className="rounded-none"
+                className="rounded-none text-[#1D2430] focus:ring-[#1D2430]"
               />
               <div>{room}호</div>
             </div>
           ))}
         </div>
-        {/* Export Excel */}
-        <Button
-          onClick={setOpenExportModal}
-          className="cursor-pointer"
-          color="dark">
-          <div className="flex flex-row items-center gap-x-3">
-            <FaFileExcel />
-            <div>내보내기</div>
-          </div>
-        </Button>
+        <div className="flex space-x-4 items-center">
+          {/* 예약 삭제 */}
+          {selectedReservationIdForDelete && (
+            <div className="flex justify-end">
+              <Button
+                color="dark"
+                onClick={() => {
+                  setSelectedReservationId(selectedReservationIdForDelete);
+                  setOpenDeleteModal(true);
+                }}>
+                삭제
+              </Button>
+            </div>
+          )}
+          {/* Export Excel */}
+          <Button
+            onClick={setOpenExportModal}
+            className="cursor-pointer"
+            color="dark">
+            <div className="flex flex-row gap-x-3 items-center">
+              <FaFileExcel />
+              <div>내보내기</div>
+            </div>
+          </Button>
+        </div>
       </div>
-      <div className="bg-white p-4 inline-block rounded-xl mb-8 hover:shadow-2xl w-full">
+      <div className="bg-white p-4 inline-block rounded-xl mb-8 shadow-md w-full">
         <Table>
           <Table.Head className="break-keep text-center">
+            <Table.HeadCell></Table.HeadCell>
             <Table.HeadCell>출석 유무</Table.HeadCell>
             <Table.HeadCell>호실</Table.HeadCell>
             <Table.HeadCell>이름</Table.HeadCell>
             <Table.HeadCell>시작 시간</Table.HeadCell>
             <Table.HeadCell>종료 시간</Table.HeadCell>
             <Table.HeadCell>출석 상태 변경</Table.HeadCell>
-            <Table.HeadCell>예약 삭제</Table.HeadCell>
           </Table.Head>
           <Table.Body className="divide-y text-center">
             {paginatedReservations
@@ -217,6 +232,22 @@ const ReservationState = () => {
               )
               .map(reservation => (
                 <Table.Row key={reservation.reservationId}>
+                  <Table.Cell>
+                    <Checkbox
+                      className="rounded-none text-[#1D2430] focus:ring-[#1D2430]"
+                      checked={
+                        selectedReservationIdForDelete ===
+                        reservation.reservationId
+                      }
+                      onChange={() => {
+                        setSelectedReservationIdForDelete(prev =>
+                          prev === reservation.reservationId
+                            ? null
+                            : reservation.reservationId,
+                        );
+                      }}
+                    />
+                  </Table.Cell>
                   <Table.Cell>
                     {reservation.reservationState === 'VISITED' ? (
                       <div className="text-blue-600">출석</div>
@@ -257,20 +288,6 @@ const ReservationState = () => {
                         onClick={() => {
                           setSelectedReservationId(reservation.reservationId);
                           setOpenEditModal(true);
-                        }}
-                        className="cursor-pointer w-6 h-6"
-                      />
-                    </div>
-                  </Table.Cell>
-
-                  <Table.Cell>
-                    <div className="flex justify-center items-center h-full">
-                      <img
-                        src={Delete}
-                        alt="delete"
-                        onClick={() => {
-                          setSelectedReservationId(reservation.reservationId);
-                          setOpenDeleteModal(reservation.reservationId);
                         }}
                         className="cursor-pointer w-6 h-6"
                       />

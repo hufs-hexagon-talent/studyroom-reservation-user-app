@@ -219,11 +219,14 @@ export const exportUserExcel = async roles => {
     responseType: 'blob', // 중요!
   });
 
+  const rolePart = Array.isArray(roles) ? roles.join('&') : roles;
+  const fileName = `${rolePart}-Users.xlsx`;
+
   // 파일 저장 처리
   const url = window.URL.createObjectURL(new Blob([userExcel.data]));
   const link = document.createElement('a');
   link.href = url;
-  link.setAttribute('download', 'users.xlsx'); // 파일명 지정
+  link.setAttribute('download', fileName);
   document.body.appendChild(link);
   link.click();
   link.remove();

@@ -24,7 +24,6 @@ const BannerEdit = () => {
 
   const handleCheckboxChange = e => {
     setIsActive(e.target.checked);
-    console.log(isActive);
   };
 
   // 배너 수정
@@ -78,7 +77,7 @@ const BannerEdit = () => {
         <div className="flex flex-row items-center gap-6 px-1 pt-4">
           <div className="text-lg">Active</div>
           <Checkbox
-            className="rounded-none p-2"
+            className="rounded-none p-2 text-[#1D2430] focus:ring-[#1D2430]"
             id="active"
             checked={isActive}
             onChange={handleCheckboxChange}

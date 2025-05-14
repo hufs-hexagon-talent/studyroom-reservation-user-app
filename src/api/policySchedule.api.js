@@ -12,6 +12,19 @@ export const fetchDate = async departmentId => {
   return dates;
 };
 
+// [관리자] 해당 날짜의 schedule들 조회
+export const fetchScheduleByDate = async date => {
+  const response = await apiClient.get(`schedules/date/${date}`);
+  return response.data.data.schedules;
+};
+
+export const useScheduleByDate = date => {
+  return useQuery({
+    queryKey: ['scheduleByDate'],
+    queryFn: () => fetchScheduleByDate(date),
+  });
+};
+
 // 스케줄 주입
 export const useSchedules = () => {
   return useMutation({

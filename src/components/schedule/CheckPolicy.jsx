@@ -14,7 +14,7 @@ const CheckPolicy = ({ selectedPolicyId, setSelectedPolicyId }) => {
   return (
     <div>
       <div className="flex flex-row items-center gap-x-2">
-        <div>모든 room Policy 조회 및 선택</div>
+        <div>Room Policy</div>
         <img
           onClick={() => setIsTableVisible(!isTableVisible)}
           className={`w-6 h-6 cursor-pointer transition-transform duration-300 hover:scale-125 ${isTableVisible ? 'rotate-180' : ''}`}
@@ -38,7 +38,7 @@ const CheckPolicy = ({ selectedPolicyId, setSelectedPolicyId }) => {
                   className="bg-white dark:border-gray-700 dark:bg-gray-800">
                   <Table.Cell className="p-4">
                     <Checkbox
-                      className="rounded-none text-[#f97316] focus:ring-[#f97316] cursor-pointer"
+                      className="rounded-none text-[#1D2430] focus:ring-[#1D2430] cursor-pointer"
                       checked={
                         selectedPolicyId === policy.roomOperationPolicyId
                       }

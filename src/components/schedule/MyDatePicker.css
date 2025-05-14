@@ -45,13 +45,13 @@
     cursor: pointer;
 
     &:hover {
-      background-color: #fb9248;
+      background-color: #1d2430;
     }
   }
 
   .selected-day,
   .react-datepicker__day--selected {
-    background-color: #f97316 !important;
+    background-color: #1d2430 !important;
     color: #ffffff !important;
   }
 
@@ -59,7 +59,7 @@
     top: 1rem;
 
     &-icon::before {
-      border-color: #1f2937;
+      border-color: #1d2430;
     }
   }
 
