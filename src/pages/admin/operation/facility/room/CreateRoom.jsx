@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   useCreateRoom,
@@ -6,10 +6,10 @@ import {
   useDeleteRoom,
   usePartitionsByRoomId,
 } from '../../../../../api/room.api';
+import { useDepartmets } from '../../../../../api/department.api';
 import { useSnackbar } from 'react-simple-snackbar';
 import { Table, TableBody, Modal, Checkbox, Button } from 'flowbite-react';
 import { Input } from '@mui/material';
-
 import Create from '../../../../../assets/icons/create.png';
 
 const CreateRoom = () => {
@@ -22,6 +22,7 @@ const CreateRoom = () => {
   const { mutateAsync: doDeleteRoom } = useDeleteRoom();
   const { data: roomPartitions } = usePartitionsByRoomId(openPartitionsModal);
   const { data: rooms, refetch } = useAllRooms();
+  const { data: departments } = useDepartmets();
 
   const [openSuccessSnackbar] = useSnackbar({
     position: 'top-right',
@@ -45,15 +46,23 @@ const CreateRoom = () => {
         departmentId,
       });
       openSuccessSnackbar(response.message, 3000);
+      await refetch();
+      setRoomName('');
+      setDepartmentId(null);
     } catch (error) {
       openErrorSnackbar(error?.response.data.message, 3000);
     }
   };
 
+  useEffect(() => {
+    console.log('삭제 시도:', selectedRoomId);
+  }, [selectedRoomId]);
+
   // 호실 삭제
   const deleteRoom = async roomId => {
     try {
-      const response = await doDeleteRoom(roomId);
+      console.log('삭제 시도:', roomId);
+      const response = await doDeleteRoom({ roomId });
       openSuccessSnackbar(response?.message);
       await refetch();
     } catch (error) {
@@ -67,7 +76,7 @@ const CreateRoom = () => {
       {/* Room 생성 */}
       <div className="bg-white p-4 inline-block rounded-xl mb-8 w-full">
         {/* Room 선택 */}
-        <div className="flex flex-row items-center gap-x-6">
+        <div className="flex flex-row items-center justify-between">
           <div className="font-bold text-xl p-3">Room 생성</div>
           <img
             src={Create}
@@ -76,7 +85,7 @@ const CreateRoom = () => {
           />
         </div>
         <div className="flex flex-row p-4">
-          <div>호실 이름 : </div>
+          <div className="text-lg">호실 이름 : </div>
           <Input
             value={roomName}
             onChange={e => setRoomName(e.target.value)}
@@ -85,24 +94,50 @@ const CreateRoom = () => {
           />
         </div>
         {/* 부서 선택 */}
-        <div className="flex flex-row p-4">
-          <div>부서 ID : </div>
-          <Input
-            value={departmentId}
-            onChange={e => setDepartmentId(e.target.value)}
-            type="string"
-            className="mx-4 rounded-sm"
-          />
+        <div className="p-4">
+          <Table className="text-lg">
+            <Table.Head className="text-lg">
+              <Table.HeadCell className="bg-gray-200"></Table.HeadCell>
+              <Table.HeadCell className="bg-gray-200">부서ID</Table.HeadCell>
+              <Table.HeadCell className="bg-gray-200">부서명</Table.HeadCell>
+            </Table.Head>
+            <Table.Body>
+              {departments?.map(department => (
+                <Table.Row
+                  key={department.departmentId}
+                  className={
+                    departmentId === department.departmentId ? 'bg-gray-50' : ''
+                  }>
+                  <Table.Cell>
+                    <Checkbox
+                      className="rounded-none"
+                      checked={departmentId === department.departmentId}
+                      onChange={() =>
+                        setDepartmentId(prev =>
+                          prev === department.departmentId
+                            ? null
+                            : department.departmentId,
+                        )
+                      }
+                    />
+                  </Table.Cell>
+                  <Table.Cell>{department.departmentId}</Table.Cell>
+                  <Table.Cell>{department.departmentName}</Table.Cell>
+                </Table.Row>
+              ))}
+            </Table.Body>
+          </Table>
         </div>
       </div>
       {/* 모든 Room 조회 */}
       <div className="bg-white p-4 mb-8 inline-block rounded-xl w-full">
         <div className="flex flex-row justify-between items-center gap-x-4 px-6 pt-3 pb-6">
           <div className="font-bold text-xl">모든 Room 조회 및 삭제</div>
+          {/* 삭제 버튼 */}
           {selectedRoomId && (
             <Button
               color="dark"
-              onClick={() => {
+              onClick={async () => {
                 deleteRoom(selectedRoomId);
                 setSelectedRoomId(null);
               }}>
