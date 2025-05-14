@@ -84,8 +84,6 @@ const FetchState = () => {
     }
   }, [allUsers]);
 
-  console.log(selectedRoles);
-
   return (
     <div className="overflow-x-auto">
       {/* Blocked User List */}

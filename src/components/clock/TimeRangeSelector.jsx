@@ -78,10 +78,6 @@ const TimeSelector = ({ setStartTime, setEndTime }) => {
     setEndSelectedTime(null);
     setIsSelectingStart(true);
   };
-
-  console.log('startSelectedTime : ', startSelectedTime);
-  console.log('endSelectedTime : ', endSelectedTime);
-
   return (
     <div className="flex flex-col space-y-4">
       <div className="h-96 overflow-y-scroll border rounded-lg p-4 bg-white">

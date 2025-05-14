@@ -24,7 +24,6 @@ const BannerEdit = () => {
 
   const handleCheckboxChange = e => {
     setIsActive(e.target.checked);
-    console.log(isActive);
   };
 
   // 배너 수정

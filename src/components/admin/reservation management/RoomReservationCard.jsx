@@ -53,8 +53,6 @@ const RoomReservationCard = ({ room, partitionIds, selectedDate }) => {
   const { mutateAsync: processedState } = useProcessedState();
 
   const partitions = allPartitions?.map(partition => partition.partitionId);
-  console.log(partitions);
-  //console.log('partitions : ', partitions);
 
   useEffect(() => {
     if (fetchedReservations) {

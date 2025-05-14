@@ -53,15 +53,9 @@ const CreateRoom = () => {
       openErrorSnackbar(error?.response.data.message, 3000);
     }
   };
-
-  useEffect(() => {
-    console.log('삭제 시도:', selectedRoomId);
-  }, [selectedRoomId]);
-
   // 호실 삭제
   const deleteRoom = async roomId => {
     try {
-      console.log('삭제 시도:', roomId);
       const response = await doDeleteRoom({ roomId });
       openSuccessSnackbar(response?.message);
       await refetch();
