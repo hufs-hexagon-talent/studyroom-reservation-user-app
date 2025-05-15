@@ -40,9 +40,32 @@ export const parseStatics = (statics, allUsers) => {
     statics?.partitionStatsToday,
     room1Partitions,
   );
+
   // 428호 오늘 총 예약 수
   const room2TodayReservations = sumReservations(
     statics?.partitionStatsToday,
+    room2Partitions,
+  );
+
+  // 파티션별 예약 수 객체 생성 함수
+  const getPartitionCounts = (stats, partitions) => {
+    const map = {};
+    partitions.forEach(pid => {
+      const entry = stats.find(p => p.partitionId === pid);
+      map[pid] = entry ? entry.reservationCount : 0;
+    });
+    return map;
+  };
+
+  // 306호 파티션 별 오늘 예약 수
+  const room1PartitionTodayReservations = getPartitionCounts(
+    statics?.partitionStatsToday || [],
+    room1Partitions,
+  );
+
+  // 428호 파티션 별 오늘 예약 수
+  const room2PartitionTodayReservations = getPartitionCounts(
+    statics?.partitionStatsToday || [],
     room2Partitions,
   );
 
@@ -99,5 +122,7 @@ export const parseStatics = (statics, allUsers) => {
     room1MonthlyReservationMinutes,
     room2MonthlyReservationMinutes,
     avgReservationsPerUser,
+    room1PartitionTodayReservations,
+    room2PartitionTodayReservations,
   };
 };

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAllUsers } from '../../../api/user.api';
 import { useReservationStatics } from '../../../api/reservation.api';
 import { parseStatics } from '../../../utils/statics.utils';
@@ -13,11 +13,16 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
+import { format } from 'date-fns';
+import { Modal, ModalBody, ModalHeader } from 'flowbite-react';
 
 const COLORS = ['#3b82f6', '#82ca9d', '#ffc658'];
 
 const ReservationStatics = () => {
   const today = format(new Date(), 'yyyy-MM-dd');
+  const [selectedRoomName, setSelectedRoomName] = useState(null);
+  const [selectedRoomId, setSelectedRoomId] = useState(null);
+  const [showModal, setShowModal] = useState(false);
   const { data: reservationStatics } = useReservationStatics(today);
   const { data: allUsers = [] } = useAllUsers();
 
@@ -34,6 +39,8 @@ const ReservationStatics = () => {
     room2MonthlyReservations,
     room1MonthlyReservationMinutes,
     room2MonthlyReservationMinutes,
+    room1PartitionTodayReservations,
+    room2PartitionTodayReservations,
   } = parseStatics(reservationStatics, allUsers);
 
   const pieData = [
@@ -50,155 +57,204 @@ const ReservationStatics = () => {
     },
   ];
 
+  const convertToChartData = partitionObj =>
+    Object.entries(partitionObj).map(([partitionId, count]) => ({
+      partition: `${selectedRoomName}-${partitionId}`,
+      count,
+    }));
+
+  const selectedPartitionData =
+    selectedRoomId === 1
+      ? convertToChartData(room1PartitionTodayReservations)
+      : selectedRoomId === 2
+        ? convertToChartData(room2PartitionTodayReservations)
+        : [];
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 ">
-      <div className="font-bold text-3xl text-black p-8">
-        Reservation Statics
-      </div>
+    <div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 ">
+        <div className="font-bold text-3xl text-black p-8">
+          Reservation Statics
+        </div>
 
-      <div className="col-span-1 md:col-span-2 grid grid-cols-2 gap-4">
-        {/* 호실 별 예약 수 (Today)*/}
+        <div className="col-span-1 md:col-span-2 grid grid-cols-2 gap-4">
+          {/* 호실 별 예약 수 (Today)*/}
+          <div className="bg-white shadow-md rounded-2xl p-4">
+            <h2 className="text-lg font-bold mb-2">호실 별 예약 수 (Today)</h2>
+            <div className="flex justify-center items-end h-[400px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={[
+                    {
+                      name: '306호',
+                      roomName: '306',
+                      roomId: 1,
+                      count: room1TodayReservations,
+                    },
+                    {
+                      name: '428호',
+                      roomName: '428',
+                      roomId: 2,
+                      count: room2TodayReservations,
+                    },
+                  ]}
+                  margin={{ top: 10, right: 10, left: 10, bottom: 0 }}
+                  onClick={data => {
+                    const roomName =
+                      data?.activePayload?.[0]?.payload?.roomName;
+                    const roomId = data?.activePayload?.[0]?.payload?.roomId;
+                    if (roomName) {
+                      setSelectedRoomName(roomName);
+                      setSelectedRoomId(roomId);
+                      setShowModal(true);
+                    }
+                  }}>
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip />
+                  <Bar dataKey="count" fill="#5DADEC" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          <div className="grid grid-rows-3 gap-6 ">
+            {/* 예약 수 통계 */}
+            <div className="bg-white shadow-md rounded-2xl px-6 py-4">
+              <div className="text-lg font-semibold mb-2">
+                시간 별 예약 수 통계
+              </div>
+              <div className="flex flex-row text-center items-center justify-center gap-x-10">
+                <div>
+                  <div className="text-gray-500 text-sm">총 예약 수</div>
+                  <div className="text-2xl font-bold">{totalReservations}</div>
+                </div>
+                <div>
+                  <div className="text-gray-500 text-sm">오늘 예약 수</div>
+                  <div className="text-2xl font-bold">{todayReservations}</div>
+                </div>
+                <div>
+                  <div className="text-gray-500 text-sm">주간 예약 수</div>
+                  <div className="text-2xl font-bold">{weeklyReservations}</div>
+                </div>
+                <div>
+                  <div className="text-gray-500 text-sm">월간 예약 수</div>
+                  <div className="text-2xl font-bold">
+                    {monthlyReservations}
+                  </div>
+                </div>
+              </div>
+            </div>
+            {/* 주간 호실 별 예약 수 */}
+            <div className="bg-white shadow-md rounded-2xl px-6 py-4">
+              <div className="text-lg font-semibold mb-2">
+                주간 호실 별 예약 수
+              </div>
+              <div className="flex flex-row justify-around items-end text-center">
+                <div>
+                  <div className="text-gray-500 text-lg">306호</div>
+                  <div className="text-3xl font-bold">
+                    {room1WeeklyReservations}
+                  </div>
+                </div>
+                <div>
+                  <div className="text-gray-500 text-lg">428호</div>
+                  <div className="text-3xl font-bold">
+                    {room2WeeklyReservations}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 월간 호실 별 예약 수 */}
+            <div className="bg-white shadow-md rounded-2xl px-6 py-4">
+              <div className="text-lg font-semibold mb-2">
+                월간 호실 별 예약 수
+              </div>
+              <div className="flex flex-row justify-around items-end text-center">
+                <div>
+                  <div className="text-gray-500 text-lg">306호</div>
+                  <div className="text-3xl font-bold">
+                    {room1MonthlyReservations}
+                  </div>
+                </div>
+                <div>
+                  <div className="text-gray-500 text-lg">428호</div>
+                  <div className="text-3xl font-bold">
+                    {room2MonthlyReservations}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* 파이 차트 */}
         <div className="bg-white shadow-md rounded-2xl p-4">
-          <h2 className="text-lg font-bold mb-2">호실 별 예약 수 (Today)</h2>
-          <div className="flex justify-center items-end h-[400px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                data={[
-                  { name: '306호', count: room1TodayReservations },
-                  { name: '428호', count: room2TodayReservations },
-                ]}
-                margin={{ top: 10, right: 10, left: 10, bottom: 0 }} // ⬅️ 여백 조정 포인트
-              >
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="count" fill="#5DADEC" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
+          <h2 className="text-lg font-semibold mb-2">월간 호실 사용 시간</h2>
+          <ResponsiveContainer width="100%" height={250}>
+            <PieChart>
+              <Pie
+                data={pieData}
+                dataKey="value"
+                nameKey="name"
+                cx="50%" // 중심 좌표
+                cy="50%" // 중심 좌표
+                outerRadius={80} // 파이의 반지름 크기
+                label={({ value, name }) => {
+                  const hours = Math.floor(value / 60);
+                  const minutes = value % 60;
+                  return `${name}: ${hours}시간 ${minutes}분`;
+                }}>
+                {pieData.map((entry, index) => (
+                  // 파이 조각마다 색상 지정
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={COLORS[index % COLORS.length]}
+                  />
+                ))}
+              </Pie>
+              <Tooltip
+                formatter={(value, name) => {
+                  const hours = Math.floor(value / 60);
+                  const minutes = value % 60;
+                  return [`${hours}시간 ${minutes}분`, `${name}호`]; // 숫자: 문자열 형식
+                }}
+                wrapperStyle={{ fontSize: '14px' }}
+              />
+            </PieChart>
+          </ResponsiveContainer>
         </div>
 
-        <div className="grid grid-rows-3 gap-6 ">
-          {/* 예약 수 통계 */}
-          <div className="bg-white shadow-md rounded-2xl px-6 py-4">
-            <div className="text-lg font-semibold mb-2">
-              시간 별 예약 수 통계
-            </div>
-            <div className="flex flex-row text-center items-center justify-center gap-x-10">
-              <div>
-                <div className="text-gray-500 text-sm">총 예약 수</div>
-                <div className="text-2xl font-bold">{totalReservations}</div>
-              </div>
-              <div>
-                <div className="text-gray-500 text-sm">오늘 예약 수</div>
-                <div className="text-2xl font-bold">{todayReservations}</div>
-              </div>
-              <div>
-                <div className="text-gray-500 text-sm">주간 예약 수</div>
-                <div className="text-2xl font-bold">{weeklyReservations}</div>
-              </div>
-              <div>
-                <div className="text-gray-500 text-sm">월간 예약 수</div>
-                <div className="text-2xl font-bold">{monthlyReservations}</div>
-              </div>
-            </div>
-          </div>
-          {/* 주간 호실 별 예약 수 */}
-          <div className="bg-white shadow-md rounded-2xl px-6 py-4">
-            <div className="text-lg font-semibold mb-2">
-              주간 호실 별 예약 수
-            </div>
-            <div className="flex flex-row justify-around items-end text-center">
-              <div>
-                <div className="text-gray-500 text-lg">306호</div>
-                <div className="text-3xl font-bold">
-                  {room1WeeklyReservations}
-                </div>
-              </div>
-              <div>
-                <div className="text-gray-500 text-lg">428호</div>
-                <div className="text-3xl font-bold">
-                  {room2WeeklyReservations}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* 월간 호실 별 예약 수 */}
-          <div className="bg-white shadow-md rounded-2xl px-6 py-4">
-            <div className="text-lg font-semibold mb-2">
-              월간 호실 별 예약 수
-            </div>
-            <div className="flex flex-row justify-around items-end text-center">
-              <div>
-                <div className="text-gray-500 text-lg">306호</div>
-                <div className="text-3xl font-bold">
-                  {room1MonthlyReservations}
-                </div>
-              </div>
-              <div>
-                <div className="text-gray-500 text-lg">428호</div>
-                <div className="text-3xl font-bold">
-                  {room2MonthlyReservations}
-                </div>
-              </div>
-            </div>
-          </div>
+        {/* 막대 차트 */}
+        <div className="bg-white shadow-md rounded-2xl p-4">
+          <h2 className="text-lg font-semibold mb-2">예약 비교</h2>
+          <ResponsiveContainer width="100%" height={250}>
+            <BarChart data={barData}>
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip />
+              <Bar dataKey="Today" fill="#3b82f6" />
+              <Bar dataKey="Weekly" fill="#82ca9d" />
+              <Bar dataKey="Monthly" fill="#ffc658" />
+            </BarChart>
+          </ResponsiveContainer>
         </div>
       </div>
-
-      {/* 파이 차트 */}
-      <div className="bg-white shadow-md rounded-2xl p-4">
-        <h2 className="text-lg font-semibold mb-2">월간 호실 사용 시간</h2>
-        {/* 차트를 부모 컨테이너 크기에 맞게 반응형으로 보여줌 */}
-        <ResponsiveContainer width="100%" height={250}>
-          <PieChart>
-            <Pie
-              data={pieData}
-              dataKey="value"
-              nameKey="name"
-              cx="50%" // 중심 좌표
-              cy="50%" // 중심 좌표
-              outerRadius={80} // 파이의 반지름 크기
-              label={({ value, name }) => {
-                const hours = Math.floor(value / 60);
-                const minutes = value % 60;
-                return `${name}: ${hours}시간 ${minutes}분`;
-              }}>
-              {pieData.map((entry, index) => (
-                // 파이 조각마다 색상 지정
-                <Cell
-                  key={`cell-${index}`}
-                  fill={COLORS[index % COLORS.length]}
-                />
-              ))}
-            </Pie>
-            <Tooltip
-              formatter={(value, name) => {
-                const hours = Math.floor(value / 60);
-                const minutes = value % 60;
-                return [`${hours}시간 ${minutes}분`, `${name}호`]; // 숫자: 문자열 형식
-              }}
-              wrapperStyle={{ fontSize: '14px' }}
-            />
-          </PieChart>
-        </ResponsiveContainer>
-      </div>
-
-      {/* 막대 차트 */}
-      <div className="bg-white shadow-md rounded-2xl p-4">
-        <h2 className="text-lg font-semibold mb-2">예약 비교</h2>
-        <ResponsiveContainer width="100%" height={250}>
-          <BarChart data={barData}>
-            <XAxis dataKey="name" />
-            <YAxis />
-            <Tooltip />
-            <Bar dataKey="Today" fill="#3b82f6" />
-            <Bar dataKey="Weekly" fill="#82ca9d" />
-            <Bar dataKey="Monthly" fill="#ffc658" />
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
+      {/* 호실 - 파티션 별 예약 수 (Today) 모달 */}
+      <Modal show={showModal} onClose={() => setShowModal(false)}>
+        <ModalHeader>{selectedRoomName}호 파티션 별 금일 예약 수</ModalHeader>
+        <ModalBody>
+          <ResponsiveContainer width="100%" height={250}>
+            <BarChart data={selectedPartitionData}>
+              <XAxis dataKey="partition" />
+              <YAxis />
+              <Tooltip />
+              <Bar dataKey="count" fill="#82ca9d" />
+            </BarChart>
+          </ResponsiveContainer>
+        </ModalBody>
+      </Modal>
     </div>
   );
 };
