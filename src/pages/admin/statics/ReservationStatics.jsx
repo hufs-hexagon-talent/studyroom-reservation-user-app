@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useAllUsers } from '../../../api/user.api';
 import { useReservationStatics } from '../../../api/reservation.api';
 import { usePartition } from '../../../api/roomPartition.api';
 import { parseStatics } from '../../../utils/statics.utils';
@@ -29,7 +28,6 @@ const ReservationStatics = () => {
   const [showReservationMinutesModal, setShowReservationMinutesModal] =
     useState(false);
   const { data: reservationStatics } = useReservationStatics(today);
-  const { data: allUsers = [] } = useAllUsers();
 
   const {
     room1Partitions,
@@ -54,7 +52,7 @@ const ReservationStatics = () => {
     room2PartitionMonthlyReservations,
     room1PartitionMonthlyReservationsMinutes,
     room2PartitionMonthlyReservationsMinutes,
-  } = parseStatics(reservationStatics, allUsers);
+  } = parseStatics(reservationStatics);
 
   const pieData = [
     { name: '306', value: room1MonthlyReservationMinutes },

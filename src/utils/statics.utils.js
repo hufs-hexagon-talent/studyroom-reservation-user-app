@@ -1,4 +1,4 @@
-export const parseStatics = (statics, allUsers) => {
+export const parseStatics = statics => {
   const room1Partitions = [1, 2, 3, 4];
   const room2Partitions = [5, 6];
 
@@ -152,6 +152,7 @@ export const parseStatics = (statics, allUsers) => {
       statics?.partitionStatsMonthly || [],
       room1Partitions,
     );
+
   // 428호 파티션 별  월간 총 사용 시간
   const room2PartitionMonthlyReservationsMinutes =
     getPartitionMonthlyReservationMinutes(
@@ -170,11 +171,6 @@ export const parseStatics = (statics, allUsers) => {
     room2Partitions,
   );
 
-  // 사용자 평균 예약 수
-  const avgReservationsPerUser = (totalReservations / allUsers.length).toFixed(
-    2,
-  );
-
   return {
     room1Partitions,
     room2Partitions,
@@ -190,7 +186,6 @@ export const parseStatics = (statics, allUsers) => {
     room2MonthlyReservations,
     room1MonthlyReservationMinutes,
     room2MonthlyReservationMinutes,
-    avgReservationsPerUser,
     room1PartitionTodayReservations,
     room2PartitionTodayReservations,
     room1PartitionWeeklyReservations,
