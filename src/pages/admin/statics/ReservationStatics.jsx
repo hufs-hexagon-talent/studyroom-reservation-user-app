@@ -371,14 +371,20 @@ const ReservationStatics = () => {
               <Table.HeadCell>예약 수</Table.HeadCell>
             </Table.Head>
             <Table.Body className="divide-y">
-              {selectedWeeklyData?.map(row => (
-                <Table.Row key={row.partition} className="bg-white">
-                  <Table.Cell className="whitespace-nowrap font-medium text-gray-900">
-                    {selectedRoomName}-{row.partition}
-                  </Table.Cell>
-                  <Table.Cell>{row.count}</Table.Cell>
+              {selectedWeeklyData ? (
+                selectedWeeklyData?.map(row => (
+                  <Table.Row key={row.partition} className="bg-white">
+                    <Table.Cell className="whitespace-nowrap font-medium text-gray-900">
+                      {selectedRoomName}-{row.partition}
+                    </Table.Cell>
+                    <Table.Cell>{row.count}</Table.Cell>
+                  </Table.Row>
+                ))
+              ) : (
+                <Table.Row>
+                  <div>no results.</div>
                 </Table.Row>
-              ))}
+              )}
             </Table.Body>
           </Table>
         </ModalBody>

@@ -4,14 +4,16 @@ import { useSnackbar } from 'react-simple-snackbar';
 import { useServiceRole } from './api/user.api';
 import FadeLoader from 'react-spinners/FadeLoader';
 
+import useAuth from './hooks/useAuth';
+
 import Footer from './components/footer/Footer';
 import NavigationBar from './components/navbar/NavigationBar';
+
 import Check from './pages/check/CheckRoom';
 import LoginPage from './pages/login/LoginPage';
 import Notice from './pages/notice/notice';
 import OtpPage from './pages/OtpPage/OtpPage';
 import RoomPage from './pages/rooms/room/RoomPage';
-import useAuth from './hooks/useAuth';
 import CheckVisit from './pages/manage/checkVisit';
 import SelectPartition from './pages/manage/SelectPartition';
 import QrCheck from './pages/qrcheck/QrCheck';
