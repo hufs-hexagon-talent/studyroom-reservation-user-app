@@ -47,8 +47,8 @@ export const parseStatics = (statics, allUsers) => {
     room2Partitions,
   );
 
-  // 파티션별 예약 수 객체 생성 함수
-  const getPartitionCounts = (stats, partitions) => {
+  // 파티션별 오늘 총 예약 수 객체 생성 함수
+  const getPartitionTodayCounts = (stats, partitions) => {
     const map = {};
     partitions.forEach(pid => {
       const entry = stats.find(p => p.partitionId === pid);
@@ -58,14 +58,36 @@ export const parseStatics = (statics, allUsers) => {
   };
 
   // 306호 파티션 별 오늘 예약 수
-  const room1PartitionTodayReservations = getPartitionCounts(
+  const room1PartitionTodayReservations = getPartitionTodayCounts(
     statics?.partitionStatsToday || [],
     room1Partitions,
   );
 
   // 428호 파티션 별 오늘 예약 수
-  const room2PartitionTodayReservations = getPartitionCounts(
+  const room2PartitionTodayReservations = getPartitionTodayCounts(
     statics?.partitionStatsToday || [],
+    room2Partitions,
+  );
+
+  // 파티션별 주간 총 예약 수 객체 생성 함수
+  const getPartitionWeeklyCounts = (stats, partitions) => {
+    const map = {};
+    partitions.forEach(pid => {
+      const entry = stats.find(p => p.partitionId === pid);
+      map[pid] = entry ? entry.reservationCount : 0;
+    });
+    return map;
+  };
+
+  // 306호 파티션 별 주간 예약 수
+  const room1PartitionWeeklyReservations = getPartitionWeeklyCounts(
+    statics?.partitionStatsWeekly || [],
+    room1Partitions,
+  );
+
+  // 428호 파티션 별 주간 예약 수
+  const room2PartitionWeeklyReservations = getPartitionWeeklyCounts(
+    statics?.partitionStatsWeekly || [],
     room2Partitions,
   );
 
@@ -81,6 +103,28 @@ export const parseStatics = (statics, allUsers) => {
     room2Partitions,
   );
 
+  // 파티션별 주간 총 예약 수 객체 생성 함수
+  const getPartitionMonthlyCounts = (stats, partitions) => {
+    const map = {};
+    partitions.forEach(pid => {
+      const entry = stats.find(p => p.partitionId === pid);
+      map[pid] = entry ? entry.reservationCount : 0;
+    });
+    return map;
+  };
+
+  // 306호 파티션 별 주간 예약 수
+  const room1PartitionMonthlyReservations = getPartitionMonthlyCounts(
+    statics?.partitionStatsMonthly || [],
+    room1Partitions,
+  );
+
+  // 428호 파티션 별 주간 예약 수
+  const room2PartitionMonthlyReservations = getPartitionMonthlyCounts(
+    statics?.partitionStatsMonthly || [],
+    room2Partitions,
+  );
+
   // 306호 월간 총 예약 수
   const room1MonthlyReservations = sumReservations(
     statics?.partitionStatsMonthly,
@@ -91,6 +135,29 @@ export const parseStatics = (statics, allUsers) => {
     statics?.partitionStatsMonthly,
     room2Partitions,
   );
+
+  // 파티션별 주간 총 예약 시간 객체 생성 함수
+  const getPartitionMonthlyReservationMinutes = (stats, partitions) => {
+    const map = {};
+    partitions.forEach(pid => {
+      const entry = stats.find(p => p.partitionId === pid);
+      map[pid] = entry ? entry.totalReservationMinutes : 0;
+    });
+    return map;
+  };
+
+  // 306호 파티션 별 월간 총 사용 시간
+  const room1PartitionMonthlyReservationsMinutes =
+    getPartitionMonthlyReservationMinutes(
+      statics?.partitionStatsMonthly || [],
+      room1Partitions,
+    );
+  // 428호 파티션 별  월간 총 사용 시간
+  const room2PartitionMonthlyReservationsMinutes =
+    getPartitionMonthlyReservationMinutes(
+      statics?.partitionStatsMonthly || [],
+      room2Partitions,
+    );
 
   // 306호 월간 총 사용시간
   const room1MonthlyReservationMinutes = sumMinutes(
@@ -109,6 +176,8 @@ export const parseStatics = (statics, allUsers) => {
   );
 
   return {
+    room1Partitions,
+    room2Partitions,
     totalReservations,
     todayReservations,
     weeklyReservations,
@@ -124,5 +193,11 @@ export const parseStatics = (statics, allUsers) => {
     avgReservationsPerUser,
     room1PartitionTodayReservations,
     room2PartitionTodayReservations,
+    room1PartitionWeeklyReservations,
+    room2PartitionWeeklyReservations,
+    room1PartitionMonthlyReservations,
+    room2PartitionMonthlyReservations,
+    room1PartitionMonthlyReservationsMinutes,
+    room2PartitionMonthlyReservationsMinutes,
   };
 };
