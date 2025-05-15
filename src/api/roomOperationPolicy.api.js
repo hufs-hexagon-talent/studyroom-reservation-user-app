@@ -41,3 +41,39 @@ export const useDeletePolicy = () => {
     },
   });
 };
+
+// [관리자] RoomOperationPolicy 조회
+const fetchPolicy = async policyId => {
+  const response = await apiClient.get(`/policies/${policyId}`);
+  return response.data.data;
+};
+
+export const usePolicy = policyId => {
+  return useQuery({
+    queryKey: ['policy', policyId],
+    queryFn: () => fetchPolicy(policyId),
+    enabled: !!policyId,
+  });
+};
+
+// [관리자] RoomOperationPolicy 정보 업데이트
+export const useEditPolicy = () => {
+  return useMutation({
+    mutationFn: async ({
+      roomOperationPolicyId,
+      operationStartTime,
+      operationEndTime,
+      eachMaxMinute,
+    }) => {
+      const response = await apiClient.patch(
+        `/policies/policy/${roomOperationPolicyId}`,
+        {
+          operationStartTime,
+          operationEndTime,
+          eachMaxMinute,
+        },
+      );
+      return response.data;
+    },
+  });
+};

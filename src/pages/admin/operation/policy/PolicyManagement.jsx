@@ -1,15 +1,20 @@
-import React, { useState } from 'react';
-import { format } from 'date-fns';
+import React, { useState, useEffect } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
 import { Button, Table, TableBody, Modal, Checkbox } from 'flowbite-react';
-
 import {
   useCreatePolicy,
   useAllPolicies,
   useDeletePolicy,
+  usePolicy,
+  useEditPolicy,
 } from '../../../../api/roomOperationPolicy.api';
 import { useSnackbar } from 'react-simple-snackbar';
-import UnderArrow from '../../../../assets/icons/under_arrow_black.png';
+import { Input } from '@mui/material';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+
+import EachMaxMinuteSelector from '../../../../components/clock/EachMaxMinuteSelector';
+import TimePicker from '../../../../components/clock/TimePicker';
 import TimeSelector from '../../../../components/clock/TimeRangeSelector';
 import TimeSlider from '../../../../components/clock/TimeSlider';
 
@@ -17,12 +22,19 @@ const PolicyManagement = () => {
   const [startTime, setStartTime] = useState(new Date());
   const [endTime, setEndTime] = useState(new Date());
   const [eachMaxMinute, setEachMaxMinute] = useState(60);
-  const [isGetPolicies, setIsGetPolicies] = useState(false);
   const [selectedPolicyId, setSelectedPolicyId] = useState(null);
+
+  const [operationStartTime, setOperationStartTime] = useState(new Date());
+  const [operationEndTime, setOperationEndTime] = useState(new Date());
+  const [operationEachMaxMinute, setOperationEachMaxMinute] = useState(null);
+
   const [openDeleteModal, setOpenDeleteModal] = useState(null);
+  const [openEditModal, setOpenEditModal] = useState(null);
   const { mutateAsync: doCreatePolicy } = useCreatePolicy();
   const { mutateAsync: doDeletePolicy } = useDeletePolicy();
   const { data: policies, refetch } = useAllPolicies();
+  const { data: policy } = usePolicy(selectedPolicyId);
+  const { mutate: editPolicy } = useEditPolicy(selectedPolicyId);
 
   const [openSuccessSnackbar] = useSnackbar({
     position: 'top-right',
@@ -37,6 +49,14 @@ const PolicyManagement = () => {
       backgroundColor: '#FF3333', // 빨간색
     },
   });
+
+  useEffect(() => {
+    if (policy) {
+      setOperationStartTime(policy.operationStartTime || '');
+      setOperationEndTime(policy.operationEndTime || '');
+      setOperationEachMaxMinute(policy.eachMaxMinute?.toString() || '');
+    }
+  }, [policy]);
 
   // 정책 생성
   const createPolicy = async () => {
@@ -69,6 +89,32 @@ const PolicyManagement = () => {
           '정책 삭제 중 오류가 발생하였습니다.',
         3000,
       );
+    }
+  };
+
+  // 정책 수정
+  const updatePolicy = async () => {
+    try {
+      await editPolicy(
+        {
+          roomOperationPolicyId: selectedPolicyId,
+          operationStartTime,
+          operationEndTime,
+          eachMaxMinute: Number(operationEachMaxMinute),
+        },
+        {
+          onSuccess: () => {
+            refetch();
+            setOpenEditModal(null);
+            openSuccessSnackbar('정책이 성공적으로 수정되었습니다.', 3000);
+          },
+          onError: error => {
+            openErrorSnackbar('정책 수정 중 오류가 발생했습니다.', 3000);
+          },
+        },
+      );
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -108,12 +154,20 @@ const PolicyManagement = () => {
           <div className="text-xl p-6 font-bold">모든 정책 조회</div>
           <div>
             {selectedPolicyId && (
-              <Button
-                onClick={() => setOpenDeleteModal(selectedPolicyId)}
-                color="dark"
-                className="hover:bg-gray-700 text-white rounded">
-                삭제
-              </Button>
+              <div className="flex flex-row gap-x-6">
+                <Button
+                  onClick={() => setOpenEditModal(selectedPolicyId)}
+                  color="dark"
+                  className="hover:bg-gray-700 text-white rounded">
+                  수정
+                </Button>
+                <Button
+                  onClick={() => setOpenDeleteModal(selectedPolicyId)}
+                  color="dark"
+                  className="hover:bg-gray-700 text-white rounded">
+                  삭제
+                </Button>
+              </div>
             )}
           </div>
         </div>
@@ -155,6 +209,56 @@ const PolicyManagement = () => {
         </div>
       </div>
 
+      {/* 수정 모달 */}
+      <div className="flex justify-center items-center">
+        <Modal show={openEditModal} onClose={() => setOpenEditModal(false)}>
+          <Modal.Header>정책 수정</Modal.Header>
+          <Modal.Body>
+            {policy ? (
+              <Table>
+                <Table.Head>
+                  <Table.HeadCell>정책 ID</Table.HeadCell>
+                  <Table.HeadCell>시작 시각</Table.HeadCell>
+                  <Table.HeadCell>종료 시각</Table.HeadCell>
+                  <Table.HeadCell>최대 이용 시간</Table.HeadCell>
+                </Table.Head>
+                <Table.Body>
+                  <Table.Row key={policy.roomOperationPolicyId}>
+                    <Table.Cell>{policy.roomOperationPolicyId}</Table.Cell>
+                    <Table.Cell>
+                      <TimePicker
+                        value={operationStartTime}
+                        onChange={setOperationStartTime}
+                      />
+                    </Table.Cell>
+                    <Table.Cell>
+                      <TimePicker
+                        value={operationEndTime}
+                        onChange={setOperationEndTime}
+                      />
+                    </Table.Cell>
+                    <Table.Cell>
+                      <EachMaxMinuteSelector
+                        value={operationEachMaxMinute}
+                        onChange={setOperationEachMaxMinute}
+                      />
+                    </Table.Cell>
+                  </Table.Row>
+                </Table.Body>
+              </Table>
+            ) : (
+              <div>정책 정보를 불러오는 중입니다...</div>
+            )}
+            <div className="flex justify-end mt-6">
+              <Button onClick={updatePolicy} color="dark">
+                수정
+              </Button>
+            </div>
+          </Modal.Body>
+        </Modal>
+      </div>
+
+      {/* 삭제 모달 */}
       <div className="flex justify-center items-center">
         <Modal
           show={openDeleteModal}
@@ -165,7 +269,7 @@ const PolicyManagement = () => {
             alignItems: 'center',
             justifyContent: 'center',
           }}
-          once={() => setOpenDeleteModal(false)}
+          onClose={() => setOpenDeleteModal(false)}
           popup>
           <Modal.Header />
           <Modal.Body>
