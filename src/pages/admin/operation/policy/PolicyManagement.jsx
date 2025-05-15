@@ -9,8 +9,6 @@ import {
   useEditPolicy,
 } from '../../../../api/roomOperationPolicy.api';
 import { useSnackbar } from 'react-simple-snackbar';
-import { Input } from '@mui/material';
-import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
 import EachMaxMinuteSelector from '../../../../components/clock/EachMaxMinuteSelector';
