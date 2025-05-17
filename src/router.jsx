@@ -22,7 +22,7 @@ import LoggedOutPassword from './pages/password/LoggedOutPassword';
 import EmailVerify from './pages/password/EmailVerify';
 import Schedule from './pages/manage/Schedule';
 import DivideAct from './pages/manage/DivideAct';
-import SerialCheck from './pages/admin/user/SerialCheck';
+import SearchUser from './pages/admin/user/SearchUser';
 import FetchState from './pages/admin/user/FetchState';
 import FetchReservations from './pages/admin/user/FetchReservations';
 import MyPage from './pages/mypage/MyPage';
@@ -107,7 +107,7 @@ const RouterComponent = () => {
                     element={<ReservationStatics />}
                   />
                   {/* 사용자 관리 */}
-                  <Route path="serialCheck" element={<SerialCheck />} />
+                  <Route path="search-user" element={<SearchUser />} />
                   <Route path="user-state" element={<FetchState />} />
                   {/* 예약 관리 */}
                   <Route
