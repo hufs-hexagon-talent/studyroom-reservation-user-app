@@ -3,25 +3,27 @@ import { Button, Checkbox, Modal, Table } from 'flowbite-react';
 import { Pagination } from '@mui/material';
 import {
   useUnblocked,
-  useAllUsers,
   useBlockedUser,
   useUserRoleList,
   exportUserExcel,
+  useUserSearch,
 } from '../../../api/user.api';
 import { useSnackbar } from 'react-simple-snackbar';
 import { FaFileExcel } from 'react-icons/fa6';
 
 const FetchState = () => {
-  const { data: allUsers } = useAllUsers();
   const { data: blocked } = useBlockedUser();
   const { data: userRoleList } = useUserRoleList();
   const { mutate: doUnblocked, refetch } = useUnblocked();
+  const { mutate: userSearch } = useUserSearch();
+
   const [currentPage, setCurrentPage] = useState(1);
-  const [openBlockedModal, setOpenBlockedModal] = useState(false);
-  const [selectedBlockedInfo, setSelectedBlockedInfo] = useState(null);
+  const [totalPages, setTotalPages] = useState(1);
+  const [pageSize, setPageSize] = useState(30);
   const [userList, setUserList] = useState([]);
   const [selectedRoles, setSelectedRoles] = useState([]);
-  const itemsPerPage = 17;
+  const [openBlockedModal, setOpenBlockedModal] = useState(false);
+  const [selectedBlockedInfo, setSelectedBlockedInfo] = useState(null);
 
   const [openSuccessSnackbar] = useSnackbar({
     position: 'top-right',
@@ -57,32 +59,40 @@ const FetchState = () => {
   // serviceRole 선택
   const handleRoleSelect = role => {
     setCurrentPage(1);
-    setSelectedRoles(
-      prev =>
-        prev.includes(role)
-          ? prev.filter(r => r !== role) // 제거
-          : [...prev, role], // 추가
+    setSelectedRoles(prev =>
+      prev.includes(role) ? prev.filter(r => r !== role) : [...prev, role],
     );
   };
 
-  // serviceRole에 따라 필터링
-  const filteredUsers =
-    selectedRoles.length > 0
-      ? userList.filter(user => selectedRoles.includes(user.serviceRole))
-      : userList;
+  // 유저 조회
+  const fetchUsers = () => {
+    const payload = {
+      page: currentPage - 1, // 페이지는 0부터 시작
+      // selectedRoles가 비어있다면 role을 요청에 안넣어서 전체 유저 조회하도록
+      ...(selectedRoles.length > 0 && { role: selectedRoles }),
+    };
 
-  // 현재 페이지에 해당하는 데이터 추출
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedData = filteredUsers.slice(
-    startIndex,
-    startIndex + itemsPerPage,
-  );
+    userSearch(payload, {
+      onSuccess: res => {
+        const { items, meta } = res.data;
+        setUserList(items || []);
+        setTotalPages(meta.totalPages);
+        setPageSize(meta.size);
+      },
+      onError: error => {
+        openErrorSnackbar(
+          error?.response?.data?.errors?.[0]?.message ||
+            error?.response?.data?.message,
+          3000,
+        );
+      },
+    });
+  };
 
+  // 체크박스 또는 페이지가 바뀌면 유저 목록 다시 가져오기
   useEffect(() => {
-    if (allUsers) {
-      setUserList(allUsers);
-    }
-  }, [allUsers]);
+    fetchUsers();
+  }, [selectedRoles, currentPage]);
 
   return (
     <div className="overflow-x-auto">
@@ -90,7 +100,7 @@ const FetchState = () => {
       <div>
         <div className="font-bold text-3xl text-black p-8">Users State</div>
         <div className="flex justify-between items-center">
-          {/* State Checkbox */}
+          {/* Role Checkbox */}
           <div className="flex flex-row gap-x-6 items-center px-4 pb-8">
             {userRoleList?.map(role => (
               <div key={role} className="flex flex-row gap-x-2 items-center">
@@ -103,6 +113,7 @@ const FetchState = () => {
               </div>
             ))}
           </div>
+
           {/* Export Excel */}
           <Button
             color="dark"
@@ -128,19 +139,19 @@ const FetchState = () => {
             <Table.HeadCell>이름</Table.HeadCell>
             <Table.HeadCell>학과</Table.HeadCell>
             <Table.HeadCell>이메일</Table.HeadCell>
-            {filteredUsers.some(user => user.serviceRole === 'BLOCKED') && (
+            {userList.some(user => user.serviceRole === 'BLOCKED') && (
               <Table.HeadCell>
                 <span className="sr-only">삭제</span>
               </Table.HeadCell>
             )}
           </Table.Head>
           <Table.Body className="divide-y text-center">
-            {paginatedData?.map((user, index) => (
+            {userList.map((user, index) => (
               <Table.Row
                 key={index}
                 className="bg-white dark:border-gray-700 dark:bg-gray-800">
-                {/* Blocked일때만 눌렀을 때 Modal 열리게 */}
                 <Table.Cell
+                  // blocked이면 userId 클릭할 수 있게
                   onClick={() => {
                     if (user.serviceRole === 'BLOCKED') {
                       const blockedInfo = blocked?.find(
@@ -151,18 +162,17 @@ const FetchState = () => {
                     }
                   }}
                   className={`whitespace-nowrap font-medium text-gray-900 dark:text-white
-                  ${user.serviceRole === 'BLOCKED' ? 'cursor-pointer hover:underline' : ''}
-                `}>
+                    ${user.serviceRole === 'BLOCKED' ? 'cursor-pointer hover:underline' : ''}
+                  `}>
                   {user.userId}
                 </Table.Cell>
                 <Table.Cell>{user.serviceRole}</Table.Cell>
-                <Table.Cell>{user.serial ? user.serial : '-'}</Table.Cell>
+                <Table.Cell>{user.serial ?? '-'}</Table.Cell>
                 <Table.Cell>{user.name}</Table.Cell>
                 <Table.Cell>
                   {user.departmentId === 1 ? '컴퓨터공학부' : '정보통신공학과'}
                 </Table.Cell>
-
-                <Table.Cell>{user.email ? user.email : '-'}</Table.Cell>
+                <Table.Cell>{user.email ?? '-'}</Table.Cell>
                 {user.serviceRole === 'BLOCKED' ? (
                   <Table.Cell>
                     <a
@@ -172,7 +182,7 @@ const FetchState = () => {
                     </a>
                   </Table.Cell>
                 ) : (
-                  filteredUsers.some(u => u.serviceRole === 'BLOCKED') && (
+                  userList.some(u => u.serviceRole === 'BLOCKED') && (
                     <Table.Cell />
                   )
                 )}
@@ -180,10 +190,11 @@ const FetchState = () => {
             ))}
           </Table.Body>
         </Table>
+
         {/* Pagination */}
         <div className="flex justify-center mt-4">
           <Pagination
-            count={Math.ceil((filteredUsers?.length || 0) / itemsPerPage)}
+            count={totalPages}
             page={currentPage}
             onChange={handlePage}
             shape="rounded"

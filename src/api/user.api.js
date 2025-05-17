@@ -244,3 +244,32 @@ export const useUserRoleList = () => {
     queryFn: fetchUserRoleList,
   });
 };
+
+// [관리자] 회원 검색 조회
+export const useUserSearch = () => {
+  return useMutation({
+    mutationFn: async ({
+      username,
+      serial,
+      name,
+      email,
+      role,
+      departmentId,
+      page = 0,
+      size = 20,
+    }) => {
+      const response = await apiClient.post('/users/search', {
+        username,
+        serial,
+        name,
+        email,
+        role,
+        departmentId,
+        page,
+        size,
+      });
+
+      return response.data;
+    },
+  });
+};
