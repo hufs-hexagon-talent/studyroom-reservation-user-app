@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { Button, Table } from 'flowbite-react';
-import { useUserBySerial, useUserByName } from '../../../api/user.api';
+import { useUserSearch } from '../../../api/user.api';
 import { useSnackbar } from 'react-simple-snackbar';
 import { useNavigate } from 'react-router-dom';
 
 const SerialCheck = () => {
   const [input, setInput] = useState('');
   const [userInfo, setUserInfo] = useState([]);
-  const { refetch: fetchBySerial } = useUserBySerial(input, { enabled: false });
-  const { refetch: fetchByName } = useUserByName(input, { enabled: false });
+  const { mutateAsync: userSearch } = useUserSearch();
+
   const [openErrorSnackbar] = useSnackbar({
     position: 'top-right',
     style: {
@@ -23,33 +23,28 @@ const SerialCheck = () => {
   });
   const navigate = useNavigate();
 
-  // input 변경 시 호출
-  const handleChange = e => {
-    setInput(e.target.value);
-  };
-
-  // 조회 버튼 클릭 시 호출
-  const handleFetchBtn = async () => {
+  // 사용자 조회 API 호출
+  const handleFetch = async () => {
     if (!input) {
       openErrorSnackbar('학번 또는 이름을 입력해주세요', 2500);
       return;
     }
+    const isNumeric = !isNaN(input);
 
     try {
-      const isNumeric = !isNaN(input);
-      const response = isNumeric ? await fetchBySerial() : await fetchByName();
+      const payload = {
+        ...(isNumeric ? { serial: input } : { name: input }),
+        page: 0,
+        size: 10,
+      };
 
-      if (response.data.isSuccess === true) {
-        // 응답을 배열 형태로 통일
-        const usersData = isNumeric
-          ? [response.data.data] // 학번 조회 시 객체를 배열로 감싸기
-          : response.data.data.users; // 이름 조회 시 이미 배열 형태
+      const response = await userSearch(payload);
+      const usersData = response.data.items;
 
-        setUserInfo(usersData);
-        openSuccessSnackbar(response.data.message, 2500);
-      }
+      setUserInfo(usersData);
+      openSuccessSnackbar(response?.message, 2500);
     } catch (error) {
-      openErrorSnackbar(error.message, 2500);
+      openErrorSnackbar(error?.response?.data?.message || '검색 실패', 2500);
     }
   };
 
@@ -60,12 +55,17 @@ const SerialCheck = () => {
         <div className="mr-3">학번 또는 이름 </div>
         <input
           className="border rounded-sm w-32 h-7"
-          onChange={handleChange}
+          onChange={e => setInput(e.target.value)}
+          onKeyDown={e => {
+            if (e.key === 'Enter') {
+              handleFetch();
+            }
+          }}
           type="text"
           maxLength="9"
         />
         <Button
-          onClick={handleFetchBtn}
+          onClick={handleFetch}
           className="ml-4 bg-gray-300 text-black rounded-full items-center h-8">
           조회
         </Button>

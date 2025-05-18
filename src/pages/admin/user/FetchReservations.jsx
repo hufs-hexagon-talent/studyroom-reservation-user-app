@@ -2,9 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import {
   useReservationsById,
-  useNotVisitedState,
-  useVisitedState,
-  useProcessedState,
+  useChangeState,
   useAdminDeleteReservation,
 } from '../../../api/reservation.api';
 import { format } from 'date-fns';
@@ -15,13 +13,11 @@ import { Pagination } from '@mui/material';
 
 const FetchReservations = () => {
   const { id } = useParams();
-  const { mutateAsync: visitedState } = useVisitedState();
-  const { mutateAsync: notVisitedState } = useNotVisitedState();
-  const { mutateAsync: processedState } = useProcessedState();
+
+  const { mutateAsync: changeState } = useChangeState();
   const { mutate: doDelete } = useAdminDeleteReservation();
   const { data: fetchedReservations, refetch } = useReservationsById(id);
-  const [selectedReservationIdForDelete, setSelectedReservationIdForDelete] =
-    useState(null);
+
   const [openDeleteModal, setOpenDeleteModal] = useState(null);
   const [openEditModal, setOpenEditModal] = useState(null);
   const [selectedReservationId, setSelectedReservationId] = useState(null);
@@ -71,19 +67,14 @@ const FetchReservations = () => {
   // 예약 상태 수정
   const handleStateChange = async state => {
     try {
-      if (state === 'notVisited') {
-        const response = await notVisitedState(selectedReservationId);
-        openSuccessSnackbar(response.message, 2500);
-      } else if (state === 'visited') {
-        const response = await visitedState(selectedReservationId);
-        openSuccessSnackbar(response.message, 2500);
-      } else if (state === 'processed') {
-        const response = await processedState(selectedReservationId);
-        openSuccessSnackbar(response.message, 2500);
-      }
+      const response = await changeState({
+        reservationId: selectedReservationId,
+        state,
+      });
+      openSuccessSnackbar(response.message, 2500);
+      setOpenEditModal(false);
 
       await refetch();
-      setOpenEditModal(false);
     } catch (error) {
       openErrorSnackbar(error.response.data.errorMessage, 2500);
     }
@@ -103,15 +94,19 @@ const FetchReservations = () => {
         <h1 className="text-3xl mx-4">
           <strong>{reservations[0]?.name}</strong>님의 예약
         </h1>
-        {selectedReservationIdForDelete && (
-          <Button
-            color="dark"
-            onClick={() => {
-              setSelectedReservationId(selectedReservationIdForDelete); // 삭제 대상 설정
-              setOpenDeleteModal(true); // 모달만 열기
-            }}>
-            삭제
-          </Button>
+        {selectedReservationId && (
+          <div className="flex justify-end space-x-4">
+            <Button color="dark" onClick={() => setOpenEditModal(true)}>
+              수정
+            </Button>
+            <Button
+              color="dark"
+              onClick={() => {
+                setOpenDeleteModal(true);
+              }}>
+              삭제
+            </Button>
+          </div>
         )}
       </div>
       <Table className="my-10">
@@ -136,11 +131,10 @@ const FetchReservations = () => {
                   <Checkbox
                     className="rounded-none"
                     checked={
-                      selectedReservationIdForDelete ===
-                      reservation.reservationId
+                      selectedReservationId === reservation.reservationId
                     }
                     onChange={() => {
-                      setSelectedReservationIdForDelete(prev =>
+                      setSelectedReservationId(prev =>
                         prev === reservation.reservationId
                           ? null
                           : reservation.reservationId,
@@ -243,17 +237,17 @@ const FetchReservations = () => {
             <div className="flex flex-col space-y-6">
               <p
                 className="inline-block text-lg hover:underline cursor-pointer"
-                onClick={() => handleStateChange('visited')}>
+                onClick={() => handleStateChange('VISITED')}>
                 출석으로 변경
               </p>
               <p
                 className="inline-block text-lg hover:underline cursor-pointer"
-                onClick={() => handleStateChange('notVisited')}>
+                onClick={() => handleStateChange('NOT_VISITED')}>
                 미출석으로 변경
               </p>
               <p
                 className="inline-block text-lg hover:underline cursor-pointer"
-                onClick={() => handleStateChange('processed')}>
+                onClick={() => handleStateChange('PROCESSED')}>
                 처리됨으로 변경
               </p>
             </div>

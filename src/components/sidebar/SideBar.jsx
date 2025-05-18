@@ -22,7 +22,7 @@ const menuData = [
     label: '사용자 관리',
     icon: HiUser,
     children: [
-      { label: '사용자 목록', to: '/divide/serialCheck' },
+      { label: '사용자 목록', to: '/divide/search-user' },
       { label: '사용자 상태 관리', to: '/divide/user-state' },
     ],
   },
