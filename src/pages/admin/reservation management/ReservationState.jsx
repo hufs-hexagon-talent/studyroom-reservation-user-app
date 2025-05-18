@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DatePicker from 'react-datepicker';
-import { format } from 'date-fns';
+import { format, addDays } from 'date-fns';
 import { Pagination } from '@mui/material';
 import { useSnackbar } from 'react-simple-snackbar';
 import { useAllRooms } from '../../../api/room.api';
-import { useAllPartitions } from '../../../api/roomPartition.api';
 import {
-  useReservationsByPartitions,
   useVisitedState,
   useNotVisitedState,
   useProcessedState,
   useAdminDeleteReservation,
   useExportReservationExcel,
+  useReservationSearch,
+  useStates,
 } from '../../../api/reservation.api';
 import { Table, Checkbox, Modal, Button } from 'flowbite-react';
 import Edit from '../../../assets/icons/edit.png';
@@ -23,36 +23,31 @@ import { FaFileExcel } from 'react-icons/fa6';
 const ReservationState = () => {
   const navigate = useNavigate();
   const [reservations, setReservations] = useState([]);
-  const [error, setError] = useState(null);
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const [selectedRooms, setSelectedRooms] = useState([]);
+  const [selectedRoomIds, setSelectedRoomIds] = useState([]);
   const [selectedReservationId, setSelectedReservationId] = useState(null);
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
   const [selectedRoles, setSelectedRoles] = useState([]);
   const [selectedReservationIdForDelete, setSelectedReservationIdForDelete] =
     useState(null);
+
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+
   const [openEditModal, setOpenEditModal] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [openExportModal, setOpenExportModal] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const [pageSize, setPageSize] = useState(10);
+  const [totalPages, setTotalPages] = useState(1);
 
   const { data: rooms } = useAllRooms();
-  const { data: allPartitions } = useAllPartitions();
-  const { data: reservationsByPartitions, refetch } =
-    useReservationsByPartitions({
-      date: format(selectedDate, 'yyyy-MM-dd'),
-      partitionIds: allPartitions?.map(partition => partition.partitionId),
-    });
+  const { data: serviceRoles } = useStates();
 
   const { mutate: doDelete } = useAdminDeleteReservation();
   const { mutateAsync: visitedState } = useVisitedState();
   const { mutateAsync: notVisitedState } = useNotVisitedState();
   const { mutateAsync: processedState } = useProcessedState();
-
-  const serviceRoles = ['NOT_VISITED', 'VISITED', 'PROCESSED'];
-  const roomNameList = rooms?.map(room => room.roomName);
+  const { mutateAsync: reservationSearch } = useReservationSearch();
 
   const [openErrorSnackbar] = useSnackbar({
     position: 'top-right',
@@ -79,22 +74,36 @@ const ReservationState = () => {
     return format(date, "yyyy-MM-dd'T'00:00:00'Z'");
   };
 
+  // 예약 목록 refetch 함수
+  const refetchReservations = async () => {
+    const startDateTime = toISODateUTC(selectedDate);
+    const endDateTime = toISODateUTC(addDays(selectedDate, 1));
+
+    const res = await reservationSearch({
+      startDateTime,
+      endDateTime,
+      roomIds: selectedRoomIds.length > 0 ? selectedRoomIds : undefined,
+      page: currentPage - 1,
+    });
+
+    setReservations(res.data.items);
+    setTotalPages(res.data.meta.totalPages);
+    setPageSize(res.data.meta.size);
+  };
+
   // 출석 상태 변경
   const handleStateChange = async state => {
     try {
-      if (state === 'notVisited') {
-        const response = await notVisitedState(selectedReservationId);
-        openSuccessSnackbar(response.message, 2500);
-      } else if (state === 'visited') {
-        const response = await visitedState(selectedReservationId);
-        openSuccessSnackbar(response.message, 2500);
-      } else if (state === 'processed') {
-        const response = await processedState(selectedReservationId);
-        openSuccessSnackbar(response.message, 2500);
-      }
+      const stateFns = {
+        notVisited: notVisitedState,
+        visited: visitedState,
+        processed: processedState,
+      };
+      const response = await stateFns[state](selectedReservationId);
+      openSuccessSnackbar(response.message, 2500);
+      setOpenEditModal(false);
 
-      setOpenEditModal(false); // 상태 변경 후 모달 닫기
-      await refetch();
+      await refetchReservations(); // 변경 후 refetch
     } catch (error) {
       openErrorSnackbar(error.response.data.errorMessage, 2500);
     }
@@ -109,49 +118,47 @@ const ReservationState = () => {
             reservation => reservation.reservationId !== reservationId,
           ),
         );
-        await refetch();
       },
-      onError: err => {
-        setError('예약 삭제 실패');
-        console.error(err);
+      onError: async () => {
+        openErrorSnackbar('예약 삭제 실패', 3000);
       },
     });
   };
 
   // 호실 선택
-  const handleRoomSelect = room => {
-    setSelectedRooms(
-      prev =>
-        prev.includes(room)
-          ? prev.filter(r => r !== room) // 이미 있으면 제거
-          : [...prev, room], // 없으면 추가
+  const handleRoomSelect = roomId => {
+    setSelectedRoomIds(prev =>
+      prev.includes(roomId)
+        ? prev.filter(r => r !== roomId)
+        : [...prev, roomId],
     );
+    setCurrentPage(1);
   };
 
   // 호실 선택이 바뀌면 페이지 초기화
   useEffect(() => {
-    setCurrentPage(1);
-  }, [selectedRooms]);
+    const fetchReservations = async () => {
+      const startDateTime = toISODateUTC(selectedDate);
+      const endDateTime = toISODateUTC(addDays(selectedDate, 1));
 
-  // 호실 선택에 따라 필터링한 예약 목록
-  const filteredReservations =
-    reservationsByPartitions
-      ?.filter(reservation =>
-        selectedRooms.length === 0
-          ? true
-          : selectedRooms.includes(reservation.roomName),
-      )
-      .sort(
-        (a, b) =>
-          new Date(a.reservationStartTime) - new Date(b.reservationStartTime),
-      ) || [];
+      try {
+        const res = await reservationSearch({
+          startDateTime,
+          endDateTime,
+          roomIds: selectedRoomIds.length > 0 ? selectedRoomIds : undefined,
+          page: currentPage - 1,
+        });
 
-  // 페이지네이션 계산
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedReservations = filteredReservations.slice(
-    startIndex,
-    startIndex + itemsPerPage,
-  );
+        setReservations(res.data.items);
+        setTotalPages(res.data.meta.totalPages);
+        setPageSize(res.data.meta.size);
+      } catch (error) {
+        openErrorSnackbar(error?.response?.data?.message || '조회 실패');
+      }
+    };
+
+    fetchReservations();
+  }, [selectedDate, currentPage, selectedRoomIds]);
 
   return (
     <div>
@@ -171,13 +178,16 @@ const ReservationState = () => {
       <div className="flex flex-row items-center justify-between">
         {/* Filtering Checkbox */}
         <div className="flex flex-row gap-x-6 items-center pt-4 pb-8">
-          {roomNameList?.map(room => (
-            <div key={room} className="flex flex-row gap-x-2 items-center">
+          {rooms?.map(room => (
+            <div
+              key={room.roomId}
+              className="flex flex-row gap-x-2 items-center">
               <Checkbox
-                onChange={() => handleRoomSelect(room)}
+                checked={selectedRoomIds.includes(room.roomId)}
+                onChange={() => handleRoomSelect(room.roomId)}
                 className="rounded-none text-[#1D2430] focus:ring-[#1D2430]"
               />
-              <div>{room}호</div>
+              <div>{room.roomName}호</div>
             </div>
           ))}
         </div>
@@ -219,13 +229,8 @@ const ReservationState = () => {
             <Table.HeadCell>출석 상태 변경</Table.HeadCell>
           </Table.Head>
           <Table.Body className="divide-y text-center">
-            {paginatedReservations
-              ?.filter(reservation =>
-                selectedRooms.length === 0
-                  ? true // 체크박스 선택 없으면 전체 출력
-                  : selectedRooms.includes(reservation.roomName),
-              )
-              .sort(
+            {reservations
+              ?.sort(
                 (a, b) =>
                   new Date(a.reservationStartTime) -
                   new Date(b.reservationStartTime),
@@ -300,7 +305,7 @@ const ReservationState = () => {
         {/* pagination */}
         <div className="flex justify-center mt-4">
           <Pagination
-            count={Math.ceil(filteredReservations.length / itemsPerPage)}
+            count={totalPages}
             page={currentPage}
             onChange={(event, value) => setCurrentPage(value)}
             shape="rounded"
@@ -323,7 +328,7 @@ const ReservationState = () => {
                     key={serviceRole}
                     className="flex items-center gap-2 mb-2">
                     <Checkbox
-                      className="rounded-none"
+                      className="rounded-none text-[#1D2430] focus:ring-[#1D2430]"
                       checked={selectedRoles.includes(serviceRole)}
                       onChange={() => toggleRole(serviceRole)}
                     />

@@ -228,3 +228,46 @@ export const useExportReservationExcel = async ({
   link.click();
   link.remove();
 };
+
+// [관리자] 예약 검색 조회
+export const useReservationSearch = () => {
+  return useMutation({
+    mutationFn: async ({
+      username,
+      serial,
+      roomIds,
+      roomPartitionIds,
+      startDateTime,
+      endDateTime,
+      states,
+      page,
+      size = 10,
+    }) => {
+      const response = await apiClient.post('reservations/search', {
+        username,
+        serial,
+        roomIds,
+        roomPartitionIds,
+        startDateTime,
+        endDateTime,
+        states,
+        page,
+        size,
+      });
+      return response.data;
+    },
+  });
+};
+
+// [관리자] 예약 상태 리스트 조회
+const fetchStates = async () => {
+  const response = await apiClient.get('/reservations/states');
+  return response.data.data;
+};
+
+export const useStates = () => {
+  return useQuery({
+    queryKey: ['states'],
+    queryFn: fetchStates,
+  });
+};
