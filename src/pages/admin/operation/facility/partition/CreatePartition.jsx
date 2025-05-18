@@ -90,8 +90,8 @@ const CreatePartition = () => {
       <div className="bg-white xl:w-1/2  p-4 mb-8 inline-block shadow-md rounded-xl w-full">
         <div className="font-bold text-xl p-3">Partition 조회</div>
         <div>
-          <Table className="text-lg">
-            <Table.Head className="text-lg">
+          <Table className="text-md">
+            <Table.Head className="text-md">
               <Table.HeadCell className="bg-gray-200">호실명</Table.HeadCell>
               <Table.HeadCell className="bg-gray-200">파티션명</Table.HeadCell>
             </Table.Head>

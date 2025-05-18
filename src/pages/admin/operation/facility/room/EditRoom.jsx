@@ -49,7 +49,7 @@ const EditRoom = () => {
       </div>
 
       <Table className="shadow-md">
-        <Table.Head className="text-lg break-keep">
+        <Table.Head className="text-md break-keep">
           <Table.HeadCell className="bg-gray-200"></Table.HeadCell>
           <Table.HeadCell className="bg-gray-200">파티션ID</Table.HeadCell>
           <Table.HeadCell className="bg-gray-200">파티션명</Table.HeadCell>
@@ -57,7 +57,7 @@ const EditRoom = () => {
         <Table.Body className="bg-white">
           {roomPartitions?.data?.partitions?.map(roomPartition => (
             <Table.Row
-              className="text-lg hover:bg-gray-50"
+              className="text-md hover:bg-gray-50"
               key={roomPartition.roomPartitionId}>
               <Table.Cell>
                 <Checkbox

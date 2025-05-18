@@ -89,8 +89,8 @@ const CreateRoom = () => {
         </div>
         {/* 부서 선택 */}
         <div className="p-4">
-          <Table className="text-lg">
-            <Table.Head className="text-lg">
+          <Table className="text-md">
+            <Table.Head className="text-md">
               <Table.HeadCell className="bg-gray-200"></Table.HeadCell>
               <Table.HeadCell className="bg-gray-200">부서ID</Table.HeadCell>
               <Table.HeadCell className="bg-gray-200">부서명</Table.HeadCell>
@@ -140,8 +140,8 @@ const CreateRoom = () => {
           )}
         </div>
         <div>
-          <Table className="text-lg text-center">
-            <Table.Head className="text-lg">
+          <Table className="text-md text-center">
+            <Table.Head className="text-md">
               <Table.HeadCell className="bg-gray-200"></Table.HeadCell>
               <Table.HeadCell className="bg-gray-200">호실 ID</Table.HeadCell>
               <Table.HeadCell className="bg-gray-200">호실명</Table.HeadCell>
