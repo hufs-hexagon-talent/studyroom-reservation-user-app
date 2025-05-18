@@ -115,51 +115,6 @@ export const useChangeState = () => {
   });
 };
 
-// visited로 변경
-export const useVisitedState = state => {
-  return useMutation({
-    mutationFn: async reservationId => {
-      const changeState_res = await apiClient.patch(
-        `/reservations/admin/${reservationId}`,
-        {
-          state: 'VISITED',
-        },
-      );
-      return changeState_res.data;
-    },
-  });
-};
-
-// not_visited로 변경
-export const useNotVisitedState = () => {
-  return useMutation({
-    mutationFn: async reservationId => {
-      const changeState_res = await apiClient.patch(
-        `/reservations/admin/${reservationId}`,
-        {
-          state: 'NOT_VISITED',
-        },
-      );
-      return changeState_res.data;
-    },
-  });
-};
-
-// processed 변경
-export const useProcessedState = () => {
-  return useMutation({
-    mutationFn: async reservationId => {
-      const changeState_res = await apiClient.patch(
-        `/reservations/admin/${reservationId}`,
-        {
-          state: 'PROCESSED',
-        },
-      );
-      return changeState_res.data;
-    },
-  });
-};
-
 // [관리자] userId로 사용자의 예약들 조회
 const fetchReservationsById = async userId => {
   const reservationById_res = await apiClient.get(
