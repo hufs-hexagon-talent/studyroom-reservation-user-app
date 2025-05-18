@@ -6,16 +6,13 @@ import { Pagination } from '@mui/material';
 import { useSnackbar } from 'react-simple-snackbar';
 import { useAllRooms } from '../../../api/room.api';
 import {
-  useVisitedState,
-  useNotVisitedState,
-  useProcessedState,
+  useChangeState,
   useAdminDeleteReservation,
   useExportReservationExcel,
   useReservationSearch,
   useStates,
 } from '../../../api/reservation.api';
 import { Table, Checkbox, Modal, Button } from 'flowbite-react';
-import Edit from '../../../assets/icons/edit.png';
 import { HiOutlineExclamationCircle } from 'react-icons/hi';
 import 'react-datepicker/dist/react-datepicker.css';
 import { FaFileExcel } from 'react-icons/fa6';
@@ -26,8 +23,6 @@ const ReservationState = () => {
   const [selectedRoomIds, setSelectedRoomIds] = useState([]);
   const [selectedReservationId, setSelectedReservationId] = useState(null);
   const [selectedRoles, setSelectedRoles] = useState([]);
-  const [selectedReservationIdForDelete, setSelectedReservationIdForDelete] =
-    useState(null);
 
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [startDate, setStartDate] = useState('');
@@ -44,9 +39,7 @@ const ReservationState = () => {
   const { data: serviceRoles } = useStates();
 
   const { mutate: doDelete } = useAdminDeleteReservation();
-  const { mutateAsync: visitedState } = useVisitedState();
-  const { mutateAsync: notVisitedState } = useNotVisitedState();
-  const { mutateAsync: processedState } = useProcessedState();
+  const { mutateAsync: changeState } = useChangeState();
   const { mutateAsync: reservationSearch } = useReservationSearch();
 
   const [openErrorSnackbar] = useSnackbar({
@@ -91,18 +84,15 @@ const ReservationState = () => {
     setPageSize(res.data.meta.size);
   };
 
-  // 출석 상태 변경
+  // 출석 상태 변경 함수
   const handleStateChange = async state => {
     try {
-      const stateFns = {
-        notVisited: notVisitedState,
-        visited: visitedState,
-        processed: processedState,
-      };
-      const response = await stateFns[state](selectedReservationId);
+      const response = await changeState({
+        reservationId: selectedReservationId,
+        state,
+      });
       openSuccessSnackbar(response.message, 2500);
       setOpenEditModal(false);
-
       await refetchReservations(); // 변경 후 refetch
     } catch (error) {
       openErrorSnackbar(error.response.data.errorMessage, 2500);
@@ -176,7 +166,7 @@ const ReservationState = () => {
         />
       </div>
       <div className="flex flex-row items-center justify-between">
-        {/* Filtering Checkbox */}
+        {/* 호실 필터링 체크박스 */}
         <div className="flex flex-row gap-x-6 items-center pt-4 pb-8">
           {rooms?.map(room => (
             <div
@@ -192,20 +182,23 @@ const ReservationState = () => {
           ))}
         </div>
         <div className="flex space-x-4 items-center">
-          {/* 예약 삭제 */}
-          {selectedReservationIdForDelete && (
-            <div className="flex justify-end">
+          {selectedReservationId && (
+            <div className="flex justify-end space-x-4">
+              {/* 예약 상태 수정 버튼 */}
+              <Button onClick={() => setOpenEditModal(true)} color="dark">
+                수정
+              </Button>
+              {/* 예약 삭제 버튼 */}
               <Button
                 color="dark"
                 onClick={() => {
-                  setSelectedReservationId(selectedReservationIdForDelete);
                   setOpenDeleteModal(true);
                 }}>
                 삭제
               </Button>
             </div>
           )}
-          {/* Export Excel */}
+          {/* 엑셀 내보내기 버튼 */}
           <Button
             onClick={setOpenExportModal}
             className="cursor-pointer"
@@ -226,7 +219,6 @@ const ReservationState = () => {
             <Table.HeadCell>이름</Table.HeadCell>
             <Table.HeadCell>시작 시간</Table.HeadCell>
             <Table.HeadCell>종료 시간</Table.HeadCell>
-            <Table.HeadCell>출석 상태 변경</Table.HeadCell>
           </Table.Head>
           <Table.Body className="divide-y text-center">
             {reservations
@@ -241,11 +233,10 @@ const ReservationState = () => {
                     <Checkbox
                       className="rounded-none text-[#1D2430] focus:ring-[#1D2430]"
                       checked={
-                        selectedReservationIdForDelete ===
-                        reservation.reservationId
+                        selectedReservationId === reservation.reservationId
                       }
                       onChange={() => {
-                        setSelectedReservationIdForDelete(prev =>
+                        setSelectedReservationId(prev =>
                           prev === reservation.reservationId
                             ? null
                             : reservation.reservationId,
@@ -285,19 +276,6 @@ const ReservationState = () => {
                   <Table.Cell>
                     {format(new Date(reservation.reservationEndTime), 'HH:mm')}
                   </Table.Cell>
-                  <Table.Cell>
-                    <div className="flex justify-center items-center h-full">
-                      <img
-                        src={Edit}
-                        alt="edit"
-                        onClick={() => {
-                          setSelectedReservationId(reservation.reservationId);
-                          setOpenEditModal(true);
-                        }}
-                        className="cursor-pointer w-6 h-6"
-                      />
-                    </div>
-                  </Table.Cell>
                 </Table.Row>
               ))}
           </Table.Body>
@@ -323,7 +301,7 @@ const ReservationState = () => {
           <Modal.Body>
             <div className="flex flex-col gap-y-6">
               <div className="flex flex-row gap-x-3">
-                {serviceRoles.map(serviceRole => (
+                {serviceRoles?.map(serviceRole => (
                   <div
                     key={serviceRole}
                     className="flex items-center gap-2 mb-2">
@@ -372,8 +350,8 @@ const ReservationState = () => {
         </Modal>
       </div>
 
+      {/* 예약 삭제 모달 */}
       <div className="flex justify-center items-center">
-        {/* 예약 삭제 모달 */}
         <Modal
           className="flex justify-center items-center w-full p-4 sm:p-0"
           show={openDeleteModal}
@@ -408,6 +386,7 @@ const ReservationState = () => {
             </div>
           </Modal.Body>
         </Modal>
+
         {/* 출석 상태 변경 모달 */}
         <Modal
           show={openEditModal}
@@ -424,17 +403,17 @@ const ReservationState = () => {
             <div className="flex flex-col space-y-6">
               <p
                 className="inline-block text-lg hover:underline cursor-pointer"
-                onClick={() => handleStateChange('visited')}>
+                onClick={() => handleStateChange('VISITED')}>
                 출석으로 변경
               </p>
               <p
                 className="inline-block text-lg hover:underline cursor-pointer"
-                onClick={() => handleStateChange('notVisited')}>
+                onClick={() => handleStateChange('NOT_VISITED')}>
                 미출석으로 변경
               </p>
               <p
                 className="inline-block text-lg hover:underline cursor-pointer"
-                onClick={() => handleStateChange('processed')}>
+                onClick={() => handleStateChange('PROCESSED')}>
                 처리됨으로 변경
               </p>
             </div>

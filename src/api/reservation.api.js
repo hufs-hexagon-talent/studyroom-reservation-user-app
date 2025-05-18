@@ -99,8 +99,24 @@ export const useNoShow = () => {
     queryFn: fetchNoShow,
   });
 };
+
+// [관리자] 특정 예약 상태 변경
+export const useChangeState = () => {
+  return useMutation({
+    mutationFn: async ({ reservationId, state }) => {
+      const response = await apiClient.patch(
+        `/reservations/admin/${reservationId}`,
+        {
+          state: state,
+        },
+      );
+      return response.data;
+    },
+  });
+};
+
 // visited로 변경
-export const useVisitedState = () => {
+export const useVisitedState = state => {
   return useMutation({
     mutationFn: async reservationId => {
       const changeState_res = await apiClient.patch(
