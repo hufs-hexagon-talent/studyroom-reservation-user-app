@@ -11,7 +11,7 @@ import { HiOutlineExclamationCircle } from 'react-icons/hi';
 import { useSnackbar } from 'react-simple-snackbar';
 import { Pagination } from '@mui/material';
 
-const FetchReservations = () => {
+const FetchUserReservations = () => {
   const { id } = useParams();
 
   const { mutateAsync: changeState } = useChangeState();
@@ -118,7 +118,6 @@ const FetchReservations = () => {
           <Table.HeadCell>날짜</Table.HeadCell>
           <Table.HeadCell>시작 시간</Table.HeadCell>
           <Table.HeadCell>종료 시간</Table.HeadCell>
-          <Table.HeadCell>출석 상태 변경</Table.HeadCell>
         </Table.Head>
         <Table.Body className="divide-y text-center">
           {paginatedReservations
@@ -160,17 +159,6 @@ const FetchReservations = () => {
                 </Table.Cell>
                 <Table.Cell>
                   {format(new Date(reservation.reservationEndTime), 'HH:mm')}
-                </Table.Cell>
-                <Table.Cell>
-                  <a
-                    href="#"
-                    onClick={() => {
-                      setSelectedReservationId(reservation.reservationId); // reservationId 설정
-                      setOpenEditModal(true);
-                    }}
-                    className="font-bold text-blue-500 cursor-pointer hover:underline dark:text-cyan-500">
-                    수정
-                  </a>
                 </Table.Cell>
               </Table.Row>
             ))}
@@ -263,4 +251,4 @@ const FetchReservations = () => {
   );
 };
 
-export default FetchReservations;
+export default FetchUserReservations;

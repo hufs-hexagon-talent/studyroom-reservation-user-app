@@ -21,14 +21,14 @@ import EmailVerify from './pages/password/EmailVerify';
 import DivideAct from './pages/manage/DivideAct';
 import SearchUser from './pages/admin/user/SearchUser';
 import FetchState from './pages/admin/user/FetchState';
-import FetchReservations from './pages/admin/user/FetchReservations';
+import FetchUserReservations from './pages/admin/user/FetchUserReservations';
 import MyPage from './pages/mypage/MyPage';
 import NoShow from './pages/check/NoShow';
 import EmailSend from './pages/email/EmailSend';
 import PolicyManagement from './pages/admin/operation/policy/PolicyManagement';
 import ScheduleCreate from './pages/admin/operation/schedule/ScheduleCreate';
-import ScheduleDelete from './pages/admin/operation/schedule/ScheduleDelete';
 import ScheduleFetch from './pages/admin/operation/schedule/ScheduleFetch';
+import Schedule from './pages/admin/operation/schedule/Schedule';
 import ReservationState from './pages/admin/reservation management/ReservationState';
 import BannerUpload from './pages/admin/banner/BannerUpload';
 import UserStatics from './pages/admin/statics/UserStatics';
@@ -106,13 +106,13 @@ const RouterComponent = () => {
                   />
                   <Route
                     path="fetchReservations/:id"
-                    element={<FetchReservations />}
+                    element={<FetchUserReservations />}
                   />
                   {/* 운영 관리 */}
                   <Route path="policy" element={<PolicyManagement />} />
                   <Route path="schedule/create" element={<ScheduleCreate />} />
-                  <Route path="schedule/delete" element={<ScheduleDelete />} />
                   <Route path="schedule/fetch" element={<ScheduleFetch />} />
+                  <Route path="schedule/fetch/:date" element={<Schedule />} />
                   <Route path="facility/room" element={<CreateRoom />} />
                   <Route path="facility/room/:roomId" element={<EditRoom />} />
                   <Route
