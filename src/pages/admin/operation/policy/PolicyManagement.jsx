@@ -161,8 +161,7 @@ const PolicyManagement = () => {
                 </Button>
                 <Button
                   onClick={() => setOpenDeleteModal(selectedPolicyId)}
-                  color="dark"
-                  className="hover:bg-gray-700 text-white rounded">
+                  className="bg-red-600 hover:bg-red-700 text-white rounded">
                   삭제
                 </Button>
               </div>

@@ -99,7 +99,7 @@ const Schedule = () => {
             </Button>
             <Button
               onClick={() => setOpenDeleteModal(selectedScheduleId)}
-              color="dark">
+              className="bg-red-600 hover:bg-red-700">
               삭제
             </Button>
           </div>

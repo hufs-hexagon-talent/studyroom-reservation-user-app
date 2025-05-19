@@ -100,7 +100,7 @@ const FetchUserReservations = () => {
               수정
             </Button>
             <Button
-              color="dark"
+              className="bg-red-600 hover:bg-red-700"
               onClick={() => {
                 setOpenDeleteModal(true);
               }}>
@@ -128,7 +128,7 @@ const FetchUserReservations = () => {
                 className="bg-white dark:border-gray-700 dark:bg-gray-800">
                 <Table.Cell>
                   <Checkbox
-                    className="rounded-none"
+                    className="rounded-none text-[#1D2430] focus:ring-[#1D2430] cursor-pointer"
                     checked={
                       selectedReservationId === reservation.reservationId
                     }
