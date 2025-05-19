@@ -42,7 +42,9 @@ const EditRoom = () => {
         </div>
 
         {selectedPartitionId && (
-          <Button color="dark" onClick={handleDelete}>
+          <Button
+            className="bg-red-600 hover:bg-red-700"
+            onClick={handleDelete}>
             삭제
           </Button>
         )}

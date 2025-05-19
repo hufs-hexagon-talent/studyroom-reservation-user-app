@@ -40,7 +40,6 @@ const menuData = [
         label: '운영 시간 관리',
         children: [
           { label: '스케줄 생성', to: '/divide/schedule/create' },
-          { label: '스케줄 삭제', to: '/divide/schedule/delete' },
           { label: '스케줄 조회', to: '/divide/schedule/fetch' },
         ],
       },

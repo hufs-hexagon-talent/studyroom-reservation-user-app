@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Pagination } from '@mui/material';
-import { Table, Modal } from 'flowbite-react';
+import { Table } from 'flowbite-react';
 import {
   fetchDate,
   fetchScheduleByDate,
@@ -9,11 +10,13 @@ import { format } from 'date-fns';
 
 const ScheduleFetch = () => {
   const DEPARTMENT_ID = 1;
+  const navigate = useNavigate();
+
   const [availableDate, setAvailableDate] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [openPolicyModal, setOpenPolicyModal] = useState(false);
   const [selectedSchedule, setSelectedSchedule] = useState([]);
   const [selectedDate, setSelectedDate] = useState(null);
+
+  const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
   useEffect(() => {
@@ -27,7 +30,7 @@ const ScheduleFetch = () => {
   // 날짜 별 스케줄 로드 함수
   useEffect(() => {
     const loadSchedule = async () => {
-      if (openPolicyModal && selectedDate) {
+      if (selectedDate) {
         const data = await fetchScheduleByDate(
           format(new Date(selectedDate), 'yyyy-MM-dd'),
         );
@@ -36,7 +39,7 @@ const ScheduleFetch = () => {
     };
 
     loadSchedule();
-  }, [openPolicyModal, selectedDate]);
+  }, [selectedDate]);
 
   // 페이지네이션
   const handlePageChange = (event, value) => {
@@ -60,21 +63,26 @@ const ScheduleFetch = () => {
         <div className="mt-8">
           <Table className="mx-auto">
             <Table.Body className="divide-y">
-              {paginatedDates?.map((date, index) => (
-                <Table.Row
-                  key={index}
-                  className="cursor-pointer bg-white"
-                  onClick={() => {
-                    setSelectedDate(date);
-                    setOpenPolicyModal(true);
-                  }}>
-                  <Table.Cell className="text-gray-600 text-lg">
-                    {format(date, 'yyyy년 MM월 dd일')}
-                  </Table.Cell>
-                </Table.Row>
-              ))}
+              {paginatedDates?.map((date, index) => {
+                const formattedDate = format(date, 'yyyy-MM-dd'); // ← 세미콜론 필수
+
+                return (
+                  <Table.Row
+                    key={index}
+                    className="cursor-pointer bg-white"
+                    onClick={() => {
+                      setSelectedDate(date);
+                      navigate(`/divide/schedule/fetch/${formattedDate}`);
+                    }}>
+                    <Table.Cell className="text-gray-600 text-lg">
+                      {format(date, 'yyyy년 MM월 dd일')}
+                    </Table.Cell>
+                  </Table.Row>
+                );
+              })}
             </Table.Body>
           </Table>
+
           <div className="flex justify-center mt-4">
             <Pagination
               count={totalPages}
@@ -85,38 +93,6 @@ const ScheduleFetch = () => {
           </div>
         </div>
       </div>
-
-      {/* Modal */}
-      <Modal
-        show={openPolicyModal}
-        onClose={() => {
-          setOpenPolicyModal(false);
-          setSelectedSchedule([]);
-        }}
-        className="flex justify-center items-center">
-        <Modal.Header>
-          상세 정보 (
-          {selectedDate ? format(new Date(selectedDate), 'yyyy-MM-dd') : ''})
-        </Modal.Header>
-        <Modal.Body>
-          {selectedSchedule.length > 0 ? (
-            <div className="flex flex-col gap-2 text-gray-800">
-              {selectedSchedule.map((item, idx) => (
-                <div key={idx} className="p-2 border rounded">
-                  <div>
-                    호실 ID: <strong>{item.roomId}</strong>
-                  </div>
-                  <div>
-                    정책 ID: <strong>{item.roomOperationPolicyId}</strong>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-gray-500">스케줄 정보가 없습니다.</div>
-          )}
-        </Modal.Body>
-      </Modal>
     </div>
   );
 };

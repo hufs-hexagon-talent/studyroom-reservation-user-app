@@ -130,7 +130,7 @@ const CreateRoom = () => {
           {/* 삭제 버튼 */}
           {selectedRoomId && (
             <Button
-              color="dark"
+              className="bg-red-600 hover:bg-red-700"
               onClick={async () => {
                 deleteRoom(selectedRoomId);
                 setSelectedRoomId(null);
