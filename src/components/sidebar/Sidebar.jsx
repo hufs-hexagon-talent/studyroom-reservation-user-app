@@ -57,9 +57,7 @@ const menuData = [
     icon: HiFilm,
     children: [
       { label: '배너 생성', to: '/divide/banner/create' },
-      { label: '배너 조회', to: '/divide/banner/fetch' },
-      { label: '배너 수정', to: '/divide/banner/edit' },
-      { label: '배너 삭제', to: '/divide/banner/delete' },
+      { label: '배너 관리', to: '/divide/banner/manage' },
     ],
   },
 ];

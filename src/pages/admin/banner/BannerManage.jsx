@@ -1,10 +1,18 @@
 import React, { useState } from 'react';
-import { useAllBanners, useEditBanner } from '../../../api/banner.api';
+import {
+  useAllBanners,
+  useEditBanner,
+  useDeleteBanner,
+} from '../../../api/banner.api';
 import { Button, Checkbox, Modal, Table } from 'flowbite-react';
-import { HiXCircle, HiCheckCircle } from 'react-icons/hi';
+import {
+  HiXCircle,
+  HiCheckCircle,
+  HiOutlineExclamationCircle,
+} from 'react-icons/hi';
 import { useSnackbar } from 'react-simple-snackbar';
 
-const FetchAllBanners = () => {
+const BannerManage = () => {
   const [selectedBannerId, setSelectedBannerId] = useState(null);
   const [editBannerType, setEditBannerType] = useState('');
   const [editImageUrl, setEditImageUrl] = useState('');
@@ -14,8 +22,10 @@ const FetchAllBanners = () => {
 
   const [openEditModal, setOpenEditModal] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
+
   const { data: allBanners, refetch: allBannersRefetch } = useAllBanners();
   const { mutateAsync: doEditBanner } = useEditBanner();
+  const { mutateAsync: doDeleteBanner } = useDeleteBanner();
 
   const [openErrorSnackbar] = useSnackbar({
     position: 'top-right',
@@ -67,16 +77,37 @@ const FetchAllBanners = () => {
     );
   };
 
+  // 배너 삭제
+  const deleteBanner = async () => {
+    if (selectedBannerId === null) {
+      openErrorSnackbar('삭제할 배너를 선택하세요.', 2500);
+      return;
+    }
+    await doDeleteBanner(selectedBannerId, {
+      onSuccess: () => {
+        openSuccessSnackbar('배너 삭제 성공!', 2500);
+        setSelectedBannerId(null);
+        allBannersRefetch();
+      },
+      onError: () => {
+        openErrorSnackbar('배너 삭제 실패!', 2500);
+      },
+    });
+  };
+
   return (
     <div className="flex flex-col px-4 gap-6">
       <div className="flex flex-row justify-between items-center py-6">
-        <div className="font-bold text-3xl text-black px-4">Fetch Banner</div>
+        <div className="font-bold text-3xl text-black px-4">
+          Banner Management
+        </div>
         {selectedBannerId && (
           <div className="flex flex-row space-x-2">
+            {/* 수정 버튼 */}
             <Button
               onClick={() => {
                 const banner = allBanners.find(
-                  b => b.bannerId === selectedBannerId,
+                  b => b.selectedBannerId === selectedBannerId,
                 );
                 if (banner) {
                   setEditBannerId(banner.bannerId);
@@ -90,8 +121,12 @@ const FetchAllBanners = () => {
               color="dark">
               수정
             </Button>
-
-            <Button className="bg-red-600 hover:bg-red-700">삭제</Button>
+            {/* 삭제 버튼 */}
+            <Button
+              onClick={() => setOpenDeleteModal(true)}
+              className="bg-red-600 hover:bg-red-700">
+              삭제
+            </Button>
           </div>
         )}
       </div>
@@ -141,6 +176,8 @@ const FetchAllBanners = () => {
           </Table.Body>
         </Table>
       </div>
+
+      {/* 배너 수정 모달 */}
       <Modal show={openEditModal} onClose={() => setOpenEditModal(false)}>
         <Modal.Header>
           <strong>{selectedBannerId}</strong>번 배너 수정
@@ -230,8 +267,44 @@ const FetchAllBanners = () => {
           </div>
         </Modal.Body>
       </Modal>
+
+      {/* 배너 삭제 모달 */}
+      <Modal
+        className="flex justify-center items-center w-full p-4 sm:p-0"
+        show={openDeleteModal}
+        size="md"
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+        onClose={() => setOpenDeleteModal(false)}
+        popup>
+        <Modal.Header />
+        <Modal.Body>
+          <div className="text-center">
+            <HiOutlineExclamationCircle className="mx-auto mb-4 h-14 w-14 text-gray-400 dark:text-gray-200" />
+            <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
+              해당 예약을 삭제하시겠습니까?
+            </h3>
+            <div className="flex justify-center gap-4">
+              <Button color="gray" onClick={() => setOpenDeleteModal(false)}>
+                취소
+              </Button>
+              <Button
+                color="failure"
+                onClick={() => {
+                  deleteBanner(selectedBannerId);
+                  setOpenDeleteModal(null);
+                }}>
+                확인
+              </Button>
+            </div>
+          </div>
+        </Modal.Body>
+      </Modal>
     </div>
   );
 };
 
-export default FetchAllBanners;
+export default BannerManage;
