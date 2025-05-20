@@ -30,15 +30,13 @@ import ScheduleCreate from './pages/admin/operation/schedule/ScheduleCreate';
 import ScheduleFetch from './pages/admin/operation/schedule/ScheduleFetch';
 import Schedule from './pages/admin/operation/schedule/Schedule';
 import ReservationState from './pages/admin/reservation management/ReservationState';
-import BannerUpload from './pages/admin/banner/BannerUpload';
 import UserStatics from './pages/admin/statics/UserStatics';
 import ReservationStatics from './pages/admin/statics/ReservationStatics';
 import CreateRoom from './pages/admin/operation/facility/room/CreateRoom';
 import EditRoom from './pages/admin/operation/facility/room/EditRoom';
 import CreatePartition from './pages/admin/operation/facility/partition/CreatePartition';
-import BannerEdit from './pages/admin/banner/BannerEdit';
-import FetchAllBanners from './pages/admin/banner/FetchAllBanners';
-import BannerDelete from './pages/admin/banner/BannerDelete';
+import BannerUpload from './pages/admin/banner/BannerUpload';
+import BannerManage from './pages/admin/banner/BannerManage';
 
 const RouterComponent = () => {
   const { loggedIn } = useAuth();
@@ -121,9 +119,7 @@ const RouterComponent = () => {
                   />
                   {/* 배너 관리 */}
                   <Route path="banner/create" element={<BannerUpload />} />
-                  <Route path="banner/edit" element={<BannerEdit />} />
-                  <Route path="banner/fetch" element={<FetchAllBanners />} />
-                  <Route path="banner/delete" element={<BannerDelete />} />
+                  <Route path="banner/manage" element={<BannerManage />} />
                 </Route>
               </>
             )}

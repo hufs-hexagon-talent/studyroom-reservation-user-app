@@ -94,6 +94,7 @@ const FetchUserReservations = () => {
         <h1 className="text-3xl mx-4">
           <strong>{reservations[0]?.name}</strong>님의 예약
         </h1>
+
         {selectedReservationId && (
           <div className="flex justify-end space-x-4">
             <Button color="dark" onClick={() => setOpenEditModal(true)}>
