@@ -83,7 +83,7 @@ const BannerEdit = () => {
             onChange={handleCheckboxChange}
           />
         </div>
-        {/* 배너 타입 업로드 */}
+        {/* 배너 아이디 */}
         <div className="flex flex-row text-center">
           <div className="border bg-gray-200 rounded-l-lg text-gray-600 font-bold text-lg w-1/4 flex justify-center items-center">
             id
@@ -100,7 +100,7 @@ const BannerEdit = () => {
             />
           </div>
         </div>
-        {/* 배너 타입 업로드 */}
+        {/* 배너 타입 */}
         <div className="flex flex-row text-center">
           <div className="border bg-gray-200 rounded-l-lg text-gray-600 font-bold text-lg w-1/4 flex justify-center items-center">
             type
@@ -117,7 +117,7 @@ const BannerEdit = () => {
             />
           </div>
         </div>
-        {/* 이미지 URL 업로드 */}
+        {/* 이미지 URL */}
         <div className="flex flex-row text-center">
           <div className="border bg-gray-200 rounded-l-lg text-gray-600 font-bold text-lg w-1/4 flex justify-center items-center">
             img
@@ -134,7 +134,7 @@ const BannerEdit = () => {
             />
           </div>
         </div>
-        {/* 링크 URL 업로드 */}
+        {/* 링크 URL */}
         <div className="flex flex-row text-center">
           <div className="border bg-gray-200 rounded-l-lg text-gray-600 font-bold text-lg w-1/4 flex justify-center items-center">
             link
