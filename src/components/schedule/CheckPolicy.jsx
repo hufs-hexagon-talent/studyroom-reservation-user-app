@@ -25,17 +25,25 @@ const CheckPolicy = ({ selectedPolicyId, setSelectedPolicyId }) => {
         <div className="overflow-x-auto mt-4">
           <Table>
             <Table.Head className="text-center">
-              <Table.HeadCell>선택</Table.HeadCell>
-              <Table.HeadCell>Policy ID</Table.HeadCell>
-              <Table.HeadCell>운영 시작 시간</Table.HeadCell>
-              <Table.HeadCell>운영 종료 시간</Table.HeadCell>
-              <Table.HeadCell>최대 사용 시간(분)</Table.HeadCell>
+              <Table.HeadCell className="cursor-pointer bg-gray-200"></Table.HeadCell>
+              <Table.HeadCell className="cursor-pointer bg-gray-200">
+                Policy ID
+              </Table.HeadCell>
+              <Table.HeadCell className="cursor-pointer bg-gray-200">
+                운영 시작 시간
+              </Table.HeadCell>
+              <Table.HeadCell className="cursor-pointer bg-gray-200">
+                운영 종료 시간
+              </Table.HeadCell>
+              <Table.HeadCell className="cursor-pointer bg-gray-200">
+                최대 사용 시간(분)
+              </Table.HeadCell>
             </Table.Head>
             <Table.Body className="text-center divide-y">
               {policies?.map(policy => (
                 <Table.Row
                   key={policy.roomOperationPolicyId}
-                  className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                  className="bg-white dark:border-gray-700 dark:bg-gray-800 cursor-pointer hover:bg-gray-50">
                   <Table.Cell className="p-4">
                     <Checkbox
                       className="rounded-none text-[#1D2430] focus:ring-[#1D2430] cursor-pointer"

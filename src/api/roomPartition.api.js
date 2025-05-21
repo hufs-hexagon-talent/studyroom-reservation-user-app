@@ -80,3 +80,16 @@ export const useDeletePartition = () => {
     },
   });
 };
+
+// [관리자] partition 정보 수정
+export const useEditPartition = () => {
+  return useMutation({
+    mutationFn: async ({ partitionId, roomId, partitionNumber }) => {
+      const response = await apiClient.patch(`/partitions/${partitionId}`, {
+        roomId,
+        partitionNumber,
+      });
+      return response.data;
+    },
+  });
+};

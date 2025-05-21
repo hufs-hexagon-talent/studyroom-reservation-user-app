@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Checkbox, Modal, Table } from 'flowbite-react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
+import { Button, Checkbox, Modal, Table, Tooltip } from 'flowbite-react';
 import { Pagination } from '@mui/material';
 import {
   useUnblocked,
@@ -12,6 +13,8 @@ import { useSnackbar } from 'react-simple-snackbar';
 import { FaFileExcel } from 'react-icons/fa6';
 
 const FetchState = () => {
+  const navigate = useNavigate();
+
   const { data: blocked } = useBlockedUser();
   const { data: userRoleList } = useUserRoleList();
   const { mutate: doUnblocked, refetch } = useUnblocked();
@@ -24,6 +27,7 @@ const FetchState = () => {
   const [selectedRoles, setSelectedRoles] = useState([]);
   const [openBlockedModal, setOpenBlockedModal] = useState(false);
   const [selectedBlockedInfo, setSelectedBlockedInfo] = useState(null);
+  const [searchParams] = useSearchParams();
 
   const [openSuccessSnackbar] = useSnackbar({
     position: 'top-right',
@@ -35,9 +39,18 @@ const FetchState = () => {
     style: { backgroundColor: '#FF3333' },
   });
 
+  // 페이지 누를때 상태 관리
   const handlePage = (event, newPage) => {
     setCurrentPage(newPage);
   };
+
+  // URL에 따라 role 필터 선택
+  useEffect(() => {
+    const queryRoles = searchParams.getAll('role');
+    if (queryRoles.length > 0) {
+      setSelectedRoles(queryRoles);
+    }
+  }, []);
 
   // 블락 해제 함수
   const handleUnblocked = async userId => {
@@ -133,14 +146,16 @@ const FetchState = () => {
         {/* Users Table */}
         <Table>
           <Table.Head className="text-center">
-            <Table.HeadCell>User Id</Table.HeadCell>
-            <Table.HeadCell>Service Role</Table.HeadCell>
-            <Table.HeadCell>학번</Table.HeadCell>
-            <Table.HeadCell>이름</Table.HeadCell>
-            <Table.HeadCell>학과</Table.HeadCell>
-            <Table.HeadCell>이메일</Table.HeadCell>
+            <Table.HeadCell className="bg-gray-200">User Id</Table.HeadCell>
+            <Table.HeadCell className="bg-gray-200">
+              Service Role
+            </Table.HeadCell>
+            <Table.HeadCell className="bg-gray-200">학번</Table.HeadCell>
+            <Table.HeadCell className="bg-gray-200">이름</Table.HeadCell>
+            <Table.HeadCell className="bg-gray-200">학과</Table.HeadCell>
+            <Table.HeadCell className="bg-gray-200">이메일</Table.HeadCell>
             {userList.some(user => user.serviceRole === 'BLOCKED') && (
-              <Table.HeadCell>
+              <Table.HeadCell className="bg-gray-200">
                 <span className="sr-only">삭제</span>
               </Table.HeadCell>
             )}
@@ -149,9 +164,8 @@ const FetchState = () => {
             {userList.map((user, index) => (
               <Table.Row
                 key={index}
-                className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                className="bg-white cursor-pointer hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800">
                 <Table.Cell
-                  // blocked이면 userId 클릭할 수 있게
                   onClick={() => {
                     if (user.serviceRole === 'BLOCKED') {
                       const blockedInfo = blocked?.find(
@@ -166,13 +180,36 @@ const FetchState = () => {
                   `}>
                   {user.userId}
                 </Table.Cell>
-                <Table.Cell>{user.serviceRole}</Table.Cell>
-                <Table.Cell>{user.serial ?? '-'}</Table.Cell>
-                <Table.Cell>{user.name}</Table.Cell>
-                <Table.Cell>
+                <Table.Cell
+                  onClick={() =>
+                    navigate(`/divide/fetchReservations/${user.userId}`)
+                  }>
+                  {user.serviceRole}
+                </Table.Cell>
+                <Table.Cell
+                  onClick={() =>
+                    navigate(`/divide/fetchReservations/${user.userId}`)
+                  }>
+                  {user.serial ?? '-'}
+                </Table.Cell>
+                <Table.Cell
+                  onClick={() =>
+                    navigate(`/divide/fetchReservations/${user.userId}`)
+                  }>
+                  {user.name}
+                </Table.Cell>
+                <Table.Cell
+                  onClick={() =>
+                    navigate(`/divide/fetchReservations/${user.userId}`)
+                  }>
                   {user.departmentId === 1 ? '컴퓨터공학부' : '정보통신공학과'}
                 </Table.Cell>
-                <Table.Cell>{user.email ?? '-'}</Table.Cell>
+                <Table.Cell
+                  onClick={() =>
+                    navigate(`/divide/fetchReservations/${user.userId}`)
+                  }>
+                  {user.email ?? '-'}
+                </Table.Cell>
                 {user.serviceRole === 'BLOCKED' ? (
                   <Table.Cell>
                     <a
@@ -208,7 +245,9 @@ const FetchState = () => {
             setOpenBlockedModal(false);
             setSelectedBlockedInfo(null);
           }}>
-          <Modal.Header>Blocked Period</Modal.Header>
+          <Modal.Header>
+            {selectedBlockedInfo?.userInfoResponse.name}의 Blocked Period
+          </Modal.Header>
           <Modal.Body>
             <Table>
               <Table.Head className="text-center text-md">

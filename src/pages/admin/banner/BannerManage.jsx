@@ -4,7 +4,7 @@ import {
   useEditBanner,
   useDeleteBanner,
 } from '../../../api/banner.api';
-import { Button, Checkbox, Modal, Table } from 'flowbite-react';
+import { Button, Checkbox, Modal, Table, Tooltip } from 'flowbite-react';
 import {
   HiXCircle,
   HiCheckCircle,
@@ -131,7 +131,7 @@ const BannerManage = () => {
         )}
       </div>
       <div className="flex flex-col gap-4">
-        <Table className="text-center text-lg">
+        <Table className="text-center text-md">
           <Table.Head className="text-lg break-keep">
             <Table.HeadCell className="bg-gray-200"></Table.HeadCell>
             <Table.HeadCell className="bg-gray-200">배너 ID</Table.HeadCell>
@@ -143,7 +143,9 @@ const BannerManage = () => {
           </Table.Head>
           <Table.Body className="bg-white">
             {allBanners?.map(banner => (
-              <Table.Row key={banner.bannerId}>
+              <Table.Row
+                key={banner.bannerId}
+                className="cursor-pointer hover:bg-gray-50">
                 <Table.Cell>
                   <Checkbox
                     checked={selectedBannerId === banner.bannerId}
@@ -159,11 +161,18 @@ const BannerManage = () => {
                 <Table.Cell className="items-center">
                   <img src={banner.imageUrl} />
                 </Table.Cell>
-                <Table.Cell
-                  className="cursor-pointer"
-                  onClick={() => window.open(banner.linkUrl, '_blank')}>
-                  {banner.linkUrl}
+                <Table.Cell className="cursor-pointer">
+                  <Tooltip content={banner.linkUrl} style="light">
+                    <span
+                      onClick={() => window.open(banner.linkUrl, '_blank')}
+                      className="cursor-defaultt">
+                      {banner.linkUrl.length > 40
+                        ? banner.linkUrl.slice(0, 40) + '...'
+                        : banner.linkUrl}
+                    </span>
+                  </Tooltip>
                 </Table.Cell>
+
                 <Table.Cell className="items-center">
                   {banner.active ? (
                     <HiCheckCircle className="w-6 h-6 text-green-400" />
@@ -285,7 +294,7 @@ const BannerManage = () => {
           <div className="text-center">
             <HiOutlineExclamationCircle className="mx-auto mb-4 h-14 w-14 text-gray-400 dark:text-gray-200" />
             <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
-              해당 예약을 삭제하시겠습니까?
+              해당 배너를 삭제하시겠습니까?
             </h3>
             <div className="flex justify-center gap-4">
               <Button color="gray" onClick={() => setOpenDeleteModal(false)}>

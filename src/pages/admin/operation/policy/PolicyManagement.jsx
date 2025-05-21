@@ -171,15 +171,19 @@ const PolicyManagement = () => {
         <div>
           <Table className="text-center">
             <Table.Head>
-              <Table.HeadCell></Table.HeadCell>
-              <Table.HeadCell>정책 ID</Table.HeadCell>
-              <Table.HeadCell>시작 시각</Table.HeadCell>
-              <Table.HeadCell>종료 시각</Table.HeadCell>
-              <Table.HeadCell>최대 이용 시간</Table.HeadCell>
+              <Table.HeadCell className="bg-gray-200"></Table.HeadCell>
+              <Table.HeadCell className="bg-gray-200">정책 ID</Table.HeadCell>
+              <Table.HeadCell className="bg-gray-200">시작 시각</Table.HeadCell>
+              <Table.HeadCell className="bg-gray-200">종료 시각</Table.HeadCell>
+              <Table.HeadCell className="bg-gray-200">
+                최대 이용 시간
+              </Table.HeadCell>
             </Table.Head>
             <TableBody>
               {policies?.map(policy => (
-                <Table.Row key={policy.roomOperationPolicyId}>
+                <Table.Row
+                  className="hover:bg-gray-50"
+                  key={policy.roomOperationPolicyId}>
                   <Table.Cell>
                     <Checkbox
                       className="rounded-none text-[#1D2430] focus:ring-[#1D2430]"
@@ -212,12 +216,20 @@ const PolicyManagement = () => {
           <Modal.Header>정책 수정</Modal.Header>
           <Modal.Body>
             {policy ? (
-              <Table>
+              <Table className="w-full text-center text-sm">
                 <Table.Head>
-                  <Table.HeadCell>정책 ID</Table.HeadCell>
-                  <Table.HeadCell>시작 시각</Table.HeadCell>
-                  <Table.HeadCell>종료 시각</Table.HeadCell>
-                  <Table.HeadCell>최대 이용 시간</Table.HeadCell>
+                  <Table.HeadCell className="bg-gray-200">
+                    정책 ID
+                  </Table.HeadCell>
+                  <Table.HeadCell className="bg-gray-200">
+                    시작 시각
+                  </Table.HeadCell>
+                  <Table.HeadCell className="bg-gray-200">
+                    종료 시각
+                  </Table.HeadCell>
+                  <Table.HeadCell className="bg-gray-200">
+                    최대 이용 시간
+                  </Table.HeadCell>
                 </Table.Head>
                 <Table.Body>
                   <Table.Row key={policy.roomOperationPolicyId}>
@@ -269,28 +281,30 @@ const PolicyManagement = () => {
           onClose={() => setOpenDeleteModal(false)}
           popup>
           <Modal.Header />
-          <Modal.Body>
-            <div className="text-center space-y-12">
-              <div className="text-lg font-semibold">
-                정책을 삭제하시겠습니까?
+          <div>
+            <Modal.Body>
+              <div className="text-center space-y-12">
+                <div className="text-lg font-semibold">
+                  정책을 삭제하시겠습니까?
+                </div>
+                <div className="flex justify-center gap-6">
+                  <Button
+                    onClick={() => setOpenDeleteModal(null)}
+                    className="bg-gray-400 hover:bg-gray-500 text-white rounded">
+                    아니요
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      deletePolicy(openDeleteModal);
+                      setOpenDeleteModal(null);
+                    }}
+                    className="bg-red-500 hover:bg-red-600 text-white rounded">
+                    삭제
+                  </Button>
+                </div>
               </div>
-              <div className="flex justify-center gap-6">
-                <Button
-                  onClick={() => setOpenDeleteModal(null)}
-                  className="bg-gray-400 hover:bg-gray-500 text-white rounded">
-                  아니요
-                </Button>
-                <Button
-                  onClick={() => {
-                    deletePolicy(openDeleteModal);
-                    setOpenDeleteModal(null);
-                  }}
-                  className="bg-red-500 hover:bg-red-600 text-white rounded">
-                  삭제
-                </Button>
-              </div>
-            </div>
-          </Modal.Body>
+            </Modal.Body>
+          </div>
         </Modal>
       </div>
     </div>
