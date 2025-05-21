@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Button, Checkbox, Modal, Table } from 'flowbite-react';
 import { Pagination } from '@mui/material';
 import {
@@ -24,6 +25,7 @@ const FetchState = () => {
   const [selectedRoles, setSelectedRoles] = useState([]);
   const [openBlockedModal, setOpenBlockedModal] = useState(false);
   const [selectedBlockedInfo, setSelectedBlockedInfo] = useState(null);
+  const [searchParams] = useSearchParams();
 
   const [openSuccessSnackbar] = useSnackbar({
     position: 'top-right',
@@ -35,9 +37,18 @@ const FetchState = () => {
     style: { backgroundColor: '#FF3333' },
   });
 
+  // 페이지 누를때 상태 관리
   const handlePage = (event, newPage) => {
     setCurrentPage(newPage);
   };
+
+  // URL에 따라 role 필터 선택
+  useEffect(() => {
+    const queryRoles = searchParams.getAll('role');
+    if (queryRoles.length > 0) {
+      setSelectedRoles(queryRoles);
+    }
+  }, []);
 
   // 블락 해제 함수
   const handleUnblocked = async userId => {
@@ -133,12 +144,14 @@ const FetchState = () => {
         {/* Users Table */}
         <Table>
           <Table.Head className="text-center">
-            <Table.HeadCell>User Id</Table.HeadCell>
-            <Table.HeadCell>Service Role</Table.HeadCell>
-            <Table.HeadCell>학번</Table.HeadCell>
-            <Table.HeadCell>이름</Table.HeadCell>
-            <Table.HeadCell>학과</Table.HeadCell>
-            <Table.HeadCell>이메일</Table.HeadCell>
+            <Table.HeadCell className="bg-gray-200">User Id</Table.HeadCell>
+            <Table.HeadCell className="bg-gray-200">
+              Service Role
+            </Table.HeadCell>
+            <Table.HeadCell className="bg-gray-200">학번</Table.HeadCell>
+            <Table.HeadCell className="bg-gray-200">이름</Table.HeadCell>
+            <Table.HeadCell className="bg-gray-200">학과</Table.HeadCell>
+            <Table.HeadCell className="bg-gray-200">이메일</Table.HeadCell>
             {userList.some(user => user.serviceRole === 'BLOCKED') && (
               <Table.HeadCell>
                 <span className="sr-only">삭제</span>
