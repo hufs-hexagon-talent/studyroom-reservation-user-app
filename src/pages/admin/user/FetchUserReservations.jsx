@@ -112,13 +112,13 @@ const FetchUserReservations = () => {
       </div>
       <Table className="my-10">
         <Table.Head className="break-keep text-center">
-          <Table.HeadCell></Table.HeadCell>
-          <Table.HeadCell>출석 상태</Table.HeadCell>
-          <Table.HeadCell>예약 ID</Table.HeadCell>
-          <Table.HeadCell>호실</Table.HeadCell>
-          <Table.HeadCell>날짜</Table.HeadCell>
-          <Table.HeadCell>시작 시간</Table.HeadCell>
-          <Table.HeadCell>종료 시간</Table.HeadCell>
+          <Table.HeadCell className="bg-gray-200"></Table.HeadCell>
+          <Table.HeadCell className="bg-gray-200">출석 상태</Table.HeadCell>
+          <Table.HeadCell className="bg-gray-200">예약 ID</Table.HeadCell>
+          <Table.HeadCell className="bg-gray-200">호실</Table.HeadCell>
+          <Table.HeadCell className="bg-gray-200">날짜</Table.HeadCell>
+          <Table.HeadCell className="bg-gray-200">시작 시간</Table.HeadCell>
+          <Table.HeadCell className="bg-gray-200">종료 시간</Table.HeadCell>
         </Table.Head>
         <Table.Body className="divide-y text-center">
           {paginatedReservations
@@ -126,7 +126,7 @@ const FetchUserReservations = () => {
             .map(reservation => (
               <Table.Row
                 key={reservation.reservationId}
-                className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                className="bg-white cursor-pointer hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800">
                 <Table.Cell>
                   <Checkbox
                     className="rounded-none text-[#1D2430] focus:ring-[#1D2430] cursor-pointer"

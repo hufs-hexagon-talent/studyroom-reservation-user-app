@@ -74,19 +74,19 @@ const SerialCheck = () => {
       <div className="overflow-x-auto">
         <Table>
           <Table.Head className="text-center">
-            <Table.HeadCell>역할</Table.HeadCell>
-            <Table.HeadCell>이름</Table.HeadCell>
-            <Table.HeadCell>학번</Table.HeadCell>
-            <Table.HeadCell>이메일</Table.HeadCell>
-            <Table.HeadCell>학과</Table.HeadCell>
-            <Table.HeadCell></Table.HeadCell>
+            <Table.HeadCell className="bg-gray-200">역할</Table.HeadCell>
+            <Table.HeadCell className="bg-gray-200">이름</Table.HeadCell>
+            <Table.HeadCell className="bg-gray-200">학번</Table.HeadCell>
+            <Table.HeadCell className="bg-gray-200">이메일</Table.HeadCell>
+            <Table.HeadCell className="bg-gray-200">학과</Table.HeadCell>
+            <Table.HeadCell className="bg-gray-200"></Table.HeadCell>
           </Table.Head>
           <Table.Body className="divide-y text-center">
             {userInfo.length > 0 ? (
               userInfo.map(user => (
                 <Table.Row
                   key={user.userId}
-                  className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                  className="bg-white cursor-pointer hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800">
                   <Table.Cell>{user.serviceRole}</Table.Cell>
                   <Table.Cell>{user.name}</Table.Cell>
                   <Table.Cell>{user.serial || '-'}</Table.Cell>

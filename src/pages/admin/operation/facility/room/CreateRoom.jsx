@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   useCreateRoom,
@@ -99,9 +99,9 @@ const CreateRoom = () => {
               {departments?.map(department => (
                 <Table.Row
                   key={department.departmentId}
-                  className={
+                  className={`cursor-pointer hover:bg-gray-50 ${
                     departmentId === department.departmentId ? 'bg-gray-50' : ''
-                  }>
+                  }`}>
                   <Table.Cell>
                     <Checkbox
                       className="rounded-none text-[#1D2430] focus:ring-[#1D2430]"

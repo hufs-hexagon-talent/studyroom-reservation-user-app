@@ -133,7 +133,9 @@ const Schedule = () => {
           </Table.Head>
           <Table.Body className="bg-white text-center">
             {scheduleByDate?.map(schedule => (
-              <Table.Row key={schedule.scheduleId}>
+              <Table.Row
+                key={schedule.scheduleId}
+                className="cursor-pointer hover:bg-gray-50">
                 <Table.Cell>
                   <Checkbox
                     onChange={() => {
@@ -179,7 +181,7 @@ const Schedule = () => {
                 <Table.HeadCell>정책 ID</Table.HeadCell>
               </Table.Head>
               <Table.Body>
-                <Table.Row>
+                <Table.Row className="cursor-pointer bg-white">
                   {/* 스케줄 ID */}
                   <Table.Cell>
                     {scheduleById?.roomOperationPolicyScheduleId}

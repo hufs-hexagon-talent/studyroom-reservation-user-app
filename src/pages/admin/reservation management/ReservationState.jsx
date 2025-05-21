@@ -213,12 +213,12 @@ const ReservationState = () => {
       <div className="bg-white p-4 inline-block rounded-xl mb-8 shadow-md w-full">
         <Table>
           <Table.Head className="break-keep text-center">
-            <Table.HeadCell></Table.HeadCell>
-            <Table.HeadCell>출석 유무</Table.HeadCell>
-            <Table.HeadCell>호실</Table.HeadCell>
-            <Table.HeadCell>이름</Table.HeadCell>
-            <Table.HeadCell>시작 시간</Table.HeadCell>
-            <Table.HeadCell>종료 시간</Table.HeadCell>
+            <Table.HeadCell className="bg-gray-200"></Table.HeadCell>
+            <Table.HeadCell className="bg-gray-200">출석 유무</Table.HeadCell>
+            <Table.HeadCell className="bg-gray-200">호실</Table.HeadCell>
+            <Table.HeadCell className="bg-gray-200">이름</Table.HeadCell>
+            <Table.HeadCell className="bg-gray-200">시작 시간</Table.HeadCell>
+            <Table.HeadCell className="bg-gray-200">종료 시간</Table.HeadCell>
           </Table.Head>
           <Table.Body className="divide-y text-center">
             {reservations
@@ -228,7 +228,9 @@ const ReservationState = () => {
                   new Date(b.reservationStartTime),
               )
               .map(reservation => (
-                <Table.Row key={reservation.reservationId}>
+                <Table.Row
+                  className="cursor-pointer hover:bg-gray-50"
+                  key={reservation.reservationId}>
                   <Table.Cell>
                     <Checkbox
                       className="rounded-none text-[#1D2430] focus:ring-[#1D2430]"
