@@ -139,7 +139,7 @@ const FetchState = () => {
             }}>
             <div className="flex flex-row gap-x-3 items-center">
               <FaFileExcel />
-              <div>내보내기</div>
+              <div className="break-keep">내보내기</div>
             </div>
           </Button>
         </div>
