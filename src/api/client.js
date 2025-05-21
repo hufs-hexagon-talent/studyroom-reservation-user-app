@@ -6,7 +6,7 @@ const getAuthState = () => {
   return authState ? JSON.parse(authState) : null;
 };
 
-const baseUrl = process.env.REACT_APP_API_URL;
+const baseUrl = process.env.REACT_APP_QA_API_URL;
 console.log('[BASE_URL]', baseUrl);
 
 export const apiClient = axios.create({

@@ -107,7 +107,7 @@ const BannerManage = () => {
             <Button
               onClick={() => {
                 const banner = allBanners.find(
-                  b => b.selectedBannerId === selectedBannerId,
+                  b => b.bannerId === selectedBannerId,
                 );
                 if (banner) {
                   setEditBannerId(banner.bannerId);
@@ -172,7 +172,6 @@ const BannerManage = () => {
                     </span>
                   </Tooltip>
                 </Table.Cell>
-
                 <Table.Cell className="items-center">
                   {banner.active ? (
                     <HiCheckCircle className="w-6 h-6 text-green-400" />
