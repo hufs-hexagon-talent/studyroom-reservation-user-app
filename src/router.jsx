@@ -18,13 +18,15 @@ import QrCheck from './pages/qrcheck/QrCheck';
 import LoggedInPassword from './pages/password/LoggedInPassword';
 import LoggedOutPassword from './pages/password/LoggedOutPassword';
 import EmailVerify from './pages/password/EmailVerify';
-import DivideAct from './pages/manage/DivideAct';
-import SearchUser from './pages/admin/user/SearchUser';
-import FetchState from './pages/admin/user/FetchState';
-import FetchUserReservations from './pages/admin/user/FetchUserReservations';
 import MyPage from './pages/mypage/MyPage';
 import NoShow from './pages/check/NoShow';
 import EmailSend from './pages/email/EmailSend';
+
+import AdminPage from './pages/admin/AdminPage';
+import SignUp from './pages/admin/user/SignUp';
+import SearchUser from './pages/admin/user/SearchUser';
+import FetchState from './pages/admin/user/FetchState';
+import FetchUserReservations from './pages/admin/user/FetchUserReservations';
 import PolicyManagement from './pages/admin/operation/policy/PolicyManagement';
 import ScheduleCreate from './pages/admin/operation/schedule/ScheduleCreate';
 import ScheduleFetch from './pages/admin/operation/schedule/ScheduleFetch';
@@ -87,7 +89,7 @@ const RouterComponent = () => {
                 <Route path="/emailSend" element={<EmailSend />} />
 
                 {/* 어드민 */}
-                <Route path="/divide" element={<DivideAct />}>
+                <Route path="/admin" element={<AdminPage />}>
                   {/* 통계 */}
                   <Route path="user-statics" element={<UserStatics />} />
                   <Route
@@ -97,6 +99,8 @@ const RouterComponent = () => {
                   {/* 사용자 관리 */}
                   <Route path="search-user" element={<SearchUser />} />
                   <Route path="user-state" element={<FetchState />} />
+                  <Route path="sign-up" element={<SignUp />} />
+
                   {/* 예약 관리 */}
                   <Route
                     path="reservation-state"
@@ -106,6 +110,7 @@ const RouterComponent = () => {
                     path="fetchReservations/:id"
                     element={<FetchUserReservations />}
                   />
+
                   {/* 운영 관리 */}
                   <Route path="policy" element={<PolicyManagement />} />
                   <Route path="schedule/create" element={<ScheduleCreate />} />

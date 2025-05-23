@@ -14,40 +14,41 @@ const menuData = [
     label: '통계 및 현황',
     icon: HiChartPie,
     children: [
-      { label: '사용자 통계', to: '/divide/user-statics' },
-      { label: '예약 통계', to: '/divide/reservation-statics' },
+      { label: '사용자 통계', to: '/admin/user-statics' },
+      { label: '예약 통계', to: '/admin/reservation-statics' },
     ],
   },
   {
     label: '사용자 관리',
     icon: HiUser,
     children: [
-      { label: '사용자 목록', to: '/divide/search-user' },
-      { label: '사용자 상태 관리', to: '/divide/user-state' },
+      { label: '사용자 목록', to: '/admin/search-user' },
+      { label: '사용자 상태 관리', to: '/admin/user-state' },
+      { label: '회원가입', to: '/admin/sign-up' },
     ],
   },
   {
     label: '예약 관리',
     icon: HiClipboardCheck,
-    children: [{ label: '예약 상태 관리', to: '/divide/reservation-state' }],
+    children: [{ label: '예약 상태 관리', to: '/admin/reservation-state' }],
   },
   {
     label: '운영 관리',
     icon: HiCalendar,
     children: [
-      { label: '정책 관리', to: '/divide/policy' },
+      { label: '정책 관리', to: '/admin/policy' },
       {
         label: '운영 시간 관리',
         children: [
-          { label: '스케줄 생성', to: '/divide/schedule/create' },
-          { label: '스케줄 조회', to: '/divide/schedule/fetch' },
+          { label: '스케줄 생성', to: '/admin/schedule/create' },
+          { label: '스케줄 조회', to: '/admin/schedule/fetch' },
         ],
       },
       {
         label: '시설 관리',
         children: [
-          { label: 'Room', to: '/divide/facility/room' },
-          { label: 'Partition', to: '/divide/facility/partition' },
+          { label: 'Room', to: '/admin/facility/room' },
+          { label: 'Partition', to: '/admin/facility/partition' },
         ],
       },
     ],
@@ -56,8 +57,8 @@ const menuData = [
     label: '배너 관리',
     icon: HiFilm,
     children: [
-      { label: '배너 생성', to: '/divide/banner/create' },
-      { label: '배너 관리', to: '/divide/banner/manage' },
+      { label: '배너 생성', to: '/admin/banner/create' },
+      { label: '배너 관리', to: '/admin/banner/manage' },
     ],
   },
 ];
