@@ -8,7 +8,7 @@ import {
   usePolicy,
   useEditPolicy,
 } from '../../../../api/roomOperationPolicy.api';
-import { useSnackbar } from 'react-simple-snackbar';
+import { useCustomSnackbars } from '../../../../components/snackbar/SnackBar';
 import 'react-datepicker/dist/react-datepicker.css';
 
 import EachMaxMinuteSelector from '../../../../components/clock/EachMaxMinuteSelector';
@@ -33,20 +33,7 @@ const PolicyManagement = () => {
   const { data: policies, refetch } = useAllPolicies();
   const { data: policy } = usePolicy(selectedPolicyId);
   const { mutate: editPolicy } = useEditPolicy(selectedPolicyId);
-
-  const [openSuccessSnackbar] = useSnackbar({
-    position: 'top-right',
-    style: {
-      backgroundColor: '#4CAF50', // 초록색
-    },
-  });
-
-  const [openErrorSnackbar] = useSnackbar({
-    position: 'top-right',
-    style: {
-      backgroundColor: '#FF3333', // 빨간색
-    },
-  });
+  const { openSuccessSnackbar, openErrorSnackbar } = useCustomSnackbars();
 
   useEffect(() => {
     if (policy) {

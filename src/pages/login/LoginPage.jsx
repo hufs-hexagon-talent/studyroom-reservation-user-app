@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, TextInput } from 'flowbite-react';
-import { useSnackbar } from 'react-simple-snackbar';
+import { useCustomSnackbars } from '../../components/snackbar/SnackBar';
 import './LoginPage.css';
 
 import useAuth from '../../hooks/useAuth';
@@ -11,21 +11,7 @@ const LoginPage = () => {
   const [studentId, setStudentId] = useState('');
   const { login, loggedIn } = useAuth();
   const navigate = useNavigate();
-
-  const [openSuccessSnackbar] = useSnackbar({
-    position: 'top-right',
-    style: {
-      backgroundColor: '#4CAF50', // 초록색
-      color: '#FFFFFF',
-    },
-  });
-
-  const [openErrorSnackbar] = useSnackbar({
-    position: 'top-right',
-    style: {
-      backgroundColor: '#FF3333', // 빨간색
-    },
-  });
+  const { openSuccessSnackbar, openErrorSnackbar } = useCustomSnackbars();
 
   if (loggedIn) navigate('/');
 

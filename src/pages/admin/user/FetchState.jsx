@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { Button, Checkbox, Modal, Table, Tooltip } from 'flowbite-react';
+import { Button, Checkbox, Modal, Table } from 'flowbite-react';
 import { Pagination } from '@mui/material';
 import {
   useUnblocked,
@@ -9,7 +9,7 @@ import {
   exportUserExcel,
   useUserSearch,
 } from '../../../api/user.api';
-import { useSnackbar } from 'react-simple-snackbar';
+import { useCustomSnackbars } from '../../../components/snackbar/SnackBar';
 import { FaFileExcel } from 'react-icons/fa6';
 
 const FetchState = () => {
@@ -28,16 +28,7 @@ const FetchState = () => {
   const [openBlockedModal, setOpenBlockedModal] = useState(false);
   const [selectedBlockedInfo, setSelectedBlockedInfo] = useState(null);
   const [searchParams] = useSearchParams();
-
-  const [openSuccessSnackbar] = useSnackbar({
-    position: 'top-right',
-    style: { backgroundColor: '#4CAF50', color: '#FFFFFF' },
-  });
-
-  const [openErrorSnackbar] = useSnackbar({
-    position: 'top-right',
-    style: { backgroundColor: '#FF3333' },
-  });
+  const { openSuccessSnackbar, openErrorSnackbar } = useCustomSnackbars();
 
   // 페이지 누를때 상태 관리
   const handlePage = (event, newPage) => {

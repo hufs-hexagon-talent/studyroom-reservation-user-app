@@ -9,7 +9,7 @@ import {
 import { useAllRooms } from '../../../../api/room.api';
 import { useAllPolicies } from '../../../../api/roomOperationPolicy.api';
 import { Table, Checkbox, Modal, Button } from 'flowbite-react';
-import { useSnackbar } from 'react-simple-snackbar';
+import { useCustomSnackbars } from '../../../../components/snackbar/SnackBar';
 import { HiOutlineExclamationCircle } from 'react-icons/hi';
 
 const Schedule = () => {
@@ -28,16 +28,7 @@ const Schedule = () => {
   const { data: policies } = useAllPolicies();
   const { mutateAsync: updateSchedule } = useUpdateSchedule();
   const { mutateAsync: deleteSchedule } = useDeleteSchedule();
-
-  const [openSuccessSnackbar] = useSnackbar({
-    position: 'top-right',
-    style: { backgroundColor: '#4CAF50', color: '#FFFFFF' },
-  });
-
-  const [openErrorSnackbar] = useSnackbar({
-    position: 'top-right',
-    style: { backgroundColor: '#FF3333' },
-  });
+  const { openSuccessSnackbar, openErrorSnackbar } = useCustomSnackbars();
 
   // scheduleById가 바뀔 때 초기화
   useEffect(() => {

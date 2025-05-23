@@ -3,7 +3,7 @@ import { Outlet } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import CustomSidebar from '../../components/sidebar/SideBar';
 
-const DivideAct = () => {
+const AdminPage = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   useEffect(() => {
@@ -29,4 +29,4 @@ const DivideAct = () => {
   );
 };
 
-export default DivideAct;
+export default AdminPage;

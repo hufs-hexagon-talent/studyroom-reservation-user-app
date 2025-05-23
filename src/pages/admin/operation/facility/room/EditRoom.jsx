@@ -6,9 +6,13 @@ import {
   useRooms,
   useAllRooms,
 } from '../../../../../api/room.api';
-import { useDeletePartition } from '../../../../../api/roomPartition.api';
+import {
+  useDeletePartition,
+  useEditPartition,
+} from '../../../../../api/roomPartition.api';
 import { HiOutlineExclamationCircle } from 'react-icons/hi';
 import { Input } from '@mui/material';
+import { useCustomSnackbars } from '../../../../../components/snackbar/SnackBar';
 
 const EditRoom = () => {
   const navigate = useNavigate();
@@ -17,6 +21,8 @@ const EditRoom = () => {
   const { data: room } = useRooms(roomId);
   const { data: roomPartitions, refetch } = usePartitionsByRoomId(roomId);
   const { mutate: deletePartition } = useDeletePartition();
+  const { mutate: editPartition } = useEditPartition();
+  const { openSuccessSnackbar, openErrorSnackbar } = useCustomSnackbars();
 
   const [selectedPartitionId, setSelectedPartitionId] = useState(null);
   const [editRoomId, setEditRoomId] = useState(null); // 드롭다운 선택용
@@ -32,6 +38,7 @@ const EditRoom = () => {
     setSelectedPartitionId(prev => (prev === partitionId ? null : partitionId));
   };
 
+  // 파티션 삭제
   const handleDelete = () => {
     if (!selectedPartitionId) return;
     deletePartition(selectedPartitionId, {
@@ -40,6 +47,30 @@ const EditRoom = () => {
         refetch();
       },
     });
+  };
+
+  // 파티션 수정
+  const handleEdit = async () => {
+    await editPartition(
+      {
+        partitionId: selectedPartitionId,
+        roomId: editRoomId,
+        partitionNumber: editPartitionNumber,
+      },
+      {
+        onSuccess: () => {
+          openSuccessSnackbar('파티션 수정 성공', 2500);
+          refetch();
+          setOpenEditModal(false);
+          setSelectedPartitionId(null);
+          setEditRoomId(null);
+          setEditPartitionNumber(null);
+        },
+        onError: error => {
+          openErrorSnackbar('파티션 수정 실패', 2500);
+        },
+      },
+    );
   };
 
   useEffect(() => {
@@ -164,6 +195,11 @@ const EditRoom = () => {
               </Table.Row>
             </Table.Body>
           </Table>
+          <div className="flex justify-end">
+            <Button onClick={handleEdit} color="dark">
+              수정
+            </Button>
+          </div>
         </Modal.Body>
       </Modal>
 

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import DatePicker from 'react-datepicker';
 import { format, addDays } from 'date-fns';
 import { Pagination } from '@mui/material';
-import { useSnackbar } from 'react-simple-snackbar';
+import { useCustomSnackbars } from '../../../components/snackbar/SnackBar';
 import { useAllRooms } from '../../../api/room.api';
 import {
   useChangeState,
@@ -34,6 +34,7 @@ const ReservationState = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
+  const { openSuccessSnackbar, openErrorSnackbar } = useCustomSnackbars();
 
   const { data: rooms } = useAllRooms();
   const { data: serviceRoles } = useStates();
@@ -41,19 +42,6 @@ const ReservationState = () => {
   const { mutate: doDelete } = useAdminDeleteReservation();
   const { mutateAsync: changeState } = useChangeState();
   const { mutateAsync: reservationSearch } = useReservationSearch();
-
-  const [openErrorSnackbar] = useSnackbar({
-    position: 'top-right',
-    style: {
-      backgroundColor: '#FF3333', // 빨간색
-    },
-  });
-  const [openSuccessSnackbar] = useSnackbar({
-    position: 'top-right',
-    style: {
-      backgroundColor: '#4CAF50', // 초록색
-    },
-  });
 
   // 선택된 serviceRoles 관리
   const toggleRole = role => {

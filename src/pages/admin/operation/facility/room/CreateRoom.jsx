@@ -5,38 +5,30 @@ import {
   useAllRooms,
   useDeleteRoom,
   usePartitionsByRoomId,
+  useEditRoom,
 } from '../../../../../api/room.api';
 import { useDepartmets } from '../../../../../api/department.api';
-import { useSnackbar } from 'react-simple-snackbar';
 import { Table, TableBody, Modal, Checkbox, Button } from 'flowbite-react';
 import { Input } from '@mui/material';
 import Create from '../../../../../assets/icons/create.png';
+import { useCustomSnackbars } from '../../../../../components/snackbar/SnackBar';
 
 const CreateRoom = () => {
   const navigate = useNavigate();
   const [roomName, setRoomName] = useState('');
   const [departmentId, setDepartmentId] = useState(null);
   const [selectedRoomId, setSelectedRoomId] = useState(null);
+  const [editRoomName, setEditRoomName] = useState('');
+  const [editDepartmentId, setEditDepartmentId] = useState(null);
   const [openPartitionsModal, setOpenPartitionsModal] = useState(null);
+  const [openEditModal, setOpenEditModal] = useState(false);
+  const { openSuccessSnackbar, openErrorSnackbar } = useCustomSnackbars();
   const { mutateAsync: doCreateRoom } = useCreateRoom();
   const { mutateAsync: doDeleteRoom } = useDeleteRoom();
+  const { mutateAsync: doEditRoom } = useEditRoom();
   const { data: roomPartitions } = usePartitionsByRoomId(openPartitionsModal);
   const { data: rooms, refetch } = useAllRooms();
   const { data: departments } = useDepartmets();
-
-  const [openSuccessSnackbar] = useSnackbar({
-    position: 'top-right',
-    style: {
-      backgroundColor: '#4CAF50', // 초록색
-    },
-  });
-
-  const [openErrorSnackbar] = useSnackbar({
-    position: 'top-right',
-    style: {
-      backgroundColor: '#FF3333', // 빨간색
-    },
-  });
 
   // 호실 생성
   const createRoom = async () => {
@@ -62,6 +54,30 @@ const CreateRoom = () => {
     } catch (error) {
       openErrorSnackbar(error?.response.data.message, 3000);
     }
+  };
+
+  // 호실 수정
+  const editRoom = async () => {
+    await doEditRoom(
+      {
+        roomId: selectedRoomId,
+        roomName: editRoomName,
+        departmentId: editDepartmentId,
+      },
+      {
+        onSuccess: data => {
+          openSuccessSnackbar(data.message);
+          refetch();
+          setOpenEditModal(false);
+          setSelectedRoomId(null);
+          setEditRoomName(null);
+          setEditDepartmentId(null);
+        },
+        onError: () => {
+          openErrorSnackbar('호실 수정에 실패하였습니다.', 2500);
+        },
+      },
+    );
   };
 
   return (
@@ -123,20 +139,26 @@ const CreateRoom = () => {
           </Table>
         </div>
       </div>
+
       {/* 모든 Room 조회 */}
       <div className="bg-white xl:w-1/2 shadow-md p-4 mb-8 inline-block rounded-xl w-full">
         <div className="flex flex-row justify-between items-center gap-x-4 px-6 pt-3 pb-6">
           <div className="font-bold text-xl">모든 Room 조회 및 삭제</div>
           {/* 삭제 버튼 */}
           {selectedRoomId && (
-            <Button
-              className="bg-red-600 hover:bg-red-700"
-              onClick={async () => {
-                deleteRoom(selectedRoomId);
-                setSelectedRoomId(null);
-              }}>
-              삭제
-            </Button>
+            <div className="flex space-x-2">
+              <Button color="dark" onClick={() => setOpenEditModal(true)}>
+                수정
+              </Button>
+              <Button
+                className="bg-red-600 hover:bg-red-700"
+                onClick={async () => {
+                  deleteRoom(selectedRoomId);
+                  setSelectedRoomId(null);
+                }}>
+                삭제
+              </Button>
+            </div>
           )}
         </div>
         <div>
@@ -152,7 +174,6 @@ const CreateRoom = () => {
                 <Table.Row
                   className="cursor-pointer hover:bg-gray-50"
                   key={room.roomId}>
-                  {/* className="rounded-none text-[#f97316] focus:ring-[#f97316] cursor-pointer" */}
                   <Table.Cell>
                     <Checkbox
                       className="rounded-none text-[#1D2430] focus:ring-[#1D2430]"
@@ -161,13 +182,14 @@ const CreateRoom = () => {
                         setSelectedRoomId(prev =>
                           prev === room.roomId ? null : room.roomId,
                         );
+                        setEditRoomName(room.roomName);
+                        setEditDepartmentId(room.departmentId);
                       }}
                     />
                   </Table.Cell>
                   <Table.Cell
                     onClick={() => {
                       navigate(`/divide/facility/room/${room.roomId}`);
-                      setOpenPartitionsModal(room.roomId);
                     }}
                     className="cursor-pointer hover:underline">
                     {room.roomId}
@@ -180,6 +202,72 @@ const CreateRoom = () => {
           </Table>
         </div>
       </div>
+
+      {/* room 수정 모달 */}
+      <div className="flex justify-center items-center">
+        <Modal
+          className="flex justify-center items-center w-full p-6"
+          show={openEditModal}
+          size="md"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+          onClose={() => setOpenEditModal(false)}
+          popup>
+          <Modal.Header className="px-6 py-4">
+            <strong>{selectedRoomId}</strong>번 호실 정보 수정
+          </Modal.Header>
+          <Modal.Body>
+            <Table>
+              <Table.Head className="text-center break-keep">
+                <Table.HeadCell className="bg-gray-200">호실 ID</Table.HeadCell>
+                <Table.HeadCell className="bg-gray-200">호실명</Table.HeadCell>
+                <Table.HeadCell className="bg-gray-200">부서</Table.HeadCell>
+              </Table.Head>
+              <Table.Body className="text-center">
+                <Table.Row>
+                  <Table.Cell>{selectedRoomId}</Table.Cell>
+                  <Table.Cell>
+                    <Input
+                      type="text"
+                      value={editRoomName}
+                      onChange={e => setEditRoomName(e.target.value)}
+                      className="text-sm rounded"
+                    />
+                  </Table.Cell>
+                  <Table.Cell>
+                    <select
+                      value={editDepartmentId ?? ''}
+                      onChange={e =>
+                        setEditDepartmentId(Number(e.target.value))
+                      }
+                      className="text-sm border min-w-[160px] border-gray-300 rounded px-2 py-1 w-full">
+                      <option value="" disabled>
+                        부서를 선택하세요
+                      </option>
+                      {departments?.map(dept => (
+                        <option
+                          key={dept.departmentId}
+                          value={dept.departmentId}>
+                          {dept.departmentName} (ID: {dept.departmentId})
+                        </option>
+                      ))}
+                    </select>
+                  </Table.Cell>
+                </Table.Row>
+              </Table.Body>
+            </Table>
+            <div className="flex justify-end">
+              <Button onClick={editRoom} color="dark">
+                수정
+              </Button>
+            </div>
+          </Modal.Body>
+        </Modal>
+      </div>
+
       {/* Room별 Partitions 조회 모달 */}
       <div className="flex justify-center items-center">
         <Modal

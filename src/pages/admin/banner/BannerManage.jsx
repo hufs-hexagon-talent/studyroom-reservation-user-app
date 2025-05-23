@@ -10,7 +10,7 @@ import {
   HiCheckCircle,
   HiOutlineExclamationCircle,
 } from 'react-icons/hi';
-import { useSnackbar } from 'react-simple-snackbar';
+import { useCustomSnackbars } from '../../../components/snackbar/SnackBar';
 
 const BannerManage = () => {
   const [selectedBannerId, setSelectedBannerId] = useState(null);
@@ -22,23 +22,11 @@ const BannerManage = () => {
 
   const [openEditModal, setOpenEditModal] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const { openSuccessSnackbar, openErrorSnackbar } = useCustomSnackbars();
 
   const { data: allBanners, refetch: allBannersRefetch } = useAllBanners();
   const { mutateAsync: doEditBanner } = useEditBanner();
   const { mutateAsync: doDeleteBanner } = useDeleteBanner();
-
-  const [openErrorSnackbar] = useSnackbar({
-    position: 'top-right',
-    style: {
-      backgroundColor: '#FF3333', // 빨간색
-    },
-  });
-  const [openSuccessSnackbar] = useSnackbar({
-    position: 'top-right',
-    style: {
-      backgroundColor: '#4CAF50', // 초록색
-    },
-  });
 
   // 배너 수정
   const editBanner = async () => {

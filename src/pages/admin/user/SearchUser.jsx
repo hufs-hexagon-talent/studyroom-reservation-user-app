@@ -1,26 +1,15 @@
 import React, { useState } from 'react';
 import { Button, Table } from 'flowbite-react';
 import { useUserSearch } from '../../../api/user.api';
-import { useSnackbar } from 'react-simple-snackbar';
+import { useCustomSnackbars } from '../../../components/snackbar/SnackBar';
 import { useNavigate } from 'react-router-dom';
 
 const SerialCheck = () => {
   const [input, setInput] = useState('');
   const [userInfo, setUserInfo] = useState([]);
-  const { mutateAsync: userSearch } = useUserSearch();
+  const { openSuccessSnackbar, openErrorSnackbar } = useCustomSnackbars();
 
-  const [openErrorSnackbar] = useSnackbar({
-    position: 'top-right',
-    style: {
-      backgroundColor: '#FF3333',
-    },
-  });
-  const [openSuccessSnackbar] = useSnackbar({
-    position: 'top-right',
-    style: {
-      backgroundColor: '#4CAF50',
-    },
-  });
+  const { mutateAsync: userSearch } = useUserSearch();
   const navigate = useNavigate();
 
   // 사용자 조회 API 호출
