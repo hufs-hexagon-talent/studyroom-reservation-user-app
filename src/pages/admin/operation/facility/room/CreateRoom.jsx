@@ -5,14 +5,13 @@ import {
   useAllRooms,
   useDeleteRoom,
   usePartitionsByRoomId,
-  useRooms,
   useEditRoom,
 } from '../../../../../api/room.api';
 import { useDepartmets } from '../../../../../api/department.api';
-import { useSnackbar } from 'react-simple-snackbar';
 import { Table, TableBody, Modal, Checkbox, Button } from 'flowbite-react';
 import { Input } from '@mui/material';
 import Create from '../../../../../assets/icons/create.png';
+import { useCustomSnackbars } from '../../../../../components/snackbar/SnackBar';
 
 const CreateRoom = () => {
   const navigate = useNavigate();
@@ -23,26 +22,13 @@ const CreateRoom = () => {
   const [editDepartmentId, setEditDepartmentId] = useState(null);
   const [openPartitionsModal, setOpenPartitionsModal] = useState(null);
   const [openEditModal, setOpenEditModal] = useState(false);
+  const { openSuccessSnackbar, openErrorSnackbar } = useCustomSnackbars();
   const { mutateAsync: doCreateRoom } = useCreateRoom();
   const { mutateAsync: doDeleteRoom } = useDeleteRoom();
   const { mutateAsync: doEditRoom } = useEditRoom();
   const { data: roomPartitions } = usePartitionsByRoomId(openPartitionsModal);
   const { data: rooms, refetch } = useAllRooms();
   const { data: departments } = useDepartmets();
-
-  const [openSuccessSnackbar] = useSnackbar({
-    position: 'top-right',
-    style: {
-      backgroundColor: '#4CAF50', // 초록색
-    },
-  });
-
-  const [openErrorSnackbar] = useSnackbar({
-    position: 'top-right',
-    style: {
-      backgroundColor: '#FF3333', // 빨간색
-    },
-  });
 
   // 호실 생성
   const createRoom = async () => {

@@ -1,26 +1,15 @@
 import React, { useState } from 'react';
-import { TextInput } from 'flowbite-react';
-import { useSnackbar } from 'react-simple-snackbar';
+import { useCustomSnackbars } from '../../../components/snackbar/SnackBar';
 import { usePostBanner } from '../../../api/banner.api';
 import UpLoad from '../../../assets/icons/upload.png';
-import { Input } from '@mui/material';
 
 const BannerUpload = () => {
   const [bannerType, setBannerType] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [linkUrl, setLinkUrl] = useState('');
+  const { openSuccessSnackbar, openErrorSnackbar } = useCustomSnackbars();
 
   const { mutateAsync: doPostBanner } = usePostBanner();
-
-  const [openSuccessSnackbar] = useSnackbar({
-    position: 'top-right',
-    style: { backgroundColor: '#4CAF50', color: '#FFFFFF' },
-  });
-
-  const [openErrorSnackbar] = useSnackbar({
-    position: 'top-right',
-    style: { backgroundColor: '#FF3333' },
-  });
 
   // 배너 업로드
   const uploadBanner = async () => {

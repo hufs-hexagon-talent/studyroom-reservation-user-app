@@ -12,7 +12,7 @@ import {
 } from '../../../../../api/roomPartition.api';
 import { HiOutlineExclamationCircle } from 'react-icons/hi';
 import { Input } from '@mui/material';
-import { useSnackbar } from 'react-simple-snackbar';
+import { useCustomSnackbars } from '../../../../../components/snackbar/SnackBar';
 
 const EditRoom = () => {
   const navigate = useNavigate();
@@ -22,6 +22,7 @@ const EditRoom = () => {
   const { data: roomPartitions, refetch } = usePartitionsByRoomId(roomId);
   const { mutate: deletePartition } = useDeletePartition();
   const { mutate: editPartition } = useEditPartition();
+  const { openSuccessSnackbar, openErrorSnackbar } = useCustomSnackbars();
 
   const [selectedPartitionId, setSelectedPartitionId] = useState(null);
   const [editRoomId, setEditRoomId] = useState(null); // 드롭다운 선택용
@@ -32,19 +33,6 @@ const EditRoom = () => {
 
   const departmentName = room?.departmentName;
   const roomName = room?.roomName;
-
-  const [openErrorSnackbar] = useSnackbar({
-    position: 'top-right',
-    style: {
-      backgroundColor: '#FF3333', // 빨간색
-    },
-  });
-  const [openSuccessSnackbar] = useSnackbar({
-    position: 'top-right',
-    style: {
-      backgroundColor: '#4CAF50', // 초록색
-    },
-  });
 
   const handleCheckboxChange = partitionId => {
     setSelectedPartitionId(prev => (prev === partitionId ? null : partitionId));

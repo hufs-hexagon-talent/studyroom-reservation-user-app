@@ -6,7 +6,7 @@ import {
 } from '../../../../../api/roomPartition.api';
 import { useAllRooms } from '../../../../../api/room.api';
 import { Input } from '@mui/material';
-import { useSnackbar } from 'react-simple-snackbar';
+import { useCustomSnackbars } from '../../../../../components/snackbar/SnackBar';
 import Create from '../../../../../assets/icons/create.png';
 import { Table } from 'flowbite-react';
 
@@ -18,19 +18,7 @@ const CreatePartition = () => {
   const { data: rooms } = useAllRooms();
   const { mutateAsync: doCreatePartition } = useCreatePartition();
 
-  const [openSuccessSnackbar] = useSnackbar({
-    position: 'top-right',
-    style: {
-      backgroundColor: '#4CAF50', // 초록색
-    },
-  });
-
-  const [openErrorSnackbar] = useSnackbar({
-    position: 'top-right',
-    style: {
-      backgroundColor: '#FF3333', // 빨간색
-    },
-  });
+  const { openSuccessSnackbar, openErrorSnackbar } = useCustomSnackbars();
 
   const groupedPartitions = partitions?.reduce((acc, cur) => {
     const key = cur.roomName;

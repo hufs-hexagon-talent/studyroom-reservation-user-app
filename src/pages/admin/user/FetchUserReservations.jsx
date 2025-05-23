@@ -8,7 +8,7 @@ import {
 import { format } from 'date-fns';
 import { Button, Checkbox, Table, Modal } from 'flowbite-react';
 import { HiOutlineExclamationCircle } from 'react-icons/hi';
-import { useSnackbar } from 'react-simple-snackbar';
+import { useCustomSnackbars } from '../../../components/snackbar/SnackBar';
 import { Pagination } from '@mui/material';
 
 const FetchUserReservations = () => {
@@ -25,19 +25,7 @@ const FetchUserReservations = () => {
   const [reservations, setReservations] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
-
-  const [openErrorSnackbar] = useSnackbar({
-    position: 'top-right',
-    style: {
-      backgroundColor: '#FF3333', // 빨간색
-    },
-  });
-  const [openSuccessSnackbar] = useSnackbar({
-    position: 'top-right',
-    style: {
-      backgroundColor: '#4CAF50', // 초록색
-    },
-  });
+  const { openSuccessSnackbar, openErrorSnackbar } = useCustomSnackbars();
 
   useEffect(() => {
     if (fetchedReservations) {

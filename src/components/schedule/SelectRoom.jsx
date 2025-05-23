@@ -2,8 +2,8 @@ import React from 'react';
 import { useAllRooms } from '../../api/room.api';
 import { useSchedules } from '../../api/policySchedule.api';
 import { Checkbox } from 'flowbite-react';
-import { useSnackbar } from 'react-simple-snackbar';
 import { format } from 'date-fns';
+import { useCustomSnackbars } from '../snackbar/SnackBar';
 import Create from '../../assets/icons/create.png';
 
 const SelectRoom = ({
@@ -14,19 +14,7 @@ const SelectRoom = ({
 }) => {
   const { data: rooms } = useAllRooms();
   const { mutateAsync: doSchedule } = useSchedules();
-
-  const [openErrorSnackbar, closeErrorSnackbar] = useSnackbar({
-    position: 'top-right',
-    style: {
-      backgroundColor: '#FF3333', // 빨간색
-    },
-  });
-  const [openSuccessSnackbar, closeSuccessSnackbar] = useSnackbar({
-    position: 'top-right',
-    style: {
-      backgroundColor: '#4CAF50', // 초록색
-    },
-  });
+  const { openSuccessSnackbar, openErrorSnackbar } = useCustomSnackbars();
 
   const handleRoomCheckbox = roomId => {
     setSelectedRooms(prevSelectedRooms =>
@@ -42,10 +30,10 @@ const SelectRoom = ({
       selectedRooms.length === 0 ||
       selectedDates.length === 0
     ) {
-      openErrorSnackbar('정책, 날짜, 그리고 호실을 모두 선택해야 합니다.');
-      setTimeout(() => {
-        closeErrorSnackbar();
-      }, 3000);
+      openErrorSnackbar(
+        '정책, 날짜, 그리고 호실을 모두 선택해야 합니다.',
+        3000,
+      );
       return;
     }
     try {
@@ -54,17 +42,12 @@ const SelectRoom = ({
         roomIds: selectedRooms,
         policyApplicationDates: selectedDates.map(d => format(d, 'yyyy-MM-dd')),
       });
-      openSuccessSnackbar(response.message);
-      setTimeout(() => {
-        closeSuccessSnackbar();
-      }, 3000);
+      openSuccessSnackbar(response.message, 3000);
     } catch (error) {
       openErrorSnackbar(
         error.response?.data?.message || '스케줄 주입 중 오류가 발생했습니다.',
+        3000,
       );
-      setTimeout(() => {
-        closeErrorSnackbar();
-      }, 3000);
     }
   };
 

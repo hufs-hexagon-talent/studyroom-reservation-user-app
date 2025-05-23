@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Label, TextInput } from 'flowbite-react';
 import { usePassword, useMyInfo } from '../../api/user.api';
-import { useSnackbar } from 'react-simple-snackbar';
+import { useCustomSnackbars } from '../../components/snackbar/SnackBar';
 import './LoggedInPassword.css';
 
 const LoggedInPassword = () => {
@@ -11,24 +11,9 @@ const LoggedInPassword = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [idError, setIdError] = useState('');
   const [passwordError, setPasswordError] = useState('');
-  const { data: me } = useMyInfo();
   const { mutateAsync: changePw } = usePassword();
   const navigate = useNavigate();
-
-  const [openErrorSnackbar] = useSnackbar({
-    position: 'top-right',
-    style: {
-      backgroundColor: '#FF3333', // 빨간색
-    },
-  });
-
-  const [openSuccessSnackbar] = useSnackbar({
-    position: 'top-right',
-    style: {
-      backgroundColor: '#4CAF50', // 초록색
-      color: '#FFFFFF',
-    },
-  });
+  const { openSuccessSnackbar, openErrorSnackbar } = useCustomSnackbars();
 
   // 기존 비밀번호
   const handlePwChange = e => {
