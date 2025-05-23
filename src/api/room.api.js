@@ -63,3 +63,16 @@ export const usePartitionsByRoomId = roomId => {
     enabled: !!roomId,
   });
 };
+
+// [관리자] room 정보 수정
+export const useEditRoom = () => {
+  return useMutation({
+    mutationFn: async ({ roomId, roomName, departmentId }) => {
+      const response = await apiClient.patch(`/rooms/${roomId}`, {
+        roomName,
+        departmentId,
+      });
+      return response.data;
+    },
+  });
+};
