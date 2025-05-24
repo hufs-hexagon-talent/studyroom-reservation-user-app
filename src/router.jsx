@@ -4,29 +4,41 @@ import { useSnackbar } from 'react-simple-snackbar';
 import { useServiceRole } from './api/user.api';
 import FadeLoader from 'react-spinners/FadeLoader';
 
-import FooterCes from './components/footer/FooterCes';
-import NavigationBarCes from './components/Navbar/NavigationBarCes';
+import useAuth from './hooks/useAuth';
+
+import Footer from './components/footer/Footer';
+import NavigationBar from './components/navbar/NavigationBar';
+
 import Check from './pages/check/CheckRoom';
 import LoginPage from './pages/login/LoginPage';
 import Notice from './pages/notice/notice';
 import OtpPage from './pages/OtpPage/OtpPage';
 import RoomPage from './pages/rooms/room/RoomPage';
-import useAuth from './hooks/useAuth';
-import CheckVisit from './pages/manage/checkVisit';
-import SelectPartition from './pages/manage/SelectPartition';
 import QrCheck from './pages/qrcheck/QrCheck';
 import LoggedInPassword from './pages/password/LoggedInPassword';
 import LoggedOutPassword from './pages/password/LoggedOutPassword';
 import EmailVerify from './pages/password/EmailVerify';
-import Schedule from './pages/manage/Schedule';
-import DivideAct from './pages/manage/DivideAct';
-import SerialCheck from './pages/manage/SerialCheck';
-import FetchBlockedUser from './pages/manage/FetchBlockedUser';
-import FetchReservations from './pages/manage/FetchReservations';
 import MyPage from './pages/mypage/MyPage';
 import NoShow from './pages/check/NoShow';
 import EmailSend from './pages/email/EmailSend';
-import ManageBanner from './pages/manage/ManageBanner';
+
+import AdminPage from './pages/admin/AdminPage';
+import SignUp from './pages/admin/user/SignUp';
+import SearchUser from './pages/admin/user/SearchUser';
+import FetchState from './pages/admin/user/FetchState';
+import FetchUserReservations from './pages/admin/user/FetchUserReservations';
+import PolicyManagement from './pages/admin/operation/policy/PolicyManagement';
+import ScheduleCreate from './pages/admin/operation/schedule/ScheduleCreate';
+import ScheduleFetch from './pages/admin/operation/schedule/ScheduleFetch';
+import Schedule from './pages/admin/operation/schedule/Schedule';
+import ReservationState from './pages/admin/reservation management/ReservationState';
+import UserStatics from './pages/admin/statics/UserStatics';
+import ReservationStatics from './pages/admin/statics/ReservationStatics';
+import CreateRoom from './pages/admin/operation/facility/room/CreateRoom';
+import EditRoom from './pages/admin/operation/facility/room/EditRoom';
+import CreatePartition from './pages/admin/operation/facility/partition/CreatePartition';
+import BannerUpload from './pages/admin/banner/BannerUpload';
+import BannerManage from './pages/admin/banner/BannerManage';
 
 const RouterComponent = () => {
   const { loggedIn } = useAuth();
@@ -49,7 +61,8 @@ const RouterComponent = () => {
   return (
     <BrowserRouter basename={'/'}>
       <div className="min-h-screen flex flex-col">
-        <NavigationBarCes showSnackbar={openSnackbar} />
+        <NavigationBar showSnackbar={openSnackbar} />
+
         <div className="flex-grow">
           <Routes>
             <Route path="/" element={<RoomPage />} />
@@ -69,23 +82,50 @@ const RouterComponent = () => {
               <>
                 <Route path="/notice" element={<Notice />} />
                 <Route path="/qrcheck" element={<QrCheck />} />
-                <Route path="/divide" element={<DivideAct />} />
-                <Route path="/check" element={<Check />} />
                 <Route path="/otp" element={<OtpPage />} />
                 <Route path="/password" element={<LoggedInPassword />} />
-                <Route path="/selectPartition" element={<SelectPartition />} />
-                <Route path="/visit" element={<CheckVisit />} />
-                <Route path="/schedule" element={<Schedule />} />
-                <Route path="/serialCheck" element={<SerialCheck />} />
-                <Route path="/blocked" element={<FetchBlockedUser />} />
-                <Route
-                  path="/fetchReservations/:id"
-                  element={<FetchReservations />}
-                />
+                <Route path="/check" element={<Check />} />
                 <Route path="/mypage" element={<MyPage />} />
-                <Route path="/noshow" element={<NoShow />} />
                 <Route path="/emailSend" element={<EmailSend />} />
-                <Route path="/banner" element={<ManageBanner />} />
+
+                {/* 어드민 */}
+                <Route path="/admin" element={<AdminPage />}>
+                  {/* 통계 */}
+                  <Route path="user-statics" element={<UserStatics />} />
+                  <Route
+                    path="reservation-statics"
+                    element={<ReservationStatics />}
+                  />
+                  {/* 사용자 관리 */}
+                  <Route path="search-user" element={<SearchUser />} />
+                  <Route path="user-state" element={<FetchState />} />
+                  <Route path="sign-up" element={<SignUp />} />
+
+                  {/* 예약 관리 */}
+                  <Route
+                    path="reservation-state"
+                    element={<ReservationState />}
+                  />
+                  <Route
+                    path="fetchReservations/:id"
+                    element={<FetchUserReservations />}
+                  />
+
+                  {/* 운영 관리 */}
+                  <Route path="policy" element={<PolicyManagement />} />
+                  <Route path="schedule/create" element={<ScheduleCreate />} />
+                  <Route path="schedule/fetch" element={<ScheduleFetch />} />
+                  <Route path="schedule/fetch/:date" element={<Schedule />} />
+                  <Route path="facility/room" element={<CreateRoom />} />
+                  <Route path="facility/room/:roomId" element={<EditRoom />} />
+                  <Route
+                    path="facility/partition"
+                    element={<CreatePartition />}
+                  />
+                  {/* 배너 관리 */}
+                  <Route path="banner/create" element={<BannerUpload />} />
+                  <Route path="banner/manage" element={<BannerManage />} />
+                </Route>
               </>
             )}
             {loggedIn && serviceRole === 'RESIDENT' && (
@@ -110,7 +150,7 @@ const RouterComponent = () => {
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </div>
-        <FooterCes showSnackbar={openSnackbar} />
+        <Footer showSnackbar={openSnackbar} />
       </div>
     </BrowserRouter>
   );

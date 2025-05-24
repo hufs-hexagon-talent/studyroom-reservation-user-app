@@ -2,29 +2,15 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLoggedOutPassword } from '../../api/user.api';
 import { Button, Label, TextInput } from 'flowbite-react';
-import { useSnackbar } from 'react-simple-snackbar';
+import { useCustomSnackbars } from '../../components/snackbar/SnackBar';
 
 const LoggedOutPassword = () => {
   const { mutateAsync: doPasswordChange } = useLoggedOutPassword();
   const [newPw, setNewPw] = useState('');
   const [confirmNewPw, setConfirmNewPw] = useState('');
+  const { openSuccessSnackbar, openErrorSnackbar } = useCustomSnackbars();
   const token = sessionStorage.getItem('pwResetToken');
   const navigate = useNavigate();
-
-  const [openSuccessSnackbar] = useSnackbar({
-    position: 'top-right',
-    style: {
-      backgroundColor: '#4CAF50', // 초록색
-      color: '#FFFFFF',
-    },
-  });
-
-  const [openErrorSnackbar] = useSnackbar({
-    position: 'top-right',
-    style: {
-      backgroundColor: '#FF3333',
-    },
-  });
 
   // 신규 비밀번호
   const handleNewPw = e => {

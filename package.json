@@ -4,11 +4,10 @@
   "private": true,
   "dependencies": {
     "@babel/runtime": "^7.24.6",
-    "@emotion/react": "^11.11.4",
-    "@emotion/styled": "^11.11.5",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
     "@mui/lab": "^5.0.0-alpha.170",
-    "@mui/material": "^5.15.19",
-    "@mui/x-date-pickers": "^7.6.1",
+    "@mui/material": "^7.0.2",
     "@tanstack/react-query": "^5.40.0",
     "@testing-library/jest-dom": "^6.4.5",
     "@testing-library/react": "^15.0.7",
@@ -19,11 +18,13 @@
     "dayjs": "^1.11.11",
     "firebase": "^10.12.2",
     "flowbite-react": "^0.9.0",
+    "framer-motion": "^12.8.2",
     "inko": "^1.1.1",
     "postcss": "^8.4.38",
     "qrcode.react": "^3.1.0",
     "react": "^18.3.1",
     "react-calendar": "^5.0.0",
+    "react-clock": "^5.1.0",
     "react-datepicker": "^6.9.0",
     "react-dom": "^18.3.1",
     "react-modal": "^3.16.1",
@@ -33,9 +34,10 @@
     "react-scripts": "5.0.1",
     "react-simple-snackbar": "^1.1.11",
     "react-spinners": "^0.15.0",
+    "recharts": "^2.15.1",
     "recoil": "^0.7.7",
     "styled-components": "^6.1.11",
-    "swiper": "^11.2.5",
+    "swiper": "^11.2.6",
     "web-vitals": "^4.0.1"
   },
   "devDependencies": {
@@ -72,5 +74,6 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  }
+  },
+  "packageManager": "yarn@1.22.22"
 }

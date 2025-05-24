@@ -1,10 +1,11 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { apiClient } from './client';
+import axios from 'axios';
 
-// id, pw 확인할 때 쓰려고
+// [관리자] 모든 회원 정보 조회
 const fetchAllUsers = async () => {
   const allUser_res = await apiClient.get('/users/search');
-  return allUser_res.data.data.items;
+  return allUser_res.data.data.users;
 };
 
 export const useAllUsers = () => {
@@ -153,6 +154,7 @@ export const useUserByName = name => {
   });
 };
 
+// 자신의 블락 기간 조회
 export const fetchBlockedPeriod = async () => {
   try {
     const blockedPreiod_res = await apiClient.get('/users/me/blocked-period');
@@ -194,6 +196,80 @@ export const useNewEmailVerify = () => {
         verifyCode,
       });
       return newEmailVerify_res.data;
+    },
+  });
+};
+
+// [관리자] 사용자 통계 조회
+const fetchUserStatics = async () => {
+  const userStatics = await apiClient.get('/users/statics');
+  return userStatics.data.data;
+};
+
+export const useUserStatics = () => {
+  return useQuery({
+    queryKey: ['userStatics'],
+    queryFn: fetchUserStatics,
+  });
+};
+
+// [관리자] 사용자 정보 Excel 내보내기
+export const exportUserExcel = async roles => {
+  const userExcel = await apiClient.get(`/users/export/excel?roles=${roles}`, {
+    responseType: 'blob', // 중요!
+  });
+
+  const rolePart = Array.isArray(roles) ? roles.join('&') : roles;
+  const fileName = `${rolePart}-Users.xlsx`;
+
+  // 파일 저장 처리
+  const url = window.URL.createObjectURL(new Blob([userExcel.data]));
+  const link = document.createElement('a');
+  link.href = url;
+  link.setAttribute('download', fileName);
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+};
+
+// [관리자] 사용자 역할 리스트 조회
+const fetchUserRoleList = async () => {
+  const userRoleList_res = await apiClient.get('/users/roles', {});
+  return userRoleList_res.data.data;
+};
+
+export const useUserRoleList = () => {
+  return useQuery({
+    queryKey: ['userRoleList'],
+    queryFn: fetchUserRoleList,
+  });
+};
+
+// [관리자] 회원 검색 조회
+export const useUserSearch = () => {
+  return useMutation({
+    mutationFn: async ({
+      username,
+      serial,
+      name,
+      email,
+      role,
+      departmentId,
+      page = 0,
+      size = 20,
+    }) => {
+      const response = await apiClient.post('/users/search', {
+        username,
+        serial,
+        name,
+        email,
+        role,
+        departmentId,
+        page,
+        size,
+      });
+
+      return response.data;
     },
   });
 };

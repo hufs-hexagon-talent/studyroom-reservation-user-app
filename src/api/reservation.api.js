@@ -99,47 +99,18 @@ export const useNoShow = () => {
     queryFn: fetchNoShow,
   });
 };
-// visited로 변경
-export const useVisitedState = () => {
-  return useMutation({
-    mutationFn: async reservationId => {
-      const changeState_res = await apiClient.patch(
-        `/reservations/admin/${reservationId}`,
-        {
-          state: 'VISITED',
-        },
-      );
-      return changeState_res.data;
-    },
-  });
-};
 
-// not_visited로 변경
-export const useNotVisitedState = () => {
+// [관리자] 특정 예약 상태 변경
+export const useChangeState = () => {
   return useMutation({
-    mutationFn: async reservationId => {
-      const changeState_res = await apiClient.patch(
+    mutationFn: async ({ reservationId, state }) => {
+      const response = await apiClient.patch(
         `/reservations/admin/${reservationId}`,
         {
-          state: 'NOT_VISITED',
+          state: state,
         },
       );
-      return changeState_res.data;
-    },
-  });
-};
-
-// processed 변경
-export const useProcessedState = () => {
-  return useMutation({
-    mutationFn: async reservationId => {
-      const changeState_res = await apiClient.patch(
-        `/reservations/admin/${reservationId}`,
-        {
-          state: 'PROCESSED',
-        },
-      );
-      return changeState_res.data;
+      return response.data;
     },
   });
 };
@@ -170,5 +141,104 @@ export const useLatestReservation = () => {
   return useQuery({
     queryKey: ['latest'],
     queryFn: () => fetchLatestReservation(),
+  });
+};
+
+// [관리자] 금일 예약들 통계 조회
+const fetchReservationStatics = async date => {
+  const statics_res = await apiClient.get(
+    `/reservations/admin/statics/by-date?date=${date}`,
+  );
+  return statics_res.data.data;
+};
+
+export const useReservationStatics = date => {
+  return useQuery({
+    queryKey: ['statics', date],
+    queryFn: () => fetchReservationStatics(date),
+  });
+};
+
+// [관리자] 예약 정보 Excel 내보내기
+export const useExportReservationExcel = async ({
+  states,
+  startDateTime,
+  endDateTime,
+}) => {
+  const params = new URLSearchParams();
+  states.forEach(state => params.append('states', state));
+  if (startDateTime) params.append('startDateTime', startDateTime);
+  if (endDateTime) params.append('endDateTime', endDateTime);
+
+  const reservationExcel = await apiClient.get(
+    `/reservations/export/excel?${params.toString()}`,
+    { responseType: 'blob' },
+  );
+
+  const formatDateForFilename = iso => {
+    if (!iso) return 'unknown';
+    const date = new Date(iso);
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}.${m}.${d}`;
+  };
+
+  const start = formatDateForFilename(startDateTime);
+  const end = formatDateForFilename(endDateTime);
+  const statePart = states.length > 0 ? states.join('&') : 'ALL';
+
+  const fileName = `${start}-${end}_${statePart}-Reservations.xlsx`;
+
+  // 파일 다운로드 처리
+  const url = window.URL.createObjectURL(new Blob([reservationExcel.data]));
+  const link = document.createElement('a');
+  link.href = url;
+  link.setAttribute('download', fileName);
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+};
+
+// [관리자] 예약 검색 조회
+export const useReservationSearch = () => {
+  return useMutation({
+    mutationFn: async ({
+      username,
+      serial,
+      roomIds,
+      roomPartitionIds,
+      startDateTime,
+      endDateTime,
+      states,
+      page,
+      size = 10,
+    }) => {
+      const response = await apiClient.post('reservations/search', {
+        username,
+        serial,
+        roomIds,
+        roomPartitionIds,
+        startDateTime,
+        endDateTime,
+        states,
+        page,
+        size,
+      });
+      return response.data;
+    },
+  });
+};
+
+// [관리자] 예약 상태 리스트 조회
+const fetchStates = async () => {
+  const response = await apiClient.get('/reservations/states');
+  return response.data.data;
+};
+
+export const useStates = () => {
+  return useQuery({
+    queryKey: ['states'],
+    queryFn: fetchStates,
   });
 };

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useSnackbar } from 'react-simple-snackbar';
+import { useCustomSnackbars } from '../../components/snackbar/SnackBar';
 import { useNewEmailSend, useNewEmailVerify } from '../../api/user.api';
 import { Button } from 'flowbite-react';
 
@@ -17,23 +17,9 @@ const EmailSend = () => {
   const [disabled, setDisabled] = useState(false);
   const [isEmailSendSuccess, setIsEmailSendSuccess] = useState(false);
   const [isPassword, setIsPassword] = useState(false);
+  const { openSuccessSnackbar, openErrorSnackbar } = useCustomSnackbars();
 
   const navigate = useNavigate();
-
-  const [openSuccessSnackbar] = useSnackbar({
-    position: 'top-right',
-    style: {
-      backgroundColor: '#4CAF50', // 초록색
-      color: '#FFFFFF',
-    },
-  });
-
-  const [openErrorSnackbar] = useSnackbar({
-    position: 'top-right',
-    style: {
-      backgroundColor: '#FF3333', // 빨간색
-    },
-  });
 
   // timer
   useEffect(() => {
