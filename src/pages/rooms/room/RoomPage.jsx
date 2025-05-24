@@ -321,8 +321,8 @@ const RoomPage = () => {
                 className={'text-center flex'}
                 selected={selectedDate}
                 locale={ko}
-                minDate={today}
-                includeDates={availableDate}
+                minDate={null}
+                //includeDates={availableDate}
                 onChange={handleDateChange}
                 dateFormat="yyyy년 MM월 dd일"
                 showIcon
