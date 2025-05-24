@@ -96,7 +96,7 @@ const EditRoom = () => {
       <div className="flex justify-between items-center pt-4">
         <div>
           <div
-            onClick={() => navigate('/divide/facility/room')}
+            onClick={() => navigate('/admin/facility/room')}
             className="font-bold text-3xl text-black cursor-pointer">
             {roomName}호
           </div>

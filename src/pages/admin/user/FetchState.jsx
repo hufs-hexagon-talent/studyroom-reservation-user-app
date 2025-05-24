@@ -173,31 +173,31 @@ const FetchState = () => {
                 </Table.Cell>
                 <Table.Cell
                   onClick={() =>
-                    navigate(`/divide/fetchReservations/${user.userId}`)
+                    navigate(`/admin/fetchReservations/${user.userId}`)
                   }>
                   {user.serviceRole}
                 </Table.Cell>
                 <Table.Cell
                   onClick={() =>
-                    navigate(`/divide/fetchReservations/${user.userId}`)
+                    navigate(`/admin/fetchReservations/${user.userId}`)
                   }>
                   {user.serial ?? '-'}
                 </Table.Cell>
                 <Table.Cell
                   onClick={() =>
-                    navigate(`/divide/fetchReservations/${user.userId}`)
+                    navigate(`/admin/fetchReservations/${user.userId}`)
                   }>
                   {user.name}
                 </Table.Cell>
                 <Table.Cell
                   onClick={() =>
-                    navigate(`/divide/fetchReservations/${user.userId}`)
+                    navigate(`/admin/fetchReservations/${user.userId}`)
                   }>
                   {user.departmentId === 1 ? '컴퓨터공학부' : '정보통신공학과'}
                 </Table.Cell>
                 <Table.Cell
                   onClick={() =>
-                    navigate(`/divide/fetchReservations/${user.userId}`)
+                    navigate(`/admin/fetchReservations/${user.userId}`)
                   }>
                   {user.email ?? '-'}
                 </Table.Cell>

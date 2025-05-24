@@ -84,7 +84,7 @@ const SerialCheck = () => {
                   <Table.Cell>
                     <a
                       onClick={() =>
-                        navigate(`/divide/fetchReservations/${user.userId}`)
+                        navigate(`/admin/fetchReservations/${user.userId}`)
                       }
                       className="font-medium cursor-pointer text-blue-500 hover:underline dark:text-cyan-500">
                       예약 조회

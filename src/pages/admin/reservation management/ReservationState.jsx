@@ -251,9 +251,7 @@ const ReservationState = () => {
                   <Table.Cell
                     className="cursor-pointer hover:underline"
                     onClick={() =>
-                      navigate(
-                        `/divide/fetchReservations/${reservation.userId}`,
-                      )
+                      navigate(`/admin/fetchReservations/${reservation.userId}`)
                     }>
                     {reservation.name}
                   </Table.Cell>
