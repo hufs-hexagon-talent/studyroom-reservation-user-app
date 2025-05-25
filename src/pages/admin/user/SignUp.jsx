@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button, Label, TextInput } from 'flowbite-react';
 import { useSignUp } from '../../../api/user.api';
 import { useCustomSnackbars } from '../../../components/snackbar/SnackBar';
+import Create from '../../../assets/icons/create.png';
 
 const SignUp = () => {
   const [name, setName] = useState('');
@@ -59,9 +60,16 @@ const SignUp = () => {
   };
 
   return (
-    <div className="flex flex-col items-center">
-      <h1 className="text-2xl text-center mt-10 mb-5">회원가입</h1>
-      <form id="form" className="flex flex-col max-w-md w-full gap-4">
+    <div className="flex flex-col">
+      <div className="flex flex-row items-center">
+        <div className="font-bold text-3xl text-black p-8">Sign Up</div>
+        <img
+          src={Create}
+          onClick={handleSignUp}
+          className="w-7 h-7 cursor-pointer hover:scale-125"
+        />
+      </div>
+      <div className="px-6 lg:w-1/2 xl:w-1/3 space-y-4">
         <div>
           <div className="mb-2 block">
             <Label value="이름" />
@@ -118,14 +126,7 @@ const SignUp = () => {
             required
           />
         </div>
-        <Button
-          onClick={handleSignUp}
-          className="mt-10 mb-10"
-          color="dark"
-          type="button">
-          회원 가입
-        </Button>
-      </form>
+      </div>
     </div>
   );
 };
