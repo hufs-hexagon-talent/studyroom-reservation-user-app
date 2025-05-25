@@ -7,7 +7,6 @@ const getAuthState = () => {
 };
 
 const baseUrl = process.env.REACT_APP_API_URL;
-console.log('[BASE_URL]', baseUrl);
 
 export const apiClient = axios.create({
   baseURL: baseUrl,

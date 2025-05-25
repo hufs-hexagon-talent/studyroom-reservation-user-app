@@ -20,6 +20,8 @@ const FetchState = () => {
   const { mutate: doUnblocked, refetch } = useUnblocked();
   const { mutate: userSearch } = useUserSearch();
 
+  const [userInfo, setUserInfo] = useState([]);
+  const [input, setInput] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [pageSize, setPageSize] = useState(30);
@@ -70,10 +72,13 @@ const FetchState = () => {
 
   // 유저 조회
   const fetchUsers = () => {
+    const isNumeric = !isNaN(input);
     const payload = {
-      page: currentPage - 1, // 페이지는 0부터 시작
-      // selectedRoles가 비어있다면 role을 요청에 안넣어서 전체 유저 조회하도록
+      page: currentPage - 1,
       ...(selectedRoles.length > 0 && { role: selectedRoles }),
+      ...(input && {
+        ...(isNumeric ? { serial: input } : { name: input }),
+      }),
     };
 
     userSearch(payload, {
@@ -93,16 +98,36 @@ const FetchState = () => {
     });
   };
 
+  // 입력할 떄마다 & Enter 키 입력 시 유저 조회
+  const handleSearchUser = () => {
+    setCurrentPage(1); // 검색 시 1페이지로
+    fetchUsers();
+  };
+
   // 체크박스 또는 페이지가 바뀌면 유저 목록 다시 가져오기
   useEffect(() => {
     fetchUsers();
-  }, [selectedRoles, currentPage]);
+  }, [selectedRoles, currentPage, input]);
 
   return (
     <div className="overflow-x-auto">
       {/* Blocked User List */}
       <div>
         <div className="font-bold text-3xl text-black p-8">Users State</div>
+        <div className="flex flex-row items-center mx-5 mb-6">
+          <div className="mr-3">학번 또는 이름 </div>
+          <input
+            className="border rounded-sm w-32 h-7"
+            onChange={e => setInput(e.target.value)}
+            onKeyDown={e => {
+              if (e.key === 'Enter') {
+                handleSearchUser();
+              }
+            }}
+            type="text"
+            maxLength="9"
+          />
+        </div>
         <div className="flex justify-between items-center">
           {/* Role Checkbox */}
           <div className="flex flex-row gap-x-6 items-center px-4 pb-8">
@@ -173,31 +198,31 @@ const FetchState = () => {
                 </Table.Cell>
                 <Table.Cell
                   onClick={() =>
-                    navigate(`/divide/fetchReservations/${user.userId}`)
+                    navigate(`/admin/fetchReservations/${user.userId}`)
                   }>
                   {user.serviceRole}
                 </Table.Cell>
                 <Table.Cell
                   onClick={() =>
-                    navigate(`/divide/fetchReservations/${user.userId}`)
+                    navigate(`/admin/fetchReservations/${user.userId}`)
                   }>
                   {user.serial ?? '-'}
                 </Table.Cell>
                 <Table.Cell
                   onClick={() =>
-                    navigate(`/divide/fetchReservations/${user.userId}`)
+                    navigate(`/admin/fetchReservations/${user.userId}`)
                   }>
                   {user.name}
                 </Table.Cell>
                 <Table.Cell
                   onClick={() =>
-                    navigate(`/divide/fetchReservations/${user.userId}`)
+                    navigate(`/admin/fetchReservations/${user.userId}`)
                   }>
                   {user.departmentId === 1 ? '컴퓨터공학부' : '정보통신공학과'}
                 </Table.Cell>
                 <Table.Cell
                   onClick={() =>
-                    navigate(`/divide/fetchReservations/${user.userId}`)
+                    navigate(`/admin/fetchReservations/${user.userId}`)
                   }>
                   {user.email ?? '-'}
                 </Table.Cell>
