@@ -24,7 +24,6 @@ import EmailSend from './pages/email/EmailSend';
 
 import AdminPage from './pages/admin/AdminPage';
 import SignUp from './pages/admin/user/SignUp';
-import SearchUser from './pages/admin/user/SearchUser';
 import FetchState from './pages/admin/user/FetchState';
 import FetchUserReservations from './pages/admin/user/FetchUserReservations';
 import PolicyManagement from './pages/admin/operation/policy/PolicyManagement';
@@ -97,7 +96,6 @@ const RouterComponent = () => {
                     element={<ReservationStatics />}
                   />
                   {/* 사용자 관리 */}
-                  <Route path="search-user" element={<SearchUser />} />
                   <Route path="user-state" element={<FetchState />} />
                   <Route path="sign-up" element={<SignUp />} />
 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import {
   HiChartPie,
   HiUser,
@@ -22,7 +22,6 @@ const menuData = [
     label: '사용자 관리',
     icon: HiUser,
     children: [
-      { label: '사용자 목록', to: '/admin/search-user' },
       { label: '사용자 상태 관리', to: '/admin/user-state' },
       { label: '회원가입', to: '/admin/sign-up' },
     ],
@@ -65,6 +64,8 @@ const menuData = [
 
 const SidebarItem = ({ item, depth = 1 }) => {
   const [open, setOpen] = useState(false);
+  const location = useLocation();
+  const isActive = location.pathname === item.to;
   const hasChildren = Array.isArray(item.children) && item.children.length > 0;
   const padding = `pl-${depth * 4}`;
 
@@ -75,7 +76,11 @@ const SidebarItem = ({ item, depth = 1 }) => {
           {item.label}
         </button>
       ) : item.to ? (
-        <Link to={item.to} className="block">
+        <Link
+          to={item.to}
+          className={`block px-2 py-1 rounded ${
+            isActive ? 'bg-gray-100 font-semibold mr-6' : ''
+          }`}>
           {item.label}
         </Link>
       ) : (
