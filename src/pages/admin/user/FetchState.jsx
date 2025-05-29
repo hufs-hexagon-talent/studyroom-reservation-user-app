@@ -1,24 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Button, Checkbox, Modal, Table } from 'flowbite-react';
-import { Pagination } from '@mui/material';
+import { Input, Pagination } from '@mui/material';
 import {
   useUnblocked,
   useBlockedUser,
   useUserRoleList,
   exportUserExcel,
   useUserSearch,
+  useUserUpdate,
+  useUserById,
 } from '../../../api/user.api';
+import { useDepartmets } from '../../../api/department.api';
 import { useCustomSnackbars } from '../../../components/snackbar/SnackBar';
 import { FaFileExcel } from 'react-icons/fa6';
 
 const FetchState = () => {
   const navigate = useNavigate();
-
-  const { data: blocked } = useBlockedUser();
-  const { data: userRoleList } = useUserRoleList();
-  const { mutate: doUnblocked, refetch } = useUnblocked();
-  const { mutate: userSearch } = useUserSearch();
 
   const [userInfo, setUserInfo] = useState([]);
   const [input, setInput] = useState('');
@@ -27,15 +25,36 @@ const FetchState = () => {
   const [pageSize, setPageSize] = useState(30);
   const [userList, setUserList] = useState([]);
   const [selectedRoles, setSelectedRoles] = useState([]);
+  const [selectedUserId, setSelectedUserId] = useState(null); // 체크된 userId (단일)
+
+  const [editname, setEditName] = useState('');
+  const [editUserName, setEditUserName] = useState('');
+  const [editSerial, setEditSerial] = useState('');
+  const [editServiceRole, setEditServiceRole] = useState('');
+  const [editDepartmentId, setEditDepartmentId] = useState(null);
+  const [editEmail, setEditEmail] = useState('');
+
+  const [editModalOpen, setEditModalOpen] = useState(false);
   const [openBlockedModal, setOpenBlockedModal] = useState(false);
   const [selectedBlockedInfo, setSelectedBlockedInfo] = useState(null);
   const [searchParams] = useSearchParams();
   const { openSuccessSnackbar, openErrorSnackbar } = useCustomSnackbars();
 
+  const { data: selectedUserData } = useUserById(selectedUserId);
+  const { data: departments } = useDepartmets();
+  const { data: blocked } = useBlockedUser();
+  const { data: userRoleList } = useUserRoleList();
+  const { data: user } = useUserById();
+  const { mutate: doUnblocked, refetch } = useUnblocked();
+  const { mutate: userSearch } = useUserSearch();
+  const { mutate: userUpdate } = useUserUpdate();
+
   // 페이지 누를때 상태 관리
   const handlePage = (event, newPage) => {
     setCurrentPage(newPage);
   };
+
+  console.log('selectedUserId:', selectedUserId);
 
   // URL에 따라 role 필터 선택
   useEffect(() => {
@@ -98,6 +117,54 @@ const FetchState = () => {
     });
   };
 
+  // 유저 정보 수정
+  const handleUserUpdate = async userId => {
+    await userUpdate(
+      {
+        userId,
+        username: editUserName,
+        serial: editSerial,
+        serviceRole: editServiceRole,
+        name: editname,
+        email: editEmail,
+        departmentId: editDepartmentId,
+      },
+      {
+        onSuccess: data => {
+          openSuccessSnackbar(data.message, 3000);
+          refetch();
+          setEditModalOpen(false);
+          setSelectedUserId(null);
+          setEditName('');
+          setEditUserName('');
+          setEditSerial('');
+          setEditEmail('');
+          setEditServiceRole('');
+          setEditDepartmentId(null);
+          fetchUsers();
+        },
+        onError: () => {
+          openErrorSnackbar('유저 정보 수정에 실패했습니다.', 3000);
+        },
+      },
+    );
+  };
+
+  const handleCheckboxChange = user => {
+    // 토글: 이미 선택된 유저를 다시 클릭하면 해제
+    if (selectedUserId === user.userId) {
+      setSelectedUserId(null);
+    } else {
+      setSelectedUserId(user.userId);
+      setEditName(user.name);
+      setEditUserName(user.username);
+      setEditSerial(user.serial);
+      setEditEmail(user.email);
+      setEditServiceRole(user.serviceRole);
+      setEditDepartmentId(user.departmentId);
+    }
+  };
+
   // 입력할 떄마다 & Enter 키 입력 시 유저 조회
   const handleSearchUser = () => {
     setCurrentPage(1); // 검색 시 1페이지로
@@ -143,25 +210,34 @@ const FetchState = () => {
             ))}
           </div>
 
-          {/* Export Excel */}
-          <Button
-            color="dark"
-            onClick={() => {
-              if (selectedRoles.length === 0) {
-                openErrorSnackbar('역할을 하나 이상 선택해주세요.');
-                return;
-              }
-              exportUserExcel(selectedRoles);
-            }}>
-            <div className="flex flex-row gap-x-3 items-center">
-              <FaFileExcel />
-              <div className="break-keep">내보내기</div>
-            </div>
-          </Button>
+          <div className="flex flex-row items-center space-x-4">
+            {/* 회원 정보 수정 버튼 */}
+            {selectedUserId && (
+              <Button color="dark" onClick={() => setEditModalOpen(true)}>
+                수정
+              </Button>
+            )}
+            {/* Export Excel */}
+            <Button
+              color="dark"
+              onClick={() => {
+                if (selectedRoles.length === 0) {
+                  openErrorSnackbar('역할을 하나 이상 선택해주세요.');
+                  return;
+                }
+                exportUserExcel(selectedRoles);
+              }}>
+              <div className="flex flex-row gap-x-3 items-center">
+                <FaFileExcel />
+                <div className="break-keep">내보내기</div>
+              </div>
+            </Button>
+          </div>
         </div>
         {/* Users Table */}
         <Table>
           <Table.Head className="text-center">
+            <Table.HeadCell className="bg-gray-200"></Table.HeadCell>
             <Table.HeadCell className="bg-gray-200">User Id</Table.HeadCell>
             <Table.HeadCell className="bg-gray-200">
               Service Role
@@ -181,6 +257,13 @@ const FetchState = () => {
               <Table.Row
                 key={index}
                 className="bg-white cursor-pointer hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800">
+                <Table.Cell className="w-4">
+                  <Checkbox
+                    checked={selectedUserId === user.userId}
+                    onChange={() => handleCheckboxChange(user)}
+                    className="rounded-none text-[#1D2430] focus:ring-[#1D2430]"
+                  />
+                </Table.Cell>
                 <Table.Cell
                   onClick={() => {
                     if (user.serviceRole === 'BLOCKED') {
@@ -254,6 +337,125 @@ const FetchState = () => {
           />
         </div>
 
+        {/* 유저 정보 수정 모달 */}
+        <Modal show={editModalOpen} onClose={() => setEditModalOpen(false)}>
+          <Modal.Header>
+            <strong>#{selectedUserId}</strong> 유저 정보 수정
+          </Modal.Header>
+          <Modal.Body>
+            <Table>
+              <Table.Body>
+                <Table.Row>
+                  <Table.Cell className="border-b border-gray-300 bg-gray-200 font-semibold text-black">
+                    유저 ID
+                  </Table.Cell>
+                  <Table.Cell className="border-b border-gray-300">
+                    {selectedUserId}
+                  </Table.Cell>
+                </Table.Row>
+                <Table.Row>
+                  <Table.Cell className="border-b border-gray-300 bg-gray-200 font-semibold text-black">
+                    이름
+                  </Table.Cell>
+                  <Table.Cell className="border-b border-gray-300">
+                    <Input
+                      fullWidth
+                      value={editname}
+                      onChange={e => setEditName(e.target.value)}
+                    />
+                  </Table.Cell>
+                </Table.Row>
+                <Table.Row>
+                  <Table.Cell className="border-b border-gray-300 bg-gray-200 font-semibold text-black">
+                    USERNAME
+                  </Table.Cell>
+                  <Table.Cell className="border-b border-gray-300">
+                    <Input
+                      fullWidth
+                      value={editUserName}
+                      onChange={e => setEditUserName(e.target.value)}
+                    />
+                  </Table.Cell>
+                </Table.Row>
+                <Table.Row>
+                  <Table.Cell className="border-b border-gray-300 bg-gray-200 font-semibold text-black">
+                    학번
+                  </Table.Cell>
+                  <Table.Cell className="border-b border-gray-300">
+                    <Input
+                      fullWidth
+                      value={editSerial}
+                      onChange={e => setEditSerial(e.target.value)}
+                    />
+                  </Table.Cell>
+                </Table.Row>
+                <Table.Row>
+                  <Table.Cell className="border-b border-gray-300 bg-gray-200 font-semibold text-black">
+                    ROLE
+                  </Table.Cell>
+                  <Table.Cell className="border-b border-gray-300">
+                    <select
+                      className="w-full border rounded-md px-2 py-1"
+                      value={editServiceRole}
+                      onChange={e => setEditServiceRole(e.target.value)}>
+                      <option value="">선택</option>
+                      {userRoleList?.map(role => (
+                        <option key={role} value={role}>
+                          {role}
+                        </option>
+                      ))}
+                    </select>
+                  </Table.Cell>
+                </Table.Row>
+
+                <Table.Row>
+                  <Table.Cell className="border-b border-gray-300 bg-gray-200 font-semibold text-black">
+                    이메일
+                  </Table.Cell>
+                  <Table.Cell className="border-b border-gray-300">
+                    <Input
+                      fullWidth
+                      value={editEmail}
+                      onChange={e => setEditEmail(e.target.value)}
+                    />
+                  </Table.Cell>
+                </Table.Row>
+                <Table.Row>
+                  <Table.Cell className=" bg-gray-200 font-semibold text-black">
+                    부서
+                  </Table.Cell>
+                  <Table.Cell>
+                    <select
+                      className="w-full border rounded-md px-2 py-1"
+                      value={editDepartmentId ?? ''}
+                      onChange={e =>
+                        setEditDepartmentId(Number(e.target.value))
+                      }>
+                      <option value="">선택</option>
+                      {departments?.map(dept => (
+                        <option
+                          key={dept.departmentId}
+                          value={dept.departmentId}>
+                          {dept.departmentName}
+                        </option>
+                      ))}
+                    </select>
+                  </Table.Cell>
+                </Table.Row>
+              </Table.Body>
+            </Table>
+
+            <div className="flex justify-end mt-4">
+              <Button
+                color="dark"
+                onClick={() => handleUserUpdate(selectedUserId)}>
+                수정
+              </Button>
+            </div>
+          </Modal.Body>
+        </Modal>
+
+        {/* 회원 블락 기간 조회 모달 */}
         <Modal
           className="flex justify-center items-center w-full"
           show={openBlockedModal}
