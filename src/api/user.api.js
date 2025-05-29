@@ -15,6 +15,19 @@ export const useAllUsers = () => {
   });
 };
 
+// [관리자] 특정 회원 정보 조회
+const fetchUserById = async userId => {
+  const userById_res = await apiClient.get(`/users/${userId}`);
+  return userById_res.data.data;
+};
+export const useUserById = userId => {
+  return useQuery({
+    queryKey: ['userById', userId],
+    queryFn: () => fetchUserById(userId),
+    enabled: false,
+  });
+};
+
 // 자신의 정보 조회
 const fetchMyInfo = async () => {
   try {
@@ -267,6 +280,32 @@ export const useUserSearch = () => {
         departmentId,
         page,
         size,
+      });
+
+      return response.data;
+    },
+  });
+};
+
+// [관리자] 특정 회원 정보 수정
+export const useUserUpdate = () => {
+  return useMutation({
+    mutationFn: async ({
+      userId,
+      username,
+      serial,
+      serviceRole,
+      name,
+      email,
+      departmentId,
+    }) => {
+      const response = await apiClient.patch(`/users/${userId}`, {
+        username,
+        serial,
+        name,
+        email,
+        serviceRole,
+        departmentId,
       });
 
       return response.data;
