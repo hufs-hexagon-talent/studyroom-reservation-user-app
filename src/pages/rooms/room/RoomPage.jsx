@@ -29,7 +29,9 @@ import { useReservations, useReserve } from '../../../api/reservation.api';
 
 import useUrlQuery from '../../../hooks/useUrlQuery';
 import useAuth from '../../../hooks/useAuth';
-import Button from '../../../components/button/Button';
+import CustomButton from '../../../components/button/Button';
+import { Button } from 'flowbite-react';
+import { Modal } from 'flowbite-react';
 
 const createTimeTable = config => {
   const { startTime, endTime, intervalMinute } = config;
@@ -79,6 +81,7 @@ const RoomPage = () => {
   const [endHour, setEndHour] = useState(null);
   const [endMinute, setEndMinute] = useState(null);
   const [maxReservationMinute, setMaxReservationMinute] = useState(null);
+  const [openReserveModal, setOpenReserveModal] = useState(false);
 
   const navigate = useNavigate();
   const today = new Date();
@@ -137,6 +140,11 @@ const RoomPage = () => {
       // 배열들 중에 가장 큰 값을 maxEachMaxMinute으로 저장
       const maxEachMaxMinute = Math.max(...eachMaxMinutes);
       setMaxReservationMinute(maxEachMaxMinute);
+
+      // 날짜 변경 시 기존 선택 초기화
+      setSelectedRoom(null);
+      setSelectedRangeFrom(null);
+      selSelectedRangeTo(null);
     }
   }, [reservationsByRooms, selectedDate]);
 
@@ -505,18 +513,88 @@ const RoomPage = () => {
           </div>
         )}
         <div className="p-10 flex justify-end">
-          <Button
-            onClick={() =>
-              handleReservation({
-                roomPartitionId: selectedRoom ? selectedRoom.partitionId : null,
-                startDateTime: selectedRangeFrom,
-                endDateTime: selectedRangeTo,
-              })
-            }
+          <CustomButton
+            onClick={() => {
+              if (selectedRoom && selectedRangeFrom && selectedRangeTo) {
+                setOpenReserveModal(true);
+              } else {
+                openSnackbar('원하는 호실과 시간대를 선택해주세요.');
+              }
+            }}
             text="예약하기"
           />
         </div>
       </div>
+
+      {/* 선택된 예약 정보 모달 */}
+      <Modal
+        className="flex items-center justify-center"
+        show={openReserveModal}
+        onClose={() => setOpenReserveModal(false)}>
+        <Modal.Header>
+          <h2 className="text-xl font-semibold text-gray-800">
+            현재 선택한 예약 정보
+          </h2>
+        </Modal.Header>
+        <Modal.Body>
+          <div className="space-y-2 text-gray-700 text-base">
+            <p className="mb-1">
+              <span className="font-medium text-gray-600">호실명 :</span>{' '}
+              <span className="font-semibold">
+                {selectedRoom?.roomName}-{selectedRoom?.partitionNumber}
+              </span>
+            </p>
+            <p className="mb-1">
+              <span className="font-medium text-gray-600">선택한 날짜 :</span>{' '}
+              <span className="font-semibold">
+                {format(selectedDate, 'yyyy년 MM월 dd일')}
+              </span>
+            </p>
+            <p className="mb-1">
+              <span className="font-medium text-gray-600">
+                예약 시작 시각 :
+              </span>{' '}
+              <span className="font-semibold">
+                {selectedRangeFrom && format(selectedRangeFrom, 'HH:mm')}
+              </span>
+            </p>
+            <p>
+              <span className="font-medium text-gray-600">
+                예약 종료 시각 :
+              </span>{' '}
+              <span className="font-semibold">
+                {selectedRangeTo && format(selectedRangeTo, 'HH:mm')}
+              </span>
+            </p>
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <div className="flex justify-end space-x-2 w-full">
+            <Button
+              onClick={() => {
+                setOpenReserveModal(false);
+              }}
+              className="bg-red-600 text-white hover:bg-red-700">
+              취소
+            </Button>
+            <Button
+              onClick={() => {
+                handleReservation({
+                  roomPartitionId: selectedRoom
+                    ? selectedRoom.partitionId
+                    : null,
+                  startDateTime: selectedRangeFrom,
+                  endDateTime: selectedRangeTo,
+                });
+                setOpenReserveModal(false);
+              }}
+              color="dark"
+              className="text-white ">
+              예약
+            </Button>
+          </div>
+        </Modal.Footer>
+      </Modal>
     </>
   );
 };
