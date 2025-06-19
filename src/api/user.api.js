@@ -1,6 +1,5 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { apiClient } from './client';
-import axios from 'axios';
 
 // [관리자] 모든 회원 정보 조회
 const fetchAllUsers = async () => {

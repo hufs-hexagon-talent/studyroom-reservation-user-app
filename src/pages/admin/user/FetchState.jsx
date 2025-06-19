@@ -9,7 +9,6 @@ import {
   exportUserExcel,
   useUserSearch,
   useUserUpdate,
-  useUserById,
 } from '../../../api/user.api';
 import { useDepartmets } from '../../../api/department.api';
 import { useCustomSnackbars } from '../../../components/snackbar/SnackBar';
@@ -18,7 +17,6 @@ import { FaFileExcel } from 'react-icons/fa6';
 const FetchState = () => {
   const navigate = useNavigate();
 
-  const [userInfo, setUserInfo] = useState([]);
   const [input, setInput] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -40,21 +38,17 @@ const FetchState = () => {
   const [searchParams] = useSearchParams();
   const { openSuccessSnackbar, openErrorSnackbar } = useCustomSnackbars();
 
-  const { data: selectedUserData } = useUserById(selectedUserId);
   const { data: departments } = useDepartmets();
   const { data: blocked } = useBlockedUser();
   const { data: userRoleList } = useUserRoleList();
-  const { data: user } = useUserById();
   const { mutate: doUnblocked, refetch } = useUnblocked();
   const { mutate: userSearch } = useUserSearch();
-  const { mutate: userUpdate } = useUserUpdate();
+  const { mutateAsync: userUpdate } = useUserUpdate();
 
   // 페이지 누를때 상태 관리
   const handlePage = (event, newPage) => {
     setCurrentPage(newPage);
   };
-
-  console.log('selectedUserId:', selectedUserId);
 
   // URL에 따라 role 필터 선택
   useEffect(() => {
@@ -119,8 +113,8 @@ const FetchState = () => {
 
   // 유저 정보 수정
   const handleUserUpdate = async userId => {
-    await userUpdate(
-      {
+    try {
+      const data = await userUpdate({
         userId,
         username: editUserName,
         serial: editSerial,
@@ -128,26 +122,23 @@ const FetchState = () => {
         name: editname,
         email: editEmail,
         departmentId: editDepartmentId,
-      },
-      {
-        onSuccess: data => {
-          openSuccessSnackbar(data.message, 3000);
-          refetch();
-          setEditModalOpen(false);
-          setSelectedUserId(null);
-          setEditName('');
-          setEditUserName('');
-          setEditSerial('');
-          setEditEmail('');
-          setEditServiceRole('');
-          setEditDepartmentId(null);
-          fetchUsers();
-        },
-        onError: () => {
-          openErrorSnackbar('유저 정보 수정에 실패했습니다.', 3000);
-        },
-      },
-    );
+      });
+
+      openSuccessSnackbar(data.message, 3000);
+
+      setEditModalOpen(false);
+      setSelectedUserId(null);
+      setEditName('');
+      setEditUserName('');
+      setEditSerial('');
+      setEditEmail('');
+      setEditServiceRole('');
+      setEditDepartmentId(null);
+      fetchUsers();
+    } catch (err) {
+      console.error('유저 정보 수정 실패:', err);
+      openErrorSnackbar('유저 정보 수정에 실패했습니다.', 3000);
+    }
   };
 
   const handleCheckboxChange = user => {
