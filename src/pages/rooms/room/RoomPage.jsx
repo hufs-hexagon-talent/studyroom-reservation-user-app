@@ -530,38 +530,37 @@ const RoomPage = () => {
       <Modal
         className="flex items-center justify-center"
         show={openReserveModal}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
         onClose={() => setOpenReserveModal(false)}>
         <Modal.Header>
-          <h2 className="text-xl font-semibold text-gray-800">
-            현재 선택한 예약 정보
-          </h2>
+          <h2 className="text-xl font-semibold">현재 선택한 예약 정보</h2>
         </Modal.Header>
         <Modal.Body>
-          <div className="space-y-2 text-gray-700 text-base">
+          <div className="space-y-2 text-base">
             <p className="mb-1">
-              <span className="font-medium text-gray-600">호실명 :</span>{' '}
+              <span className="font-medium">호실명 :</span>{' '}
               <span className="font-semibold">
                 {selectedRoom?.roomName}-{selectedRoom?.partitionNumber}
               </span>
             </p>
             <p className="mb-1">
-              <span className="font-medium text-gray-600">선택한 날짜 :</span>{' '}
+              <span className="font-medium">선택한 날짜 :</span>{' '}
               <span className="font-semibold">
                 {format(selectedDate, 'yyyy년 MM월 dd일')}
               </span>
             </p>
             <p className="mb-1">
-              <span className="font-medium text-gray-600">
-                예약 시작 시각 :
-              </span>{' '}
+              <span className="font-medium">예약 시작 시각 :</span>{' '}
               <span className="font-semibold">
                 {selectedRangeFrom && format(selectedRangeFrom, 'HH:mm')}
               </span>
             </p>
             <p>
-              <span className="font-medium text-gray-600">
-                예약 종료 시각 :
-              </span>{' '}
+              <span className="font-medium">예약 종료 시각 :</span>{' '}
               <span className="font-semibold">
                 {selectedRangeTo && format(selectedRangeTo, 'HH:mm')}
               </span>
