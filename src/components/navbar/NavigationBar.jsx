@@ -30,7 +30,7 @@ const NavigationBar = () => {
             <Navbar.Link href="/qrcheck">출석 체크</Navbar.Link>
             <Navbar.Link href="/notice">이용 규칙</Navbar.Link>
             {loggedIn ? (
-              <Navbar.Link href="/" onClick={logout}>
+              <Navbar.Link href="/login" onClick={logout}>
                 로그아웃
               </Navbar.Link>
             ) : (
