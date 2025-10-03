@@ -21,10 +21,7 @@ const menuData = [
   {
     label: '사용자 관리',
     icon: HiUser,
-    children: [
-      { label: '사용자 상태 관리', to: '/admin/user-state' },
-      { label: '회원가입', to: '/admin/sign-up' },
-    ],
+    children: [{ label: '사용자 상태 관리', to: '/admin/user-state' }],
   },
   {
     label: '예약 관리',

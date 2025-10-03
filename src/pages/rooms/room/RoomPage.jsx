@@ -543,25 +543,18 @@ const RoomPage = () => {
           <div className="space-y-2 text-base">
             <p className="mb-1">
               <span className="font-medium">호실명 :</span>{' '}
-              <span className="font-semibold">
+              <span>
                 {selectedRoom?.roomName}-{selectedRoom?.partitionNumber}
               </span>
             </p>
             <p className="mb-1">
               <span className="font-medium">선택한 날짜 :</span>{' '}
-              <span className="font-semibold">
-                {format(selectedDate, 'yyyy년 MM월 dd일')}
-              </span>
+              <span>{format(selectedDate, 'yyyy년 MM월 dd일')}</span>
             </p>
             <p className="mb-1">
-              <span className="font-medium">예약 시작 시각 :</span>{' '}
-              <span className="font-semibold">
-                {selectedRangeFrom && format(selectedRangeFrom, 'HH:mm')}
-              </span>
-            </p>
-            <p>
-              <span className="font-medium">예약 종료 시각 :</span>{' '}
-              <span className="font-semibold">
+              <span className="font-medium">사용 시간 :</span>{' '}
+              <span>
+                {selectedRangeFrom && format(selectedRangeFrom, 'HH:mm')} ~{' '}
                 {selectedRangeTo && format(selectedRangeTo, 'HH:mm')}
               </span>
             </p>

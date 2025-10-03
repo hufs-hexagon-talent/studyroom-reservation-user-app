@@ -202,6 +202,13 @@ const FetchState = () => {
           </div>
 
           <div className="flex flex-row items-center space-x-4">
+            {/* 사용자 추가 */}
+            <Button
+              color="dark"
+              className="cursor-pointer"
+              onClick={() => navigate('/admin/sign-up')}>
+              사용자 추가
+            </Button>
             {/* 회원 정보 수정 버튼 */}
             {selectedUserId && (
               <Button color="dark" onClick={() => setEditModalOpen(true)}>
@@ -210,7 +217,7 @@ const FetchState = () => {
             )}
             {/* Export Excel */}
             <Button
-              color="dark"
+              className="bg-[#009900]"
               onClick={() => {
                 if (selectedRoles.length === 0) {
                   openErrorSnackbar('역할을 하나 이상 선택해주세요.');
