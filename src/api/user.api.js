@@ -17,14 +17,15 @@ export const useAllUsers = () => {
 
 // [관리자] 특정 회원 정보 조회
 const fetchUserById = async userId => {
-  const userById_res = await apiClient.get(`/users/${userId}`);
+  const userById_res = await apiClient.get(`/users/search/by-id/${userId}`);
   return userById_res.data.data;
 };
+
 export const useUserById = userId => {
   return useQuery({
     queryKey: ['userById', userId],
     queryFn: () => fetchUserById(userId),
-    enabled: false,
+    enabled: !!userId,
   });
 };
 
