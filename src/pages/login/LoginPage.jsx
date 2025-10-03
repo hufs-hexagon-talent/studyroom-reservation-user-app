@@ -46,14 +46,11 @@ const LoginPage = () => {
   };
 
   return (
-    <div>
-      <h1 className="flex justify-center w-screen text-2xl text-center mt-20 mb-5">
-        로그인
-      </h1>
-      <form id="form" className="pt-3 pb-5">
-        {/* 공통 컨테이너 - 여기서만 max-w-xs 적용 */}
-        <div className="mx-auto w-full max-w-xs flex flex-col items-center">
-          {/* 학번 */}
+    <div className="flex flex-col items-center justify-center">
+      <div className="text-2xl text-center mt-20 mb-5">로그인</div>
+      <div className="flex flex-col max-w-md w-full gap-4">
+        {/* 학번 */}
+        <div>
           <TextInput
             id="number"
             placeholder="학번을 입력해주세요"
@@ -61,8 +58,10 @@ const LoginPage = () => {
             className="w-full"
             autoComplete="username"
           />
+        </div>
 
-          {/* 비밀번호 */}
+        {/* 비밀번호 */}
+        <div>
           <div className="relative w-full mt-3">
             <TextInput
               id="password"
@@ -81,7 +80,9 @@ const LoginPage = () => {
               {showPwd ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
           </div>
+        </div>
 
+        <div>
           {/* 버튼 */}
           <Button
             id="btn"
@@ -91,9 +92,9 @@ const LoginPage = () => {
             로그인하기
           </Button>
         </div>
-      </form>
+      </div>
 
-      <div className="flex flex-col items-center justify-center w-screen pt-4 pb-10 text-sm text-gray-600 cursor-pointer">
+      <div className="flex flex-col items-center justify-center w-screen pt-8 pb-10 text-sm text-gray-600 cursor-pointer">
         <span onClick={handlePasword}>비밀번호 재설정하러 가기 &gt;</span>
       </div>
     </div>
