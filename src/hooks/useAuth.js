@@ -46,7 +46,6 @@ const useAuth = () => {
       accessToken: null,
       refreshToken: null,
     });
-    // navigate('/login'); // 리다이렉트가 필요하다면 사용
   }, [setAuth]);
 
   return { ...auth, loggedIn, login, logout };

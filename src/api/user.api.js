@@ -1,5 +1,6 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { apiClient } from './client';
+import useAuth from '../hooks/useAuth';
 
 // [관리자] 모든 회원 정보 조회
 const fetchAllUsers = async () => {
@@ -309,5 +310,20 @@ export const useUserUpdate = () => {
 
       return response.data;
     },
+  });
+};
+
+// 비밀번호 변경 필요 여부 확인
+export const fetchCheckPwd = async () => {
+  const check_pwd_res = await apiClient.get('/users/me/check-password');
+  return check_pwd_res.data.data;
+};
+
+export const useCheckPwd = () => {
+  const { accessToken } = useAuth;
+  return useQuery({
+    queryKey: ['checkPwd'],
+    queryFn: fetchCheckPwd,
+    enabled: !!accessToken,
   });
 };

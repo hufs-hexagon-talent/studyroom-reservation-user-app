@@ -142,7 +142,7 @@ const Check = () => {
                         onClick={() => {
                           setOpenModal(reservation.reservationId);
                         }}
-                        className="font-medium text-cyan-600 hover:underline dark:text-cyan-500">
+                        className="font-medium text-red-600 hover:underline dark:text-cyan-500">
                         삭제
                       </a>
                     )}
@@ -243,6 +243,7 @@ const Check = () => {
           </div>
         </Popover>
       </div>
+
       <div className="flex justify-center items-center">
         <Modal
           className="flex justify-center items-center w-full p-4 sm:p-0"

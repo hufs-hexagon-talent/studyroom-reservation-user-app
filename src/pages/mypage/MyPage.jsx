@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Logo from '../../assets/logo/logoCes.png';
 import { useMyInfo } from '../../api/user.api';
@@ -8,6 +8,8 @@ import './MyPage.css';
 import useIsMobile from '../../hooks/useIsMobile';
 import ClockGreen from '../../assets/clock_icon/clock Green.png';
 import ClockGray from '../../assets/clock_icon/clock gray.png';
+import { MdOutlineEdit } from 'react-icons/md';
+import { Modal, Button } from 'flowbite-react';
 
 const MyPage = () => {
   const navigate = useNavigate();
@@ -15,6 +17,8 @@ const MyPage = () => {
   const { data: me } = useMyInfo();
   const { data: latest } = useLatestReservation();
   const department = '컴퓨터공학부';
+
+  const [openEditModal, setOpenEditModal] = useState(false);
 
   return (
     <>
@@ -25,7 +29,10 @@ const MyPage = () => {
           <div>
             {me?.serial} | {department}
           </div>
-          <div className="pb-1">{me?.email}</div>
+          <div className="flex items-center space-x-4 cursor-pointer">
+            <div className="pb-1">{me?.email}</div>
+            <MdOutlineEdit onClick={() => setOpenEditModal(true)} />
+          </div>
           {latest?.length > 0 ? (
             <div>
               {isMobile ? (
@@ -112,7 +119,7 @@ const MyPage = () => {
           </div>
         </div>
         {/* 내 계정 관리 */}
-        <div className="menu-section">
+        {/* <div className="menu-section">
           <div className="menu-title">내 계정 관리</div>
           <div className="menu-item" onClick={() => navigate('/password')}>
             비밀번호 변경
@@ -120,7 +127,7 @@ const MyPage = () => {
           <div className="menu-item" onClick={() => navigate('/emailSend')}>
             이메일 변경
           </div>
-        </div>
+        </div> */}
         {/* 문의 및 건의 */}
         <div className="menu-section">
           <div className="menu-title">문의 및 건의</div>
@@ -146,6 +153,34 @@ const MyPage = () => {
           </div>
         </div>
       </div>
+
+      <Modal
+        className="flex justify-center items-center w-full p-4 sm:p-0"
+        show={openEditModal}
+        size="md"
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+        onClose={() => setOpenEditModal(false)}
+        popup>
+        <Modal.Header />
+        <Modal.Body>
+          <div className="text-center px-16">
+            <h3
+              onClick={() => navigate('/password')}
+              className="mb-5 text-lg font-normal cursor-pointer hover:underline dark:text-gray-400">
+              비밀번호 변경
+            </h3>
+            <h3
+              onClick={() => navigate('/emailSend')}
+              className="mb-5 text-lg font-normal cursor-pointer hover:underline dark:text-gray-400">
+              이메일 변경
+            </h3>
+          </div>
+        </Modal.Body>
+      </Modal>
     </>
   );
 };
