@@ -6,12 +6,19 @@ import { useCustomSnackbars } from '../../components/snackbar/SnackBar';
 import './LoggedInPassword.css';
 import useAuth from '../../hooks/useAuth';
 import { flushSync } from 'react-dom';
+import { Eye, EyeOff } from 'lucide-react';
 
 const LoggedInPassword = () => {
   const [prePassword, setPrePassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [passwordError, setPasswordError] = useState('');
+
+  // 보기/가리기 토글 상태
+  const [showOld, setShowOld] = useState(false);
+  const [showNew, setShowNew] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+
   const { mutateAsync: changePw } = usePassword();
   const navigate = useNavigate();
   const { openSuccessSnackbar, openErrorSnackbar } = useCustomSnackbars();
@@ -66,48 +73,79 @@ const LoggedInPassword = () => {
           <div className="mb-2 block">
             <Label htmlFor="password1" value="기존 비밀번호" />
           </div>
-          <TextInput
-            id="password1"
-            type="password"
-            placeholder="기존 비밀번호를 입력해주세요"
-            required
-            onChange={e => setPrePassword(e.target.value)}
-          />
+          <div className="relative with-eye">
+            <TextInput
+              id="password1"
+              type={showOld ? 'text' : 'password'}
+              placeholder="기존 비밀번호를 입력해주세요"
+              required
+              autoComplete="current-password"
+              onChange={e => setPrePassword(e.target.value)}
+            />
+            <button
+              type="button"
+              aria-label={showOld ? '비밀번호 숨기기' : '비밀번호 보기'}
+              onClick={() => setShowOld(v => !v)}
+              className="absolute inset-y-0 right-3 flex items-center">
+              {showOld ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
         </div>
 
+        {/* 새 비밀번호 */}
         <div>
           <div className="mb-2 block">
             <Label htmlFor="newPassword" value="새 비밀번호" />
           </div>
-          <TextInput
-            id="newPassword"
-            type="password"
-            placeholder="새 비밀번호를 입력해주세요"
-            required
-            onChange={e => setNewPassword(e.target.value)}
-            color={passwordError ? 'failure' : undefined}
-          />
+          <div className="relative with-eye">
+            <TextInput
+              id="newPassword"
+              type={showNew ? 'text' : 'password'}
+              placeholder="새 비밀번호를 입력해주세요"
+              required
+              autoComplete="new-password"
+              onChange={e => setNewPassword(e.target.value)}
+              color={passwordError ? 'failure' : undefined}
+            />
+            <button
+              type="button"
+              aria-label={showNew ? '비밀번호 숨기기' : '비밀번호 보기'}
+              onClick={() => setShowNew(v => !v)}
+              className="absolute inset-y-0 right-3 flex items-center">
+              {showNew ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
         </div>
 
+        {/* 새 비밀번호 확인 */}
         <div>
           <div className="mb-2 block">
             <Label htmlFor="confirmPassword" value="새 비밀번호 확인" />
           </div>
-          <TextInput
-            id="confirmPassword"
-            type="password"
-            placeholder="새 비밀번호를 한번 더 입력해주세요"
-            required
-            onChange={e => {
-              setConfirmPassword(e.target.value);
-              setPasswordError('');
-            }}
-            color={passwordError ? 'failure' : undefined}
-            helperText={passwordError || undefined}
-          />
+          <div className="relative with-eye">
+            <TextInput
+              id="confirmPassword"
+              type={showConfirm ? 'text' : 'password'}
+              placeholder="새 비밀번호를 한번 더 입력해주세요"
+              required
+              autoComplete="new-password"
+              onChange={e => {
+                setConfirmPassword(e.target.value);
+                setPasswordError('');
+              }}
+              color={passwordError ? 'failure' : undefined}
+              helperText={passwordError || undefined}
+            />
+            <button
+              type="button"
+              aria-label={showConfirm ? '비밀번호 숨기기' : '비밀번호 보기'}
+              onClick={() => setShowConfirm(v => !v)}
+              className="absolute inset-y-0 right-3 flex items-center">
+              {showConfirm ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
         </div>
 
-        {/* ✅ onClick 제거하고, form onSubmit만 사용 */}
         <Button className="mt-10 mb-10" color="dark" type="submit">
           변경하기
         </Button>
