@@ -26,7 +26,6 @@ import 'react-datepicker/dist/react-datepicker.css';
 
 import { fetchDate } from '../../../api/policySchedule.api';
 import { useReservations, useReserve } from '../../../api/reservation.api';
-
 import useUrlQuery from '../../../hooks/useUrlQuery';
 import useAuth from '../../../hooks/useAuth';
 import CustomButton from '../../../components/button/Button';

@@ -5,6 +5,7 @@ import { useCustomSnackbars } from '../../components/snackbar/SnackBar';
 import './LoginPage.css';
 
 import useAuth from '../../hooks/useAuth';
+import { useCheckPwd } from '../../api/user.api';
 
 const LoginPage = () => {
   const [password, setPassword] = useState('');
@@ -12,8 +13,9 @@ const LoginPage = () => {
   const { login, loggedIn } = useAuth();
   const navigate = useNavigate();
   const { openSuccessSnackbar, openErrorSnackbar } = useCustomSnackbars();
-
-  if (loggedIn) navigate('/');
+  const { refetch: refetchCheckPwd } = useCheckPwd({
+    enabled: false,
+  });
 
   const handleLogin = async () => {
     if (!studentId || !password) {
@@ -22,9 +24,18 @@ const LoginPage = () => {
     }
     try {
       await login({ id: studentId, password });
-      openSuccessSnackbar('로그인 되었습니다', 1500); // 성공 시 스낵바 실행
+      const { data: checkPwd } = await refetchCheckPwd();
+
+      // 비밀번호 변경 여부 분기
+      if (checkPwd?.isPasswordChangeRequired) {
+        openErrorSnackbar(`${checkPwd?.message}`, 3000);
+        navigate('/password');
+      } else {
+        openSuccessSnackbar('로그인 되었습니다', 1500);
+        navigate('/');
+      }
     } catch (error) {
-      openErrorSnackbar(error.message, 2500); // 실패 시 에러 메시지 표시
+      openErrorSnackbar(error.message, 2500);
     }
   };
 
