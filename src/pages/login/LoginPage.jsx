@@ -5,7 +5,6 @@ import { useCustomSnackbars } from '../../components/snackbar/SnackBar';
 import './LoginPage.css';
 import { Eye, EyeOff } from 'lucide-react';
 import useAuth from '../../hooks/useAuth';
-import { useCheckPwd } from '../../api/user.api';
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -13,23 +12,22 @@ const LoginPage = () => {
   const [password, setPassword] = useState('');
   const [studentId, setStudentId] = useState('');
   const [showPwd, setShowPwd] = useState(false);
-
   const { login } = useAuth();
   const { openSuccessSnackbar, openErrorSnackbar } = useCustomSnackbars();
-  const { refetch: refetchCheckPwd } = useCheckPwd({ enabled: false });
 
   const handleLogin = async () => {
-    if (!studentId || !password) {
-      openErrorSnackbar('아이디와 비밀번호를 모두 입력해주세요.', 2500);
-      return;
-    }
     try {
-      await login({ id: studentId, password });
-      const { data: checkPwd } = await refetchCheckPwd();
-
-      if (checkPwd?.isPasswordChangeRequired) {
-        openErrorSnackbar(`${checkPwd?.message}`, 3000);
-        navigate('/password');
+      const { isPasswordChangeRequired } = await login({
+        id: studentId,
+        password,
+      });
+      if (isPasswordChangeRequired) {
+        openErrorSnackbar(
+          '비밀번호 변경이 필요합니다. 변경 페이지로 이동합니다.',
+          3000,
+        );
+        navigate('/password', { replace: true });
+        return;
       } else {
         openSuccessSnackbar('로그인 되었습니다', 1500);
         navigate('/');
