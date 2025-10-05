@@ -65,10 +65,6 @@ const RouterComponent = () => {
         <div className="flex-grow">
           <Routes>
             <Route path="/" element={<RoomPage />} />
-            {loggedIn && (
-              <Route path="/password" element={<LoggedInPassword />} />
-            )}
-
             {loggedIn &&
               (serviceRole === 'USER' || serviceRole === 'BLOCKED') && (
                 <>
@@ -78,6 +74,7 @@ const RouterComponent = () => {
                   <Route path="/mypage" element={<MyPage />} />
                   <Route path="/noshow" element={<NoShow />} />
                   <Route path="/emailSend" element={<EmailSend />} />
+                  <Route path="/password" element={<LoggedInPassword />} />
                 </>
               )}
             {loggedIn && serviceRole === 'ADMIN' && (
@@ -85,6 +82,7 @@ const RouterComponent = () => {
                 <Route path="/notice" element={<Notice />} />
                 <Route path="/qrcheck" element={<QrCheck />} />
                 <Route path="/otp" element={<OtpPage />} />
+                <Route path="/password" element={<LoggedInPassword />} />
                 <Route path="/check" element={<Check />} />
                 <Route path="/mypage" element={<MyPage />} />
                 <Route path="/emailSend" element={<EmailSend />} />

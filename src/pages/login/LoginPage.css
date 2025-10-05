@@ -6,3 +6,10 @@
     margin: 0 auto;
   }
 }
+
+.textInput,
+#btn {
+  width: calc(100% - 2rem);
+  max-width: 400px;
+  margin: 0.5rem 0;
+}

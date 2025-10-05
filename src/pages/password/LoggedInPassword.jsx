@@ -1,64 +1,63 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Label, TextInput } from 'flowbite-react';
-import { usePassword } from '../../api/user.api';
+import { usePassword, useMyInfo } from '../../api/user.api';
 import { useCustomSnackbars } from '../../components/snackbar/SnackBar';
 import './LoggedInPassword.css';
-import useAuth from '../../hooks/useAuth';
-import { flushSync } from 'react-dom';
-import { Eye, EyeOff } from 'lucide-react';
 
 const LoggedInPassword = () => {
   const [prePassword, setPrePassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [idError, setIdError] = useState('');
   const [passwordError, setPasswordError] = useState('');
-
-  // 보기/가리기 토글 상태
-  const [showOld, setShowOld] = useState(false);
-  const [showNew, setShowNew] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
-
   const { mutateAsync: changePw } = usePassword();
   const navigate = useNavigate();
   const { openSuccessSnackbar, openErrorSnackbar } = useCustomSnackbars();
-  const { logout } = useAuth();
 
+  // 기존 비밀번호
+  const handlePwChange = e => {
+    setPrePassword(e.target.value);
+  };
+
+  // 신규 비밀번호
+  const handleNewPasswordChange = e => {
+    setNewPassword(e.target.value);
+  };
+
+  // 신규 비밀번호 확인
+  const handleConfirmPasswordChange = e => {
+    setConfirmPassword(e.target.value);
+    setPasswordError('');
+  };
+
+  // 비밀번호 수정
   const handleSubmit = async e => {
     e.preventDefault();
 
-    // 모든 필드 체크
+    // 모든 필드가 채워져 있는지 확인
     if (!prePassword || !newPassword || !confirmPassword) {
-      openErrorSnackbar('모든 값을 입력해주세요');
-      return;
-    }
-    if (newPassword !== confirmPassword) {
-      const msg = '신규 비밀번호가 일치하지 않습니다.';
-      setPasswordError(msg);
-      openErrorSnackbar(msg);
+      const errorMessage = '모든 값을 입력해주세요';
+      openErrorSnackbar(errorMessage); // 모든 값을 입력하라는 오류 메시지 표시
       return;
     }
 
+    if (newPassword !== confirmPassword) {
+      const errorMessage = '신규 비밀번호가 일치하지 않습니다.';
+      setPasswordError(errorMessage);
+      openErrorSnackbar(errorMessage); // 직접 문자열을 전달
+      return;
+    }
+
+    setIdError('');
     setPasswordError('');
     try {
-      await changePw({ prePassword, newPassword });
-      openSuccessSnackbar(
-        '비밀번호가 성공적으로 변경되었습니다. 재로그인 부탁드립니다.',
-      );
-
-      // 로그아웃 상태를 동기적으로 반영 후 이동
-      flushSync(() => {
-        logout();
-      });
-
-      // 자동 리다이렉트 회피
-      navigate('/login', { replace: true, state: { fromLogout: true } });
+      const response = await changePw({ prePassword, newPassword });
+      openSuccessSnackbar('비밀번호가 성공적으로 변경되었습니다.');
+      navigate('/');
     } catch (error) {
       console.error('Failed to change password:', error);
-      openErrorSnackbar(
-        error?.message ?? '비밀번호 변경에 실패했습니다.',
-        2500,
-      );
+      openErrorSnackbar(error.message, 2500);
     }
   };
 
@@ -73,80 +72,43 @@ const LoggedInPassword = () => {
           <div className="mb-2 block">
             <Label htmlFor="password1" value="기존 비밀번호" />
           </div>
-          <div className="relative with-eye">
-            <TextInput
-              id="password1"
-              type={showOld ? 'text' : 'password'}
-              placeholder="기존 비밀번호를 입력해주세요"
-              required
-              autoComplete="current-password"
-              onChange={e => setPrePassword(e.target.value)}
-            />
-            <button
-              type="button"
-              aria-label={showOld ? '비밀번호 숨기기' : '비밀번호 보기'}
-              onClick={() => setShowOld(v => !v)}
-              className="absolute inset-y-0 right-3 flex items-center">
-              {showOld ? <EyeOff size={18} /> : <Eye size={18} />}
-            </button>
-          </div>
+          <TextInput
+            onChange={handlePwChange}
+            id="password1"
+            type="password"
+            placeholder="기존 비밀번호를 입력해주세요"
+            required
+          />
         </div>
-
-        {/* 새 비밀번호 */}
         <div>
           <div className="mb-2 block">
             <Label htmlFor="newPassword" value="새 비밀번호" />
           </div>
-          <div className="relative with-eye">
-            <TextInput
-              id="newPassword"
-              type={showNew ? 'text' : 'password'}
-              placeholder="새 비밀번호를 입력해주세요"
-              required
-              autoComplete="new-password"
-              onChange={e => setNewPassword(e.target.value)}
-              color={passwordError ? 'failure' : undefined}
-            />
-            <button
-              type="button"
-              aria-label={showNew ? '비밀번호 숨기기' : '비밀번호 보기'}
-              onClick={() => setShowNew(v => !v)}
-              className="absolute inset-y-0 right-3 flex items-center">
-              {showNew ? <EyeOff size={18} /> : <Eye size={18} />}
-            </button>
-          </div>
+          <TextInput
+            onChange={handleNewPasswordChange}
+            id="newPassword"
+            type="password"
+            placeholder="새 비밀번호를 입력해주세요"
+            required
+          />
         </div>
-
-        {/* 새 비밀번호 확인 */}
         <div>
           <div className="mb-2 block">
             <Label htmlFor="confirmPassword" value="새 비밀번호 확인" />
           </div>
-          <div className="relative with-eye">
-            <TextInput
-              id="confirmPassword"
-              type={showConfirm ? 'text' : 'password'}
-              placeholder="새 비밀번호를 한번 더 입력해주세요"
-              required
-              autoComplete="new-password"
-              onChange={e => {
-                setConfirmPassword(e.target.value);
-                setPasswordError('');
-              }}
-              color={passwordError ? 'failure' : undefined}
-              helperText={passwordError || undefined}
-            />
-            <button
-              type="button"
-              aria-label={showConfirm ? '비밀번호 숨기기' : '비밀번호 보기'}
-              onClick={() => setShowConfirm(v => !v)}
-              className="absolute inset-y-0 right-3 flex items-center">
-              {showConfirm ? <EyeOff size={18} /> : <Eye size={18} />}
-            </button>
-          </div>
+          <TextInput
+            onChange={handleConfirmPasswordChange}
+            id="confirmPassword"
+            type="password"
+            placeholder="새 비밀번호를 한번 더 입력해주세요"
+            required
+          />
         </div>
-
-        <Button className="mt-10 mb-10" color="dark" type="submit">
+        <Button
+          onClick={handleSubmit}
+          className="mt-10 mb-10"
+          color="dark"
+          type="submit">
           변경하기
         </Button>
       </form>

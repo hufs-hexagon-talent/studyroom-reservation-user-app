@@ -17,14 +17,8 @@ const useAuth = () => {
           password: password,
         });
 
-        const data = response?.data?.data;
-        const accessToken = data?.accessToken;
-        const refreshToken = data?.refreshToken;
-        const tokenType = data?.tokenType;
-        const isPasswordChangeRequired = Boolean(
-          data?.isPasswordChangeRequired,
-        );
-
+        const accessToken = response.data.data.accessToken;
+        const refreshToken = response.data.data.refreshToken;
         if (!isTokenValid(accessToken) || !isTokenValid(refreshToken)) {
           throw new Error('유효하지 않는 토큰');
         }
@@ -33,13 +27,9 @@ const useAuth = () => {
           isAuthenticated: true,
           accessToken: accessToken,
           refreshToken: refreshToken,
-          tokenType: tokenType ?? 'bearer',
         });
 
-        return {
-          isPasswordChangeRequired,
-          message: response?.data?.message,
-        };
+        return true;
       } catch (error) {
         console.log(error.response?.data?.message);
         throw new Error(
@@ -56,6 +46,7 @@ const useAuth = () => {
       accessToken: null,
       refreshToken: null,
     });
+    // navigate('/login'); // 리다이렉트가 필요하다면 사용
   }, [setAuth]);
 
   return { ...auth, loggedIn, login, logout };

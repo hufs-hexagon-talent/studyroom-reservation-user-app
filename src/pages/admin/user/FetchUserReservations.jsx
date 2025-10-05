@@ -5,7 +5,6 @@ import {
   useChangeState,
   useAdminDeleteReservation,
 } from '../../../api/reservation.api';
-import { useUserById } from '../../../api/user.api';
 import { format } from 'date-fns';
 import { Button, Checkbox, Table, Modal } from 'flowbite-react';
 import { HiOutlineExclamationCircle } from 'react-icons/hi';
@@ -18,7 +17,6 @@ const FetchUserReservations = () => {
   const { mutateAsync: changeState } = useChangeState();
   const { mutate: doDelete } = useAdminDeleteReservation();
   const { data: fetchedReservations, refetch } = useReservationsById(id);
-  const { data: userById } = useUserById(id);
 
   const [openDeleteModal, setOpenDeleteModal] = useState(null);
   const [openEditModal, setOpenEditModal] = useState(null);
@@ -82,7 +80,7 @@ const FetchUserReservations = () => {
     <div className="overflow-x-auto">
       <div className="flex justify-between items-center pt-8">
         <h1 className="text-3xl mx-4">
-          <strong>{userById?.name}</strong>님의 예약
+          <strong>{reservations[0]?.name}</strong>님의 예약
         </h1>
 
         {selectedReservationId && (

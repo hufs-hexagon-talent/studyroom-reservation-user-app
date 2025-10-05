@@ -21,7 +21,10 @@ const menuData = [
   {
     label: '사용자 관리',
     icon: HiUser,
-    children: [{ label: '사용자 상태 관리', to: '/admin/user-state' }],
+    children: [
+      { label: '사용자 상태 관리', to: '/admin/user-state' },
+      { label: '회원가입', to: '/admin/sign-up' },
+    ],
   },
   {
     label: '예약 관리',
@@ -136,12 +139,12 @@ const CustomSidebar = ({ isVisible = true }) => {
           animate={{ x: 0, opacity: 1 }}
           exit={{ x: -300, opacity: 0 }}
           transition={{ type: 'spring', stiffness: 200, damping: 30 }}
-          className="bg-white overflow-y-auto w-64 min-w-[16rem] shrink-0 grow-0 basis-64">
+          className="w-64 h-full bg-white overflow-y-auto">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.1 }}
+            transition={{ duration: 0.1 }} // 빠르게 같이 사라지게
             className="py-4">
             <div className="mt-4">
               {menuData.map((section, index) => (
