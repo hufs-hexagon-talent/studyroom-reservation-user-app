@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
-import CustomSidebar from '../../components/sidebar/Sidebar';
+import CustomSidebar from '../../components/sidebar/SideBar';
 
 const AdminPage = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
