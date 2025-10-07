@@ -23,7 +23,7 @@ import Banner from '../../admin/banner/Banner';
 import { ko } from 'date-fns/locale';
 import { useSnackbar } from 'react-simple-snackbar';
 import 'react-datepicker/dist/react-datepicker.css';
-
+import { CalendarX2 } from 'lucide-react';
 import { fetchDate } from '../../../api/policySchedule.api';
 import { useReservations, useReserve } from '../../../api/reservation.api';
 import useUrlQuery from '../../../hooks/useUrlQuery';
@@ -334,7 +334,7 @@ const RoomPage = () => {
                 selected={selectedDate}
                 locale={ko}
                 minDate={null}
-                //includeDates={availableDate}
+                includeDates={availableDate}
                 onChange={handleDateChange}
                 dateFormat="yyyy년 MM월 dd일"
                 showIcon
@@ -342,21 +342,23 @@ const RoomPage = () => {
             </div>
           </div>
         </div>
-
-        <div id="squares" className="flex pl-4">
-          <div
-            className="w-6 h-6 mt-10"
-            style={{ backgroundColor: '#F1EEE9' }}></div>
-          <div className="mt-10 ml-2">예약 가능</div>
-          <div
-            className="w-6 h-6 mt-10 ml-5"
-            style={{ backgroundColor: '#7599BA' }}></div>
-          <div className="mt-10 ml-2">예약 선택</div>
-          <div
-            className="w-6 h-6 mt-10 ml-5"
-            style={{ backgroundColor: '#002D56' }}></div>
-          <div className="mt-10 ml-2">예약 완료</div>
-        </div>
+        {/* 예약 가능/불가능 색 표현 */}
+        {reservationsByRooms?.length > 0 && (
+          <div id="squares" className="flex pl-4">
+            <div
+              className="w-6 h-6 mt-10"
+              style={{ backgroundColor: '#F1EEE9' }}></div>
+            <div className="mt-10 ml-2">예약 가능</div>
+            <div
+              className="w-6 h-6 mt-10 ml-5"
+              style={{ backgroundColor: '#7599BA' }}></div>
+            <div className="mt-10 ml-2">예약 선택</div>
+            <div
+              className="w-6 h-6 mt-10 ml-5"
+              style={{ backgroundColor: '#002D56' }}></div>
+            <div className="mt-10 ml-2">예약 완료</div>
+          </div>
+        )}
         {/* timeTable 시작 */}
         {reservationsByRooms?.length > 0 ? (
           <div>
@@ -507,22 +509,25 @@ const RoomPage = () => {
             </TableContainer>
           </div>
         ) : (
-          <div className="text-center text-gray-500 mt-10 text-lg">
-            예약이 불가능한 날짜입니다.
+          <div className="text-center mx-8 md:mx-12 lg:mx-96 py-12 my-12 rounded-lg bg-gray-100 text-gray-900">
+            오늘은 예약할 수 없습니다. <br />
+            다른 날짜를 선택해 주세요.
           </div>
         )}
-        <div className="p-10 flex justify-end">
-          <CustomButton
-            onClick={() => {
-              if (selectedRoom && selectedRangeFrom && selectedRangeTo) {
-                setOpenReserveModal(true);
-              } else {
-                openSnackbar('원하는 호실과 시간대를 선택해주세요.');
-              }
-            }}
-            text="예약하기"
-          />
-        </div>
+        {reservationsByRooms?.length > 0 && (
+          <div className="p-10 flex justify-end">
+            <CustomButton
+              onClick={() => {
+                if (selectedRoom && selectedRangeFrom && selectedRangeTo) {
+                  setOpenReserveModal(true);
+                } else {
+                  openSnackbar('원하는 호실과 시간대를 선택해주세요.');
+                }
+              }}
+              text="예약하기"
+            />
+          </div>
+        )}
       </div>
 
       {/* 선택된 예약 정보 모달 */}
