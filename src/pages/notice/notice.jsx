@@ -20,7 +20,7 @@ const Notice = () => {
     <div className="px-8 break-keep">
       <h1 className="font-bold text-3xl text-black pt-10 pb-6">NOTICE</h1>
 
-      <div className="w-full lg:w-2/3">
+      <div className="w-full">
         <Accordion type="multiple" defaultValue={['notice']}>
           {/* 예약 주의 사항 */}
           <AccordionItem value="notice" className="border-b">
