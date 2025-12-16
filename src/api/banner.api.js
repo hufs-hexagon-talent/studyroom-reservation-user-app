@@ -1,7 +1,5 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { apiClient } from './client';
-const authState = JSON.parse(localStorage.getItem('authState'));
-const accessToken = authState?.accessToken;
 
 // [관리자] 모든 배너 조회
 const fetchAllBanners = async () => {

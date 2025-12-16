@@ -1,79 +1,70 @@
 import axios from 'axios';
 
-// 기존 authState를 가져오는 함수 정의
-const getAuthState = () => {
-  const authState = localStorage.getItem('authState');
-  return authState ? JSON.parse(authState) : null;
-};
-
-const baseUrl = process.env.REACT_APP_API_URL;
+const baseUrl = process.env.REACT_APP_QA_API_URL;
 
 export const apiClient = axios.create({
   baseURL: baseUrl,
-  headers: {
-    Authorization: `Bearer ${getAuthState()?.accessToken}`,
-  },
+  withCredentials: true,
 });
 
-apiClient.interceptors.request.use(
-  config => {
-    const authState = getAuthState(); // authState 객체를 가져옵니다.
-    const accessToken = authState?.accessToken;
-    if (accessToken) {
-      config.headers.Authorization = `Bearer ${accessToken}`;
-    } else {
-      delete config.headers.Authorization;
-    }
-    return config;
-  },
-  error => {
-    return Promise.reject(error);
-  },
-);
+// 동시에 여러 요청이 401 터질 때 refresh 중복 호출 방지
+let isRefreshing = false;
+let refreshQueue = [];
+
+const runQueue = error => {
+  refreshQueue.forEach(({ resolve, reject }) => {
+    if (error) reject(error);
+    else resolve();
+  });
+  refreshQueue = [];
+};
 
 apiClient.interceptors.response.use(
-  response => {
-    return response;
-  },
+  response => response,
   async error => {
-    if (error.response && error.response.status === 401) {
-      // 리프레시 토큰 가져오기
-      const authState = getAuthState(); // authState 객체를 가져옵니다.
-      const refreshToken = authState?.refreshToken;
+    if (!error?.response) return Promise.reject(error);
 
-      if (!refreshToken) {
-        // 리프레시 토큰이 없으면 로그아웃 처리
-        return Promise.reject(error);
-      }
+    const originalRequest = error.config;
 
-      // 현재 요청이 리프레시 요청인지 확인
-      if (error.config.url.includes('/auth/refresh')) {
-        return Promise.reject(error);
-      }
-
-      try {
-        // 리프레시 토큰으로 액세스 토큰 갱신
-        const response = await axios.post(`${baseUrl}/auth/refresh`, {
-          refreshToken: refreshToken, // 올바른 키 사용
-        });
-        const accessToken = response.data.data.accessToken;
-
-        // authState 업데이트
-        const updatedAuthState = {
-          ...authState,
-          accessToken: accessToken,
-        };
-
-        localStorage.setItem('authState', JSON.stringify(updatedAuthState));
-        // 새로운 토큰으로 원래 요청 재시도
-        error.config.headers['Authorization'] = `Bearer ${accessToken}`;
-        return axios(error.config); // 원래 요청 재시도
-      } catch (refreshError) {
-        // 토큰 갱신 실패 시 로그아웃 처리
-        return Promise.reject(error);
-      }
+    // 401만 처리
+    if (error.response.status !== 401) {
+      return Promise.reject(error);
     }
 
-    return Promise.reject(error);
+    // refresh 자체가 401이면 종료 (로그인 만료)
+    if (originalRequest?.url?.includes('/auth/refresh')) {
+      return Promise.reject(error);
+    }
+
+    // 무한 루프 방지
+    if (originalRequest._retry) {
+      return Promise.reject(error);
+    }
+    originalRequest._retry = true;
+
+    // 이미 refresh 중이면 큐에서 대기 후 재시도
+    if (isRefreshing) {
+      return new Promise((resolve, reject) => {
+        refreshQueue.push({
+          resolve: () => resolve(apiClient(originalRequest)),
+          reject,
+        });
+      });
+    }
+
+    isRefreshing = true;
+
+    try {
+      // efreshToken 쿠키를 서버가 읽는 구조라면 바디 필요 없음
+      await apiClient.post('/auth/refresh');
+
+      runQueue(null);
+      return apiClient(originalRequest);
+    } catch (refreshError) {
+      runQueue(refreshError);
+      return Promise.reject(refreshError);
+    } finally {
+      isRefreshing = false;
+    }
   },
 );
