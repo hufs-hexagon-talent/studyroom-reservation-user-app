@@ -5,36 +5,24 @@ import { apiClient } from '../api/client';
 
 const useAuth = () => {
   const [auth, setAuth] = useRecoilState(authState);
-  const isTokenValid = token => token !== undefined && token !== null;
 
   const loggedIn = auth.isAuthenticated;
 
   const login = useCallback(
     async ({ id, password }) => {
       try {
-        const response = await apiClient.post(`/auth/login`, {
+        const response = await apiClient.post('/auth/login', {
           username: id,
-          password: password,
+          password,
         });
 
         const data = response?.data?.data;
-        const accessToken = data?.accessToken;
-        const refreshToken = data?.refreshToken;
-        const tokenType = data?.tokenType;
         const isPasswordChangeRequired = Boolean(
           data?.isPasswordChangeRequired,
         );
 
-        if (!isTokenValid(accessToken) || !isTokenValid(refreshToken)) {
-          throw new Error('유효하지 않는 토큰');
-        }
-
-        setAuth({
-          isAuthenticated: true,
-          accessToken: accessToken,
-          refreshToken: refreshToken,
-          tokenType: tokenType ?? 'bearer',
-        });
+        // 쿠키는 서버가 Set-Cookie로 심어줌. 프론트는 상태만 갱신.
+        setAuth({ isAuthenticated: true });
 
         return {
           isPasswordChangeRequired,
@@ -50,12 +38,11 @@ const useAuth = () => {
     [setAuth],
   );
 
-  const logout = useCallback(() => {
-    setAuth({
-      isAuthenticated: false,
-      accessToken: null,
-      refreshToken: null,
-    });
+  const logout = useCallback(async () => {
+    // 가능하면 서버에 logout API가 있으면 호출해서 쿠키 만료시키는 게 정석
+    // await apiClient.post('/auth/logout');
+
+    setAuth({ isAuthenticated: false });
   }, [setAuth]);
 
   return { ...auth, loggedIn, login, logout };
