@@ -15,9 +15,6 @@ import reportWebVitals from './reportWebVitals';
 import Router from './router';
 import { DomainProvider } from './contexts/DomainContext';
 
-localStorage.removeItem('authState');
-localStorage.removeItem('refreshToken');
-localStorage.removeItem('accessToken');
 
 export const queryClient = new QueryClient();
 

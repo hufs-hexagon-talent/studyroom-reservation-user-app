@@ -39,9 +39,7 @@ const useAuth = () => {
   );
 
   const logout = useCallback(async () => {
-    // 가능하면 서버에 logout API가 있으면 호출해서 쿠키 만료시키는 게 정석
-    // await apiClient.post('/auth/logout');
-
+    await apiClient.post('/auth/logout');
     setAuth({ isAuthenticated: false });
   }, [setAuth]);
 
