@@ -31,8 +31,11 @@ apiClient.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    // refresh 자체가 401이면 종료 (로그인 만료)
-    if (originalRequest?.url?.includes('/auth/refresh')) {
+    // refresh 자체이거나 로그인 실패(비밀번호 불일치)면 갱신 시도 없이 종료
+    if (
+      originalRequest?.url?.includes('/auth/refresh') ||
+      originalRequest?.url?.includes('/auth/login')
+    ) {
       return Promise.reject(error);
     }
 
