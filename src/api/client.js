@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { handleSessionExpired } from './session';
 
 const baseUrl = process.env.REACT_APP_API_URL;
 
@@ -64,6 +65,8 @@ apiClient.interceptors.response.use(
       runQueue(null);
       return apiClient(originalRequest);
     } catch (refreshError) {
+      // 갱신 실패 = 재로그인 외에 복구 방법이 없음. 남아있는 인증 상태를 정리한다.
+      handleSessionExpired();
       runQueue(refreshError);
       return Promise.reject(refreshError);
     } finally {

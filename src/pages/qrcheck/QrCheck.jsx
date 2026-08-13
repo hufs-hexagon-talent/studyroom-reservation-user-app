@@ -122,8 +122,13 @@ const QrCheck = () => {
           }, 5000);
         },
         onError: error => {
+          // 인증 관련 서버 메시지(예: "쿠키에 refreshToken 이 없습니다")는
+          // 사용자가 이해할 수 없으므로 그대로 노출하지 않는다.
           setErrorMessage(
-            error.response?.data?.message || 'An unexpected error occurred',
+            error.response?.status === 401
+              ? '로그인이 만료되었습니다. 다시 로그인해 주세요.'
+              : error.response?.data?.message ||
+                '출석 확인 중 오류가 발생했습니다.',
           );
           setSuccessMessage('');
           setTimeout(() => {

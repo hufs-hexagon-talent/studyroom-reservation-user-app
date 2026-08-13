@@ -8,6 +8,7 @@ import useAuth from './hooks/useAuth';
 
 import Footer from './components/footer/Footer';
 import NavigationBar from './components/navbar/NavigationBar';
+import SessionExpiryWatcher from './components/SessionExpiryWatcher';
 
 import Check from './pages/check/CheckRoom';
 import LoginPage from './pages/login/LoginPage';
@@ -59,6 +60,7 @@ const RouterComponent = () => {
 
   return (
     <BrowserRouter basename={'/'}>
+      <SessionExpiryWatcher />
       <div className="min-h-screen flex flex-col">
         <NavigationBar showSnackbar={openSnackbar} />
 
