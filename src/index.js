@@ -15,6 +15,7 @@ import reportWebVitals from './reportWebVitals';
 import Router from './router';
 import { DomainProvider } from './contexts/DomainContext';
 
+
 export const queryClient = new QueryClient();
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
