@@ -1,16 +1,5 @@
-const AUTH_STORAGE_KEY = 'authState';
-
 let handler = null;
 let pending = false;
-
-const isAuthenticatedLocally = () => {
-  try {
-    const saved = localStorage.getItem(AUTH_STORAGE_KEY);
-    return saved ? JSON.parse(saved).isAuthenticated === true : false;
-  } catch (e) {
-    return false;
-  }
-};
 
 export const setSessionExpiredHandler = fn => {
   handler = fn;
@@ -29,22 +18,11 @@ export const clearSessionExpiredHandler = () => {
 /**
  * 토큰 갱신에 실패해 재로그인 외에는 복구할 수 없는 상태를 앱에 알린다.
  *
- * 인증 상태는 localStorage 에, 토큰은 쿠키에 있어서 둘이 어긋나면
- * "로그인된 것처럼 보이지만 모든 요청이 401" 인 상태로 고착된다.
- *
- * - 로그인한 적 없는 방문자의 401 은 무시한다. (예: 공개 페이지에서의 /users/me)
- * - 저장된 인증 플래그를 먼저 지우므로 동시에 401 이 여러 건 나도 한 번만 처리된다.
- * - 앱 부팅 직후처럼 핸들러가 아직 없으면 보류해 두었다가 등록될 때 처리한다.
+ * 로그인 여부 판단은 화면(SessionExpiryWatcher)이 한다. 인증 상태를 어디에
+ * 보관하는지와 무관하게 동작해야 하므로 여기서는 저장소를 읽지 않는다.
+ * 앱 부팅 직후처럼 처리 함수가 아직 없으면 보류했다가 등록될 때 처리한다.
  */
 export const handleSessionExpired = () => {
-  if (!isAuthenticatedLocally()) return;
-
-  try {
-    localStorage.removeItem(AUTH_STORAGE_KEY);
-  } catch (e) {
-    // localStorage 를 쓸 수 없는 환경은 무시한다
-  }
-
   if (handler) handler();
   else pending = true;
 };
