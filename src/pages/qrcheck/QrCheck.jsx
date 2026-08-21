@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import Inko from 'inko';
-import { fetchServiceRole, useMyInfo } from '../../api/user.api';
+import { useMyInfo } from '../../api/user.api';
 import { useCheckIn } from '../../api/checkin.api';
 import { useRooms, useAllRooms } from '../../api/room.api';
 
@@ -48,37 +48,20 @@ const QrCheck = () => {
     }
   }, [me, navigate, openSnackbar, closeSnackbar]);
 
-  const { data: rooms } =
-    me?.serviceRole === 'ADMIN'
-      ? useAllRooms()
-      : useRooms(roomId ? roomId : null);
+  // 훅은 조건 없이 항상 호출한다. 조건부 호출은 me 로드 전후로 훅 개수가
+  // 바뀌어 렌더가 깨진다. useRooms 는 roomId 가 없으면 요청하지 않는다.
+  const { data: allRooms } = useAllRooms();
+  const { data: singleRoom } = useRooms(roomId ? roomId : null);
+  const rooms = me?.serviceRole === 'ADMIN' ? allRooms : singleRoom;
 
+  // 접근 제어는 라우트 마운트(ADMIN/RESIDENT 만 /qrcheck 존재)가 담당한다.
+  // 여기는 로그인이 풀린 경우의 방어만 남긴다.
   useEffect(() => {
-    const checkAdminStatus = async () => {
-      // 관리자 인지 확인
-      try {
-        const isAdmin = await fetchServiceRole();
-        if (!isAdmin) {
-          navigate('/');
-        }
-      } catch (error) {
-        openSnackbar('관리자 외 접근 금지', error);
-        navigate('/');
-        setTimeout(() => {
-          closeSnackbar();
-        }, 2500);
-        return;
-      }
-    };
-
-    // 로그인이 되어 있지 않으면 로그인 페이지로 이동
-    if (loggedIn) {
-      checkAdminStatus();
-    } else {
+    if (!loggedIn) {
       openSnackbar('로그인이 되어 있지 않습니다', 2500);
       navigate('/login');
     }
-  }, [navigate, loggedIn]);
+  }, [navigate, loggedIn, openSnackbar]);
 
   const handleQrCode = verificationCode => {
     if (isScanDisabled) return; // 스캔이 차단된 경우 함수 종료

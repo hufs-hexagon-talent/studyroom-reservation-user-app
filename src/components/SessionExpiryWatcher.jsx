@@ -8,6 +8,7 @@ import {
   setSessionExpiredHandler,
 } from '../api/session';
 import { authState } from '../hooks/authState';
+import { queryClient } from '../queryClient';
 
 /**
  * 토큰 갱신 실패를 감지해 로그인 화면으로 되돌린다.
@@ -42,6 +43,8 @@ const SessionExpiryWatcher = () => {
     handled.current = true;
 
     setAuth({ isAuthenticated: false });
+    // 만료된 계정의 조회 결과(이름·예약·출석 QR)를 메모리에 남기지 않는다
+    queryClient.clear();
     openSnackbar('로그인이 만료되었습니다. 다시 로그인해 주세요.', 4000);
     navigate('/login', { replace: true });
   };

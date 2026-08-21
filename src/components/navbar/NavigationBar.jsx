@@ -1,22 +1,31 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Navbar } from 'flowbite-react';
+import { Link, useNavigate } from 'react-router-dom';
 import Logo from '../../assets/logo/logoCes.png';
 import useAuth from '../../hooks/useAuth';
 import { useServiceRole } from '../../api/user.api';
 
+// 메뉴 이동은 라우터로 한다. href(전체 페이지 로드)는 화면 상태를 초기화하고
+// 로그아웃 요청을 페이지 이탈로 중단시키는 원인이었다.
 const NavigationBar = () => {
   const { loggedIn, logout } = useAuth();
-  const { data: serviceRole, refetch, isFetching } = useServiceRole();
+  const { data: serviceRole } = useServiceRole();
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    if (loggedIn && !isFetching) {
-      refetch();
+  const handleLogout = async to => {
+    // 로그아웃이 끝난 뒤 이동해야 한다. 먼저 이동하면 아직 로그인 상태라
+    // /login 라우트가 없어 * 라우트가 / 로 덮어쓴다.
+    try {
+      await logout();
+    } catch (e) {
+      // 화면 상태 정리는 logout 안의 finally 가 보장한다. 이동은 계속한다.
     }
-  }, [loggedIn, refetch]);
+    navigate(to, { replace: true });
+  };
 
   return (
     <Navbar fluid rounded className="border-b-2">
-      <Navbar.Brand href="/">
+      <Navbar.Brand as={Link} to="/">
         <img src={Logo} className="mr-3 h-6 sm:h-9" alt="cse logo" />
         <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white">
           컴퓨터공학부 세미나실 예약 시스템
@@ -27,39 +36,55 @@ const NavigationBar = () => {
         {/* 출석 체크용 아이디라면 */}
         {loggedIn && serviceRole === 'RESIDENT' ? (
           <>
-            <Navbar.Link href="/qrcheck">출석 체크</Navbar.Link>
-            <Navbar.Link href="/notice">이용 규칙</Navbar.Link>
-            {loggedIn ? (
-              <Navbar.Link href="/login" onClick={logout}>
-                로그아웃
-              </Navbar.Link>
-            ) : (
-              <Navbar.Link href="/login">로그인</Navbar.Link>
-            )}
+            <Navbar.Link as={Link} to="/qrcheck">
+              출석 체크
+            </Navbar.Link>
+            <Navbar.Link as={Link} to="/notice">
+              이용 규칙
+            </Navbar.Link>
+            <Navbar.Link as="button" onClick={() => handleLogout('/login')}>
+              로그아웃
+            </Navbar.Link>
           </>
         ) : (
           <>
             {loggedIn && serviceRole === 'ADMIN' && (
-              <Navbar.Link href="/qrcheck">출석 체크</Navbar.Link>
+              <Navbar.Link as={Link} to="/qrcheck">
+                출석 체크
+              </Navbar.Link>
             )}
-            <Navbar.Link href="/">세미나실 예약</Navbar.Link>
-            <Navbar.Link
-              href={loggedIn ? '/otp' : '#'}
-              className={!loggedIn ? 'pointer-events-none text-gray-400' : ''}>
-              내 QR코드
+            <Navbar.Link as={Link} to="/">
+              세미나실 예약
             </Navbar.Link>
-            <Navbar.Link
-              href={loggedIn ? '/mypage' : '#'}
-              className={!loggedIn ? 'pointer-events-none text-gray-400' : ''}>
-              마이페이지
-            </Navbar.Link>
-            <Navbar.Link href="/notice">이용 규칙</Navbar.Link>
             {loggedIn ? (
-              <Navbar.Link href="/" onClick={logout}>
+              <Navbar.Link as={Link} to="/otp">
+                내 QR코드
+              </Navbar.Link>
+            ) : (
+              <Navbar.Link as="span" className="text-gray-400">
+                내 QR코드
+              </Navbar.Link>
+            )}
+            {loggedIn ? (
+              <Navbar.Link as={Link} to="/mypage">
+                마이페이지
+              </Navbar.Link>
+            ) : (
+              <Navbar.Link as="span" className="text-gray-400">
+                마이페이지
+              </Navbar.Link>
+            )}
+            <Navbar.Link as={Link} to="/notice">
+              이용 규칙
+            </Navbar.Link>
+            {loggedIn ? (
+              <Navbar.Link as="button" onClick={() => handleLogout('/')}>
                 로그아웃
               </Navbar.Link>
             ) : (
-              <Navbar.Link href="/login">로그인</Navbar.Link>
+              <Navbar.Link as={Link} to="/login">
+                로그인
+              </Navbar.Link>
             )}
           </>
         )}

@@ -1,10 +1,9 @@
 import axios from 'axios';
 import { handleSessionExpired } from './session';
-
-const baseUrl = process.env.REACT_APP_API_URL;
+import config from '../config';
 
 export const apiClient = axios.create({
-  baseURL: baseUrl,
+  baseURL: config.API_URL,
   withCredentials: true,
 });
 
