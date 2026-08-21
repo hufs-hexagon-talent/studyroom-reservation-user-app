@@ -47,6 +47,10 @@ export const useMe = () =>
     refetchOnWindowFocus: false,
     // 401 은 다시 물어도 결과가 같다. 네트워크 오류만 재시도한다.
     retry: (failureCount, error) => !isAuthError(error) && failureCount < 2,
+    // 에러(비로그인) 상태에서 새 화면이 구독할 때마다 재조회하면
+    // 에러가 잠시 지워져 라우터 게이트가 로더로 되돌아가고,
+    // 마운트와 재조회가 무한 반복된다. 붙을 때는 다시 묻지 않는다.
+    retryOnMount: false,
   });
 
 export const useMyInfo = () => useMe();

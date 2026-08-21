@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
 import { useSnackbar } from 'react-simple-snackbar';
 import { useSetRecoilState } from 'recoil';
@@ -67,6 +67,14 @@ const RouterComponent = () => {
     setAuth({ isAuthenticated: authFromServer });
   }, [authKnown, authFromServer, setAuth]);
 
+  // 최초 복원은 한 번만 기다린다. 이후에 쿼리가 잠시 pending 이 되어도
+  // 로더로 되돌아가 화면 전체를 언마운트하지 않는다.
+  // 언마운트하면 자식들의 재구독이 다시 pending 을 만들어 무한 반복이 된다.
+  const [bootDone, setBootDone] = useState(false);
+  useEffect(() => {
+    if (authKnown) setBootDone(true);
+  }, [authKnown]);
+
   // 로그인 여부를 모르는 오류에서 로그아웃 처리를 하면 멀쩡한 세션을 버리게 된다.
   // 사용 중이던 화면을 덮지 않도록, 보여줄 데이터조차 없을 때만 오류 화면을 낸다.
   if (status === 'error' && !isAuthError(error) && me === undefined)
@@ -83,7 +91,7 @@ const RouterComponent = () => {
 
   // 화면 상태가 서버 판정과 일치하기 전에 라우트를 렌더하면
   // 아래 * 라우트가 딥링크를 / 로 지워버린다. 일치할 때까지 기다린다.
-  if (!authKnown || loggedIn !== authFromServer)
+  if (!bootDone || loggedIn !== authFromServer)
     return (
       <div className="flex items-center justify-center h-screen">
         <FadeLoader />
