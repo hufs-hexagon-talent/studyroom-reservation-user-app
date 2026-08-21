@@ -1,15 +1,13 @@
-#!/usr/bin/env sh
-set -Ex
+#!/bin/sh
+set -eu
 
-echo "Check that we have environment vars"
-echo "REACT_APP_API_URL is: $REACT_APP_API_URL"
-echo "REACT_APP_DEPARTMENT_ID is: $REACT_APP_DEPARTMENT_ID"
+# 환경 값은 config.js(window.env) 한 파일에만 주입한다.
+# 해시 붙은 번들 파일을 고치면 장기 캐시(immutable)와 충돌한다.
+CONFIG=/usr/share/nginx/html/config.js
 
-test -n "$REACT_APP_API_URL"
-test -n "$REACT_APP_DEPARTMENT_ID"
+: "${REACT_APP_API_URL:?REACT_APP_API_URL 이 비어 있습니다. compose 의 environment 를 확인하세요.}"
 
-find /usr/share/nginx/html \( -type d -name .git -prune \) -o -type f -print0 | xargs -0 sed -i"" "s#APP__REPLACE_ME__REACT_APP_API_URL#$REACT_APP_API_URL#g"
-find /usr/share/nginx/html \( -type d -name .git -prune \) -o -type f -print0 | xargs -0 sed -i"" "s#APP__REPLACE_ME__REACT_APP_DEPARTMENT_ID#$REACT_APP_DEPARTMENT_ID#g"
+sed -i "s#APP__REPLACE_ME__REACT_APP_API_URL#${REACT_APP_API_URL}#g" "$CONFIG"
+sed -i "s#APP__REPLACE_ME__REACT_APP_DEPARTMENT_ID#${REACT_APP_DEPARTMENT_ID:-1}#g" "$CONFIG"
 
-echo "Starting Nginx"
 exec "$@"
