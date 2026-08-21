@@ -1,7 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { RecoilRoot } from 'recoil';
+import { queryClient } from './queryClient';
 const packagejson = require('../package.json');
 
 import SnackbarProvider from 'react-simple-snackbar';
@@ -14,9 +15,6 @@ import './index.css';
 import reportWebVitals from './reportWebVitals';
 import Router from './router';
 import { DomainProvider } from './contexts/DomainContext';
-
-
-export const queryClient = new QueryClient();
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

@@ -1,6 +1,5 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { apiClient } from './client';
-import useAuth from '../hooks/useAuth';
 
 // [관리자] 모든 회원 정보 조회
 const fetchAllUsers = async () => {
@@ -29,38 +28,33 @@ export const useUserById = userId => {
   });
 };
 
-// 자신의 정보 조회
-const fetchMyInfo = async () => {
-  try {
-    const myInfo_res = await apiClient.get('/users/me');
-    return myInfo_res.data.data;
-  } catch (e) {
-    return false;
-  }
+// 자신의 정보 조회. 로그인 여부 판정(부팅 복원)까지 겸하는 단일 소스라
+// 에러를 삼키지 않는다. 삼키면 401(비로그인)과 네트워크 순단(로그인 유지)을
+// 구분할 수 없어 서버 순단 때 로그인 사용자를 로그아웃으로 오판하게 된다.
+export const fetchMe = async () => {
+  const me_res = await apiClient.get('/users/me');
+  return me_res.data.data;
 };
 
-export const useMyInfo = () => {
-  return useQuery({
-    queryKey: ['myInfo'],
-    queryFn: fetchMyInfo,
+export const isAuthError = error =>
+  error?.response?.status === 401 || error?.response?.status === 403;
+
+export const useMe = () =>
+  useQuery({
+    queryKey: ['me'],
+    queryFn: fetchMe,
+    staleTime: 60 * 1000,
+    refetchOnWindowFocus: false,
+    // 401 은 다시 물어도 결과가 같다. 네트워크 오류만 재시도한다.
+    retry: (failureCount, error) => !isAuthError(error) && failureCount < 2,
   });
-};
 
-// 관리자인지 아닌지
-export const fetchServiceRole = async () => {
-  try {
-    const isAdmin_res = await apiClient.get('/users/me');
-    return isAdmin_res.data.data.serviceRole;
-  } catch (e) {
-    return false;
-  }
-};
+export const useMyInfo = () => useMe();
 
+// 관리자인지 아닌지. useMe 와 같은 캐시를 공유한다.
 export const useServiceRole = () => {
-  return useQuery({
-    queryKey: ['serviceRole'],
-    queryFn: fetchServiceRole,
-  });
+  const { data: me, ...rest } = useMe();
+  return { ...rest, data: me?.serviceRole };
 };
 
 // 로그인 된 상태에서 비밀번호 수정
