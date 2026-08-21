@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { apiClient } from './client';
-import { queryClient } from '../index';
+import { queryClient } from '../queryClient';
 
 // 자신의 예약 생성
 export const useReserve = () => {
@@ -59,7 +59,11 @@ export const useDeleteReservation = () => {
       return res.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries('userReservation');
+      // v5 는 객체 필터만 받는다. 문자열을 주면 전체 캐시가 무효화된다.
+      // 삭제 후 갱신이 필요한 화면: 내 예약 목록, 체크인 대상, 노쇼 목록
+      queryClient.invalidateQueries({ queryKey: ['userReservation'] });
+      queryClient.invalidateQueries({ queryKey: ['latest'] });
+      queryClient.invalidateQueries({ queryKey: ['noShow'] });
     },
   });
 };
@@ -132,7 +136,6 @@ export const useReservationsById = userId => {
 
 // 자신이 현재 체크인 해야하는 예약 조회
 const fetchLatestReservation = async () => {
-  // 로컬스토리지에서 authState 가져오기
   const latest_res = await apiClient.get('/reservations/me/latest');
   return latest_res.data.data.reservationInfoResponses;
 };

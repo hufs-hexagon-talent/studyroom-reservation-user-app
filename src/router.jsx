@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
 import { useSnackbar } from 'react-simple-snackbar';
-import { useServiceRole } from './api/user.api';
+import { useSetRecoilState } from 'recoil';
+import { useMe, isAuthError } from './api/user.api';
 import FadeLoader from 'react-spinners/FadeLoader';
 
 import useAuth from './hooks/useAuth';
+import { authState } from './hooks/authState';
 
 import Footer from './components/footer/Footer';
 import NavigationBar from './components/navbar/NavigationBar';
@@ -42,7 +44,9 @@ import BannerManage from './pages/admin/banner/BannerManage';
 
 const RouterComponent = () => {
   const { loggedIn } = useAuth();
-  const { data: serviceRole, isLoading } = useServiceRole();
+  const setAuth = useSetRecoilState(authState);
+  const { data: me, status, error, refetch } = useMe();
+  const serviceRole = me?.serviceRole;
   const [openSnackbar] = useSnackbar({
     position: 'top-right',
     style: {
@@ -51,7 +55,35 @@ const RouterComponent = () => {
   });
   const pwResetToken = sessionStorage.getItem('pwResetToken');
 
-  if (isLoading)
+  // 부팅 복원: 서버가 쿠키로 판정한 결과만 화면 상태로 삼는다.
+  // 401/403 만 비로그인이고, 네트워크 순단·5xx 는 로그인 여부를 모르는 상태다.
+  // 백그라운드 재조회가 실패해도 캐시에 me 가 남아 있으면 로그인 유지로 본다.
+  // 진짜 만료는 SessionExpiryWatcher 가 캐시를 지우므로 me 도 함께 사라진다.
+  const authFromServer = status === 'success' || me !== undefined;
+  const authKnown = authFromServer || (status === 'error' && isAuthError(error));
+
+  useEffect(() => {
+    if (!authKnown) return;
+    setAuth({ isAuthenticated: authFromServer });
+  }, [authKnown, authFromServer, setAuth]);
+
+  // 로그인 여부를 모르는 오류에서 로그아웃 처리를 하면 멀쩡한 세션을 버리게 된다.
+  // 사용 중이던 화면을 덮지 않도록, 보여줄 데이터조차 없을 때만 오류 화면을 낸다.
+  if (status === 'error' && !isAuthError(error) && me === undefined)
+    return (
+      <div className="flex flex-col items-center justify-center h-screen gap-4">
+        <p>서버에 연결하지 못했습니다.</p>
+        <button
+          className="rounded border border-gray-300 px-4 py-2"
+          onClick={() => refetch()}>
+          다시 시도
+        </button>
+      </div>
+    );
+
+  // 화면 상태가 서버 판정과 일치하기 전에 라우트를 렌더하면
+  // 아래 * 라우트가 딥링크를 / 로 지워버린다. 일치할 때까지 기다린다.
+  if (!authKnown || loggedIn !== authFromServer)
     return (
       <div className="flex items-center justify-center h-screen">
         <FadeLoader />

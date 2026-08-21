@@ -5,7 +5,6 @@ import { usePassword } from '../../api/user.api';
 import { useCustomSnackbars } from '../../components/snackbar/SnackBar';
 import './LoggedInPassword.css';
 import useAuth from '../../hooks/useAuth';
-import { flushSync } from 'react-dom';
 import { Eye, EyeOff } from 'lucide-react';
 
 const LoggedInPassword = () => {
@@ -46,10 +45,13 @@ const LoggedInPassword = () => {
         '비밀번호가 성공적으로 변경되었습니다. 재로그인 부탁드립니다.',
       );
 
-      // 로그아웃 상태를 동기적으로 반영 후 이동
-      flushSync(() => {
-        logout();
-      });
+      // 서버 로그아웃(쿠키 만료)까지 끝낸 뒤 이동한다. 로그아웃 실패를
+      // 비밀번호 변경 실패로 오표시하지 않도록 여기서 따로 처리한다.
+      try {
+        await logout();
+      } catch (logoutError) {
+        console.error('Failed to logout after password change:', logoutError);
+      }
 
       // 자동 리다이렉트 회피
       navigate('/login', { replace: true, state: { fromLogout: true } });
