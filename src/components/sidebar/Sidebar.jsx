@@ -9,6 +9,8 @@ import {
 } from 'react-icons/hi';
 import { AnimatePresence, motion } from 'framer-motion';
 
+import ServiceStatusBadge from './ServiceStatusBadge';
+
 const menuData = [
   {
     label: '통계 및 현황',
@@ -126,6 +128,9 @@ const SidebarSection = ({ section }) => {
   );
 };
 
+// 사이드바 바깥에 overflow-y-auto 를 두면 상태 배지의 sticky 기준이
+// 그 안쪽 스크롤로 바뀌어 화면 아래에 붙지 않는다. 메뉴는 화면 높이를
+// 넘지 않으므로 스크롤을 떼고 페이지 스크롤을 기준으로 삼는다.
 const CustomSidebar = ({ isVisible = true }) => {
   return (
     <AnimatePresence mode="wait">
@@ -136,17 +141,22 @@ const CustomSidebar = ({ isVisible = true }) => {
           animate={{ x: 0, opacity: 1 }}
           exit={{ x: -300, opacity: 0 }}
           transition={{ type: 'spring', stiffness: 200, damping: 30 }}
-          className="bg-white overflow-y-auto w-64 min-w-[16rem] shrink-0 grow-0 basis-64">
+          className="bg-white w-64 min-w-[16rem] shrink-0 grow-0 basis-64 flex flex-col">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.1 }}
-            className="py-4">
-            <div className="mt-4">
+            className="flex flex-1 flex-col py-4">
+            <div className="mt-4 flex-1">
               {menuData.map((section, index) => (
                 <SidebarSection key={index} section={section} />
               ))}
+            </div>
+            {/* 관리자 화면은 본문이 길어 스크롤이 생긴다. 배지를 화면 아래에
+                붙여 두어야 어느 위치에서 보든 상태가 눈에 들어온다. */}
+            <div className="sticky bottom-0 bg-white">
+              <ServiceStatusBadge />
             </div>
           </motion.div>
         </motion.div>
