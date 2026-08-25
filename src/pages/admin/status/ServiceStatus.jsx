@@ -1,4 +1,5 @@
 import React from 'react';
+import { ExternalLink, RotateCw } from 'lucide-react';
 
 import {
   STATUS_PAGE_URL,
@@ -28,13 +29,21 @@ const formatDayTooltip = day => {
   return `${day.date} ${day.ratio.toFixed(2)}%`;
 };
 
-const StatusPageLink = () => (
+// 외부로 나가는 동작이라 화면 안의 다른 조작과 섞이지 않게 아이콘을 함께 둔다.
+// 평소에는 눈에 덜 띄는 보조 링크지만, 데이터를 못 받아 이 링크가
+// 유일한 확인 수단이 되는 자리에서는 테두리를 둘러 앞으로 내세운다.
+const StatusPageLink = ({ prominent = false }) => (
   <a
     href={STATUS_PAGE_URL}
     target="_blank"
     rel="noreferrer"
-    className="text-sm text-blue-600 underline">
-    UptimeRobot 상태 페이지 열기
+    className={
+      prominent
+        ? 'inline-flex items-center gap-x-2 rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100'
+        : 'inline-flex items-center gap-x-1 text-sm text-gray-500 hover:text-gray-700'
+    }>
+    {prominent ? 'UptimeRobot 상태 페이지 열기' : 'UptimeRobot'}
+    <ExternalLink aria-hidden size={14} />
   </a>
 );
 
@@ -102,28 +111,41 @@ const ServiceStatus = () => {
 
       <div className="flex flex-col gap-y-6">
         <div className="bg-white shadow-md rounded-2xl p-8">
-          <div className="flex items-center">
-            <span
-              className={`mr-3 inline-block h-4 w-4 shrink-0 rounded-full ${DOT_CLASS[level]}`}
-            />
-            <span className="text-2xl font-bold">{text}</span>
-          </div>
+          {/* 왼쪽은 지금 상태, 오른쪽 끝은 외부로 나가는 링크로 갈라 둔다.
+              한 줄에 나란히 두면 성격이 다른 둘이 같은 무게로 보인다. */}
+          <div className="flex items-start justify-between">
+            <div>
+              <div className="flex items-center">
+                <span
+                  className={`mr-3 inline-block h-4 w-4 shrink-0 rounded-full ${DOT_CLASS[level]}`}
+                />
+                <span className="text-2xl font-bold">{text}</span>
+              </div>
 
-          <div className="mt-4 flex items-center gap-x-4">
-            <span className="text-sm text-gray-500">
-              {dataUpdatedAt
-                ? `마지막 확인 ${new Date(dataUpdatedAt).toLocaleTimeString(
-                    'ko-KR',
-                  )}`
-                : '아직 확인 전'}
-            </span>
-            <button
-              type="button"
-              onClick={() => refetch()}
-              disabled={isFetching}
-              className="text-sm text-blue-600 underline disabled:text-gray-400 disabled:no-underline">
-              {isFetching ? '확인 중' : '다시 확인'}
-            </button>
+              <div className="mt-2 flex items-center gap-x-2">
+                <span className="text-sm text-gray-500">
+                  {dataUpdatedAt
+                    ? `마지막 확인 ${new Date(dataUpdatedAt).toLocaleTimeString(
+                        'ko-KR',
+                      )}`
+                    : '아직 확인 전'}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => refetch()}
+                  disabled={isFetching}
+                  aria-label="상태 다시 확인"
+                  title="다시 확인"
+                  className="rounded-md p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-300 disabled:hover:bg-transparent">
+                  <RotateCw
+                    aria-hidden
+                    size={16}
+                    className={isFetching ? 'animate-spin' : ''}
+                  />
+                </button>
+              </div>
+            </div>
+
             <StatusPageLink />
           </div>
         </div>
@@ -139,7 +161,7 @@ const ServiceStatus = () => {
               링크로 원래 상태 페이지에서 확인할 수 있습니다.
             </div>
             <div className="mt-4">
-              <StatusPageLink />
+              <StatusPageLink prominent />
             </div>
           </div>
         )}
