@@ -10,6 +10,7 @@ import { authState } from './hooks/authState';
 
 import Footer from './components/footer/Footer';
 import NavigationBar from './components/navbar/NavigationBar';
+import ConnectionError from './components/ConnectionError';
 import SessionExpiryWatcher from './components/SessionExpiryWatcher';
 
 import Check from './pages/check/CheckRoom';
@@ -79,16 +80,7 @@ const RouterComponent = () => {
   // 로그인 여부를 모르는 오류에서 로그아웃 처리를 하면 멀쩡한 세션을 버리게 된다.
   // 사용 중이던 화면을 덮지 않도록, 보여줄 데이터조차 없을 때만 오류 화면을 낸다.
   if (status === 'error' && !isAuthError(error) && me === undefined)
-    return (
-      <div className="flex flex-col items-center justify-center h-screen gap-4">
-        <p>서버에 연결하지 못했습니다.</p>
-        <button
-          className="rounded border border-gray-300 px-4 py-2"
-          onClick={() => refetch()}>
-          다시 시도
-        </button>
-      </div>
-    );
+    return <ConnectionError error={error} onRetry={refetch} />;
 
   // 화면 상태가 서버 판정과 일치하기 전에 라우트를 렌더하면
   // 아래 * 라우트가 딥링크를 / 로 지워버린다. 일치할 때까지 기다린다.
