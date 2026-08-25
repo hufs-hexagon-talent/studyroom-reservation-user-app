@@ -66,7 +66,10 @@ const normalize = body => {
   };
 };
 
-const fetchServiceStatus = async () => {
+// 관리자 화면뿐 아니라 학생 오류 화면의 연결 진단도 이 호출을 쓴다.
+// 우리 서버와 다른 호스트라, 이 호출이 되는지가 학생 인터넷이 살아 있는지를
+// 가르는 신호가 된다.
+export const fetchServiceStatus = async () => {
   // apiClient 는 baseURL 이 우리 API 서버이고 withCredentials 로 쿠키를 싣는다.
   // 외부 도메인에 그대로 쓰면 인증 쿠키가 밖으로 나가고, 401 인터셉터가
   // 남의 응답을 보고 토큰 갱신을 시도하게 된다. 그래서 fetch 로 직접 부른다.
