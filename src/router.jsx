@@ -41,6 +41,7 @@ import EditRoom from './pages/admin/operation/facility/room/EditRoom';
 import CreatePartition from './pages/admin/operation/facility/partition/CreatePartition';
 import BannerUpload from './pages/admin/banner/BannerUpload';
 import BannerManage from './pages/admin/banner/BannerManage';
+import ServiceStatus from './pages/admin/status/ServiceStatus';
 
 const RouterComponent = () => {
   const { loggedIn } = useAuth();
@@ -167,6 +168,9 @@ const RouterComponent = () => {
                   {/* 배너 관리 */}
                   <Route path="banner/create" element={<BannerUpload />} />
                   <Route path="banner/manage" element={<BannerManage />} />
+
+                  {/* 서비스 상태 */}
+                  <Route path="service-status" element={<ServiceStatus />} />
                 </Route>
               </>
             )}
