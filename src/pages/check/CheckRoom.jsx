@@ -56,8 +56,10 @@ const Check = () => {
 
   const handleDelete = async id => {
     try {
-      const response = await deleteReservation(id);
-      openSuccessSnackbar(response?.message || '예약을 취소했습니다.', 3000);
+      // 서버 성공 문구는 "리소스가 성공적으로 삭제되었습니다" 라 학생이 볼 말이 아니다.
+      // 실패했을 때만 서버가 준 이유를 그대로 보여준다.
+      await deleteReservation(id);
+      openSuccessSnackbar('예약을 취소했습니다.', 3000);
     } catch (error) {
       openErrorSnackbar(
         error?.response?.data?.message ||
