@@ -393,28 +393,37 @@ const RoomPage = () => {
             <TableContainer
               sx={{
                 overflowX: 'auto',
-                width: '100%',
                 marginTop: '20px',
                 '@media (max-width : 1300px)': {
                   overflowX: 'scroll',
                 },
-                paddingLeft: '60px',
+                // sticky 기준점이 어긋나지 않게 padding 대신 margin 으로 띄운다
+                width: 'calc(100% - 60px)',
+                marginLeft: '60px',
               }}>
               <Table>
                 <TableHead
-                  className="fixedPartitions"
                   sx={{
                     overflowX: 'auto',
                     borderBottom: 'none',
                   }}>
                   <TableRow>
-                    <TableCell align="center" width={100} />
+                    <TableCell
+                      align="center"
+                      width={100}
+                      sx={{
+                        position: 'sticky',
+                        left: 0,
+                        zIndex: 3,
+                        backgroundColor: '#fff',
+                      }}
+                    />
                     {times.map((time, timeIndex) => (
                       <TableCell
                         key={timeIndex}
                         align="center"
                         width={200}
-                        className="fixedPartitions relative"
+                        className="relative"
                         sx={{
                           borderRight: 'none',
                           borderTop: 'none',
@@ -438,6 +447,10 @@ const RoomPage = () => {
                           py: 2,
                           borderLeft: '1px solid #ccc',
                           whiteSpace: 'nowrap',
+                          position: 'sticky',
+                          left: 0,
+                          zIndex: 2,
+                          backgroundColor: '#fff',
                         }}>
                         {`${reservationsByRoom.roomName}-${reservationsByRoom.partitionNumber}`}
                       </TableCell>
