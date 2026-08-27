@@ -2,6 +2,9 @@ import axios from 'axios';
 import { handleSessionExpired } from './session';
 import config from '../config';
 
+export const SESSION_EXPIRED_MESSAGE =
+  '로그인이 만료되었습니다. 다시 로그인해 주세요.';
+
 export const apiClient = axios.create({
   baseURL: config.API_URL,
   withCredentials: true,
@@ -20,6 +23,30 @@ const runQueue = error => {
     else resolve();
   });
   refreshQueue = [];
+};
+
+// 세션 만료 판정은 서버가 갱신을 거부한 경우(401/403)만.
+// 네트워크 순단이나 5xx 를 만료로 단정하면 멀쩡한 세션을 버리게 된다.
+const isRefreshRejected = refreshError => {
+  const status = refreshError?.response?.status;
+  return status === 401 || status === 403;
+};
+
+// 호출자는 대개 response.data.message 를 그대로 스낵바에 띄운다. 갱신 실패의
+// 서버 원문("쿠키에 refreshToken 이 없습니다" 등)은 학생이 이해할 수 없으므로
+// 여기서 재로그인 안내로 바꿔 넘긴다. 상태는 401 로 두어 isAuthError 판정과
+// 서버 에러 코드는 그대로 남긴다.
+const toSessionExpiredError = refreshError => {
+  const error = new Error(SESSION_EXPIRED_MESSAGE);
+  error.sessionExpired = true;
+  error.cause = refreshError;
+  error.config = refreshError?.config;
+  error.response = {
+    ...refreshError?.response,
+    status: 401,
+    data: { ...refreshError?.response?.data, message: SESSION_EXPIRED_MESSAGE },
+  };
+  return error;
 };
 
 apiClient.interceptors.response.use(
@@ -61,16 +88,22 @@ apiClient.interceptors.response.use(
     isRefreshing = true;
 
     try {
-      // efreshToken 쿠키를 서버가 읽는 구조라면 바디 필요 없음
+      // refreshToken 쿠키를 서버가 읽는 구조라 바디 필요 없음
       await apiClient.post('/auth/refresh');
 
       runQueue(null);
       return apiClient(originalRequest);
     } catch (refreshError) {
-      // 갱신 실패 = 재로그인 외에 복구 방법이 없음. 남아있는 인증 상태를 정리한다.
+      if (!isRefreshRejected(refreshError)) {
+        // 갱신 요청이 닿지 않았거나 서버 장애. 세션은 살아 있을 수 있으니 정리하지 않는다.
+        runQueue(refreshError);
+        return Promise.reject(refreshError);
+      }
+      // 갱신 거부 = 재로그인 외에 복구 방법이 없음. 남아있는 인증 상태를 정리한다.
+      const sessionExpired = toSessionExpiredError(refreshError);
       handleSessionExpired();
-      runQueue(refreshError);
-      return Promise.reject(refreshError);
+      runQueue(sessionExpired);
+      return Promise.reject(sessionExpired);
     } finally {
       isRefreshing = false;
     }
