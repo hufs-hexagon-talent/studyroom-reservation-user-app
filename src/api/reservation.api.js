@@ -175,7 +175,8 @@ export const useExportReservationExcel = async ({
 
   const reservationExcel = await apiClient.get(
     `/reservations/export/excel?${params.toString()}`,
-    { responseType: 'blob' },
+    // 내보내기는 건수가 많으면 오래 걸린다. 공통 타임아웃(15초)으로는 끊긴다.
+    { responseType: 'blob', timeout: 120000 },
   );
 
   const formatDateForFilename = iso => {

@@ -5,6 +5,9 @@ import config from '../config';
 export const apiClient = axios.create({
   baseURL: config.API_URL,
   withCredentials: true,
+  // 서버가 응답을 붙들고 있으면 학생은 끝나지 않는 스피너만 본다.
+  // 끊긴 요청은 응답 없는 오류가 되어 아래 인터셉터를 그대로 통과한다.
+  timeout: 15000,
 });
 
 // 동시에 여러 요청이 401 터질 때 refresh 중복 호출 방지

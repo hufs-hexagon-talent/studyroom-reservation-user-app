@@ -36,8 +36,20 @@ export const fetchMe = async () => {
   return me_res.data.data;
 };
 
-export const isAuthError = error =>
-  error?.response?.status === 401 || error?.response?.status === 403;
+// 인증 오류가 401/403 으로만 오지 않는다. 토큰의 사용자를 못 찾으면 404(USER-001),
+// 토큰 서명·형식이 깨졌으면 400(AUTH-008 등)이 온다. 상태 코드만 보면 이런 응답이
+// 서버 장애로 분류돼 앱 전체가 연결 오류 화면에 잠기고, 쿠키가 HttpOnly 라
+// 학생이 스스로 빠져나오지 못한다. 그래서 응답 본문의 에러 코드도 같이 본다.
+export const isAuthError = error => {
+  const status = error?.response?.status;
+  if (status === 401 || status === 403) return true;
+
+  const code = error?.response?.data?.code;
+  return (
+    typeof code === 'string' &&
+    (code.startsWith('AUTH-') || code === 'USER-001')
+  );
+};
 
 export const useMe = () =>
   useQuery({
@@ -229,6 +241,8 @@ export const useUserStatics = () => {
 export const exportUserExcel = async roles => {
   const userExcel = await apiClient.get(`/users/export/excel?roles=${roles}`, {
     responseType: 'blob', // 중요!
+    // 내보내기는 건수가 많으면 오래 걸린다. 공통 타임아웃(15초)으로는 끊긴다.
+    timeout: 120000,
   });
 
   const rolePart = Array.isArray(roles) ? roles.join('&') : roles;
