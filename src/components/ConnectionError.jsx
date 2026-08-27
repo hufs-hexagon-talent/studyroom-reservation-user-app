@@ -153,6 +153,16 @@ const ConnectionError = ({ error, onRetry }) => {
           )}
         </div>
 
+        {/* 인증 문제로 이 화면에 들어온 경우 다시 시도만으로는 빠져나갈 수 없다.
+            라우터 밖에서 렌더되므로 링크로 새로 열어 앱을 다시 띄운다. */}
+        <p className="mt-6">
+          <a
+            href="/login"
+            className="text-sm text-gray-400 hover:text-gray-600">
+            로그인 화면으로
+          </a>
+        </p>
+
         {trace && (
           <p className="mt-10 font-mono text-xs text-gray-300">{trace}</p>
         )}

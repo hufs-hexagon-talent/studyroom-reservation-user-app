@@ -15,6 +15,26 @@ import { fetchServiceStatus } from '../api/serviceStatus.api';
 // 진단 결과를 화면이 그대로 쓰도록 세 줄로 정규화해서 돌려준다.
 const UNKNOWN = 'unknown';
 
+// 상태 페이지가 응답을 주지 않고 매달리면 진단이 끝나지 않아 오류 화면이
+// "확인 중" 에 잠기고 다시 시도 버튼도 비활성으로 남는다. 5초에서 끊고,
+// 끊긴 경우는 상태 페이지에 닿지 못한 것으로 보고 판정을 이어 간다.
+const STATUS_TIMEOUT_MS = 5000;
+
+const fetchServiceStatusWithTimeout = () => {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), STATUS_TIMEOUT_MS);
+
+  const cutoff = new Promise((_, reject) => {
+    controller.signal.addEventListener('abort', () =>
+      reject(new Error('상태 페이지 응답 시간 초과')),
+    );
+  });
+
+  return Promise.race([fetchServiceStatus(), cutoff]).finally(() =>
+    clearTimeout(timer),
+  );
+};
+
 const buildResult = ({ internet, api, service, httpStatus = null, counts = null }) => ({
   internet,
   api,
@@ -41,7 +61,7 @@ const diagnose = async error => {
 
   // 신호 3. 응답조차 없다. 제3의 호스트에 닿는지로 가른다.
   try {
-    const status = await fetchServiceStatus();
+    const status = await fetchServiceStatusWithTimeout();
     const { down, total, up } = status.counts;
 
     // 감시가 장애를 잡아 뒀다면 우리 서비스 장애로 확정할 수 있다.
