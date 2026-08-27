@@ -92,15 +92,28 @@ const RoomPage = () => {
   );
 
   const { mutateAsync: doReserve } = useReserve();
-  const { data: reservationsByRooms } = useReservations({
+  const {
+    data: reservationsByRooms,
+    isPending: isReservationsPending,
+    isError: isReservationsError,
+    refetch: refetchReservations,
+  } = useReservations({
     date: selectedDate,
     departmentId: departmentId,
   });
   const { loggedIn: isLoggedIn } = useAuth();
 
+  const hasRooms =
+    !isReservationsPending &&
+    !isReservationsError &&
+    reservationsByRooms?.length > 0;
+
+  // 화면을 열어둔 채 시간이 지나면 지난 칸이 저절로 잠기도록 현재 시각을 갱신한다
+  const [now, setNow] = useState(() => new Date());
+
   useEffect(() => {
-    const todayFormatted = format(new Date(), 'yyyy-MM-dd');
-    setSelectedDate(todayFormatted);
+    const timer = setInterval(() => setNow(new Date()), 30000);
+    return () => clearInterval(timer);
   }, []);
 
   useEffect(() => {
@@ -173,12 +186,6 @@ const RoomPage = () => {
     setSelectedDate(formattedDate);
   };
 
-  const isRangeSelected =
-    selectedRangeFrom &&
-    selectedRangeTo &&
-    differenceInMinutes(selectedRangeTo, selectedRangeFrom) >
-      timeTableConfig.intervalMinute;
-
   const isSomethingSelected =
     selectedRoom && selectedRangeFrom && selectedRangeTo;
 
@@ -215,13 +222,7 @@ const RoomPage = () => {
       }
 
       // 새롭게 시간을 선택함
-      if (
-        isFirstSelect ||
-        isDifferentRoom ||
-        isRangeSelected ||
-        isSelectPast ||
-        isOverDue
-      ) {
+      if (isFirstSelect || isDifferentRoom || isSelectPast || isOverDue) {
         setSelectedRoom(partition);
         setSelectedRangeFrom(targetStartAt);
         selSelectedRangeTo(targetEndAt);
@@ -239,7 +240,6 @@ const RoomPage = () => {
       selectedRoom,
       selectedRangeFrom,
       selectedRangeTo,
-      isRangeSelected,
     ],
   );
 
@@ -271,7 +271,10 @@ const RoomPage = () => {
         });
         navigate('/check');
       } catch (error) {
-        openSnackbar(error.response.data.message);
+        openSnackbar(
+          error?.response?.data?.message ??
+            '예약에 실패했습니다. 잠시 뒤 다시 시도해 주세요.',
+        );
       }
     },
     [doReserve, isLoggedIn, selectedRoom, selectedRangeFrom, selectedRangeTo],
@@ -284,6 +287,13 @@ const RoomPage = () => {
       'yyyy-MM-dd HH:mm',
       new Date(),
     );
+
+    // 갱신 주기 사이에 지나가 버린 칸이 눌리지 않게 클릭 시점으로 한 번 더 확인한다
+    const clickedAt = new Date();
+    if (clickedAt > addMinutes(slotDateFrom, timeTableConfig.intervalMinute)) {
+      setNow(clickedAt);
+      return;
+    }
 
     const isFuture = format(slotDateFrom, 'HH:mm') > latestEndTime;
 
@@ -343,7 +353,7 @@ const RoomPage = () => {
           </div>
         </div>
         {/* 예약 가능/불가능 색 표현 */}
-        {reservationsByRooms?.length > 0 && (
+        {hasRooms && (
           <div id="squares" className="flex pl-4">
             <div
               className="w-6 h-6 mt-10"
@@ -360,7 +370,25 @@ const RoomPage = () => {
           </div>
         )}
         {/* timeTable 시작 */}
-        {reservationsByRooms?.length > 0 ? (
+        {isReservationsPending && (
+          <div className="text-center mx-8 md:mx-12 lg:mx-96 py-12 my-12 rounded-lg bg-gray-100 text-gray-900">
+            예약 현황을 불러오는 중입니다.
+          </div>
+        )}
+        {!isReservationsPending && isReservationsError && (
+          <div className="text-center mx-8 md:mx-12 lg:mx-96 py-12 my-12 rounded-lg bg-gray-100 text-gray-900">
+            예약 현황을 불러오지 못했습니다.
+            <div className="mt-4 flex justify-center">
+              <Button
+                size="sm"
+                color="dark"
+                onClick={() => refetchReservations()}>
+                다시 시도
+              </Button>
+            </div>
+          </div>
+        )}
+        {hasRooms && (
           <div>
             <TableContainer
               sx={{
@@ -429,7 +457,7 @@ const RoomPage = () => {
                         const isFuture =
                           format(slotDateFrom, 'HH:mm') > roomEndTime &&
                           format(slotDateFrom, 'HH:mm') <= latestEndTime;
-                        const isPast = new Date() > slotDateFromPlus30;
+                        const isPast = now > slotDateFromPlus30;
                         const isSelected =
                           reservationsByRoom.partitionId ===
                             selectedRoom?.partitionId &&
@@ -462,10 +490,10 @@ const RoomPage = () => {
                             0 &&
                           selectedRoom?.partitionId ===
                             reservationsByRoom.partitionId;
-                        const mode = isSelected
-                          ? 'selected'
-                          : isReserved
-                            ? 'reserved'
+                        const mode = isReserved
+                          ? 'reserved'
+                          : isSelected
+                            ? 'selected'
                             : isPast
                               ? 'past'
                               : isFuture
@@ -482,9 +510,7 @@ const RoomPage = () => {
                             className={isSelected ? 'selected' : ''}
                             style={{
                               opacity:
-                                !isRangeSelected &&
-                                !isInSelectableRange &&
-                                isSomethingSelected
+                                !isInSelectableRange && isSomethingSelected
                                   ? 0.4
                                   : 1,
                               backgroundColor: {
@@ -508,13 +534,14 @@ const RoomPage = () => {
               </Table>
             </TableContainer>
           </div>
-        ) : (
+        )}
+        {!isReservationsPending && !isReservationsError && !hasRooms && (
           <div className="text-center mx-8 md:mx-12 lg:mx-96 py-12 my-12 rounded-lg bg-gray-100 text-gray-900">
-            오늘은 예약할 수 없습니다. <br />
+            선택한 날짜에는 예약할 수 있는 방이 없습니다. <br />
             다른 날짜를 선택해 주세요.
           </div>
         )}
-        {reservationsByRooms?.length > 0 && (
+        {hasRooms && (
           <div className="p-10 flex justify-end">
             <CustomButton
               onClick={() => {
