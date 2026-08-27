@@ -16,13 +16,15 @@ import {
   useUserReservation,
 } from '../../api/reservation.api';
 import { useMyInfo, fetchBlockedPeriod } from '../../api/user.api';
+import { useCustomSnackbars } from '../../components/snackbar/SnackBar';
 
 const Check = () => {
   const { data: noShow } = useNoShow();
   const { data: reservations } = useUserReservation();
   const { data: me } = useMyInfo();
   const { data: latest } = useLatestReservation();
-  const { mutate: deleteReservation } = useDeleteReservation();
+  const { mutateAsync: deleteReservation } = useDeleteReservation();
+  const { openSuccessSnackbar, openErrorSnackbar } = useCustomSnackbars();
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
@@ -54,9 +56,14 @@ const Check = () => {
 
   const handleDelete = async id => {
     try {
-      await deleteReservation(id);
+      const response = await deleteReservation(id);
+      openSuccessSnackbar(response?.message || '예약을 취소했습니다.', 3000);
     } catch (error) {
-      console.error('예약 삭제 실패', error);
+      openErrorSnackbar(
+        error?.response?.data?.message ||
+          '예약 취소에 실패했습니다. 잠시 뒤 다시 시도해 주세요.',
+        3000,
+      );
     }
     setOpenModal(null); // 모달 닫기
   };
