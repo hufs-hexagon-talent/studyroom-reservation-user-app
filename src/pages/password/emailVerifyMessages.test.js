@@ -1,5 +1,6 @@
 import {
   RESEND_COOLDOWN_SECONDS,
+  resetPasswordErrorMessage,
   sendCodeErrorMessage,
   verifyCodeErrorMessage,
 } from './emailVerifyMessages';
@@ -23,6 +24,12 @@ describe('sendCodeErrorMessage', () => {
     const expected = '등록되지 않은 아이디입니다. 아이디를 다시 확인해 주세요.';
     expect(sendCodeErrorMessage(httpError(400, 'CLIENT-001'))).toBe(expected);
     expect(sendCodeErrorMessage(httpError(404, 'USER-001'))).toBe(expected);
+  });
+
+  it('등록된 이메일이 없으면(400 USER-012) 학부 사무실 문의 안내', () => {
+    expect(sendCodeErrorMessage(httpError(400, 'USER-012'))).toBe(
+      '등록된 이메일이 없어 인증 코드를 보낼 수 없습니다. 학부 사무실에 문의해 주세요.',
+    );
   });
 
   it('429 는 재발송 제한·시간당 상한·IP 제한을 구분한다', () => {
@@ -88,5 +95,55 @@ describe('verifyCodeErrorMessage', () => {
     expect(verifyCodeErrorMessage(httpError(400, 'X-1')).message).toBe(
       '인증 코드를 확인하지 못했습니다. 다시 시도해 주세요.',
     );
+  });
+});
+
+describe('resetPasswordErrorMessage', () => {
+  const reauth = {
+    message: '인증이 만료되었습니다. 이메일 인증을 다시 진행해 주세요.',
+    reauth: true,
+  };
+
+  it('응답이 없으면 네트워크 안내', () => {
+    expect(resetPasswordErrorMessage(new Error('Network Error'))).toEqual({
+      message:
+        '서버에 연결하지 못했습니다. 네트워크를 확인한 뒤 다시 시도해 주세요.',
+      reauth: false,
+    });
+  });
+
+  it('만료된 재설정 토큰(401 AUTH-007)은 서버 원문 대신 재인증 안내', () => {
+    expect(resetPasswordErrorMessage(httpError(401, 'AUTH-007'))).toEqual(
+      reauth,
+    );
+  });
+
+  it('인터셉터가 세션 만료로 바꾼 오류도 재인증 안내', () => {
+    const error = httpError(401, 'AUTH-013');
+    error.sessionExpired = true;
+    expect(resetPasswordErrorMessage(error)).toEqual(reauth);
+  });
+
+  it('토큰 형식 오류(400 AUTH-008)도 재인증 안내', () => {
+    expect(resetPasswordErrorMessage(httpError(400, 'AUTH-008'))).toEqual(
+      reauth,
+    );
+  });
+
+  it('5xx 는 서버 문제 안내', () => {
+    expect(resetPasswordErrorMessage(httpError(500, 'AUTH-015'))).toEqual({
+      message:
+        '서버에 문제가 있어 비밀번호를 변경하지 못했습니다. 잠시 뒤 다시 시도해 주세요.',
+      reauth: false,
+    });
+  });
+
+  it('그 밖의 4xx 는 서버 원문 없이 일반 실패 문구', () => {
+    const result = resetPasswordErrorMessage(httpError(400, 'CLIENT-001'));
+    expect(result).toEqual({
+      message: '비밀번호 변경에 실패했습니다. 다시 시도해 주세요.',
+      reauth: false,
+    });
+    expect(result.message).not.toContain('서버 원문');
   });
 });

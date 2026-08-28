@@ -1,7 +1,11 @@
 import axios from 'axios';
 
 import { apiClient } from './client';
-import { fetchBlockedPeriod, passwordChangeErrorMessage } from './user.api';
+import {
+  fetchBlockedPeriod,
+  isAuthError,
+  passwordChangeErrorMessage,
+} from './user.api';
 
 jest.mock('./session', () => ({ handleSessionExpired: jest.fn() }));
 jest.mock('../config', () => ({ API_URL: 'http://api.test' }));
@@ -76,17 +80,72 @@ describe('passwordChangeErrorMessage', () => {
     );
   });
 
-  it('4xx 는 서버 안내를 쓰고, 없으면 일반 실패 문구', () => {
+  it('4xx 는 에러 코드로 매핑하고 서버 원문은 쓰지 않는다', () => {
     expect(
       passwordChangeErrorMessage({
         response: {
           status: 400,
-          data: { message: '기존 비밀번호가 틀립니다.' },
+          data: {
+            code: 'USER-006',
+            message: '현재 비밀번호가 일치하지 않습니다.',
+          },
         },
       }),
-    ).toBe('기존 비밀번호가 틀립니다.');
+    ).toBe('현재 비밀번호가 맞지 않습니다. 다시 확인해 주세요.');
+    expect(
+      passwordChangeErrorMessage({
+        response: { status: 400, data: { code: 'USER-007', message: '원문' } },
+      }),
+    ).toBe('새 비밀번호는 현재 비밀번호와 달라야 합니다.');
+    expect(
+      passwordChangeErrorMessage({
+        response: {
+          status: 400,
+          data: { code: 'CLIENT-001', message: '잘못된 요청입니다.' },
+        },
+      }),
+    ).toBe('비밀번호 변경에 실패했습니다. 다시 시도해 주세요.');
     expect(passwordChangeErrorMessage({ response: { status: 400 } })).toBe(
       '비밀번호 변경에 실패했습니다. 다시 시도해 주세요.',
     );
+  });
+
+  it('인터셉터가 세션 만료로 바꾼 오류는 재로그인 안내를 그대로 쓴다', () => {
+    const error = new Error('로그인이 만료되었습니다. 다시 로그인해 주세요.');
+    error.sessionExpired = true;
+    error.response = {
+      status: 401,
+      data: {
+        code: 'AUTH-013',
+        message: '로그인이 만료되었습니다. 다시 로그인해 주세요.',
+      },
+    };
+    expect(passwordChangeErrorMessage(error)).toBe(
+      '로그인이 만료되었습니다. 다시 로그인해 주세요.',
+    );
+  });
+});
+
+describe('isAuthError', () => {
+  const withCode = (status, code) => ({ response: { status, data: { code } } });
+
+  it('401/403 은 코드와 상관없이 인증 오류', () => {
+    expect(isAuthError(withCode(401, 'AUTH-013'))).toBe(true);
+    expect(isAuthError({ response: { status: 403 } })).toBe(true);
+  });
+
+  it('4xx 의 AUTH-*, USER-001 은 인증 오류', () => {
+    expect(isAuthError(withCode(400, 'AUTH-008'))).toBe(true);
+    expect(isAuthError(withCode(404, 'USER-001'))).toBe(true);
+  });
+
+  it('5xx 는 AUTH-* 코드라도 인증 오류가 아니다', () => {
+    expect(isAuthError(withCode(500, 'AUTH-015'))).toBe(false);
+    expect(isAuthError(withCode(503, 'AUTH-018'))).toBe(false);
+  });
+
+  it('응답이 없거나 다른 코드면 인증 오류가 아니다', () => {
+    expect(isAuthError(new Error('Network Error'))).toBe(false);
+    expect(isAuthError(withCode(412, 'RESERVATION-012'))).toBe(false);
   });
 });

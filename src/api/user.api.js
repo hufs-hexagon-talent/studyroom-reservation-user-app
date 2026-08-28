@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { apiClient } from './client';
+import { apiClient, SESSION_EXPIRED_MESSAGE } from './client';
 import { queryClient } from '../queryClient';
 
 // [관리자] 모든 회원 정보 조회
@@ -51,6 +51,9 @@ export const isAuthError = error => {
   const status = error?.response?.status;
   if (status === 401 || status === 403) return true;
 
+  // AUTH-015~018 같은 5xx 는 인증 서버 장애라 재시도해 볼 여지가 있으니 4xx 만 본다.
+  if (!(status >= 400 && status < 500)) return false;
+
   const code = error?.response?.data?.code;
   return (
     typeof code === 'string' &&
@@ -83,15 +86,23 @@ export const useServiceRole = () => {
 
 // 비밀번호 변경 실패를 학생용 문구로 바꾼다. 응답이 없으면(네트워크·타임아웃)
 // axios 영문 원문("Network Error")이 화면에 가지 않도록 여기서 막는다.
+// 4xx 는 서버 원문 대신 에러 코드로 매핑한다. 세션 만료는 인터셉터가 이미
+// 재로그인 안내로 바꿔 두었으니 그 문구를 그대로 쓴다.
+const PASSWORD_CHANGE_ERROR_MESSAGES = {
+  'USER-006': '현재 비밀번호가 맞지 않습니다. 다시 확인해 주세요.',
+  'USER-007': '새 비밀번호는 현재 비밀번호와 달라야 합니다.',
+};
+
 export const passwordChangeErrorMessage = error => {
   if (!error?.response) {
     return '서버에 연결하지 못했습니다. 네트워크를 확인한 뒤 다시 시도해 주세요.';
   }
+  if (error.sessionExpired) return SESSION_EXPIRED_MESSAGE;
   if (error.response.status >= 500) {
     return '서버에 문제가 있어 비밀번호를 변경하지 못했습니다. 잠시 뒤 다시 시도해 주세요.';
   }
   return (
-    error.response.data?.message ||
+    PASSWORD_CHANGE_ERROR_MESSAGES[error.response.data?.code] ||
     '비밀번호 변경에 실패했습니다. 다시 시도해 주세요.'
   );
 };

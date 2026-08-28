@@ -27,6 +27,9 @@ export const sendCodeErrorMessage = error => {
   if (code === 'USER-001' || code === 'CLIENT-001') {
     return '등록되지 않은 아이디입니다. 아이디를 다시 확인해 주세요.';
   }
+  if (code === 'USER-012') {
+    return '등록된 이메일이 없어 인증 코드를 보낼 수 없습니다. 학부 사무실에 문의해 주세요.';
+  }
   if (code === 'AUTH-020') {
     return '인증 코드는 1분에 한 번만 보낼 수 있습니다. 잠시 뒤 다시 시도해 주세요.';
   }
@@ -80,5 +83,37 @@ export const verifyCodeErrorMessage = error => {
   return {
     message: '인증 코드를 확인하지 못했습니다. 다시 시도해 주세요.',
     resetResend: false,
+  };
+};
+
+// 비로그인 비밀번호 재설정 실패. 401(재설정 토큰 만료 AUTH-007)이나 400 AUTH-008~011(토큰
+// 형식 오류)은 새 비밀번호를 다시 넣어도 소용없고 이메일 인증부터 다시 해야 한다.
+// reauth 가 true 면 화면이 재설정 토큰을 지우고 이메일 인증 화면으로 보낸다.
+export const resetPasswordErrorMessage = error => {
+  if (!error?.response) return { message: NETWORK_MESSAGE, reauth: false };
+
+  const { status, data } = error.response;
+  const code = data?.code;
+
+  if (status >= 500) {
+    return {
+      message:
+        '서버에 문제가 있어 비밀번호를 변경하지 못했습니다. 잠시 뒤 다시 시도해 주세요.',
+      reauth: false,
+    };
+  }
+  if (
+    error.sessionExpired ||
+    status === 401 ||
+    (typeof code === 'string' && code.startsWith('AUTH-'))
+  ) {
+    return {
+      message: '인증이 만료되었습니다. 이메일 인증을 다시 진행해 주세요.',
+      reauth: true,
+    };
+  }
+  return {
+    message: '비밀번호 변경에 실패했습니다. 다시 시도해 주세요.',
+    reauth: false,
   };
 };
