@@ -35,6 +35,7 @@ import {
   isOutsideOperationHours,
   maxMinutesExceededMessage,
   normalizeErrorCode,
+  RESERVE_AUTH_FAILED_MESSAGE,
 } from './reservationSlot';
 import CustomButton from '../../../components/button/Button';
 import { Button } from 'flowbite-react';
@@ -245,13 +246,8 @@ const RoomPage = () => {
         return;
       }
 
-      // 최대 예약 시간을 넘는 연장은 안내만 하고 선택은 그대로 둔다
-      if (isOverDue) {
-        openSnackbar(maxMinutesExceededMessage(selectedRoom?.eachMaxMinute));
-        return;
-      }
-
-      // 연장 범위 안에 남의 예약이 있으면 건너뛰지 않고 클릭한 칸부터 새로 선택한다
+      // 연장 범위 안에 남의 예약이 있으면 건너뛰지 않고 클릭한 칸부터 새로 선택한다.
+      // 남의 예약을 가로지르는 범위는 연장이 될 수 없으니 최대 시간 검사보다 먼저 본다.
       if (
         hasReservedSlotInRange(
           partition.reservationTimeRanges,
@@ -262,6 +258,12 @@ const RoomPage = () => {
         setSelectedRoom(partition);
         setSelectedRangeFrom(targetStartAt);
         selSelectedRangeTo(targetEndAt);
+        return;
+      }
+
+      // 최대 예약 시간을 넘는 연장은 안내만 하고 선택은 그대로 둔다
+      if (isOverDue) {
+        openSnackbar(maxMinutesExceededMessage(selectedRoom?.eachMaxMinute));
         return;
       }
 
@@ -310,8 +312,13 @@ const RoomPage = () => {
         });
         navigate('/check');
       } catch (error) {
-        // 인증 오류는 SessionExpiryWatcher 가 재로그인 안내를 띄운다
-        if (isAuthError(error)) return;
+        // 인터셉터가 세션 만료로 확정한 경우만 SessionExpiryWatcher 가 안내한다.
+        // 그 밖의 인증 오류(403 권한 없음 등)는 인터셉터가 손대지 않으므로 여기서 안내한다.
+        if (error?.sessionExpired) return;
+        if (isAuthError(error)) {
+          openSnackbar(RESERVE_AUTH_FAILED_MESSAGE);
+          return;
+        }
 
         const status = error?.response?.status;
         const code = normalizeErrorCode(error?.response?.data?.code);

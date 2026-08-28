@@ -75,6 +75,10 @@ const RESERVE_ERROR_MESSAGES = {
 export const RESERVE_FAILED_MESSAGE =
   '예약에 실패했습니다. 잠시 뒤 다시 시도해 주세요.';
 
+// 세션 만료가 아닌 인증 오류(403 권한 없음, 만료된 역할 등). 서버 원문은 쓰지 않는다.
+export const RESERVE_AUTH_FAILED_MESSAGE =
+  '예약할 권한이 없습니다. 다시 로그인한 뒤 시도해 주세요.';
+
 // 예약 실패 응답의 코드를 학생용 문구로 바꾼다. 서버 원문은 쓰지 않는다.
 // blockedUntil: 노쇼 차단 해제일("yyyy-MM-dd"). 있으면 문구에 넣는다.
 export const getReserveErrorMessage = (code, { blockedUntil } = {}) => {
