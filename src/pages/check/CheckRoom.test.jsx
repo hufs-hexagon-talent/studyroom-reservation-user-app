@@ -137,6 +137,31 @@ describe('예약 취소', () => {
     expect(mutateAsync).toHaveBeenCalledWith(7);
   });
 
+  test('취소 실패는 서버 원문 대신 학생용 문구를 띄운다', async () => {
+    const mutateAsync = jest.fn().mockRejectedValue({
+      response: {
+        status: 412,
+        data: {
+          code: 'RESERVATION-010',
+          message: '이미 방문 처리된 예약은 삭제할 수 없습니다.',
+        },
+      },
+    });
+    useDeleteReservation.mockReturnValue({ mutateAsync, isPending: false });
+    useUserReservation.mockReturnValue(loaded([reservation(7)]));
+    render(<Check />);
+
+    fireEvent.click(screen.getByRole('link', { name: '삭제' }));
+    fireEvent.click(screen.getByRole('button', { name: '확인' }));
+
+    await waitFor(() =>
+      expect(mockOpenErrorSnackbar).toHaveBeenCalledWith(
+        '이미 출석한 예약은 취소할 수 없습니다.',
+        3000,
+      ),
+    );
+  });
+
   test('취소 요청이 진행 중이면 확인을 다시 누를 수 없다', () => {
     const mutateAsync = jest.fn(() => new Promise(() => {}));
     useDeleteReservation.mockReturnValue({ mutateAsync, isPending: true });

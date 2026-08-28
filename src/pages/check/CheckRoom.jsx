@@ -17,6 +17,7 @@ import {
 } from '../../api/reservation.api';
 import { useMyInfo, useBlockedPeriod } from '../../api/user.api';
 import { useCustomSnackbars } from '../../components/snackbar/SnackBar';
+import { cancelReservationErrorMessage } from './cancelReservationMessage';
 
 const Check = () => {
   const {
@@ -70,15 +71,12 @@ const Check = () => {
     if (isDeleting) return;
     try {
       // 서버 성공 문구는 "리소스가 성공적으로 삭제되었습니다" 라 학생이 볼 말이 아니다.
-      // 실패했을 때만 서버가 준 이유를 그대로 보여준다.
+      // 실패 이유도 서버 원문 대신 에러 코드로 학생용 문구를 고른다.
       await deleteReservation(id);
       openSuccessSnackbar('예약을 취소했습니다.', 3000);
     } catch (error) {
-      openErrorSnackbar(
-        error?.response?.data?.message ||
-          '예약 취소에 실패했습니다. 잠시 뒤 다시 시도해 주세요.',
-        3000,
-      );
+      const message = cancelReservationErrorMessage(error);
+      if (message) openErrorSnackbar(message, 3000);
     }
     setOpenModal(null); // 모달 닫기
   };
