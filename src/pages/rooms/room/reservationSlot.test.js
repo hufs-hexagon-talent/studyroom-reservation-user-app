@@ -120,6 +120,9 @@ describe('getReserveErrorMessage', () => {
     expect(getReserveErrorMessage('RESERVATION-012')).toBe(
       '이미 지난 시간대는 예약할 수 없습니다. 시간을 다시 선택해 주세요.',
     );
+    expect(getReserveErrorMessage('RESERVATION-013')).toBe(
+      '예약은 30분 단위로만 할 수 있습니다. 시간을 다시 선택해 주세요.',
+    );
     expect(getReserveErrorMessage('POLICY-003')).toBe(
       '선택한 시간은 해당 세미나실의 운영시간이 아닙니다. 다른 시간을 선택해 주세요.',
     );

@@ -1,4 +1,5 @@
 import { SESSION_EXPIRED_MESSAGE } from '../../api/client';
+import { PASSWORD_RULE_MESSAGE } from './passwordRule';
 
 // 비로그인 비밀번호 찾기의 인증 코드 발송·확인 실패를 학생용 문구로 바꾼다.
 // 서버 원문(data.message)은 그대로 띄우지 않는다. 400 은 일반 문구라 원인을 구분할 수 없고,
@@ -123,6 +124,10 @@ export const resetPasswordErrorMessage = error => {
       message: '인증이 만료되었습니다. 이메일 인증을 다시 진행해 주세요.',
       reauth: true,
     };
+  }
+  // 400 CLIENT-001 은 요청 검증 실패인데, 이 요청에서 걸릴 수 있는 것은 새 비밀번호 규칙뿐이다.
+  if (code === 'CLIENT-001') {
+    return { message: PASSWORD_RULE_MESSAGE, reauth: false };
   }
   return {
     message: '비밀번호 변경에 실패했습니다. 다시 시도해 주세요.',

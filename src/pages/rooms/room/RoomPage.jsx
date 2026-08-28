@@ -200,7 +200,11 @@ const RoomPage = () => {
       );
 
       const isFirstSelect = !selectedRangeFrom && !selectedRangeTo;
-      const isDifferentRoom = selectedRoom !== partition;
+      // 예약 현황은 30초마다 다시 불러온다. 남이 예약하면 그 방 객체만 새 참조로 바뀌므로
+      // 객체를 그대로 비교하면 고르던 칸이 연장되지 않고 새 선택으로 접힌다. 식별자로 비교한다.
+      const isSameRoom =
+        !!selectedRoom && selectedRoom.partitionId === partition.partitionId;
+      const isDifferentRoom = !isSameRoom;
 
       const isSelectPast = isBefore(targetStartAt, selectedRangeFrom);
       const isOverDue =
@@ -208,7 +212,7 @@ const RoomPage = () => {
         selectedRoom?.eachMaxMinute;
 
       if (
-        selectedRoom === partition &&
+        isSameRoom &&
         selectedRangeFrom?.getTime() === targetStartAt.getTime() &&
         selectedRangeTo?.getTime() === targetEndAt.getTime()
       ) {

@@ -1,6 +1,7 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { apiClient, SESSION_EXPIRED_MESSAGE } from './client';
 import { queryClient } from '../queryClient';
+import { PASSWORD_RULE_MESSAGE } from '../pages/password/passwordRule';
 
 // [관리자] 모든 회원 정보 조회
 const fetchAllUsers = async () => {
@@ -88,9 +89,12 @@ export const useServiceRole = () => {
 // axios 영문 원문("Network Error")이 화면에 가지 않도록 여기서 막는다.
 // 4xx 는 서버 원문 대신 에러 코드로 매핑한다. 세션 만료는 인터셉터가 이미
 // 재로그인 안내로 바꿔 두었으니 그 문구를 그대로 쓴다.
+// CLIENT-001 은 요청 검증 실패다. 이 요청에서 걸릴 수 있는 것은 새 비밀번호 규칙뿐이라
+// 서버 원문(errors[].message) 대신 규칙을 그대로 알려 준다.
 const PASSWORD_CHANGE_ERROR_MESSAGES = {
   'USER-006': '현재 비밀번호가 맞지 않습니다. 다시 확인해 주세요.',
   'USER-007': '새 비밀번호는 현재 비밀번호와 달라야 합니다.',
+  'CLIENT-001': PASSWORD_RULE_MESSAGE,
 };
 
 export const passwordChangeErrorMessage = error => {

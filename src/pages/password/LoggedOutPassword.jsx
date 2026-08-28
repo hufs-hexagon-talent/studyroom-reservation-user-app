@@ -4,6 +4,7 @@ import { useLoggedOutPassword } from '../../api/user.api';
 import { Button, Label, TextInput } from 'flowbite-react';
 import { useCustomSnackbars } from '../../components/snackbar/SnackBar';
 import { resetPasswordErrorMessage } from './emailVerifyMessages';
+import { PASSWORD_RULE_TEXT, validateNewPassword } from './passwordRule';
 
 const LoggedOutPassword = () => {
   const { mutateAsync: doPasswordChange } = useLoggedOutPassword();
@@ -35,6 +36,13 @@ const LoggedOutPassword = () => {
     }
     if (newPw === '' || confirmNewPw === '') {
       openErrorSnackbar('비밀번호를 입력한 후 변경하기를 눌러주세요', 2500);
+      return;
+    }
+    // 서버가 규칙을 어긴 비밀번호를 400 으로 되돌린다. 보내기 전에 같은 규칙으로 걸러
+    // 학생이 이유를 모른 채 같은 값으로 다시 시도하는 일을 막는다.
+    const ruleError = validateNewPassword(newPw);
+    if (ruleError) {
+      openErrorSnackbar(ruleError, 2500);
       return;
     }
     // 더블탭하면 같은 토큰으로 두 번 보내고, 두 번째 응답이 성공 안내를 실패 안내로 덮는다
@@ -77,6 +85,7 @@ const LoggedOutPassword = () => {
               type="password"
               placeholder="새 비밀번호를 입력해주세요"
               required
+              helperText={PASSWORD_RULE_TEXT}
             />
           </div>
           <div>

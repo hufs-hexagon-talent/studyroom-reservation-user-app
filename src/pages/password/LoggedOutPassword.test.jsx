@@ -93,6 +93,35 @@ describe('LoggedOutPassword', () => {
     expect(mockNavigate).toHaveBeenCalledWith('/login');
   });
 
+  it('규칙을 어긴 새 비밀번호는 보내지 않고 규칙을 알려 준다', async () => {
+    render(<LoggedOutPassword />);
+    // 기본 비밀번호가 학번이라 숫자만 넣는 경우가 흔하다
+    fireEvent.change(
+      screen.getByPlaceholderText('새 비밀번호를 입력해주세요'),
+      { target: { value: '202412345' } },
+    );
+    fireEvent.change(
+      screen.getByPlaceholderText('새 비밀번호를 한번 더 입력해주세요'),
+      { target: { value: '202412345' } },
+    );
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: '변경하기' }));
+    });
+
+    expect(doPasswordChange).not.toHaveBeenCalled();
+    expect(mockOpenErrorSnackbar.mock.calls[0][0]).toBe(
+      '새 비밀번호는 8자 이상이고 영문과 숫자를 포함해야 합니다.',
+    );
+  });
+
+  it('입력하기 전에도 비밀번호 규칙을 화면에 보여 준다', () => {
+    render(<LoggedOutPassword />);
+    expect(
+      screen.getByText('8자 이상, 영문과 숫자를 포함해 주세요.'),
+    ).toBeInTheDocument();
+  });
+
   it('실패하면 서버 원문 대신 학생용 문구를 띄운다', async () => {
     doPasswordChange.mockRejectedValue({
       response: {

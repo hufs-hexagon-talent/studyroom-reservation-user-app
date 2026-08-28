@@ -231,8 +231,17 @@ describe('resetPasswordErrorMessage', () => {
     });
   });
 
-  it('그 밖의 4xx 는 서버 원문 없이 일반 실패 문구', () => {
+  it('규칙에 걸린 새 비밀번호(400 CLIENT-001)는 서버 원문 없이 규칙을 알려 준다', () => {
     const result = resetPasswordErrorMessage(httpError(400, 'CLIENT-001'));
+    expect(result).toEqual({
+      message: '새 비밀번호는 8자 이상이고 영문과 숫자를 포함해야 합니다.',
+      reauth: false,
+    });
+    expect(result.message).not.toContain('서버 원문');
+  });
+
+  it('그 밖의 4xx 는 서버 원문 없이 일반 실패 문구', () => {
+    const result = resetPasswordErrorMessage(httpError(409, 'USER-020'));
     expect(result).toEqual({
       message: '비밀번호 변경에 실패했습니다. 다시 시도해 주세요.',
       reauth: false,

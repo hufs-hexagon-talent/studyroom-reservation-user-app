@@ -97,17 +97,24 @@ describe('passwordChangeErrorMessage', () => {
         response: { status: 400, data: { code: 'USER-007', message: '원문' } },
       }),
     ).toBe('새 비밀번호는 현재 비밀번호와 달라야 합니다.');
+    expect(passwordChangeErrorMessage({ response: { status: 400 } })).toBe(
+      '비밀번호 변경에 실패했습니다. 다시 시도해 주세요.',
+    );
+  });
+
+  it('규칙에 걸린 새 비밀번호는 규칙을 알려 준다', () => {
     expect(
       passwordChangeErrorMessage({
         response: {
           status: 400,
-          data: { code: 'CLIENT-001', message: '잘못된 요청입니다.' },
+          data: {
+            code: 'CLIENT-001',
+            message: '잘못된 요청입니다.',
+            errors: [{ message: '새 비밀번호는 8자 이상이어야 합니다.' }],
+          },
         },
       }),
-    ).toBe('비밀번호 변경에 실패했습니다. 다시 시도해 주세요.');
-    expect(passwordChangeErrorMessage({ response: { status: 400 } })).toBe(
-      '비밀번호 변경에 실패했습니다. 다시 시도해 주세요.',
-    );
+    ).toBe('새 비밀번호는 8자 이상이고 영문과 숫자를 포함해야 합니다.');
   });
 
   it('인터셉터가 세션 만료로 바꾼 오류는 재로그인 안내를 그대로 쓴다', () => {
