@@ -17,7 +17,13 @@ const LoginPage = () => {
   const { openSuccessSnackbar, openErrorSnackbar } = useCustomSnackbars();
 
   const handleLogin = async () => {
-    // 연타·더블클릭이 로그인 횟수 제한(분당 10회)을 소진하지 않게 막는다
+    // 빈 값은 서버에 보내지 않는다. 아이디 창에서 Enter 를 눌러도 폼이 제출되므로
+    // 여기서 막지 않으면 빈 비밀번호 요청이 로그인 횟수 제한(분당 10회)을 소모한다.
+    if (!studentId.trim() || !password) {
+      openErrorSnackbar('아이디와 비밀번호를 모두 입력해 주세요.', 2500);
+      return;
+    }
+    // 연타·더블클릭이 로그인 횟수 제한을 소진하지 않게 막는다
     if (submitting) return;
     setSubmitting(true);
     try {
