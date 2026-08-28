@@ -15,36 +15,34 @@ import {
   useDeleteReservation,
   useUserReservation,
 } from '../../api/reservation.api';
-import { useMyInfo, fetchBlockedPeriod } from '../../api/user.api';
+import { useMyInfo, useBlockedPeriod } from '../../api/user.api';
 import { useCustomSnackbars } from '../../components/snackbar/SnackBar';
 
 const Check = () => {
-  const { data: noShow } = useNoShow();
-  const { data: reservations } = useUserReservation();
+  const {
+    data: noShow,
+    isPending: isNoShowPending,
+    isError: isNoShowError,
+    refetch: refetchNoShow,
+  } = useNoShow();
+  const {
+    data: reservations,
+    isPending: isReservationsPending,
+    isError: isReservationsError,
+    refetch: refetchReservations,
+  } = useUserReservation();
   const { data: me } = useMyInfo();
   const { data: latest } = useLatestReservation();
-  const { mutateAsync: deleteReservation } = useDeleteReservation();
+  const { mutateAsync: deleteReservation, isPending: isDeleting } =
+    useDeleteReservation();
   const { openSuccessSnackbar, openErrorSnackbar } = useCustomSnackbars();
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
   const [anchorEl, setAnchorEl] = useState(null);
   const [openModal, setOpenModal] = useState(null);
-  const [blockedPeriod, setBlockePeriod] = useState(null);
   const handleMuiBtnClick = event => {
     setAnchorEl(event.currentTarget);
-  };
-
-  const handlePopoverClick = async e => {
-    if (anchorEl) {
-      // Popover이 열려있을 때
-      const blockedData = await fetchBlockedPeriod();
-      setBlockePeriod(blockedData);
-      setAnchorEl(null); // Popover 닫기
-    } else {
-      // Popover이 닫혀있을 때
-      setAnchorEl(e.currentTarget); // Popover 열기
-    }
   };
 
   const handleClose = () => {
@@ -54,7 +52,22 @@ const Check = () => {
   const open = Boolean(anchorEl);
   const id = open ? 'simple-popover' : undefined;
 
+  // 제한 기간은 팝오버를 여는 시점에 조회해 첫 열람부터 보이게 한다.
+  // 이미 제한 상태인 학생은 화면에 들어올 때 미리 받아 둔다.
+  // 제한 상태가 아니면 null 이 온다(조회 실패가 아니다).
+  const {
+    data: blockedPeriod,
+    isPending: isBlockedPeriodPending,
+    isError: isBlockedPeriodError,
+  } = useBlockedPeriod({ enabled: open || me?.serviceRole === 'BLOCKED' });
+  const blockedDates = blockedPeriod?.data;
+  const hasBlockedPeriod = Boolean(
+    blockedDates?.startBlockedDate && blockedDates?.endBlockedDate,
+  );
+
   const handleDelete = async id => {
+    // 응답이 오기 전에 확인을 다시 누르면 같은 예약을 두 번 취소하게 된다.
+    if (isDeleting) return;
     try {
       // 서버 성공 문구는 "리소스가 성공적으로 삭제되었습니다" 라 학생이 볼 말이 아니다.
       // 실패했을 때만 서버가 준 이유를 그대로 보여준다.
@@ -85,6 +98,10 @@ const Check = () => {
     ? Math.ceil(reservations.length / itemsPerPage)
     : 0;
 
+  // 조회 실패를 빈 목록으로 오인하지 않도록 로딩·실패·없음을 따로 보여준다.
+  const isReservationsLoaded = !isReservationsPending && !isReservationsError;
+  const hasReservations = isReservationsLoaded && reservations?.length > 0;
+
   return (
     <div>
       <div className="flex justify-center text-2xl mt-20">
@@ -105,60 +122,90 @@ const Check = () => {
             </Table.HeadCell>
           </Table.Head>
           <Table.Body className="divide-y">
-            {paginatedReservations?.map((reservation, index) => {
-              const start = new Date(reservation.reservationStartTime);
-              const end = new Date(reservation.reservationEndTime);
-              const isPast = start < new Date();
-              return (
-                <Table.Row
-                  key={index}
-                  className="bg-white dark:border-gray-700 dark:bg-gray-800 text-center text-gray-900">
-                  <Table.Cell>
-                    {reservation.reservationState === 'VISITED' ? (
-                      '출석'
-                    ) : reservation.reservationState === 'NOT_VISITED' ? (
-                      '미출석'
-                    ) : (
-                      <Tooltip
-                        title={
-                          <Typography sx={{ fontSize: '1.2em' }}>
-                            노쇼를 3번 이상 하여 제한된 후 상태가 초기화된
-                            상태를 말합니다.
-                          </Typography>
-                        }>
-                        <span>처리됨</span>
-                      </Tooltip>
-                    )}
-                  </Table.Cell>
-                  <Table.Cell className="px-2 py-4">
-                    {`${reservation.roomName}-${reservation.partitionNumber}`}
-                  </Table.Cell>
-                  <Table.Cell className="px-2 py-4">
-                    {format(start, 'MM-dd')}
-                  </Table.Cell>
-                  <Table.Cell className="px-2 py-4">
-                    {format(start, 'HH:mm')}
-                  </Table.Cell>
-                  <Table.Cell className="px-2 py-4">
-                    {format(end, 'HH:mm')}
-                  </Table.Cell>
-                  <Table.Cell className="px-2 py-4">
-                    {!(
-                      isPast || reservation.reservationState === 'VISITED'
-                    ) && (
-                      <a
-                        href="#"
-                        onClick={() => {
-                          setOpenModal(reservation.reservationId);
-                        }}
-                        className="font-medium text-red-600 hover:underline dark:text-cyan-500">
-                        삭제
-                      </a>
-                    )}
-                  </Table.Cell>
-                </Table.Row>
-              );
-            })}
+            {isReservationsPending && (
+              <Table.Row className="bg-white text-center text-gray-900">
+                <Table.Cell colSpan={6} className="px-2 py-8">
+                  예약 목록을 불러오는 중입니다.
+                </Table.Cell>
+              </Table.Row>
+            )}
+            {!isReservationsPending && isReservationsError && (
+              <Table.Row className="bg-white text-center text-gray-900">
+                <Table.Cell colSpan={6} className="px-2 py-8">
+                  예약 목록을 불러오지 못했습니다.
+                  <div className="mt-4 flex justify-center">
+                    <Button
+                      size="sm"
+                      color="dark"
+                      onClick={() => refetchReservations()}>
+                      다시 시도
+                    </Button>
+                  </div>
+                </Table.Cell>
+              </Table.Row>
+            )}
+            {isReservationsLoaded && !hasReservations && (
+              <Table.Row className="bg-white text-center text-gray-900">
+                <Table.Cell colSpan={6} className="px-2 py-8">
+                  예약 내역이 없습니다.
+                </Table.Cell>
+              </Table.Row>
+            )}
+            {hasReservations &&
+              paginatedReservations.map((reservation, index) => {
+                const start = new Date(reservation.reservationStartTime);
+                const end = new Date(reservation.reservationEndTime);
+                const isPast = start < new Date();
+                return (
+                  <Table.Row
+                    key={index}
+                    className="bg-white dark:border-gray-700 dark:bg-gray-800 text-center text-gray-900">
+                    <Table.Cell>
+                      {reservation.reservationState === 'VISITED' ? (
+                        '출석'
+                      ) : reservation.reservationState === 'NOT_VISITED' ? (
+                        '미출석'
+                      ) : (
+                        <Tooltip
+                          title={
+                            <Typography sx={{ fontSize: '1.2em' }}>
+                              노쇼가 4회가 되어 예약이 제한된 뒤, 제한 기간이
+                              끝나 노쇼 횟수에서 빠진 예약입니다.
+                            </Typography>
+                          }>
+                          <span>처리됨</span>
+                        </Tooltip>
+                      )}
+                    </Table.Cell>
+                    <Table.Cell className="px-2 py-4">
+                      {`${reservation.roomName}-${reservation.partitionNumber}`}
+                    </Table.Cell>
+                    <Table.Cell className="px-2 py-4">
+                      {format(start, 'MM-dd')}
+                    </Table.Cell>
+                    <Table.Cell className="px-2 py-4">
+                      {format(start, 'HH:mm')}
+                    </Table.Cell>
+                    <Table.Cell className="px-2 py-4">
+                      {format(end, 'HH:mm')}
+                    </Table.Cell>
+                    <Table.Cell className="px-2 py-4">
+                      {!(
+                        isPast || reservation.reservationState === 'VISITED'
+                      ) && (
+                        <a
+                          href="#"
+                          onClick={() => {
+                            setOpenModal(reservation.reservationId);
+                          }}
+                          className="font-medium text-red-600 hover:underline dark:text-cyan-500">
+                          삭제
+                        </a>
+                      )}
+                    </Table.Cell>
+                  </Table.Row>
+                );
+              })}
           </Table.Body>
         </Table>
       </div>
@@ -189,67 +236,92 @@ const Check = () => {
           open={open}
           anchorEl={anchorEl}
           onClose={handleClose}
-          onClick={handlePopoverClick}
           anchorOrigin={{
             vertical: 'bottom',
             horizontal: 'left',
           }}>
-          <Typography sx={{ px: 2, py: 1 }}>
-            {`* 현재 예약 취소 없이 세미나실을 방문하지 않은 횟수는 ${noShow?.noShowCount}번 입니다.`}
-          </Typography>
-          <Typography sx={{ px: 3 }} className="text-red-700">
-            (3회 초과 시 세미나실 예약이 1개월 동안 제한 됩니다)
-          </Typography>
-          {blockedPeriod?.data && (
+          {isNoShowPending && (
+            <Typography sx={{ px: 2, py: 1 }}>
+              노쇼 현황을 불러오는 중입니다.
+            </Typography>
+          )}
+          {!isNoShowPending && isNoShowError && (
+            <div className="px-4 py-2 text-center">
+              <Typography>노쇼 현황을 불러오지 못했습니다.</Typography>
+              <div className="mt-2 flex justify-center">
+                <Button size="sm" color="dark" onClick={() => refetchNoShow()}>
+                  다시 시도
+                </Button>
+              </div>
+            </div>
+          )}
+          {!isNoShowPending && !isNoShowError && noShow && (
             <>
-              <Typography sx={{ px: 3, py: 1 }}>
-                {blockedPeriod?.data?.startBlockedDate &&
-                blockedPeriod?.data?.endBlockedDate
-                  ? `현재 블락 기간 : ${blockedPeriod.data.startBlockedDate} ~ ${blockedPeriod.data.endBlockedDate}`
-                  : '블락 정보가 없습니다.'}
+              <Typography sx={{ px: 2, py: 1 }}>
+                {`* 현재 예약 취소 없이 세미나실을 방문하지 않은 횟수는 ${noShow.noShowCount}번 입니다.`}
+              </Typography>
+              <Typography sx={{ px: 3 }} className="text-red-700">
+                (노쇼가 4회가 되면 세미나실 예약이 1개월 동안 제한됩니다)
               </Typography>
             </>
           )}
+          {isBlockedPeriodPending && (
+            <Typography sx={{ px: 3, py: 1 }}>
+              예약 제한 기간을 확인하는 중입니다.
+            </Typography>
+          )}
+          {!isBlockedPeriodPending && isBlockedPeriodError && (
+            <Typography sx={{ px: 3, py: 1 }}>
+              예약 제한 기간을 불러오지 못했습니다.
+            </Typography>
+          )}
+          {hasBlockedPeriod && (
+            <Typography sx={{ px: 3, py: 1 }}>
+              {`현재 예약 제한 기간 : ${blockedDates.startBlockedDate} ~ ${blockedDates.endBlockedDate}`}
+            </Typography>
+          )}
 
-          <div className="overflow-x-auto">
-            <Table>
-              <Table.Head className="text-black text-center">
-                <Table.HeadCell>출석 상태</Table.HeadCell>
-                <Table.HeadCell>날짜</Table.HeadCell>
-                <Table.HeadCell>호실</Table.HeadCell>
-                <Table.HeadCell>시작 시간</Table.HeadCell>
-                <Table.HeadCell>종료 시간</Table.HeadCell>
-              </Table.Head>
-              <Table.Body className="divide-y text-center">
-                {noShow?.reservationList.reservationInfoResponses.map(
-                  (reservation, index) => (
-                    <Table.Row
-                      key={index}
-                      className="bg-white dark:border-gray-700 dark:bg-gray-800">
-                      <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                        {reservation.reservationState === 'NOT_VISITED'
-                          ? '미출석'
-                          : ''}
-                      </Table.Cell>
-                      <Table.Cell>
-                        {format(
-                          new Date(reservation.reservationStartTime),
-                          'yyyy-MM-dd',
-                        )}
-                      </Table.Cell>
-                      <Table.Cell>{`${reservation.roomName}-${reservation.partitionNumber}`}</Table.Cell>
-                      <Table.Cell>
-                        {format(reservation.reservationStartTime, 'HH:mm')}
-                      </Table.Cell>
-                      <Table.Cell>
-                        {format(reservation.reservationEndTime, 'HH:mm')}
-                      </Table.Cell>
-                    </Table.Row>
-                  ),
-                )}
-              </Table.Body>
-            </Table>
-          </div>
+          {!isNoShowPending && !isNoShowError && noShow && (
+            <div className="overflow-x-auto">
+              <Table>
+                <Table.Head className="text-black text-center">
+                  <Table.HeadCell>출석 상태</Table.HeadCell>
+                  <Table.HeadCell>날짜</Table.HeadCell>
+                  <Table.HeadCell>호실</Table.HeadCell>
+                  <Table.HeadCell>시작 시간</Table.HeadCell>
+                  <Table.HeadCell>종료 시간</Table.HeadCell>
+                </Table.Head>
+                <Table.Body className="divide-y text-center">
+                  {noShow.reservationList?.reservationInfoResponses?.map(
+                    (reservation, index) => (
+                      <Table.Row
+                        key={index}
+                        className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                        <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
+                          {reservation.reservationState === 'NOT_VISITED'
+                            ? '미출석'
+                            : ''}
+                        </Table.Cell>
+                        <Table.Cell>
+                          {format(
+                            new Date(reservation.reservationStartTime),
+                            'yyyy-MM-dd',
+                          )}
+                        </Table.Cell>
+                        <Table.Cell>{`${reservation.roomName}-${reservation.partitionNumber}`}</Table.Cell>
+                        <Table.Cell>
+                          {format(reservation.reservationStartTime, 'HH:mm')}
+                        </Table.Cell>
+                        <Table.Cell>
+                          {format(reservation.reservationEndTime, 'HH:mm')}
+                        </Table.Cell>
+                      </Table.Row>
+                    ),
+                  )}
+                </Table.Body>
+              </Table>
+            </div>
+          )}
         </Popover>
       </div>
 
@@ -278,10 +350,8 @@ const Check = () => {
                 </Button>
                 <Button
                   color="failure"
-                  onClick={() => {
-                    handleDelete(openModal);
-                    setOpenModal(null);
-                  }}>
+                  disabled={isDeleting}
+                  onClick={() => handleDelete(openModal)}>
                   확인
                 </Button>
               </div>

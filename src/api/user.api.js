@@ -179,22 +179,26 @@ export const useUserByName = name => {
 };
 
 // 자신의 블락 기간 조회
+// 제한 상태가 아닌 학생에게는 400(USER-009) 이 온다. 이건 오류가 아니라 "제한 없음" 이다.
+// react-query v5 는 queryFn 이 undefined 를 돌려주면 오류로 다루므로 null 로 돌려준다.
+// 그 밖의 실패는 그대로 던져 화면이 조회 실패를 알 수 있게 한다.
 export const fetchBlockedPeriod = async () => {
   try {
     const blockedPreiod_res = await apiClient.get('/users/me/blocked-period');
     return blockedPreiod_res.data;
   } catch (error) {
-    if (error.response && error.response.status === 400) {
-      console.warn('사용자가 블락 상태가 아님:', error.response.data.message);
-      return undefined;
+    if (error?.response?.data?.code === 'USER-009') {
+      return null;
     }
+    throw error;
   }
 };
 
-export const useBlockedPeriod = () => {
+export const useBlockedPeriod = ({ enabled = true } = {}) => {
   return useQuery({
     queryKey: ['blockedPeriod'],
     queryFn: fetchBlockedPeriod,
+    enabled,
   });
 };
 
