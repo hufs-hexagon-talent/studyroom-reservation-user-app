@@ -61,10 +61,13 @@ apiClient.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    // refresh 자체이거나 로그인 실패(비밀번호 불일치)면 갱신 시도 없이 종료
+    // refresh 자체이거나 로그인 실패(비밀번호 불일치)면 갱신 시도 없이 종료.
+    // 비로그인 비밀번호 재설정(/users/reset-password)의 401 은 재설정 토큰 만료라
+    // 세션과 무관하다. 갱신을 타면 원래 코드(AUTH-007)가 세션 만료로 덮인다.
     if (
       originalRequest?.url?.includes('/auth/refresh') ||
-      originalRequest?.url?.includes('/auth/login')
+      originalRequest?.url?.includes('/auth/login') ||
+      originalRequest?.url?.includes('/users/reset-password')
     ) {
       return Promise.reject(error);
     }

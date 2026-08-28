@@ -137,6 +137,26 @@ describe('갱신을 시도하지 않는 경우', () => {
     expect(handleSessionExpired).not.toHaveBeenCalled();
   });
 
+  test('/users/reset-password 401 은 갱신 없이 원래 오류를 그대로 넘긴다', async () => {
+    const calls = [];
+    apiClient.defaults.adapter = jest.fn(async config => {
+      calls.push(config.url);
+      throw httpError(config, 401, {
+        code: 'AUTH-007',
+        message: '비밀번호 리셋 토큰의 유효기간이 만료되었습니다.',
+      });
+    });
+
+    const error = await apiClient
+      .post('/users/reset-password', {})
+      .catch(e => e);
+
+    expect(error.response.data.code).toBe('AUTH-007');
+    expect(error.sessionExpired).toBeUndefined();
+    expect(calls).not.toContain('/auth/refresh');
+    expect(handleSessionExpired).not.toHaveBeenCalled();
+  });
+
   test('401 이 아닌 오류는 손대지 않는다', async () => {
     const calls = useAdapter({ refresh: c => Promise.resolve(ok(c)) });
     apiClient.defaults.adapter = jest.fn(async config => {

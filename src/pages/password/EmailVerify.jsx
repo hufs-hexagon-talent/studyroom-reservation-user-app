@@ -4,6 +4,11 @@ import { useSnackbar } from 'react-simple-snackbar';
 import './EmailVerify.css';
 import { useEmailSend, useEmailVerify } from '../../api/auth.api';
 import { Button } from 'flowbite-react';
+import {
+  RESEND_COOLDOWN_SECONDS,
+  sendCodeErrorMessage,
+  verifyCodeErrorMessage,
+} from './emailVerifyMessages';
 
 const EmailVerify = () => {
   const [username, setUsername] = useState('');
@@ -66,14 +71,22 @@ const EmailVerify = () => {
       setTimeout(() => {
         closeSuccessSnackbar();
       }, 2500);
-      setTimer(300);
+      setTimer(RESEND_COOLDOWN_SECONDS);
     } catch (error) {
-      openErrorSnackbar('인증 코드 발송에 실패하였습니다.');
+      // 원인별로 다른 안내. 서버 원문은 띄우지 않는다.
+      openErrorSnackbar(sendCodeErrorMessage(error));
       setTimeout(() => {
         closeErrorSnackbar();
       }, 2500);
       setDisabled(false);
     }
+  };
+
+  // 서버에 코드가 남아 있지 않으면(시도 초과·만료) 재발송 잠금을 푼다
+  const releaseResendLock = () => {
+    setTimer(null);
+    setTimerDisplay('');
+    setDisabled(false);
   };
 
   // 인증 코드 입력 감지
@@ -97,13 +110,14 @@ const EmailVerify = () => {
       }, 2500);
       navigate('/email/pwreset');
     } catch (error) {
-      openErrorSnackbar('인증 코드 확인에 실패하였습니다.');
+      const { message, resetResend } = verifyCodeErrorMessage(error);
+      if (resetResend) releaseResendLock();
+      openErrorSnackbar(message);
       setTimeout(() => {
         closeErrorSnackbar();
       }, 2500);
     }
   };
-  // todo : 인증번호 발송 실패했을 때 버튼이 안눌려지는 문제
   return (
     <div className="flex flex-col items-center w-screen p-5">
       <h1

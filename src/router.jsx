@@ -23,7 +23,6 @@ import LoggedInPassword from './pages/password/LoggedInPassword';
 import LoggedOutPassword from './pages/password/LoggedOutPassword';
 import EmailVerify from './pages/password/EmailVerify';
 import MyPage from './pages/mypage/MyPage';
-import NoShow from './pages/check/NoShow';
 import EmailSend from './pages/email/EmailSend';
 
 import AdminPage from './pages/admin/AdminPage';
@@ -62,7 +61,8 @@ const RouterComponent = () => {
   // 백그라운드 재조회가 실패해도 캐시에 me 가 남아 있으면 로그인 유지로 본다.
   // 진짜 만료는 SessionExpiryWatcher 가 캐시를 지우므로 me 도 함께 사라진다.
   const authFromServer = status === 'success' || me !== undefined;
-  const authKnown = authFromServer || (status === 'error' && isAuthError(error));
+  const authKnown =
+    authFromServer || (status === 'error' && isAuthError(error));
 
   useEffect(() => {
     if (!authKnown) return;
@@ -111,7 +111,6 @@ const RouterComponent = () => {
                   <Route path="/check" element={<Check />} />
                   <Route path="/otp" element={<OtpPage />} />
                   <Route path="/mypage" element={<MyPage />} />
-                  <Route path="/noshow" element={<NoShow />} />
                   <Route path="/emailSend" element={<EmailSend />} />
                 </>
               )}

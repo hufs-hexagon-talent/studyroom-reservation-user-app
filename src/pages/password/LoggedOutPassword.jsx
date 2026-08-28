@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useLoggedOutPassword } from '../../api/user.api';
 import { Button, Label, TextInput } from 'flowbite-react';
 import { useCustomSnackbars } from '../../components/snackbar/SnackBar';
+import { resetPasswordErrorMessage } from './emailVerifyMessages';
 
 const LoggedOutPassword = () => {
   const { mutateAsync: doPasswordChange } = useLoggedOutPassword();
@@ -35,14 +36,19 @@ const LoggedOutPassword = () => {
     }
     try {
       await doPasswordChange({ token: token, newPassword: newPw });
+      // 한 번 쓴 재설정 토큰은 지운다. 남겨 두면 재설정 화면이 계속 열린다.
+      sessionStorage.removeItem('pwResetToken');
       navigate('/login');
       openSuccessSnackbar('비밀번호가 성공적으로 변경되었습니다.', 2500);
     } catch (error) {
-      openErrorSnackbar(
-        error.response?.data?.message ||
-          '비밀번호 변경에 실패했습니다. 다시 시도해 주세요.',
-        2500,
-      );
+      // 서버 원문은 띄우지 않는다. 재설정 토큰이 만료됐으면 토큰을 지우고
+      // 이메일 인증부터 다시 하게 보낸다. 남겨 두면 재설정 화면이 계속 열린다.
+      const { message, reauth } = resetPasswordErrorMessage(error);
+      openErrorSnackbar(message, 2500);
+      if (reauth) {
+        sessionStorage.removeItem('pwResetToken');
+        navigate('/email');
+      }
     }
   };
   //todo : 비밀번호 보이게 하는거
