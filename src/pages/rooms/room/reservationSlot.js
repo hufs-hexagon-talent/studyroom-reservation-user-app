@@ -1,4 +1,30 @@
-import { areIntervalsOverlapping } from 'date-fns';
+import { addMinutes, areIntervalsOverlapping, format } from 'date-fns';
+
+// 예약 현황 표의 시각 라벨을 만든다.
+// 마지막 항목은 표 본문에서 렌더하지 않고 그 앞 칸의 오른쪽 경계로만 쓰인다.
+// 마지막 항목을 운영 종료 시각으로 덮어쓰면 실제 칸 길이와 라벨이 어긋나므로 덮어쓰지 않는다.
+export const createTimeTable = config => {
+  const { startTime, endTime, intervalMinute } = config;
+  const start = new Date();
+  // 시작 시간에 맞게 지정
+  start.setHours(startTime.hour, startTime.minute, 0, 0);
+
+  const end = new Date();
+  // 종료 시간에 맞게 지정
+  end.setHours(endTime.hour, endTime.minute, 0, 0);
+
+  const timeTable = [];
+
+  // 시작시간으로 선언
+  let currentTime = start;
+  // 종료 시간이 될 떄 까지 intervalMinunte 간격으로 배열에 시간을 채워 넣음
+  while (currentTime <= end) {
+    timeTable.push(format(currentTime, 'HH:mm'));
+    currentTime = addMinutes(currentTime, intervalMinute);
+  }
+
+  return timeTable;
+};
 
 // 서버는 운영시간을 "HH:mm:ss" 로 준다. 표의 칸은 "HH:mm" 이라 자릿수를 맞춰 비교한다.
 export const normalizeOperationTime = time => {

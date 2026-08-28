@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import {
@@ -30,6 +30,7 @@ import useUrlQuery from '../../../hooks/useUrlQuery';
 import useAuth from '../../../hooks/useAuth';
 import { fetchBlockedPeriod, isAuthError } from '../../../api/user.api';
 import {
+  createTimeTable,
   getReserveErrorMessage,
   hasReservedSlotInRange,
   isOutsideOperationHours,
@@ -40,34 +41,6 @@ import {
 import CustomButton from '../../../components/button/Button';
 import { Button } from 'flowbite-react';
 import { Modal } from 'flowbite-react';
-
-const createTimeTable = config => {
-  const { startTime, endTime, intervalMinute } = config;
-  const start = new Date();
-  // 시작 시간에 맞게 지정
-  start.setHours(startTime.hour, startTime.minute, 0, 0);
-
-  const end = new Date();
-  // 종료 시간에 맞게 지정
-  end.setHours(endTime.hour, endTime.minute, 0, 0);
-
-  const timeTable = [];
-
-  // 시작시간으로 선언
-  let currentTime = start;
-  // 종료 시간이 될 떄 까지 intervalMinunte 간격으로 배열에 시간을 채워 넣음
-  while (currentTime <= end) {
-    timeTable.push(format(currentTime, 'HH:mm'));
-    currentTime = addMinutes(currentTime, intervalMinute);
-  }
-
-  // 마지막 종료 시각을 채워 넣어야해서 배열의 length-1엔 endTime이 되게
-  if (timeTable[timeTable.length - 1] !== format(end, 'HH:mm')) {
-    timeTable[timeTable.length - 1] = format(end, 'HH:mm');
-  }
-
-  return timeTable;
-};
 
 const RoomPage = () => {
   // snackBar
@@ -101,6 +74,9 @@ const RoomPage = () => {
   );
 
   const { mutateAsync: doReserve, isPending: isReserving } = useReserve();
+  // isPending 은 다음 렌더에서야 true 가 되어 같은 tick 의 두 번째 클릭을 막지 못한다.
+  // 실제 차단은 동기 래치가 한다.
+  const reservingRef = useRef(false);
   const {
     data: reservationsByRooms,
     isPending: isReservationsPending,
@@ -169,13 +145,17 @@ const RoomPage = () => {
       // 배열들 중에 가장 큰 값을 maxEachMaxMinute으로 저장
       const maxEachMaxMinute = Math.max(...eachMaxMinutes);
       setMaxReservationMinute(maxEachMaxMinute);
-
-      // 날짜 변경 시 기존 선택 초기화
-      setSelectedRoom(null);
-      setSelectedRangeFrom(null);
-      selSelectedRangeTo(null);
     }
-  }, [reservationsByRooms, selectedDate]);
+  }, [reservationsByRooms]);
+
+  // 날짜 변경 시 기존 선택 초기화.
+  // 예약 현황은 30초마다 다시 불러오므로 조회 결과가 아니라 날짜에만 반응해야
+  // 남이 예약하는 순간 학생이 고르던 칸이 풀리지 않는다.
+  useEffect(() => {
+    setSelectedRoom(null);
+    setSelectedRangeFrom(null);
+    selSelectedRangeTo(null);
+  }, [selectedDate]);
 
   // 계산해놓은 시간들을 timeTableConfig에 객체로 선언
   const timeTableConfig = {
@@ -285,6 +265,7 @@ const RoomPage = () => {
   // 자신의 예약 생성
   const handleReservation = useCallback(
     async ({ roomPartitionId, startDateTime, endDateTime }) => {
+      if (reservingRef.current) return;
       if (!isLoggedIn) {
         openSnackbar('로그인 후에 세미나실 예약이 가능합니다.');
         setTimeout(() => {
@@ -303,7 +284,8 @@ const RoomPage = () => {
         return;
       }
       // 요청이 끝나기 전에 다시 누르면 같은 예약이 두 번 전송된다
-      if (isReserving) return;
+      if (reservingRef.current) return;
+      reservingRef.current = true;
       try {
         await doReserve({
           roomPartitionId,
@@ -342,16 +324,11 @@ const RoomPage = () => {
           setSelectedRangeFrom(null);
           selSelectedRangeTo(null);
         }
+      } finally {
+        reservingRef.current = false;
       }
     },
-    [
-      doReserve,
-      isLoggedIn,
-      isReserving,
-      selectedRoom,
-      selectedRangeFrom,
-      selectedRangeTo,
-    ],
+    [doReserve, isLoggedIn, selectedRoom, selectedRangeFrom, selectedRangeTo],
   );
 
   // 최대 예약 시간에 부합하는지 계산하는 함수

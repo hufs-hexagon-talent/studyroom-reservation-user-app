@@ -20,6 +20,17 @@ describe('cancelReservationErrorMessage', () => {
     );
   });
 
+  it('이미 사라진 예약(RESERVATION-001)은 다시 시도하라고 하지 않는다', () => {
+    const message = cancelReservationErrorMessage(
+      httpError(404, 'RESERVATION-001'),
+    );
+
+    expect(message).toBe(
+      '이미 취소되었거나 없는 예약입니다. 목록을 새로 고쳤습니다.',
+    );
+    expect(message).not.toBe(CANCEL_FAILED_MESSAGE);
+  });
+
   it('코드 앞뒤 공백은 무시한다', () => {
     expect(
       cancelReservationErrorMessage(httpError(412, ' RESERVATION-010')),
@@ -33,6 +44,12 @@ describe('cancelReservationErrorMessage', () => {
     expect(cancelReservationErrorMessage(new Error('Network Error'))).toBe(
       CANCEL_FAILED_MESSAGE,
     );
+  });
+
+  it('매핑된 코드여도 서버 원문을 그대로 돌려주지 않는다', () => {
+    expect(
+      cancelReservationErrorMessage(httpError(404, 'RESERVATION-001')),
+    ).not.toContain('서버 원문');
   });
 
   it('세션 만료로 확정된 오류는 스낵바를 생략한다', () => {

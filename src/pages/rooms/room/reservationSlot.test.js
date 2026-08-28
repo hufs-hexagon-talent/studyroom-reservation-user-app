@@ -1,4 +1,5 @@
 import {
+  createTimeTable,
   normalizeOperationTime,
   isOutsideOperationHours,
   hasReservedSlotInRange,
@@ -141,5 +142,32 @@ describe('getReserveErrorMessage', () => {
       RESERVE_FAILED_MESSAGE,
     );
     expect(getReserveErrorMessage(undefined)).toBe(RESERVE_FAILED_MESSAGE);
+  });
+});
+
+describe('createTimeTable', () => {
+  it('운영 종료가 23:59 여도 30분 격자 라벨을 빠뜨리지 않는다', () => {
+    const times = createTimeTable({
+      startTime: { hour: 9, minute: 0 },
+      endTime: { hour: 23, minute: 59 },
+      intervalMinute: 30,
+    });
+
+    expect(times[0]).toBe('09:00');
+    expect(times).toContain('23:30');
+    expect(times[times.length - 1]).toBe('23:30');
+    // 표 본문은 마지막 라벨을 렌더하지 않으므로 마지막 칸은 23:00~23:30 이다
+    expect(times[times.length - 2]).toBe('23:00');
+  });
+
+  it('운영 종료가 격자에 맞으면 종료 시각이 마지막 라벨이 된다', () => {
+    const times = createTimeTable({
+      startTime: { hour: 9, minute: 0 },
+      endTime: { hour: 22, minute: 0 },
+      intervalMinute: 30,
+    });
+
+    expect(times[times.length - 1]).toBe('22:00');
+    expect(times).toHaveLength(27);
   });
 });
