@@ -155,7 +155,19 @@ describe('OtpPage', () => {
     expect(refetch).not.toHaveBeenCalled();
   });
 
-  it('서버 만료 시각을 지난 QR 은 감추고 만료로 안내한다', () => {
+  it('기기 시계가 서버보다 앞서 expiresAt 이 지나 보여도 방금 받은 QR 은 그린다', () => {
+    renderWith(
+      queryState({
+        // 서버 시계가 기기보다 10분 느린 상황: expiresAt 이 이미 과거로 온다
+        data: otpAt(T0 - 600_000, 'otp-new'),
+        dataUpdatedAt: T0,
+      }),
+    );
+
+    expect(screen.getByTestId('qr')).toHaveTextContent('otp-new');
+  });
+
+  it('유효 시간(5분) 동안 재조회에 실패한 QR 은 감추고 만료로 안내한다', () => {
     renderWith(
       queryState({
         data: otpAt(T0 - TTL_MS - 1000, 'otp-old'),

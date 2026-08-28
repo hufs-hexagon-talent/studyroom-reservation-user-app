@@ -9,7 +9,7 @@ import {
   getOtpView,
   getRemainingSeconds,
   isOtpExpired,
-  parseExpiresAt,
+  OTP_TTL_MS,
 } from './otpTimer';
 
 const TimerCircularProgressBar = ({ radius, strokeWidth, progress }) => {
@@ -64,7 +64,9 @@ const Qrcode = () => {
   const otpValue = otp?.verificationCode;
   const hasOtp = Boolean(otpValue);
   const timer = getRemainingSeconds(dataUpdatedAt, now);
-  const isExpired = hasOtp && isOtpExpired(parseExpiresAt(otp?.expiresAt), now);
+  // 만료는 기기 시계끼리 비교한다(받은 시각 + 서버 유효 시간). 서버가 준 expiresAt 을
+  // 기기 시계와 비교하면 기기 시계가 앞서 있을 때 받자마자 만료로 보여 QR 을 영영 못 본다.
+  const isExpired = hasOtp && isOtpExpired(dataUpdatedAt + OTP_TTL_MS, now);
   const view = getOtpView({
     hasOtp,
     isPending,
