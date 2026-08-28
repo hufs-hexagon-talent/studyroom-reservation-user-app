@@ -35,6 +35,8 @@ const LoggedOutPassword = () => {
     }
     try {
       await doPasswordChange({ token: token, newPassword: newPw });
+      // 한 번 쓴 재설정 토큰은 지운다. 남겨 두면 재설정 화면이 계속 열린다.
+      sessionStorage.removeItem('pwResetToken');
       navigate('/login');
       openSuccessSnackbar('비밀번호가 성공적으로 변경되었습니다.', 2500);
     } catch (error) {

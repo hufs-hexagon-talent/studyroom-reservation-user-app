@@ -54,7 +54,8 @@ const useAuth = () => {
 
   const logout = useCallback(async () => {
     try {
-      await apiClient.post('/auth/logout');
+      // 망이 느릴 때 15초를 기다리게 하지 않는다. 실패해도 finally 가 정리한다.
+      await apiClient.post('/auth/logout', null, { timeout: 5000 });
     } finally {
       // 요청이 실패해도 화면 상태와 계정 캐시는 정리한다.
       // 서버 쿠키가 남아 있으면 다음 부팅 복원에서 다시 로그인 상태가 된다.

@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 import { apiClient } from './client';
-import { fetchBlockedPeriod } from './user.api';
+import { fetchBlockedPeriod, passwordChangeErrorMessage } from './user.api';
 
 jest.mock('./session', () => ({ handleSessionExpired: jest.fn() }));
 jest.mock('../config', () => ({ API_URL: 'http://api.test' }));
@@ -53,5 +53,40 @@ describe('fetchBlockedPeriod', () => {
 
     const error = await fetchBlockedPeriod().catch(e => e);
     expect(error.response.status).toBe(502);
+  });
+});
+
+describe('passwordChangeErrorMessage', () => {
+  it('응답이 없으면(네트워크·타임아웃) 영문 원문 대신 연결 안내', () => {
+    expect(passwordChangeErrorMessage(new Error('Network Error'))).toBe(
+      '서버에 연결하지 못했습니다. 네트워크를 확인한 뒤 다시 시도해 주세요.',
+    );
+    expect(
+      passwordChangeErrorMessage(new Error('timeout of 15000ms exceeded')),
+    ).not.toContain('timeout');
+  });
+
+  it('5xx 는 서버 문제 안내', () => {
+    expect(
+      passwordChangeErrorMessage({
+        response: { status: 502, data: { message: 'Bad Gateway' } },
+      }),
+    ).toBe(
+      '서버에 문제가 있어 비밀번호를 변경하지 못했습니다. 잠시 뒤 다시 시도해 주세요.',
+    );
+  });
+
+  it('4xx 는 서버 안내를 쓰고, 없으면 일반 실패 문구', () => {
+    expect(
+      passwordChangeErrorMessage({
+        response: {
+          status: 400,
+          data: { message: '기존 비밀번호가 틀립니다.' },
+        },
+      }),
+    ).toBe('기존 비밀번호가 틀립니다.');
+    expect(passwordChangeErrorMessage({ response: { status: 400 } })).toBe(
+      '비밀번호 변경에 실패했습니다. 다시 시도해 주세요.',
+    );
   });
 });

@@ -50,7 +50,7 @@ const EmailSend = () => {
       const response = await doEmailSend({ password, newEmail });
       setVerificationId(response.data.verificationId);
       setIsEmailSendSuccess(true);
-      openSuccessSnackbar(response.message, 2500);
+      openSuccessSnackbar('인증 코드를 보냈습니다.', 2500);
       setTimer(300);
     } catch (error) {
       openErrorSnackbar(
@@ -70,11 +70,11 @@ const EmailSend = () => {
   //인증 코드 확인
   const handleButton = async () => {
     try {
-      const response = await doEmailVerify({
+      await doEmailVerify({
         verificationId: verificationId,
         verifyCode: verificationCode,
       });
-      openSuccessSnackbar(response.message, 2500);
+      openSuccessSnackbar('이메일을 변경했습니다.', 2500);
       navigate('/mypage');
     } catch (error) {
       openErrorSnackbar(
