@@ -28,6 +28,14 @@ import { fetchDate } from '../../../api/policySchedule.api';
 import { useReservations, useReserve } from '../../../api/reservation.api';
 import useUrlQuery from '../../../hooks/useUrlQuery';
 import useAuth from '../../../hooks/useAuth';
+import { fetchBlockedPeriod, isAuthError } from '../../../api/user.api';
+import {
+  getReserveErrorMessage,
+  hasReservedSlotInRange,
+  isOutsideOperationHours,
+  maxMinutesExceededMessage,
+  normalizeErrorCode,
+} from './reservationSlot';
 import CustomButton from '../../../components/button/Button';
 import { Button } from 'flowbite-react';
 import { Modal } from 'flowbite-react';
@@ -72,9 +80,9 @@ const RoomPage = () => {
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [selectedRangeFrom, setSelectedRangeFrom] = useState(null);
   const [selectedRangeTo, selSelectedRangeTo] = useState(null);
+  // 조회 실패 시 null 로 두면 달력 제한이 풀려 학생이 날짜를 직접 고를 수 있다
   const [availableDate, setAvailableDate] = useState([]);
   const [earliestStartTime, setEarliestStartTime] = useState(null);
-  const [latestEndTime, setLatestEndTime] = useState(null);
   const [startHour, setStartHour] = useState(null);
   const [startMinute, setStartMinute] = useState(null);
   const [endHour, setEndHour] = useState(null);
@@ -91,7 +99,7 @@ const RoomPage = () => {
     format(new Date(), 'yyyy-MM-dd'),
   );
 
-  const { mutateAsync: doReserve } = useReserve();
+  const { mutateAsync: doReserve, isPending: isReserving } = useReserve();
   const {
     data: reservationsByRooms,
     isPending: isReservationsPending,
@@ -116,6 +124,16 @@ const RoomPage = () => {
     return () => clearInterval(timer);
   }, []);
 
+  // 선택해 둔 첫 칸이 시간이 지나 잠기면 선택을 푼다. 잠긴 칸을 예약하려다 실패하는 일을 막는다
+  useEffect(() => {
+    if (!selectedRangeFrom) return;
+    if (now > addMinutes(selectedRangeFrom, 30)) {
+      setSelectedRoom(null);
+      setSelectedRangeFrom(null);
+      selSelectedRangeTo(null);
+    }
+  }, [now, selectedRangeFrom]);
+
   useEffect(() => {
     if (reservationsByRooms && reservationsByRooms.length > 0) {
       const startTimes = reservationsByRooms?.map(
@@ -138,8 +156,6 @@ const RoomPage = () => {
       const latestTime = endTimes.reduce((latest, current) => {
         return latest > current ? latest : current;
       });
-      setLatestEndTime(latestTime);
-
       // ':' 분리해서 시와 분으로 나눠서 저장
       const [endHour, endMinute] = latestTime.split(':');
       setEndHour(parseInt(endHour, 10));
@@ -222,7 +238,27 @@ const RoomPage = () => {
       }
 
       // 새롭게 시간을 선택함
-      if (isFirstSelect || isDifferentRoom || isSelectPast || isOverDue) {
+      if (isFirstSelect || isDifferentRoom || isSelectPast) {
+        setSelectedRoom(partition);
+        setSelectedRangeFrom(targetStartAt);
+        selSelectedRangeTo(targetEndAt);
+        return;
+      }
+
+      // 최대 예약 시간을 넘는 연장은 안내만 하고 선택은 그대로 둔다
+      if (isOverDue) {
+        openSnackbar(maxMinutesExceededMessage(selectedRoom?.eachMaxMinute));
+        return;
+      }
+
+      // 연장 범위 안에 남의 예약이 있으면 건너뛰지 않고 클릭한 칸부터 새로 선택한다
+      if (
+        hasReservedSlotInRange(
+          partition.reservationTimeRanges,
+          selectedRangeFrom,
+          targetEndAt,
+        )
+      ) {
         setSelectedRoom(partition);
         setSelectedRangeFrom(targetStartAt);
         selSelectedRangeTo(targetEndAt);
@@ -240,6 +276,7 @@ const RoomPage = () => {
       selectedRoom,
       selectedRangeFrom,
       selectedRangeTo,
+      openSnackbar,
     ],
   );
 
@@ -263,6 +300,8 @@ const RoomPage = () => {
         }, 5000);
         return;
       }
+      // 요청이 끝나기 전에 다시 누르면 같은 예약이 두 번 전송된다
+      if (isReserving) return;
       try {
         await doReserve({
           roomPartitionId,
@@ -271,13 +310,41 @@ const RoomPage = () => {
         });
         navigate('/check');
       } catch (error) {
-        openSnackbar(
-          error?.response?.data?.message ??
-            '예약에 실패했습니다. 잠시 뒤 다시 시도해 주세요.',
-        );
+        // 인증 오류는 SessionExpiryWatcher 가 재로그인 안내를 띄운다
+        if (isAuthError(error)) return;
+
+        const status = error?.response?.status;
+        const code = normalizeErrorCode(error?.response?.data?.code);
+
+        // 노쇼 차단이면 해제일을 조회해 문구에 넣는다. 조회에 실패해도 안내는 한다
+        let blockedUntil = null;
+        if (code === 'RESERVATION-004') {
+          try {
+            const blocked = await fetchBlockedPeriod();
+            blockedUntil = blocked?.data?.endBlockedDate ?? null;
+          } catch {
+            blockedUntil = null;
+          }
+        }
+
+        openSnackbar(getReserveErrorMessage(code, { blockedUntil }));
+
+        // 업무 규칙에 걸린 선택은 그대로 두면 같은 실패가 반복된다
+        if (status === 412) {
+          setSelectedRoom(null);
+          setSelectedRangeFrom(null);
+          selSelectedRangeTo(null);
+        }
       }
     },
-    [doReserve, isLoggedIn, selectedRoom, selectedRangeFrom, selectedRangeTo],
+    [
+      doReserve,
+      isLoggedIn,
+      isReserving,
+      selectedRoom,
+      selectedRangeFrom,
+      selectedRangeTo,
+    ],
   );
 
   // 최대 예약 시간에 부합하는지 계산하는 함수
@@ -295,9 +362,14 @@ const RoomPage = () => {
       return;
     }
 
-    const isFuture = format(slotDateFrom, 'HH:mm') > latestEndTime;
+    // 표의 공통 범위가 아니라 방별 운영시간으로 검사한다
+    const isClosed = isOutsideOperationHours(
+      format(slotDateFrom, 'HH:mm'),
+      partition.operationStartTime,
+      partition.operationEndTime,
+    );
 
-    if (!isFuture) {
+    if (!isClosed) {
       toggleSlot(partition, times[timeIndex]);
     }
   };
@@ -308,8 +380,16 @@ const RoomPage = () => {
   // 현재로부터 예약 가능한 방들의 날짜 목록 가져오기
   useEffect(() => {
     const getDate = async () => {
-      const dates = await fetchDate(departmentId);
-      setAvailableDate(dates);
+      try {
+        const dates = await fetchDate(departmentId);
+        setAvailableDate(dates);
+      } catch {
+        // 목록이 비어 있으면 달력의 모든 날짜가 잠기므로 제한을 풀고 안내한다
+        setAvailableDate(null);
+        openSnackbar(
+          '예약 가능한 날짜를 불러오지 못했습니다. 달력에서 날짜를 직접 골라 주세요.',
+        );
+      }
     };
     getDate();
   }, []);
@@ -343,7 +423,7 @@ const RoomPage = () => {
                 className={'text-center flex'}
                 selected={selectedDate}
                 locale={ko}
-                minDate={null}
+                minDate={today}
                 includeDates={availableDate}
                 onChange={handleDateChange}
                 dateFormat="yyyy년 MM월 dd일"
@@ -466,10 +546,11 @@ const RoomPage = () => {
                         );
                         const slotDateTo = addMinutes(slotDateFrom, 30);
                         const slotDateFromPlus30 = addMinutes(slotDateFrom, 30);
-                        const roomEndTime = reservationsByRoom.operationEndTime;
-                        const isFuture =
-                          format(slotDateFrom, 'HH:mm') > roomEndTime &&
-                          format(slotDateFrom, 'HH:mm') <= latestEndTime;
+                        const isClosed = isOutsideOperationHours(
+                          format(slotDateFrom, 'HH:mm'),
+                          reservationsByRoom.operationStartTime,
+                          reservationsByRoom.operationEndTime,
+                        );
                         const isPast = now > slotDateFromPlus30;
                         const isSelected =
                           reservationsByRoom.partitionId ===
@@ -494,7 +575,7 @@ const RoomPage = () => {
                             },
                           );
                         const isSelectable =
-                          !isPast && !isReserved && !isFuture;
+                          !isPast && !isReserved && !isClosed;
                         const isInSelectableRange =
                           selectedRangeTo &&
                           differenceInMinutes(slotDateTo, selectedRangeFrom) <=
@@ -503,14 +584,15 @@ const RoomPage = () => {
                             0 &&
                           selectedRoom?.partitionId ===
                             reservationsByRoom.partitionId;
+                        // 지난 칸은 선택 표시보다 잠금 표시가 우선이다
                         const mode = isReserved
                           ? 'reserved'
-                          : isSelected
-                            ? 'selected'
-                            : isPast
-                              ? 'past'
-                              : isFuture
-                                ? 'future'
+                          : isPast
+                            ? 'past'
+                            : isSelected
+                              ? 'selected'
+                              : isClosed
+                                ? 'closed'
                                 : 'none';
 
                         return (
@@ -528,7 +610,7 @@ const RoomPage = () => {
                                   : 1,
                               backgroundColor: {
                                 past: '#AAAAAA',
-                                future: '#AAAAAA',
+                                closed: '#AAAAAA',
                                 selected: '#7599BA',
                                 reserved: '#002D56',
                                 none: '#F1EEE9',
@@ -557,7 +639,9 @@ const RoomPage = () => {
         {hasRooms && (
           <div className="p-10 flex justify-end">
             <CustomButton
+              disabled={isReserving}
               onClick={() => {
+                if (isReserving) return;
                 if (selectedRoom && selectedRangeFrom && selectedRangeTo) {
                   setOpenReserveModal(true);
                 } else {
@@ -614,7 +698,9 @@ const RoomPage = () => {
               취소
             </Button>
             <Button
+              disabled={isReserving}
               onClick={() => {
+                if (isReserving) return;
                 handleReservation({
                   roomPartitionId: selectedRoom
                     ? selectedRoom.partitionId
