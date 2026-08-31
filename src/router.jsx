@@ -142,7 +142,6 @@ const RouterComponent = () => {
             {loggedIn && serviceRole === 'ADMIN' && (
               <>
                 <Route path="/notice" element={<Notice />} />
-                <Route path="/qrcheck" element={<QrCheck />} />
                 <Route path="/otp" element={<OtpPage />} />
                 <Route path="/check" element={<Check />} />
                 <Route path="/mypage" element={<MyPage />} />
