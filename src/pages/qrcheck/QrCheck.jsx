@@ -2,7 +2,6 @@ import React, { useState, useCallback, useEffect } from 'react';
 import Inko from 'inko';
 import { useMyInfo } from '../../api/user.api';
 import { useCheckIn } from '../../api/checkin.api';
-import { useAllRooms } from '../../api/room.api';
 
 import { convertToEnglish } from '../../api/convertToEnglish';
 import { useNavigate } from 'react-router-dom';
@@ -33,10 +32,6 @@ const QrCheck = () => {
   // 화면은 멀쩡해 보이는데 출석만 안 되는 상태가 된다.
   useEffect(() => {
     if (!me) return;
-    if (me.serviceRole === 'ADMIN') {
-      setroomId(null);
-      return;
-    }
     if (me.roomId) {
       setroomId(me.roomId);
       return;
@@ -51,10 +46,7 @@ const QrCheck = () => {
     navigate('/');
   }, [me, navigate, openSnackbar, closeSnackbar]);
 
-  // 관리자는 전체 호실을 보여준다. 관리실 계정은 서버가 준 담당 호실 이름을 그대로 쓴다.
-  const { data: allRooms } = useAllRooms();
-
-  // 접근 제어는 라우트 마운트(ADMIN/RESIDENT 만 /qrcheck 존재)가 담당한다.
+  // 접근 제어는 라우트 마운트(RESIDENT 만 /qrcheck 존재)가 담당한다.
   // 여기는 로그인이 풀린 경우의 방어만 남긴다.
   useEffect(() => {
     if (!loggedIn) {
@@ -155,13 +147,7 @@ const QrCheck = () => {
       <div className="mt-5 mb-10 text-center" style={{ color: '#9D9FA2' }}>
         <p>
           현재 선택된 호실 :{' '}
-          {me?.serviceRole === 'ADMIN'
-            ? allRooms
-              ? allRooms.map(room => room.roomName).join(', ') + '호'
-              : '선택된 호실이 없음'
-            : me?.roomName
-              ? me.roomName + '호'
-              : '선택된 호실이 없음'}
+          {me?.roomName ? me.roomName + '호' : '선택된 호실이 없음'}
         </p>
 
         <p>본인의 QR코드를 스캐너에 스캔해주세요</p>

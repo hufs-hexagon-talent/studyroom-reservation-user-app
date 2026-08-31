@@ -46,6 +46,16 @@ const EditRoom = () => {
         setSelectedPartitionId(null); // 선택 초기화
         refetch();
       },
+      // onError 가 없으면 서버가 ROOM-008 로 거절해도 화면에 아무 일도 일어나지 않아
+      // 관리자는 지워진 줄 안다. 서버 원문 대신 상태로만 판정한다.
+      onError: error => {
+        openErrorSnackbar(
+          error?.response?.status === 409
+            ? '이 파티션에 예약 이력이 남아 있어 삭제할 수 없습니다.'
+            : '파티션 삭제에 실패했습니다.',
+          2500,
+        );
+      },
     });
   };
 
