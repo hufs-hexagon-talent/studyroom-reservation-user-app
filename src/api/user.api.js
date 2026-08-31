@@ -144,13 +144,22 @@ export const useLoggedOutPassword = () => {
 // 회원 가입
 export const useSignUp = () => {
   return useMutation({
-    mutationFn: async ({ username, password, serial, name, email }) => {
+    mutationFn: async ({
+      username,
+      password,
+      serial,
+      name,
+      email,
+      departmentId,
+    }) => {
+      // departmentId 는 서버 필수값이다. 빠지면 400 CLIENT-001 로 되튕긴다.
       const signUp_res = await apiClient.post('/users/sign-up', {
         username,
         password,
         serial,
         name,
         email,
+        departmentId,
       });
       return signUp_res.data;
     },
@@ -353,7 +362,11 @@ export const useUserUpdate = () => {
       name,
       email,
       departmentId,
+      roomId,
     }) => {
+      // roomId 는 관리실(RESIDENT) 계정의 담당 호실이다. 서버가 값 없는 필드를
+      // '변경 없음' 으로 읽어 담당 해제에는 쓸 수 없고, 역할이 RESIDENT 가 아닌데
+      // 보내면 거절당한다. 그래서 화면이 값을 줄 때만 키를 싣는다.
       const response = await apiClient.patch(`/users/${userId}`, {
         username,
         serial,
@@ -361,6 +374,7 @@ export const useUserUpdate = () => {
         email,
         serviceRole,
         departmentId,
+        ...(roomId != null && { roomId }),
       });
 
       return response.data;

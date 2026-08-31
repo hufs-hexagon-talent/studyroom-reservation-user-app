@@ -142,7 +142,6 @@ const RouterComponent = () => {
             {loggedIn && serviceRole === 'ADMIN' && (
               <>
                 <Route path="/notice" element={<Notice />} />
-                <Route path="/qrcheck" element={<QrCheck />} />
                 <Route path="/otp" element={<OtpPage />} />
                 <Route path="/check" element={<Check />} />
                 <Route path="/mypage" element={<MyPage />} />
@@ -209,7 +208,7 @@ const RouterComponent = () => {
                 <Route path="/login" element={<LoginPage />} />
               </>
             )}
-            <Route path="*" element={<Navigate to="/" />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </div>
         <Footer showSnackbar={openSnackbar} />

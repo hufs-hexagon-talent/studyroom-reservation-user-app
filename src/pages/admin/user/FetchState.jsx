@@ -11,8 +11,10 @@ import {
   useUserUpdate,
 } from '../../../api/user.api';
 import { useDepartmets } from '../../../api/department.api';
+import { useAllRooms } from '../../../api/room.api';
 import { useCustomSnackbars } from '../../../components/snackbar/SnackBar';
 import { FaFileExcel } from 'react-icons/fa6';
+import { updateUserErrorMessage } from './updateUserMessage';
 
 const FetchState = () => {
   const navigate = useNavigate();
@@ -31,6 +33,7 @@ const FetchState = () => {
   const [editServiceRole, setEditServiceRole] = useState('');
   const [editDepartmentId, setEditDepartmentId] = useState(null);
   const [editEmail, setEditEmail] = useState('');
+  const [editRoomId, setEditRoomId] = useState(null);
 
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [openBlockedModal, setOpenBlockedModal] = useState(false);
@@ -39,6 +42,7 @@ const FetchState = () => {
   const { openSuccessSnackbar, openErrorSnackbar } = useCustomSnackbars();
 
   const { data: departments } = useDepartmets();
+  const { data: rooms, isError: roomsFailed } = useAllRooms();
   const { data: blocked } = useBlockedUser();
   const { data: userRoleList } = useUserRoleList();
   const { mutate: doUnblocked, refetch } = useUnblocked();
@@ -66,9 +70,11 @@ const FetchState = () => {
         refetch();
       },
       onError: error => {
+        // 서버 원문을 그대로 띄우지 않는다. 만료는 SessionExpiryWatcher 가 안내하므로
+        // 여기서 또 띄우면 중복이다.
+        if (error?.sessionExpired) return;
         openErrorSnackbar(
-          error?.response?.data?.errors?.[0]?.message ||
-            error?.response?.data?.message,
+          '블락 해제에 실패했습니다. 잠시 뒤 다시 시도해 주세요.',
           3000,
         );
       },
@@ -102,9 +108,9 @@ const FetchState = () => {
         setPageSize(meta.size);
       },
       onError: error => {
+        if (error?.sessionExpired) return;
         openErrorSnackbar(
-          error?.response?.data?.errors?.[0]?.message ||
-            error?.response?.data?.message,
+          '유저 목록을 불러오지 못했습니다. 잠시 뒤 다시 시도해 주세요.',
           3000,
         );
       },
@@ -113,6 +119,19 @@ const FetchState = () => {
 
   // 유저 정보 수정
   const handleUserUpdate = async userId => {
+    // 승격 시점에만 담당 호실이 필수다. 백필에서 빠져 담당이 없는 관리실 계정도
+    // 이름·이메일만 고칠 수 있어야 해서 이미 RESIDENT 인 계정은 막지 않는다.
+    const promoting =
+      editServiceRole === 'RESIDENT' &&
+      userList.find(user => user.userId === userId)?.serviceRole !== 'RESIDENT';
+    if (promoting && !editRoomId) {
+      openErrorSnackbar(
+        '관리실 계정으로 바꾸려면 담당 호실을 지정해 주세요.',
+        3000,
+      );
+      return;
+    }
+
     try {
       const data = await userUpdate({
         userId,
@@ -122,6 +141,11 @@ const FetchState = () => {
         name: editname,
         email: editEmail,
         departmentId: editDepartmentId,
+        // 관리실 계정이 아니면 호실 키 자체를 빼야 한다. 강등 저장에 예전 호실이
+        // 실려 나가면 서버가 거절한다.
+        ...(editServiceRole === 'RESIDENT' && editRoomId
+          ? { roomId: editRoomId }
+          : {}),
       });
 
       openSuccessSnackbar(data.message, 3000);
@@ -134,10 +158,12 @@ const FetchState = () => {
       setEditEmail('');
       setEditServiceRole('');
       setEditDepartmentId(null);
+      setEditRoomId(null);
       fetchUsers();
     } catch (err) {
       console.error('유저 정보 수정 실패:', err);
-      openErrorSnackbar('유저 정보 수정에 실패했습니다.', 3000);
+      const message = updateUserErrorMessage(err);
+      if (message) openErrorSnackbar(message, 3000);
     }
   };
 
@@ -145,6 +171,7 @@ const FetchState = () => {
     // 토글: 이미 선택된 유저를 다시 클릭하면 해제
     if (selectedUserId === user.userId) {
       setSelectedUserId(null);
+      setEditRoomId(null);
     } else {
       setSelectedUserId(user.userId);
       setEditName(user.name);
@@ -153,6 +180,7 @@ const FetchState = () => {
       setEditEmail(user.email);
       setEditServiceRole(user.serviceRole);
       setEditDepartmentId(user.departmentId);
+      setEditRoomId(user.roomId ?? null);
     }
   };
 
@@ -243,6 +271,7 @@ const FetchState = () => {
             <Table.HeadCell className="bg-gray-200">학번</Table.HeadCell>
             <Table.HeadCell className="bg-gray-200">이름</Table.HeadCell>
             <Table.HeadCell className="bg-gray-200">학과</Table.HeadCell>
+            <Table.HeadCell className="bg-gray-200">담당 호실</Table.HeadCell>
             <Table.HeadCell className="bg-gray-200">이메일</Table.HeadCell>
             {userList.some(user => user.serviceRole === 'BLOCKED') && (
               <Table.HeadCell className="bg-gray-200">
@@ -300,6 +329,12 @@ const FetchState = () => {
                     navigate(`/admin/fetchReservations/${user.userId}`)
                   }>
                   {user.departmentId === 1 ? '컴퓨터공학부' : '정보통신공학과'}
+                </Table.Cell>
+                <Table.Cell
+                  onClick={() =>
+                    navigate(`/admin/fetchReservations/${user.userId}`)
+                  }>
+                  {user.roomName ?? '-'}
                 </Table.Cell>
                 <Table.Cell
                   onClick={() =>
@@ -394,8 +429,15 @@ const FetchState = () => {
                   <Table.Cell className="border-b border-gray-300">
                     <select
                       className="w-full border rounded-md px-2 py-1"
+                      aria-label="ROLE"
                       value={editServiceRole}
-                      onChange={e => setEditServiceRole(e.target.value)}>
+                      onChange={e => {
+                        const nextRole = e.target.value;
+                        setEditServiceRole(nextRole);
+                        // 관리실이 아닌 역할로 내리면 담당 호실을 즉시 비운다.
+                        // 남겨 두면 강등 저장에 예전 호실이 실려 나간다.
+                        if (nextRole !== 'RESIDENT') setEditRoomId(null);
+                      }}>
                       <option value="">선택</option>
                       {userRoleList?.map(role => (
                         <option key={role} value={role}>
@@ -419,17 +461,24 @@ const FetchState = () => {
                   </Table.Cell>
                 </Table.Row>
                 <Table.Row>
-                  <Table.Cell className=" bg-gray-200 font-semibold text-black">
+                  <Table.Cell className="border-b border-gray-300 bg-gray-200 font-semibold text-black">
                     부서
                   </Table.Cell>
-                  <Table.Cell>
+                  <Table.Cell className="border-b border-gray-300">
                     <select
                       className="w-full border rounded-md px-2 py-1"
+                      aria-label="부서"
                       value={editDepartmentId ?? ''}
                       onChange={e =>
-                        setEditDepartmentId(Number(e.target.value))
+                        setEditDepartmentId(
+                          e.target.value === '' ? null : Number(e.target.value),
+                        )
                       }>
-                      <option value="">선택</option>
+                      {/* Number('') 은 0 이 되어 없는 학과로 나간다. 값을 비우는 경로는
+                          서버에 없으므로 '선택' 은 아예 고를 수 없게 둔다. */}
+                      <option value="" disabled>
+                        선택
+                      </option>
                       {departments?.map(dept => (
                         <option
                           key={dept.departmentId}
@@ -438,6 +487,52 @@ const FetchState = () => {
                         </option>
                       ))}
                     </select>
+                  </Table.Cell>
+                </Table.Row>
+                <Table.Row>
+                  <Table.Cell className=" bg-gray-200 font-semibold text-black">
+                    담당 호실
+                  </Table.Cell>
+                  <Table.Cell>
+                    <select
+                      className="w-full border rounded-md px-2 py-1 disabled:bg-gray-100 disabled:text-gray-400"
+                      aria-label="담당 호실"
+                      disabled={editServiceRole !== 'RESIDENT'}
+                      value={editRoomId ?? ''}
+                      onChange={e =>
+                        setEditRoomId(
+                          e.target.value === '' ? null : Number(e.target.value),
+                        )
+                      }>
+                      {/* 담당을 비우는 경로는 서버에 없다. '선택' 은 '아직 안 골랐다' 는 뜻이라
+                          되돌려 고를 수 없게 둔다. 이미 RESIDENT 인 계정에서 이걸 다시 고르면
+                          승격 가드도 전송 가드도 지나쳐 roomId 없이 PATCH 가 나가고, 서버는 옛
+                          호실을 유지한 채 200 을 준다 — 관리자는 바뀐 줄 알고 성공 스낵바만 본다. */}
+                      <option value="" disabled>
+                        선택
+                      </option>
+                      {/* 호실 이름(306 등)은 부서마다 겹치므로 부서명을 같이 적는다. */}
+                      {rooms?.map(room => (
+                        <option key={room.roomId} value={room.roomId}>
+                          {room.departmentName
+                            ? `${room.roomName} (${room.departmentName})`
+                            : room.roomName}
+                        </option>
+                      ))}
+                    </select>
+                    {editServiceRole !== 'RESIDENT' && (
+                      <div className="mt-1 text-xs text-gray-500">
+                        관리실(RESIDENT) 계정만 담당 호실을 지정합니다.
+                      </div>
+                    )}
+                    {/* 목록을 못 불러오면 고를 항목이 하나도 없다. 승격은 담당 호실을
+                        요구하므로 원인을 못 짚으면 막다른 길이 된다. */}
+                    {editServiceRole === 'RESIDENT' && roomsFailed && (
+                      <div className="mt-1 text-xs text-red-500">
+                        호실 목록을 불러오지 못했습니다. 새로 고친 뒤 다시
+                        시도해 주세요.
+                      </div>
+                    )}
                   </Table.Cell>
                 </Table.Row>
               </Table.Body>

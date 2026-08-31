@@ -2,7 +2,6 @@ import React, { useState, useCallback, useEffect } from 'react';
 import Inko from 'inko';
 import { useMyInfo } from '../../api/user.api';
 import { useCheckIn } from '../../api/checkin.api';
-import { useRooms, useAllRooms } from '../../api/room.api';
 
 import { convertToEnglish } from '../../api/convertToEnglish';
 import { useNavigate } from 'react-router-dom';
@@ -29,32 +28,25 @@ const QrCheck = () => {
     },
   });
 
+  // 담당 호실은 서버가 정한다. 계정 이름으로 정하면 이름을 바꾸거나 호실이 늘 때
+  // 화면은 멀쩡해 보이는데 출석만 안 되는 상태가 된다.
   useEffect(() => {
-    if (me) {
-      if (me.serviceRole === 'ADMIN') {
-        setroomId(null);
-      } else if (me.name === 'RESIDENT_306') {
-        setroomId(1);
-      } else if (me.name === 'RESIDENT_428') {
-        setroomId(2);
-      } else {
-        setroomId(null);
-        openSnackbar('유효하지 않은 사용자입니다');
-        setTimeout(() => {
-          closeSnackbar();
-        }, 2500);
-        navigate('/');
-      }
+    if (!me) return;
+    if (me.roomId) {
+      setroomId(me.roomId);
+      return;
     }
+    setroomId(null);
+    openSnackbar(
+      '이 계정에 담당 호실이 지정되지 않았습니다. 관리자에게 알려 주세요.',
+    );
+    setTimeout(() => {
+      closeSnackbar();
+    }, 2500);
+    navigate('/');
   }, [me, navigate, openSnackbar, closeSnackbar]);
 
-  // 훅은 조건 없이 항상 호출한다. 조건부 호출은 me 로드 전후로 훅 개수가
-  // 바뀌어 렌더가 깨진다. useRooms 는 roomId 가 없으면 요청하지 않는다.
-  const { data: allRooms } = useAllRooms();
-  const { data: singleRoom } = useRooms(roomId ? roomId : null);
-  const rooms = me?.serviceRole === 'ADMIN' ? allRooms : singleRoom;
-
-  // 접근 제어는 라우트 마운트(ADMIN/RESIDENT 만 /qrcheck 존재)가 담당한다.
+  // 접근 제어는 라우트 마운트(RESIDENT 만 /qrcheck 존재)가 담당한다.
   // 여기는 로그인이 풀린 경우의 방어만 남긴다.
   useEffect(() => {
     if (!loggedIn) {
@@ -111,7 +103,7 @@ const QrCheck = () => {
             error.response?.status === 401
               ? '로그인이 만료되었습니다. 다시 로그인해 주세요.'
               : error.response?.data?.message ||
-                '출석 확인 중 오류가 발생했습니다.',
+                  '출석 확인 중 오류가 발생했습니다.',
           );
           setSuccessMessage('');
           setTimeout(() => {
@@ -155,11 +147,7 @@ const QrCheck = () => {
       <div className="mt-5 mb-10 text-center" style={{ color: '#9D9FA2' }}>
         <p>
           현재 선택된 호실 :{' '}
-          {rooms
-            ? Array.isArray(rooms)
-              ? rooms.map(room => room.roomName).join(', ') + '호'
-              : rooms.roomName + '호'
-            : '선택된 호실이 없음'}
+          {me?.roomName ? me.roomName + '호' : '선택된 호실이 없음'}
         </p>
 
         <p>본인의 QR코드를 스캐너에 스캔해주세요</p>

@@ -15,15 +15,19 @@ import EachMaxMinuteSelector from '../../../../components/clock/EachMaxMinuteSel
 import TimePicker from '../../../../components/clock/TimePicker';
 import TimeSelector from '../../../../components/clock/TimeRangeSelector';
 import TimeSlider from '../../../../components/clock/TimeSlider';
+import { toApiTime } from '../../../../components/clock/timeValue';
+import { policyErrorMessage } from './policyErrorMessage';
 
 const PolicyManagement = () => {
-  const [startTime, setStartTime] = useState(new Date());
-  const [endTime, setEndTime] = useState(new Date());
+  // TimeSelector 가 넣어 주는 값은 "HH:mm" 문자열이다. 미선택을 Date 로 두면 truthy 라
+  // 한 번도 고르지 않은 채로 전송돼 서버가 파싱하지 못하는 문자열이 나갔다.
+  const [startTime, setStartTime] = useState(null);
+  const [endTime, setEndTime] = useState(null);
   const [eachMaxMinute, setEachMaxMinute] = useState(60);
   const [selectedPolicyId, setSelectedPolicyId] = useState(null);
 
-  const [operationStartTime, setOperationStartTime] = useState(new Date());
-  const [operationEndTime, setOperationEndTime] = useState(new Date());
+  const [operationStartTime, setOperationStartTime] = useState('');
+  const [operationEndTime, setOperationEndTime] = useState('');
   const [operationEachMaxMinute, setOperationEachMaxMinute] = useState(null);
 
   const [openDeleteModal, setOpenDeleteModal] = useState(null);
@@ -32,7 +36,7 @@ const PolicyManagement = () => {
   const { mutateAsync: doDeletePolicy } = useDeletePolicy();
   const { data: policies, refetch } = useAllPolicies();
   const { data: policy } = usePolicy(selectedPolicyId);
-  const { mutate: editPolicy } = useEditPolicy(selectedPolicyId);
+  const { mutate: editPolicy } = useEditPolicy();
   const { openSuccessSnackbar, openErrorSnackbar } = useCustomSnackbars();
 
   useEffect(() => {
@@ -45,20 +49,27 @@ const PolicyManagement = () => {
 
   // 정책 생성
   const createPolicy = async () => {
+    const start = toApiTime(startTime);
+    const end = toApiTime(endTime);
+    // 아직 고르지 않았거나 시각 형태가 아니면 서버까지 보내지 않는다.
+    if (!start || !end) {
+      openErrorSnackbar('시간 구간을 먼저 선택해 주세요.', 3000);
+      return;
+    }
     try {
       const response = await doCreatePolicy({
-        operationStartTime: startTime ? `${startTime}:00` : '',
-        operationEndTime: endTime ? `${endTime}:00` : '',
+        operationStartTime: start,
+        operationEndTime: end,
         eachMaxMinute: eachMaxMinute,
       });
       refetch();
       openSuccessSnackbar(response?.message, 3000);
     } catch (error) {
-      openErrorSnackbar(
-        error?.response.data.data.message ||
-          '정책 생성 중 오류가 발생하였습니다.',
-        3000,
+      const message = policyErrorMessage(
+        error,
+        '정책 생성 중 오류가 발생하였습니다.',
       );
+      if (message) openErrorSnackbar(message, 3000);
     }
   };
 
@@ -69,38 +80,46 @@ const PolicyManagement = () => {
       refetch();
       openSuccessSnackbar(response?.message, 3000);
     } catch (error) {
-      openErrorSnackbar(
-        error?.response.data.data.message ||
-          '정책 삭제 중 오류가 발생하였습니다.',
-        3000,
+      const message = policyErrorMessage(
+        error,
+        '정책 삭제 중 오류가 발생하였습니다.',
       );
+      if (message) openErrorSnackbar(message, 3000);
     }
   };
 
   // 정책 수정
-  const updatePolicy = async () => {
-    try {
-      await editPolicy(
-        {
-          roomOperationPolicyId: selectedPolicyId,
-          operationStartTime,
-          operationEndTime,
-          eachMaxMinute: Number(operationEachMaxMinute),
-        },
-        {
-          onSuccess: () => {
-            refetch();
-            setOpenEditModal(null);
-            openSuccessSnackbar('정책이 성공적으로 수정되었습니다.', 3000);
-          },
-          onError: error => {
-            openErrorSnackbar('정책 수정 중 오류가 발생했습니다.', 3000);
-          },
-        },
-      );
-    } catch (error) {
-      console.error(error);
+  const updatePolicy = () => {
+    const start = toApiTime(operationStartTime);
+    const end = toApiTime(operationEndTime);
+    // 빈 값을 그대로 올리면 MapStruct 가 null 로 보고 조용히 옛 값을 유지한다.
+    // 관리자는 성공 스낵바만 보고 아무것도 바뀌지 않는다.
+    if (!start || !end) {
+      openErrorSnackbar('시작·종료 시각을 확인해 주세요.', 3000);
+      return;
     }
+    editPolicy(
+      {
+        roomOperationPolicyId: selectedPolicyId,
+        operationStartTime: start,
+        operationEndTime: end,
+        eachMaxMinute: Number(operationEachMaxMinute),
+      },
+      {
+        onSuccess: () => {
+          refetch();
+          setOpenEditModal(null);
+          openSuccessSnackbar('정책이 성공적으로 수정되었습니다.', 3000);
+        },
+        onError: error => {
+          const message = policyErrorMessage(
+            error,
+            '정책 수정 중 오류가 발생했습니다.',
+          );
+          if (message) openErrorSnackbar(message, 3000);
+        },
+      },
+    );
   };
 
   return (
@@ -122,10 +141,10 @@ const PolicyManagement = () => {
           {/* 시간 구간 선택 */}
           <TimeSelector setStartTime={setStartTime} setEndTime={setEndTime} />
           {/* 정책 생성 버튼 */}
-          {/* todo: null일 때 정책 생성되는거 막기 */}
           <div className="flex justify-end pt-8">
             <Button
               onClick={createPolicy}
+              disabled={!startTime || !endTime}
               className=" bg-gray-800 px-6 hover:bg-gray-700 text-white rounded disabled:bg-gray-200">
               생성
             </Button>
@@ -245,8 +264,9 @@ const PolicyManagement = () => {
             ) : (
               <div>정책 정보를 불러오는 중입니다...</div>
             )}
+            {/* 조회가 끝나기 전에는 화면의 시각 칸이 비어 있어 저장할 값이 없다 */}
             <div className="flex justify-end mt-6">
-              <Button onClick={updatePolicy} color="dark">
+              <Button onClick={updatePolicy} color="dark" disabled={!policy}>
                 수정
               </Button>
             </div>

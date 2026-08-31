@@ -62,11 +62,6 @@ const NavigationBar = ({ locked = false }) => {
           </>
         ) : (
           <>
-            {loggedIn && serviceRole === 'ADMIN' && (
-              <Navbar.Link as={Link} to="/qrcheck">
-                출석 체크
-              </Navbar.Link>
-            )}
             {locked ? (
               <Navbar.Link as="span" className="text-gray-400">
                 세미나실 예약
