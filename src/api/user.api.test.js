@@ -1,3 +1,6 @@
+import React from 'react';
+import { renderHook, waitFor } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import axios from 'axios';
 
 import { apiClient } from './client';
@@ -5,6 +8,8 @@ import {
   fetchBlockedPeriod,
   isAuthError,
   passwordChangeErrorMessage,
+  useSignUp,
+  useUserUpdate,
 } from './user.api';
 
 jest.mock('./session', () => ({ handleSessionExpired: jest.fn() }));
@@ -154,5 +159,93 @@ describe('isAuthError', () => {
   it('응답이 없거나 다른 코드면 인증 오류가 아니다', () => {
     expect(isAuthError(new Error('Network Error'))).toBe(false);
     expect(isAuthError(withCode(412, 'RESERVATION-012'))).toBe(false);
+  });
+});
+
+// 두 화면 테스트가 user.api 모듈을 통째로 목킹해서, 요청 본문을 만드는 mutationFn 은
+// 어느 테스트도 지나지 않았다. departmentId·roomId 를 지워도 전부 초록이었다.
+// 그 둘이 실제 요청에 실리는지 여기서 본다.
+const withQueryClient = () => {
+  const client = new QueryClient({
+    defaultOptions: { mutations: { retry: false } },
+  });
+  return ({ children }) => (
+    <QueryClientProvider client={client}>{children}</QueryClientProvider>
+  );
+};
+
+// 어댑터가 받은 config 를 그대로 돌려줘 본문을 들여다본다.
+const captureRequest = () => {
+  const sent = [];
+  apiClient.defaults.adapter = jest.fn(async config => {
+    sent.push({ url: config.url, body: JSON.parse(config.data) });
+    return ok(config, { isSuccess: true, data: {} });
+  });
+  return sent;
+};
+
+describe('useSignUp', () => {
+  test('학과를 함께 보낸다. 빠지면 서버가 DEPARTMENT_NOT_FOUND 로 거절한다', async () => {
+    const sent = captureRequest();
+    const { result } = renderHook(() => useSignUp(), {
+      wrapper: withQueryClient(),
+    });
+
+    await waitFor(() => expect(result.current).toBeDefined());
+    await result.current.mutateAsync({
+      username: '202612345',
+      password: '202612345',
+      serial: '202612345',
+      name: '홍길동',
+      email: 'test@hufs.ac.kr',
+      departmentId: 1,
+    });
+
+    expect(sent[0].url).toBe('/users/sign-up');
+    expect(sent[0].body).toHaveProperty('departmentId', 1);
+  });
+});
+
+describe('useUserUpdate', () => {
+  test('관리실 계정이면 담당 호실을 함께 보낸다', async () => {
+    const sent = captureRequest();
+    const { result } = renderHook(() => useUserUpdate(), {
+      wrapper: withQueryClient(),
+    });
+
+    await waitFor(() => expect(result.current).toBeDefined());
+    await result.current.mutateAsync({
+      userId: 5,
+      username: 'room306',
+      serial: '000012345',
+      serviceRole: 'RESIDENT',
+      name: '306관리실',
+      email: 'room306@hufs.ac.kr',
+      departmentId: 1,
+      roomId: 2,
+    });
+
+    expect(sent[0].url).toBe('/users/5');
+    expect(sent[0].body).toHaveProperty('roomId', 2);
+  });
+
+  test('roomId 를 안 넘기면 본문에 키 자체가 없다. 서버가 미전송을 유지로 읽기 때문이다', async () => {
+    const sent = captureRequest();
+    const { result } = renderHook(() => useUserUpdate(), {
+      wrapper: withQueryClient(),
+    });
+
+    await waitFor(() => expect(result.current).toBeDefined());
+    await result.current.mutateAsync({
+      userId: 6,
+      username: '202612345',
+      serial: '202612345',
+      serviceRole: 'USER',
+      name: '홍길동',
+      email: 'test@hufs.ac.kr',
+      departmentId: 1,
+    });
+
+    expect(sent[0].body).not.toHaveProperty('roomId');
   });
 });
