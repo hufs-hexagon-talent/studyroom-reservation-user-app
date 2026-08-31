@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   Button as MuiButton,
   Popover,
@@ -37,6 +37,9 @@ const Check = () => {
   const { mutateAsync: deleteReservation, isPending: isDeleting } =
     useDeleteReservation();
   const { openSuccessSnackbar, openErrorSnackbar } = useCustomSnackbars();
+  // isPending 은 다음 렌더에서야 true 가 되어 같은 tick 의 두 번째 클릭을 막지 못한다.
+  // 실제 차단은 동기 래치가 한다.
+  const deletingRef = useRef(false);
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
@@ -68,7 +71,8 @@ const Check = () => {
 
   const handleDelete = async id => {
     // 응답이 오기 전에 확인을 다시 누르면 같은 예약을 두 번 취소하게 된다.
-    if (isDeleting) return;
+    if (deletingRef.current) return;
+    deletingRef.current = true;
     try {
       // 서버 성공 문구는 "리소스가 성공적으로 삭제되었습니다" 라 학생이 볼 말이 아니다.
       // 실패 이유도 서버 원문 대신 에러 코드로 학생용 문구를 고른다.
@@ -77,6 +81,8 @@ const Check = () => {
     } catch (error) {
       const message = cancelReservationErrorMessage(error);
       if (message) openErrorSnackbar(message, 3000);
+    } finally {
+      deletingRef.current = false;
     }
     setOpenModal(null); // 모달 닫기
   };
@@ -85,16 +91,19 @@ const Check = () => {
     setCurrentPage(value);
   };
 
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedReservations = reservations?.slice(
-    startIndex,
-    startIndex + itemsPerPage,
-  );
-
   // count를 계산하고 NaN이 아닐 때만 사용할 수 있도록 안전한 변수를 생성합니다.
   const pageCount = reservations
     ? Math.ceil(reservations.length / itemsPerPage)
     : 0;
+
+  // 마지막 페이지의 유일한 예약을 취소하면 현재 페이지가 범위를 벗어나 빈 표만 남는다.
+  const safePage = pageCount > 0 ? Math.min(currentPage, pageCount) : 1;
+
+  const startIndex = (safePage - 1) * itemsPerPage;
+  const paginatedReservations = reservations?.slice(
+    startIndex,
+    startIndex + itemsPerPage,
+  );
 
   // 조회 실패를 빈 목록으로 오인하지 않도록 로딩·실패·없음을 따로 보여준다.
   const isReservationsLoaded = !isReservationsPending && !isReservationsError;
@@ -191,14 +200,14 @@ const Check = () => {
                       {!(
                         isPast || reservation.reservationState === 'VISITED'
                       ) && (
-                        <a
-                          href="#"
+                        <button
+                          type="button"
                           onClick={() => {
                             setOpenModal(reservation.reservationId);
                           }}
                           className="font-medium text-red-600 hover:underline dark:text-cyan-500">
                           삭제
-                        </a>
+                        </button>
                       )}
                     </Table.Cell>
                   </Table.Row>
@@ -210,7 +219,7 @@ const Check = () => {
 
       <Pagination
         count={pageCount} // 안전한 pageCount 값을 전달합니다.
-        page={currentPage}
+        page={safePage}
         onChange={handlePageChange}
         shape="rounded"
         className="flex justify-center mt-4"

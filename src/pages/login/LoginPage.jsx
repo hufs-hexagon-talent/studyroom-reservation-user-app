@@ -28,7 +28,8 @@ const LoginPage = () => {
     setSubmitting(true);
     try {
       const { isPasswordChangeRequired } = await login({
-        id: studentId,
+        // 자동완성·복사 붙여넣기로 앞뒤 공백이 붙으면 맞는 학번도 401 이 된다
+        id: studentId.trim(),
         password,
       });
       if (isPasswordChangeRequired) {

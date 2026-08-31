@@ -14,6 +14,10 @@ export const useReserve = () => {
 
       return res.data; // 명시적으로 반환
     },
+    // 성공하면 내 칸이, 겹침(412)으로 실패하면 남이 먼저 잡은 칸이 표에 반영돼야 한다.
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['reservationsByRooms'] });
+    },
   });
 };
 
@@ -49,6 +53,9 @@ export const useReservations = ({ date, departmentId }) =>
     queryKey: ['reservationsByRooms', date, departmentId],
     queryFn: () => fetchReservations({ date, departmentId }),
     enabled: !!departmentId,
+    // 표를 열어둔 사이 남이 잡거나 취소한 칸이 반영되지 않으면 제출 단계에서야 겹침을 알게 된다.
+    refetchInterval: 30000,
+    refetchIntervalInBackground: false,
   });
 
 // 예약 삭제하기
@@ -58,7 +65,8 @@ export const useDeleteReservation = () => {
       const res = await apiClient.delete(`/reservations/me/${reservationId}`);
       return res.data;
     },
-    onSuccess: () => {
+    // 실패했을 때도 갱신해야 한다. 이미 사라진 예약이면 화면에 그대로 남아 재시도만 반복된다.
+    onSettled: () => {
       // v5 는 객체 필터만 받는다. 문자열을 주면 전체 캐시가 무효화된다.
       // 삭제 후 갱신이 필요한 화면: 내 예약 목록, 체크인 대상, 노쇼 목록
       queryClient.invalidateQueries({ queryKey: ['userReservation'] });

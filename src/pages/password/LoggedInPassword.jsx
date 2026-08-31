@@ -6,12 +6,14 @@ import { useCustomSnackbars } from '../../components/snackbar/SnackBar';
 import './LoggedInPassword.css';
 import useAuth from '../../hooks/useAuth';
 import { Eye, EyeOff } from 'lucide-react';
+import { PASSWORD_RULE_TEXT, validateNewPassword } from './passwordRule';
 
 const LoggedInPassword = () => {
   const [prePassword, setPrePassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [passwordError, setPasswordError] = useState('');
+  const [newPasswordError, setNewPasswordError] = useState('');
 
   // 보기/가리기 토글 상태
   const [showOld, setShowOld] = useState(false);
@@ -37,7 +39,16 @@ const LoggedInPassword = () => {
       openErrorSnackbar(msg);
       return;
     }
+    // 서버가 규칙을 어긴 비밀번호를 400 으로 되돌린다. 보내기 전에 같은 규칙으로 걸러
+    // 학생이 이유를 모른 채 같은 값으로 다시 시도하는 일을 막는다.
+    const ruleError = validateNewPassword(newPassword);
+    if (ruleError) {
+      setNewPasswordError(ruleError);
+      openErrorSnackbar(ruleError);
+      return;
+    }
 
+    setNewPasswordError('');
     setPasswordError('');
     try {
       await changePw({ prePassword, newPassword });
@@ -106,8 +117,12 @@ const LoggedInPassword = () => {
               placeholder="새 비밀번호를 입력해주세요"
               required
               autoComplete="new-password"
-              onChange={e => setNewPassword(e.target.value)}
-              color={passwordError ? 'failure' : undefined}
+              onChange={e => {
+                setNewPassword(e.target.value);
+                setNewPasswordError('');
+              }}
+              color={passwordError || newPasswordError ? 'failure' : undefined}
+              helperText={newPasswordError || PASSWORD_RULE_TEXT}
             />
             <button
               type="button"

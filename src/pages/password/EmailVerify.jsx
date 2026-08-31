@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSnackbar } from 'react-simple-snackbar';
 import './EmailVerify.css';
@@ -20,6 +20,9 @@ const EmailVerify = () => {
   const [timerDisplay, setTimerDisplay] = useState(''); // 타이머 표시 상태
   const [token, setToken] = useState('');
   const [disabled, setDisabled] = useState(false);
+  const [verifying, setVerifying] = useState(false);
+  // 상태는 다음 렌더에서야 바뀐다. 같은 tick 의 두 번째 탭까지 막으려면 동기 값이어야 한다.
+  const verifyingRef = useRef(false);
 
   const navigate = useNavigate();
 
@@ -96,6 +99,10 @@ const EmailVerify = () => {
 
   //인증 코드 확인
   const handleButton = async () => {
+    // 한 번 더 탭하면 서버의 인증 코드 시도 횟수(5회)만 줄어든다
+    if (verifyingRef.current) return;
+    verifyingRef.current = true;
+    setVerifying(true);
     try {
       const response = await doEmailVerify({
         verificationId: verificationId,
@@ -116,6 +123,9 @@ const EmailVerify = () => {
       setTimeout(() => {
         closeErrorSnackbar();
       }, 2500);
+    } finally {
+      verifyingRef.current = false;
+      setVerifying(false);
     }
   };
   return (
@@ -168,8 +178,9 @@ const EmailVerify = () => {
         onClick={handleButton}
         style={{ backgroundColor: '#1e2332' }}
         id="btn"
+        disabled={verifying}
         className="cursor-pointer text-white w-full max-w-xs">
-        확인
+        {verifying ? '확인 중...' : '확인'}
       </Button>
     </div>
   );

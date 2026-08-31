@@ -1,4 +1,5 @@
 import {
+  createTimeTable,
   normalizeOperationTime,
   isOutsideOperationHours,
   hasReservedSlotInRange,
@@ -119,6 +120,9 @@ describe('getReserveErrorMessage', () => {
     expect(getReserveErrorMessage('RESERVATION-012')).toBe(
       '이미 지난 시간대는 예약할 수 없습니다. 시간을 다시 선택해 주세요.',
     );
+    expect(getReserveErrorMessage('RESERVATION-013')).toBe(
+      '예약은 30분 단위로만 할 수 있습니다. 시간을 다시 선택해 주세요.',
+    );
     expect(getReserveErrorMessage('POLICY-003')).toBe(
       '선택한 시간은 해당 세미나실의 운영시간이 아닙니다. 다른 시간을 선택해 주세요.',
     );
@@ -141,5 +145,32 @@ describe('getReserveErrorMessage', () => {
       RESERVE_FAILED_MESSAGE,
     );
     expect(getReserveErrorMessage(undefined)).toBe(RESERVE_FAILED_MESSAGE);
+  });
+});
+
+describe('createTimeTable', () => {
+  it('운영 종료가 23:59 여도 30분 격자 라벨을 빠뜨리지 않는다', () => {
+    const times = createTimeTable({
+      startTime: { hour: 9, minute: 0 },
+      endTime: { hour: 23, minute: 59 },
+      intervalMinute: 30,
+    });
+
+    expect(times[0]).toBe('09:00');
+    expect(times).toContain('23:30');
+    expect(times[times.length - 1]).toBe('23:30');
+    // 표 본문은 마지막 라벨을 렌더하지 않으므로 마지막 칸은 23:00~23:30 이다
+    expect(times[times.length - 2]).toBe('23:00');
+  });
+
+  it('운영 종료가 격자에 맞으면 종료 시각이 마지막 라벨이 된다', () => {
+    const times = createTimeTable({
+      startTime: { hour: 9, minute: 0 },
+      endTime: { hour: 22, minute: 0 },
+      intervalMinute: 30,
+    });
+
+    expect(times[times.length - 1]).toBe('22:00');
+    expect(times).toHaveLength(27);
   });
 });

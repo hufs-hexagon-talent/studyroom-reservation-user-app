@@ -3,6 +3,7 @@ import { useRecoilState } from 'recoil';
 import { authState } from './authState';
 import { apiClient } from '../api/client';
 import { queryClient } from '../queryClient';
+import { loginErrorMessage } from './loginErrorMessage';
 
 const useAuth = () => {
   const [auth, setAuth] = useRecoilState(authState);
@@ -32,21 +33,9 @@ const useAuth = () => {
           message: response?.data?.message,
         };
       } catch (error) {
-        console.log(error.response?.data?.message);
-        // 비밀번호 오류와 서버·네트워크 문제를 구분해 안내한다
-        if (!error.response) {
-          throw new Error(
-            '서버에 연결하지 못했습니다. 네트워크를 확인한 뒤 다시 시도해 주세요.',
-          );
-        }
-        if (error.response.status >= 500) {
-          throw new Error(
-            '서버에 문제가 있어 로그인하지 못했습니다. 잠시 뒤 다시 시도해 주세요.',
-          );
-        }
-        throw new Error(
-          error.response?.data?.message || '로그인에 실패했습니다.',
-        );
+        // 비밀번호 오류·요청 제한·서버·네트워크 문제를 구분해 안내한다.
+        // 서버 원문은 학생에게 그대로 보여주지 않는다.
+        throw new Error(loginErrorMessage(error));
       }
     },
     [setAuth],

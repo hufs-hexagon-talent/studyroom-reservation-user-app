@@ -115,6 +115,26 @@ describe('예약 목록', () => {
     expect(screen.getByText('세미나실-1')).toBeVisible();
     expect(screen.queryByText('예약 내역이 없습니다.')).toBeNull();
   });
+
+  test('마지막 페이지의 예약이 사라지면 남은 페이지를 보여준다', () => {
+    const many = Array.from({ length: 6 }, (_, index) =>
+      reservation(index + 1, { partitionNumber: index + 1 }),
+    );
+    useUserReservation.mockReturnValue(loaded(many));
+    const { rerender } = render(<Check />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Go to page 2' }));
+    expect(screen.getByText('세미나실-6')).toBeVisible();
+
+    useUserReservation.mockReturnValue(loaded(many.slice(0, 5)));
+    rerender(<Check />);
+
+    expect(screen.getByText('세미나실-1')).toBeVisible();
+    expect(screen.getByRole('button', { name: 'page 1' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
+  });
 });
 
 describe('예약 취소', () => {
@@ -124,7 +144,7 @@ describe('예약 취소', () => {
     useUserReservation.mockReturnValue(loaded([reservation(7)]));
     render(<Check />);
 
-    fireEvent.click(screen.getByRole('link', { name: '삭제' }));
+    fireEvent.click(screen.getByRole('button', { name: '삭제' }));
     fireEvent.click(screen.getByRole('button', { name: '확인' }));
 
     await waitFor(() =>
@@ -151,7 +171,7 @@ describe('예약 취소', () => {
     useUserReservation.mockReturnValue(loaded([reservation(7)]));
     render(<Check />);
 
-    fireEvent.click(screen.getByRole('link', { name: '삭제' }));
+    fireEvent.click(screen.getByRole('button', { name: '삭제' }));
     fireEvent.click(screen.getByRole('button', { name: '확인' }));
 
     await waitFor(() =>
@@ -168,7 +188,7 @@ describe('예약 취소', () => {
     useUserReservation.mockReturnValue(loaded([reservation(7)]));
     render(<Check />);
 
-    fireEvent.click(screen.getByRole('link', { name: '삭제' }));
+    fireEvent.click(screen.getByRole('button', { name: '삭제' }));
     const confirm = screen.getByRole('button', { name: '확인' });
     expect(confirm).toBeDisabled();
 
