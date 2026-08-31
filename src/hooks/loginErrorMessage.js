@@ -8,6 +8,11 @@ const NETWORK_MESSAGE =
 const CREDENTIAL_MESSAGE =
   '아이디 또는 비밀번호가 맞지 않습니다. 다시 확인해 주세요.';
 
+// 만료(EXPIRED)는 재학생 동기화 명단에 학번이 없어 내려간 상태다.
+// 다음 동기화에서 명단에 다시 들어오면 자동으로 풀린다.
+const EXPIRED_MESSAGE =
+  '재학생 명단에 없어 만료된 계정입니다. 학부 사무실에 문의해 주세요.';
+
 // 서버가 남은 초를 Retry-After 로 내려주고 CORS 로 노출까지 해 둔다.
 // 값이 없으면 시간을 지어내지 않는다.
 const retryAfterSeconds = error => {
@@ -32,7 +37,12 @@ export const loginErrorMessage = error => {
       ? `로그인 시도가 많아 잠시 막혔습니다. ${seconds}초 뒤 다시 시도해 주세요.`
       : '로그인 시도가 많아 잠시 막혔습니다. 잠시 뒤 다시 시도해 주세요.';
   }
-  // 계정 만료·아이디 없음도 서버는 AUTH-001 로 내려준다. 아이디 존재 여부를 알려주지 않는다.
+  // 서버는 비밀번호가 맞은 뒤에야 USER-010(403)을 낸다. 틀리면 만료 계정이라도 AUTH-001 이다.
+  // 이 문구를 보는 사람은 이미 그 계정의 비밀번호를 아는 사람이라 아이디 존재 여부가 새로 새지 않는다.
+  // status 가 아니라 code 로만 본다. 403 을 통째로 잡으면 다른 403 이 만료로 잘못 안내된다.
+  if (code === 'USER-010') return EXPIRED_MESSAGE;
+  // 아이디가 없어도, 비밀번호가 틀려도 서버는 똑같이 AUTH-001 을 내려준다.
+  // 아이디 존재 여부를 알려주지 않는다.
   if (code === 'AUTH-001' || code === 'AUTH-004' || status === 401) {
     return CREDENTIAL_MESSAGE;
   }

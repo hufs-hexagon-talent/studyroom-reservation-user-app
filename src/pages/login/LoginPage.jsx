@@ -44,7 +44,9 @@ const LoginPage = () => {
         navigate('/');
       }
     } catch (error) {
-      openErrorSnackbar(error.message, 2500);
+      // 만료 계정 안내처럼 다음에 할 일을 적은 문구는 2.5초 안에 다 읽히지 않는다.
+      // 좁은 화면에서 여러 줄로 접히므로 SessionExpiryWatcher 와 같은 4초를 쓴다.
+      openErrorSnackbar(error.message, 4000);
     } finally {
       setSubmitting(false);
     }

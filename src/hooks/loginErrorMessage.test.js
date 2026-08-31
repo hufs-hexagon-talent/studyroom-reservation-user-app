@@ -60,6 +60,18 @@ describe('loginErrorMessage', () => {
     );
   });
 
+  it('만료 계정(403 USER-010)은 명단에서 빠졌다는 것과 문의처를 안내한다', () => {
+    expect(loginErrorMessage(httpError(403, 'USER-010'))).toBe(
+      '재학생 명단에 없어 만료된 계정입니다. 학부 사무실에 문의해 주세요.',
+    );
+  });
+
+  it('USER-010 이 아닌 403(AUTH-002)은 만료 안내로 새지 않는다', () => {
+    expect(loginErrorMessage(httpError(403, 'AUTH-002'))).toBe(
+      '로그인하지 못했습니다. 다시 시도해 주세요.',
+    );
+  });
+
   it('미매핑 4xx 는 서버 원문 없이 일반 실패 문구', () => {
     const message = loginErrorMessage(httpError(409, 'X-999'));
     expect(message).toBe('로그인하지 못했습니다. 다시 시도해 주세요.');
