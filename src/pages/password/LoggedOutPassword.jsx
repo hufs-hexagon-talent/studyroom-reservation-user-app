@@ -1,13 +1,18 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLoggedOutPassword } from '../../api/user.api';
 import { Button, Label, TextInput } from 'flowbite-react';
 import { useCustomSnackbars } from '../../components/snackbar/SnackBar';
+import { resetPasswordErrorMessage } from './emailVerifyMessages';
+import { PASSWORD_RULE_TEXT, validateNewPassword } from './passwordRule';
 
 const LoggedOutPassword = () => {
   const { mutateAsync: doPasswordChange } = useLoggedOutPassword();
   const [newPw, setNewPw] = useState('');
   const [confirmNewPw, setConfirmNewPw] = useState('');
+  const [changing, setChanging] = useState(false);
+  // 상태는 다음 렌더에서야 바뀐다. 같은 tick 의 두 번째 탭까지 막으려면 동기 값이어야 한다.
+  const changingRef = useRef(false);
   const { openSuccessSnackbar, openErrorSnackbar } = useCustomSnackbars();
   const token = sessionStorage.getItem('pwResetToken');
   const navigate = useNavigate();
@@ -33,16 +38,35 @@ const LoggedOutPassword = () => {
       openErrorSnackbar('비밀번호를 입력한 후 변경하기를 눌러주세요', 2500);
       return;
     }
+    // 서버가 규칙을 어긴 비밀번호를 400 으로 되돌린다. 보내기 전에 같은 규칙으로 걸러
+    // 학생이 이유를 모른 채 같은 값으로 다시 시도하는 일을 막는다.
+    const ruleError = validateNewPassword(newPw);
+    if (ruleError) {
+      openErrorSnackbar(ruleError, 2500);
+      return;
+    }
+    // 더블탭하면 같은 토큰으로 두 번 보내고, 두 번째 응답이 성공 안내를 실패 안내로 덮는다
+    if (changingRef.current) return;
+    changingRef.current = true;
+    setChanging(true);
     try {
       await doPasswordChange({ token: token, newPassword: newPw });
+      // 한 번 쓴 재설정 토큰은 지운다. 남겨 두면 재설정 화면이 계속 열린다.
+      sessionStorage.removeItem('pwResetToken');
       navigate('/login');
       openSuccessSnackbar('비밀번호가 성공적으로 변경되었습니다.', 2500);
     } catch (error) {
-      openErrorSnackbar(
-        error.response?.data?.message ||
-          '비밀번호 변경에 실패했습니다. 다시 시도해 주세요.',
-        2500,
-      );
+      // 서버 원문은 띄우지 않는다. 재설정 토큰이 만료됐으면 토큰을 지우고
+      // 이메일 인증부터 다시 하게 보낸다. 남겨 두면 재설정 화면이 계속 열린다.
+      const { message, reauth } = resetPasswordErrorMessage(error);
+      openErrorSnackbar(message, 2500);
+      if (reauth) {
+        sessionStorage.removeItem('pwResetToken');
+        navigate('/email');
+      }
+    } finally {
+      changingRef.current = false;
+      setChanging(false);
     }
   };
   //todo : 비밀번호 보이게 하는거
@@ -61,6 +85,7 @@ const LoggedOutPassword = () => {
               type="password"
               placeholder="새 비밀번호를 입력해주세요"
               required
+              helperText={PASSWORD_RULE_TEXT}
             />
           </div>
           <div>
@@ -79,8 +104,9 @@ const LoggedOutPassword = () => {
             onClick={handleChange}
             className="mt-10 mb-10"
             color="dark"
+            disabled={changing}
             type="submit">
-            변경하기
+            {changing ? '변경 중...' : '변경하기'}
           </Button>
         </form>
       </div>

@@ -1,8 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCustomSnackbars } from '../../components/snackbar/SnackBar';
 import { useNewEmailSend, useNewEmailVerify } from '../../api/user.api';
 import { Button } from 'flowbite-react';
+import {
+  RESEND_COOLDOWN_SECONDS,
+  changeEmailSendErrorMessage,
+  changeEmailVerifyErrorMessage,
+} from '../password/emailVerifyMessages';
 
 const EmailSend = () => {
   const { mutateAsync: doEmailSend } = useNewEmailSend();
@@ -17,7 +22,10 @@ const EmailSend = () => {
   const [disabled, setDisabled] = useState(false);
   const [isEmailSendSuccess, setIsEmailSendSuccess] = useState(false);
   const [isPassword, setIsPassword] = useState(false);
+  const [verifying, setVerifying] = useState(false);
   const { openSuccessSnackbar, openErrorSnackbar } = useCustomSnackbars();
+  // 상태는 다음 렌더에서야 바뀐다. 같은 tick 의 두 번째 탭까지 막으려면 동기 값이어야 한다.
+  const verifyingRef = useRef(false);
 
   const navigate = useNavigate();
 
@@ -50,16 +58,21 @@ const EmailSend = () => {
       const response = await doEmailSend({ password, newEmail });
       setVerificationId(response.data.verificationId);
       setIsEmailSendSuccess(true);
-      openSuccessSnackbar(response.message, 2500);
-      setTimer(300);
+      openSuccessSnackbar('인증 코드를 보냈습니다.', 2500);
+      setTimer(RESEND_COOLDOWN_SECONDS);
     } catch (error) {
-      openErrorSnackbar(
-        error.response?.data?.message || '인증 코드 발송에 실패하였습니다.',
-        2500,
-      );
+      // 원인별로 다른 안내. 서버 원문은 띄우지 않는다.
+      openErrorSnackbar(changeEmailSendErrorMessage(error), 2500);
       setIsEmailSendSuccess(false);
       setDisabled(false);
     }
+  };
+
+  // 서버에 코드가 남아 있지 않으면(시도 초과·만료) 재발송 잠금을 푼다
+  const releaseResendLock = () => {
+    setTimer(null);
+    setTimerDisplay('');
+    setDisabled(false);
   };
 
   // 인증 코드 입력 감지
@@ -69,18 +82,24 @@ const EmailSend = () => {
 
   //인증 코드 확인
   const handleButton = async () => {
+    // 한 번 더 탭하면 서버의 인증 코드 시도 횟수(5회)만 줄어든다
+    if (verifyingRef.current) return;
+    verifyingRef.current = true;
+    setVerifying(true);
     try {
-      const response = await doEmailVerify({
+      await doEmailVerify({
         verificationId: verificationId,
         verifyCode: verificationCode,
       });
-      openSuccessSnackbar(response.message, 2500);
+      openSuccessSnackbar('이메일을 변경했습니다.', 2500);
       navigate('/mypage');
     } catch (error) {
-      openErrorSnackbar(
-        error.response?.data?.message || '이메일 재설정에 실패하였습니다.',
-        2500,
-      );
+      const { message, resetResend } = changeEmailVerifyErrorMessage(error);
+      if (resetResend) releaseResendLock();
+      openErrorSnackbar(message, 2500);
+    } finally {
+      verifyingRef.current = false;
+      setVerifying(false);
     }
   };
 
@@ -154,8 +173,9 @@ const EmailSend = () => {
         onClick={handleButton}
         style={{ backgroundColor: '#1e2332' }}
         id="btn"
+        disabled={verifying}
         className="cursor-pointer text-white w-full max-w-xs">
-        확인
+        {verifying ? '확인 중...' : '확인'}
       </Button>
     </div>
   );

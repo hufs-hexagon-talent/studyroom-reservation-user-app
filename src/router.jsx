@@ -23,7 +23,6 @@ import LoggedInPassword from './pages/password/LoggedInPassword';
 import LoggedOutPassword from './pages/password/LoggedOutPassword';
 import EmailVerify from './pages/password/EmailVerify';
 import MyPage from './pages/mypage/MyPage';
-import NoShow from './pages/check/NoShow';
 import EmailSend from './pages/email/EmailSend';
 
 import AdminPage from './pages/admin/AdminPage';
@@ -62,7 +61,8 @@ const RouterComponent = () => {
   // 백그라운드 재조회가 실패해도 캐시에 me 가 남아 있으면 로그인 유지로 본다.
   // 진짜 만료는 SessionExpiryWatcher 가 캐시를 지우므로 me 도 함께 사라진다.
   const authFromServer = status === 'success' || me !== undefined;
-  const authKnown = authFromServer || (status === 'error' && isAuthError(error));
+  const authKnown =
+    authFromServer || (status === 'error' && isAuthError(error));
 
   useEffect(() => {
     if (!authKnown) return;
@@ -91,6 +91,31 @@ const RouterComponent = () => {
       </div>
     );
 
+  // 기본 비밀번호(=학번)를 쓰는 동안에는 비밀번호 변경 화면에만 머무르게 한다.
+  // 로그인 직후 이동은 LoginPage 가 하지만 새로고침·주소 입력으로 벗어날 수 있었다.
+  // 서버가 값을 안 내려주는 동안에는(=== true 가 아니면) 평소대로 동작한다.
+  if (loggedIn && me?.isPasswordChangeRequired === true)
+    return (
+      <BrowserRouter basename={'/'}>
+        <SessionExpiryWatcher />
+        <div className="min-h-screen flex flex-col">
+          <NavigationBar showSnackbar={openSnackbar} locked />
+          <div className="flex-grow">
+            <div className="mx-auto mt-6 max-w-2xl px-4 text-center text-gray-600">
+              처음 로그인해 비밀번호가 학번 그대로입니다. 비밀번호를 바꾼 뒤에
+              예약을 이용할 수 있습니다.
+            </div>
+            <Routes>
+              <Route path="/password" element={<LoggedInPassword />} />
+              <Route path="/notice" element={<Notice />} />
+              <Route path="*" element={<Navigate to="/password" replace />} />
+            </Routes>
+          </div>
+          <Footer showSnackbar={openSnackbar} />
+        </div>
+      </BrowserRouter>
+    );
+
   return (
     <BrowserRouter basename={'/'}>
       <SessionExpiryWatcher />
@@ -111,7 +136,6 @@ const RouterComponent = () => {
                   <Route path="/check" element={<Check />} />
                   <Route path="/otp" element={<OtpPage />} />
                   <Route path="/mypage" element={<MyPage />} />
-                  <Route path="/noshow" element={<NoShow />} />
                   <Route path="/emailSend" element={<EmailSend />} />
                 </>
               )}

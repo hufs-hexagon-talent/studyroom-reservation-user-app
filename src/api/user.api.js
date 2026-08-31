@@ -1,5 +1,7 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { apiClient } from './client';
+import { apiClient, SESSION_EXPIRED_MESSAGE } from './client';
+import { queryClient } from '../queryClient';
+import { PASSWORD_RULE_MESSAGE } from '../pages/password/passwordRule';
 
 // [관리자] 모든 회원 정보 조회
 const fetchAllUsers = async () => {
@@ -31,8 +33,14 @@ export const useUserById = userId => {
 // 자신의 정보 조회. 로그인 여부 판정(부팅 복원)까지 겸하는 단일 소스라
 // 에러를 삼키지 않는다. 삼키면 401(비로그인)과 네트워크 순단(로그인 유지)을
 // 구분할 수 없어 서버 순단 때 로그인 사용자를 로그아웃으로 오판하게 된다.
+// 8초 × 3회 + 재시도 간격 0.5초 × 2 = 최대 약 25초
+export const ME_TIMEOUT_MS = 8000;
+export const ME_RETRY_DELAY_MS = 500;
+
 export const fetchMe = async () => {
-  const me_res = await apiClient.get('/users/me');
+  // 부팅 복원은 이 응답을 기다려야 화면이 열린다. 공통 타임아웃(15초)으로
+  // 재시도까지 돌면 약 48초를 스피너만 보게 되어 짧게 끊는다.
+  const me_res = await apiClient.get('/users/me', { timeout: ME_TIMEOUT_MS });
   return me_res.data.data;
 };
 
@@ -43,6 +51,9 @@ export const fetchMe = async () => {
 export const isAuthError = error => {
   const status = error?.response?.status;
   if (status === 401 || status === 403) return true;
+
+  // AUTH-015~018 같은 5xx 는 인증 서버 장애라 재시도해 볼 여지가 있으니 4xx 만 본다.
+  if (!(status >= 400 && status < 500)) return false;
 
   const code = error?.response?.data?.code;
   return (
@@ -59,6 +70,7 @@ export const useMe = () =>
     refetchOnWindowFocus: false,
     // 401 은 다시 물어도 결과가 같다. 네트워크 오류만 재시도한다.
     retry: (failureCount, error) => !isAuthError(error) && failureCount < 2,
+    retryDelay: ME_RETRY_DELAY_MS,
     // 에러(비로그인) 상태에서 새 화면이 구독할 때마다 재조회하면
     // 에러가 잠시 지워져 라우터 게이트가 로더로 되돌아가고,
     // 마운트와 재조회가 무한 반복된다. 붙을 때는 다시 묻지 않는다.
@@ -73,6 +85,32 @@ export const useServiceRole = () => {
   return { ...rest, data: me?.serviceRole };
 };
 
+// 비밀번호 변경 실패를 학생용 문구로 바꾼다. 응답이 없으면(네트워크·타임아웃)
+// axios 영문 원문("Network Error")이 화면에 가지 않도록 여기서 막는다.
+// 4xx 는 서버 원문 대신 에러 코드로 매핑한다. 세션 만료는 인터셉터가 이미
+// 재로그인 안내로 바꿔 두었으니 그 문구를 그대로 쓴다.
+// CLIENT-001 은 요청 검증 실패다. 이 요청에서 걸릴 수 있는 것은 새 비밀번호 규칙뿐이라
+// 서버 원문(errors[].message) 대신 규칙을 그대로 알려 준다.
+const PASSWORD_CHANGE_ERROR_MESSAGES = {
+  'USER-006': '현재 비밀번호가 맞지 않습니다. 다시 확인해 주세요.',
+  'USER-007': '새 비밀번호는 현재 비밀번호와 달라야 합니다.',
+  'CLIENT-001': PASSWORD_RULE_MESSAGE,
+};
+
+export const passwordChangeErrorMessage = error => {
+  if (!error?.response) {
+    return '서버에 연결하지 못했습니다. 네트워크를 확인한 뒤 다시 시도해 주세요.';
+  }
+  if (error.sessionExpired) return SESSION_EXPIRED_MESSAGE;
+  if (error.response.status >= 500) {
+    return '서버에 문제가 있어 비밀번호를 변경하지 못했습니다. 잠시 뒤 다시 시도해 주세요.';
+  }
+  return (
+    PASSWORD_CHANGE_ERROR_MESSAGES[error.response.data?.code] ||
+    '비밀번호 변경에 실패했습니다. 다시 시도해 주세요.'
+  );
+};
+
 // 로그인 된 상태에서 비밀번호 수정
 export const usePassword = () => {
   return useMutation({
@@ -84,11 +122,7 @@ export const usePassword = () => {
         });
         return password_res.data;
       } catch (error) {
-        // 에러 발생 시 에러 응답을 반환
-        if (error.response && error.response.data) {
-          throw new Error(error.response.data.message);
-        }
-        throw error;
+        throw new Error(passwordChangeErrorMessage(error));
       }
     },
   });
@@ -179,22 +213,26 @@ export const useUserByName = name => {
 };
 
 // 자신의 블락 기간 조회
+// 제한 상태가 아닌 학생에게는 400(USER-009) 이 온다. 이건 오류가 아니라 "제한 없음" 이다.
+// react-query v5 는 queryFn 이 undefined 를 돌려주면 오류로 다루므로 null 로 돌려준다.
+// 그 밖의 실패는 그대로 던져 화면이 조회 실패를 알 수 있게 한다.
 export const fetchBlockedPeriod = async () => {
   try {
     const blockedPreiod_res = await apiClient.get('/users/me/blocked-period');
     return blockedPreiod_res.data;
   } catch (error) {
-    if (error.response && error.response.status === 400) {
-      console.warn('사용자가 블락 상태가 아님:', error.response.data.message);
-      return undefined;
+    if (error?.response?.data?.code === 'USER-009') {
+      return null;
     }
+    throw error;
   }
 };
 
-export const useBlockedPeriod = () => {
+export const useBlockedPeriod = ({ enabled = true } = {}) => {
   return useQuery({
     queryKey: ['blockedPeriod'],
     queryFn: fetchBlockedPeriod,
+    enabled,
   });
 };
 
@@ -220,6 +258,10 @@ export const useNewEmailVerify = () => {
         verifyCode,
       });
       return newEmailVerify_res.data;
+    },
+    onSuccess: () => {
+      // 마이페이지가 캐시(staleTime 60초)의 이전 이메일을 보여주지 않도록 갱신한다
+      queryClient.invalidateQueries({ queryKey: ['me'] });
     },
   });
 };

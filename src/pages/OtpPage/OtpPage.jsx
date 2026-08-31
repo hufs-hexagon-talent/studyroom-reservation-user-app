@@ -5,6 +5,12 @@ import { RotateCw } from 'lucide-react';
 
 import { useMyInfo } from '../../api/user.api';
 import { useOtp } from '../../api/checkin.api';
+import {
+  getOtpView,
+  getRemainingSeconds,
+  isOtpExpired,
+  OTP_TTL_MS,
+} from './otpTimer';
 
 const TimerCircularProgressBar = ({ radius, strokeWidth, progress }) => {
   const center = radius + strokeWidth / 2;
@@ -38,12 +44,12 @@ const TimerCircularProgressBar = ({ radius, strokeWidth, progress }) => {
 };
 
 const Qrcode = () => {
-  const [timer, setTimer] = useState(30);
+  const [now, setNow] = useState(() => Date.now());
   const [radius, setRadius] = useState(170);
 
   const { data: me } = useMyInfo();
   const {
-    data: otpValue,
+    data: otp,
     refetch,
     dataUpdatedAt,
     isPending,
@@ -53,21 +59,28 @@ const Qrcode = () => {
 
   // 값이 없거나 만료된 QR 은 대봐야 출석이 되지 않는다. 정상처럼 보이는 QR 을
   // 그려두면 학생이 그대로 대다가 출석 시간을 넘기므로 아예 그리지 않는다.
+  // 다만 30초 카운트다운이 끝나 재조회하는 동안에는 이전 QR 이 아직 유효하므로
+  // 새 QR 이 올 때까지 그대로 보여 준다.
+  const otpValue = otp?.verificationCode;
   const hasOtp = Boolean(otpValue);
-  const isExpired = hasOtp && timer === 0;
-  const showQr = hasOtp && !isExpired;
-  const isLoadingOtp = isPending || isFetching;
+  const timer = getRemainingSeconds(dataUpdatedAt, now);
+  // 만료는 기기 시계끼리 비교한다(받은 시각 + 서버 유효 시간). 서버가 준 expiresAt 을
+  // 기기 시계와 비교하면 기기 시계가 앞서 있을 때 받자마자 만료로 보여 QR 을 영영 못 본다.
+  const isExpired = hasOtp && isOtpExpired(dataUpdatedAt + OTP_TTL_MS, now);
+  const view = getOtpView({
+    hasOtp,
+    isPending,
+    isFetching,
+    isError,
+    isExpired,
+  });
+  const showQr = view === 'ready';
+  const isLoadingOtp = view === 'loading';
   const statusMessage = isLoadingOtp
     ? 'QR 을 불러오는 중입니다'
-    : isError
+    : view === 'error'
       ? 'QR 을 불러오지 못했습니다'
       : 'QR 이 만료되었습니다. 다시 발급받아 주세요.';
-
-  useEffect(() => {
-    const intervalId = setInterval(refetch, 30000);
-
-    return () => clearInterval(intervalId);
-  }, [otpValue]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -82,21 +95,24 @@ const Qrcode = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // 1초 시계는 QR 을 받은 시각에 맞춰 다시 시작한다. 그래야 카운트다운과 재조회
+  // 시점이 어긋나지 않는다.
   useEffect(() => {
-    if (!hasOtp) return undefined;
+    if (!dataUpdatedAt) return undefined;
 
-    const timerInterval = setInterval(() => {
-      setTimer(prevTimer => (prevTimer > 0 ? prevTimer - 1 : 0));
-    }, 1000);
+    setNow(Date.now());
+    const tick = setInterval(() => setNow(Date.now()), 1000);
 
-    return () => clearInterval(timerInterval);
-  }, [hasOtp]);
+    return () => clearInterval(tick);
+  }, [dataUpdatedAt]);
 
+  // 카운트다운이 끝나면 새 QR 을 받아온다. 실패했을 때는 학생이 다시 시도 버튼을
+  // 누르게 두고 자동으로 반복하지 않는다.
   useEffect(() => {
-    if (!hasOtp) return;
+    if (timer > 0 || !hasOtp || isFetching || isError) return;
 
-    setTimer(30);
-  }, [otpValue, dataUpdatedAt]);
+    refetch({ cancelRefetch: false });
+  }, [timer, hasOtp, isFetching, isError, refetch]);
 
   return (
     <div>
@@ -129,7 +145,11 @@ const Qrcode = () => {
       </div>
       <div className="flex justify-center p-10 mb-5 first:ml-10 selection:p-10 items-center">
         {showQr ? (
-          <span className="ml-2">{timer}초 남았습니다</span>
+          <span className="ml-2">
+            {timer > 0
+              ? `${timer}초 남았습니다`
+              : 'QR 을 다시 발급하는 중입니다'}
+          </span>
         ) : (
           (isError || isExpired) && (
             <Button
