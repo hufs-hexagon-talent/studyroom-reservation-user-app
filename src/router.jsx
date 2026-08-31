@@ -206,10 +206,13 @@ const RouterComponent = () => {
                 />
                 <Route path="/notice" element={<Notice />} />
                 <Route path="/email" element={<EmailVerify />} />
-                <Route path="/login" element={<LoginPage />} />
               </>
             )}
-            <Route path="*" element={<Navigate to="/" />} />
+            {/* 세션이 끊긴 직후에는 화면 상태가 아직 로그인으로 남아 있다.
+                그때 이 경로가 없으면 아래 * 가 / 로 덮어써, 만료 안내를 본 학생이
+                로그인 화면 대신 홈으로 튕긴다. 로그인 여부와 무관하게 둔다. */}
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </div>
         <Footer showSnackbar={openSnackbar} />
