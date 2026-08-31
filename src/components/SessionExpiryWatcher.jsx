@@ -34,6 +34,11 @@ const SessionExpiryWatcher = () => {
     if (auth.isAuthenticated) handled.current = false;
   }, [auth.isAuthenticated]);
 
+  // 상태를 내리는 것과 화면을 옮기는 것을 나눈다. 여기서 바로 이동하면
+  // 라우터가 아직 로그인 상태로 렌더돼 있어 /login 라우트가 없고,
+  // * 폴백이 주소를 / 로 덮어써 학생이 만료 안내만 보고 홈으로 튕긴다.
+  const redirectPending = useRef(false);
+
   // 등록은 한 번만 하되 항상 최신 상태를 보도록 ref 로 감싼다
   const onSessionExpired = useRef(() => {});
   onSessionExpired.current = () => {
@@ -46,8 +51,15 @@ const SessionExpiryWatcher = () => {
     // 만료된 계정의 조회 결과(이름·예약·출석 QR)를 메모리에 남기지 않는다
     queryClient.clear();
     openSnackbar('로그인이 만료되었습니다. 다시 로그인해 주세요.', 4000);
-    navigate('/login', { replace: true });
+    redirectPending.current = true;
   };
+
+  // 로그인 상태가 실제로 내려간 렌더 이후에 옮긴다. 그때는 /login 라우트가 있다.
+  useEffect(() => {
+    if (!redirectPending.current || auth.isAuthenticated) return;
+    redirectPending.current = false;
+    navigate('/login', { replace: true });
+  }, [auth.isAuthenticated, navigate]);
 
   useEffect(() => {
     setSessionExpiredHandler(() => onSessionExpired.current());

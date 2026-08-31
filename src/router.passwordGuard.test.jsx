@@ -21,7 +21,6 @@ jest.mock('./pages/password/LoggedInPassword', () => () => (
 ));
 jest.mock('./pages/rooms/room/RoomPage', () => () => <div>예약 현황 화면</div>);
 jest.mock('./pages/notice/notice', () => () => <div>이용 규칙 화면</div>);
-jest.mock('./pages/login/LoginPage', () => () => <div>로그인 화면</div>);
 jest.mock('./components/navbar/NavigationBar', () => () => null);
 jest.mock('./components/footer/Footer', () => () => null);
 jest.mock('./components/SessionExpiryWatcher', () => () => null);
@@ -81,16 +80,6 @@ describe('기본 비밀번호 강제 변경', () => {
       expect(
         screen.getByText(/비밀번호가 학번 그대로입니다/),
       ).toBeInTheDocument(),
-    );
-  });
-
-  // 세션이 끊긴 직후에는 화면 상태가 아직 로그인으로 남아 있다.
-  // 그 렌더에서도 /login 이 매칭돼야 만료 안내를 본 학생이 홈으로 튕기지 않는다.
-  test('로그인 상태 렌더에서도 로그인 화면 경로가 살아 있다', async () => {
-    global.__me = me({ isPasswordChangeRequired: false });
-    renderAt('/login');
-    await waitFor(() =>
-      expect(screen.getByText('로그인 화면')).toBeInTheDocument(),
     );
   });
 
