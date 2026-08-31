@@ -91,6 +91,26 @@ const RouterComponent = () => {
       </div>
     );
 
+  // 기본 비밀번호(=학번)를 쓰는 동안에는 비밀번호 변경 화면에만 머무르게 한다.
+  // 로그인 직후 이동은 LoginPage 가 하지만 새로고침·주소 입력으로 벗어날 수 있었다.
+  // 서버가 값을 안 내려주는 동안에는(=== true 가 아니면) 평소대로 동작한다.
+  if (loggedIn && me?.isPasswordChangeRequired === true)
+    return (
+      <BrowserRouter basename={'/'}>
+        <SessionExpiryWatcher />
+        <div className="min-h-screen flex flex-col">
+          <NavigationBar showSnackbar={openSnackbar} />
+          <div className="flex-grow">
+            <Routes>
+              <Route path="/password" element={<LoggedInPassword />} />
+              <Route path="*" element={<Navigate to="/password" replace />} />
+            </Routes>
+          </div>
+          <Footer showSnackbar={openSnackbar} />
+        </div>
+      </BrowserRouter>
+    );
+
   return (
     <BrowserRouter basename={'/'}>
       <SessionExpiryWatcher />
