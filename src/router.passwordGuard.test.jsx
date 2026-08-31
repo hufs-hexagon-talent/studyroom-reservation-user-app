@@ -20,7 +20,8 @@ jest.mock('./pages/password/LoggedInPassword', () => () => (
   <div>비밀번호 변경 화면</div>
 ));
 jest.mock('./pages/rooms/room/RoomPage', () => () => <div>예약 현황 화면</div>);
-jest.mock('./components/Navbar/NavigationBar', () => () => null);
+jest.mock('./pages/notice/notice', () => () => <div>이용 규칙 화면</div>);
+jest.mock('./components/navbar/NavigationBar', () => () => null);
 jest.mock('./components/footer/Footer', () => () => null);
 jest.mock('./components/SessionExpiryWatcher', () => () => null);
 jest.mock('./components/ConnectionError', () => () => <div>연결 오류</div>);
@@ -61,6 +62,24 @@ describe('기본 비밀번호 강제 변경', () => {
     renderAt('/');
     await waitFor(() =>
       expect(screen.getByText('예약 현황 화면')).toBeInTheDocument(),
+    );
+  });
+
+  test('잠긴 상태에서도 이용 규칙은 볼 수 있다', async () => {
+    global.__me = me({ isPasswordChangeRequired: true });
+    renderAt('/notice');
+    await waitFor(() =>
+      expect(screen.getByText('이용 규칙 화면')).toBeInTheDocument(),
+    );
+  });
+
+  test('잠긴 이유를 화면이 설명한다', async () => {
+    global.__me = me({ isPasswordChangeRequired: true });
+    renderAt('/check');
+    await waitFor(() =>
+      expect(
+        screen.getByText(/비밀번호가 학번 그대로입니다/),
+      ).toBeInTheDocument(),
     );
   });
 

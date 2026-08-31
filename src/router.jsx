@@ -99,10 +99,15 @@ const RouterComponent = () => {
       <BrowserRouter basename={'/'}>
         <SessionExpiryWatcher />
         <div className="min-h-screen flex flex-col">
-          <NavigationBar showSnackbar={openSnackbar} />
+          <NavigationBar showSnackbar={openSnackbar} locked />
           <div className="flex-grow">
+            <div className="mx-auto mt-6 max-w-2xl px-4 text-center text-gray-600">
+              처음 로그인해 비밀번호가 학번 그대로입니다. 비밀번호를 바꾼 뒤에
+              예약을 이용할 수 있습니다.
+            </div>
             <Routes>
               <Route path="/password" element={<LoggedInPassword />} />
+              <Route path="/notice" element={<Notice />} />
               <Route path="*" element={<Navigate to="/password" replace />} />
             </Routes>
           </div>
