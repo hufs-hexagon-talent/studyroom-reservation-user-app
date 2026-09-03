@@ -24,6 +24,8 @@ import LoggedOutPassword from './pages/password/LoggedOutPassword';
 import EmailVerify from './pages/password/EmailVerify';
 import MyPage from './pages/mypage/MyPage';
 import EmailSend from './pages/email/EmailSend';
+import MyInquiries from './pages/inquiry/MyInquiries';
+import InquiryForm from './pages/inquiry/InquiryForm';
 
 import AdminPage from './pages/admin/AdminPage';
 import SignUp from './pages/admin/user/SignUp';
@@ -42,6 +44,16 @@ import CreatePartition from './pages/admin/operation/facility/partition/CreatePa
 import BannerUpload from './pages/admin/banner/BannerUpload';
 import BannerManage from './pages/admin/banner/BannerManage';
 import ServiceStatus from './pages/admin/status/ServiceStatus';
+
+// USER·BLOCKED·ADMIN 세 블록이 공유한다(RESIDENT 제외) — BLOCKED 학생이 노쇼 이의를
+// 접수하는 주 대상이라 빼면 기능 취지에 어긋난다.
+const inquiryRoutes = (
+  <>
+    <Route path="/inquiry" element={<MyInquiries />} />
+    <Route path="/inquiry/new" element={<InquiryForm />} />
+    <Route path="/inquiry/:id/edit" element={<InquiryForm />} />
+  </>
+);
 
 const RouterComponent = () => {
   const { loggedIn } = useAuth();
@@ -137,6 +149,7 @@ const RouterComponent = () => {
                   <Route path="/otp" element={<OtpPage />} />
                   <Route path="/mypage" element={<MyPage />} />
                   <Route path="/emailSend" element={<EmailSend />} />
+                  {inquiryRoutes}
                 </>
               )}
             {loggedIn && serviceRole === 'ADMIN' && (
@@ -146,6 +159,7 @@ const RouterComponent = () => {
                 <Route path="/check" element={<Check />} />
                 <Route path="/mypage" element={<MyPage />} />
                 <Route path="/emailSend" element={<EmailSend />} />
+                {inquiryRoutes}
 
                 {/* 어드민 */}
                 <Route path="/admin" element={<AdminPage />}>
