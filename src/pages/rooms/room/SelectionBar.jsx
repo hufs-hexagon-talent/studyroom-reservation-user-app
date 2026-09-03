@@ -6,13 +6,32 @@ import { format } from 'date-fns';
 const SelectionBar = ({ roomLabel, from, to, disabled, onReserve }) => {
   const barRef = useRef(null);
 
-  // fixed 요소라 페이지 흐름에서 빠져 있다. 자기 높이만큼 문서 아래에 자리를 잡아
-  // 푸터가 가려지지 않게 한다. 실제 높이를 재므로 safe-area 도 함께 계산된다.
+  // fixed 요소라 페이지 흐름에서 빠져 있다. 실제 높이만큼 문서 아래 자리를 잡아
+  // 푸터가 가려지지 않게 한다. CSS 가 바를 숨기면 높이가 0 이 되므로
+  // 브레이크포인트를 여기서 다시 판정하지 않고 요소 자신을 관찰한다.
   useLayoutEffect(() => {
     const el = barRef.current;
-    if (!el) return undefined;
-    document.body.style.paddingBottom = `${el.offsetHeight}px`;
+    if (!el) {
+      document.body.style.paddingBottom = '';
+      return undefined;
+    }
+
+    const apply = () => {
+      const height = el.offsetHeight;
+      document.body.style.paddingBottom = height ? `${height}px` : '';
+    };
+    apply();
+
+    if (typeof ResizeObserver === 'undefined') {
+      return () => {
+        document.body.style.paddingBottom = '';
+      };
+    }
+
+    const observer = new ResizeObserver(apply);
+    observer.observe(el);
     return () => {
+      observer.disconnect();
       document.body.style.paddingBottom = '';
     };
   }, [roomLabel, from, to]);
