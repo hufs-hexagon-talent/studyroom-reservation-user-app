@@ -10,7 +10,7 @@ import {
 } from '@mui/material';
 import { parse } from 'date-fns';
 
-import { SLOT_PALETTE } from './slotPalette';
+import { SLOT_LABEL, SLOT_PALETTE } from './slotPalette';
 import { getSlotState, initialScrollIndex } from './slotState';
 import useTimeTableScroll from './useTimeTableScroll';
 
@@ -63,6 +63,7 @@ const ReservationTimeTable = ({
             marginLeft: { xs: '12px', md: '60px' },
           }}>
           <Table>
+            <caption className="sr-only">호실별 30분 단위 예약 현황</caption>
             <TableHead sx={{ borderBottom: 'none' }}>
               <TableRow>
                 <TableCell
@@ -82,6 +83,8 @@ const ReservationTimeTable = ({
                   <TableCell
                     key={timeIndex}
                     data-time-index={timeIndex}
+                    component="th"
+                    scope="col"
                     align="center"
                     sx={{
                       border: 'none',
@@ -101,6 +104,7 @@ const ReservationTimeTable = ({
               {rooms.map((room, i) => (
                 <TableRow key={i}>
                   <TableCell
+                    scope="row"
                     sx={{
                       px: { xs: 0.75, md: 2 },
                       py: { xs: 1, md: 2 },
@@ -129,7 +133,16 @@ const ReservationTimeTable = ({
                       <TableCell
                         key={timeIndex}
                         data-time-index={timeIndex}
+                        role="button"
+                        tabIndex={state.selectable ? 0 : -1}
+                        aria-disabled={!state.selectable}
+                        aria-label={`${room.roomName}-${room.partitionNumber} ${time} ${SLOT_LABEL[state.status]}`}
                         onClick={() => onCellClick(room, timeIndex, state)}
+                        onKeyDown={event => {
+                          if (event.key !== 'Enter' && event.key !== ' ') return;
+                          event.preventDefault();
+                          onCellClick(room, timeIndex, state);
+                        }}
                         className={state.status === 'selected' ? 'selected' : ''}
                         sx={{
                           padding: 0,
