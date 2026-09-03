@@ -27,13 +27,10 @@ const ReservationTimeTable = ({
   onCellClick,
 }) => {
   // 날짜가 바뀔 때만 다시 잡는다. now 가 30초마다 바뀌어도 스크롤이 되돌아가지 않게.
-  // times 가 아직 빈 배열인 첫 렌더(예약 현황은 왔지만 시간표 계산은 다음 렌더에야 끝난다)에는
-  // 잠그지 않는다 — 잠그면 initialScrollIndex 가 0 을 반환해 그 값으로 영원히 고정돼 버린다.
   const initialIndexRef = useRef(null);
   if (
-    times.length > 0 &&
-    (initialIndexRef.current === null ||
-      initialIndexRef.current.date !== selectedDate)
+    initialIndexRef.current === null ||
+    initialIndexRef.current.date !== selectedDate
   ) {
     initialIndexRef.current = {
       date: selectedDate,
@@ -51,16 +48,21 @@ const ReservationTimeTable = ({
 
   return (
     <>
-      <div className="relative">
+      <Box
+        sx={{
+          position: 'relative',
+          // 페이드는 이 wrapper 를 기준으로 절대 위치를 잡는다. marginLeft/width 를
+          // TableContainer 에 두면 표시되는 표의 실제 가장자리와 페이드 기준점이 어긋난다.
+          // 모바일에서는 좌우 여백을 최소로 두고 폭을 전부 쓴다
+          width: { xs: 'calc(100% - 24px)', md: 'calc(100% - 60px)' },
+          marginLeft: { xs: '12px', md: '60px' },
+        }}>
         <TableContainer
           ref={containerRef}
           onScroll={handleScroll}
           sx={{
             overflowX: 'auto',
             marginTop: '20px',
-            // 모바일에서는 좌우 여백을 최소로 두고 폭을 전부 쓴다
-            width: { xs: 'calc(100% - 24px)', md: 'calc(100% - 60px)' },
-            marginLeft: { xs: '12px', md: '60px' },
           }}>
           <Table>
             <caption className="sr-only">호실별 30분 단위 예약 현황</caption>
@@ -196,7 +198,7 @@ const ReservationTimeTable = ({
             }}
           />
         )}
-      </div>
+      </Box>
       <div className="mt-1 pr-3 text-right text-xs text-gray-500 md:pr-16">
         {`${times[times.length - 1]} 운영 종료`}
       </div>

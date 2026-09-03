@@ -55,6 +55,9 @@ export const getSlotState = ({ slotStart, now, room, selection }) => {
     status,
     selectable: !past && !reserved && !closed,
     outOfExtendRange: hasSelection && !withinExtend,
+    // 다른 호실을 골랐을 때 이 칸을 흐리게 할지는 설계에서 표현 방식을 아직 정하지 않아
+    // 미뤄 둔 결정이다(2026-09-03 설계 문서 "미결정" 참고). 지금은 이 값을 읽는 컴포넌트가
+    // 없지만, 그 결정이 나면 소비하면 되도록 판정만 미리 내보낸다.
     otherRoom: hasSelection && !sameRoom,
     lockedReason: reserved ? 'reserved' : past ? 'past' : closed ? 'closed' : null,
   };

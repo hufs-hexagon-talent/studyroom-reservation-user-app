@@ -29,7 +29,7 @@ const SelectionBar = ({ roomLabel, from, to, disabled, onReserve }) => {
     }
 
     const observer = new ResizeObserver(apply);
-    observer.observe(el);
+    observer.observe(el, { box: 'border-box' });
     return () => {
       observer.disconnect();
       document.body.style.paddingBottom = '';

@@ -47,6 +47,14 @@ const RoomPage = () => {
     },
   });
 
+  // react-simple-snackbar 는 매 렌더 새 함수를 돌려준다. 그대로 의존성에 넣으면
+  // 아래 useCallback 들이 매번 새로 만들어져 표의 memo 가 무력해진다.
+  const openSnackbarRef = useRef(openSnackbar);
+  openSnackbarRef.current = openSnackbar;
+  const showSnackbar = useCallback(message => {
+    openSnackbarRef.current(message);
+  }, []);
+
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [selectedRangeFrom, setSelectedRangeFrom] = useState(null);
   const [selectedRangeTo, selSelectedRangeTo] = useState(null);
@@ -243,7 +251,7 @@ const RoomPage = () => {
 
       // 최대 예약 시간을 넘는 연장은 안내만 하고 선택은 그대로 둔다
       if (isOverDue) {
-        openSnackbar(maxMinutesExceededMessage(selectedRoom?.eachMaxMinute));
+        showSnackbar(maxMinutesExceededMessage(selectedRoom?.eachMaxMinute));
         return;
       }
 
@@ -258,7 +266,7 @@ const RoomPage = () => {
       selectedRoom,
       selectedRangeFrom,
       selectedRangeTo,
-      openSnackbar,
+      showSnackbar,
     ],
   );
 
@@ -336,7 +344,7 @@ const RoomPage = () => {
     if (selectedRoom && selectedRangeFrom && selectedRangeTo) {
       setOpenReserveModal(true);
     } else {
-      openSnackbar('원하는 호실과 시간대를 선택해주세요.');
+      showSnackbar('원하는 호실과 시간대를 선택해주세요.');
     }
   };
 
@@ -377,9 +385,22 @@ const RoomPage = () => {
         return;
       }
       const message = lockedSlotMessage(state.lockedReason);
-      if (message) openSnackbar(message);
+      if (message) showSnackbar(message);
     },
-    [handleCellClick, openSnackbar],
+    [handleCellClick, showSnackbar],
+  );
+
+  // 매 렌더 새 객체를 만들면 표에 넘기는 selection prop 이 계속 바뀌어 표의 memo 가 무력해진다.
+  const selection = useMemo(
+    () =>
+      selectedRoom && selectedRangeFrom && selectedRangeTo
+        ? {
+            partitionId: selectedRoom.partitionId,
+            from: selectedRangeFrom,
+            to: selectedRangeTo,
+          }
+        : null,
+    [selectedRoom, selectedRangeFrom, selectedRangeTo],
   );
 
   // date-picker 설정
@@ -440,7 +461,6 @@ const RoomPage = () => {
             </div>
           </div>
         </div>
-        {/* 예약 가능/불가능 색 표현 */}
         {hasRooms && <TimeTableLegend />}
         {/* timeTable 시작 */}
         {isReservationsPending && (
@@ -461,22 +481,14 @@ const RoomPage = () => {
             </div>
           </div>
         )}
-        {hasRooms && (
+        {hasRooms && times.length > 0 && (
           <div>
             <ReservationTimeTable
               rooms={reservationsByRooms}
               times={times}
               selectedDate={selectedDate}
               now={now}
-              selection={
-                selectedRoom && selectedRangeFrom && selectedRangeTo
-                  ? {
-                      partitionId: selectedRoom.partitionId,
-                      from: selectedRangeFrom,
-                      to: selectedRangeTo,
-                    }
-                  : null
-              }
+              selection={selection}
               onCellClick={handleSlotClick}
             />
           </div>
