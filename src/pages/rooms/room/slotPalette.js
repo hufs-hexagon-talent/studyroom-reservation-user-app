@@ -1,13 +1,14 @@
 // 칸 상태별 색과 라벨. 시각 정리는 이 파일만 고친다.
+// 밝은 색 = 예약 가능, 회색 = 예약 불가, 빗금 회색 = 운영시간 외, 진한 색 = 이미 예약됨.
 export const SLOT_PALETTE = {
   free: { background: '#F1EEE9', pattern: null, mark: null },
   selected: { background: '#7599BA', pattern: null, mark: null },
   reserved: { background: '#002D56', pattern: null, mark: '✕' },
-  past: { background: '#E3E1DE', pattern: null, mark: null },
+  past: { background: '#C7C4C0', pattern: null, mark: null },
   closed: {
-    background: '#CFCFCF',
+    background: '#C7C4C0',
     pattern:
-      'repeating-linear-gradient(45deg, transparent 0 4px, rgba(0,0,0,0.09) 4px 8px)',
+      'repeating-linear-gradient(45deg, transparent 0 4px, rgba(0,0,0,0.18) 4px 8px)',
     mark: null,
   },
 };
