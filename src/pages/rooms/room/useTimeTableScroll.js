@@ -1,4 +1,10 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
 
 // 표를 열거나 날짜를 바꿀 때 원하는 열로 맞추고, 가장자리에 더 있는지 알린다.
 const useTimeTableScroll = ({ scrollToIndex, resetKey, columnCount }) => {
@@ -20,10 +26,15 @@ const useTimeTableScroll = ({ scrollToIndex, resetKey, columnCount }) => {
   useLayoutEffect(() => {
     const el = containerRef.current;
     if (!el) return;
-    const target = el.querySelector(`thead [data-time-index="${scrollToIndex}"]`);
+    const target = el.querySelector(
+      `thead [data-time-index="${scrollToIndex}"]`,
+    );
     const sticky = el.querySelector('[data-sticky-col]');
     if (target) {
-      el.scrollLeft = Math.max(0, target.offsetLeft - (sticky?.offsetWidth ?? 0));
+      el.scrollLeft = Math.max(
+        0,
+        target.offsetLeft - (sticky?.offsetWidth ?? 0),
+      );
     }
     updateEdges();
     // columnCount 는 실제로 참조하지 않지만 의도적으로 넣었다: 열이 빈 표에서 채워진 표로 바뀌면

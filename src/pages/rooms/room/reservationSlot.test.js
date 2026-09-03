@@ -186,9 +186,7 @@ describe('lockedSlotMessage', () => {
   });
 
   it('운영시간이 아님을 안내한다', () => {
-    expect(lockedSlotMessage('closed')).toBe(
-      '이 호실의 운영시간이 아닙니다.',
-    );
+    expect(lockedSlotMessage('closed')).toBe('이 호실의 운영시간이 아닙니다.');
   });
 
   it('사유가 없으면 안내하지 않는다', () => {

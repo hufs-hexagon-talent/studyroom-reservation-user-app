@@ -129,7 +129,12 @@ const ReservationTimeTable = ({
                       'yyyy-MM-dd HH:mm',
                       new Date(),
                     );
-                    const state = getSlotState({ slotStart, now, room, selection });
+                    const state = getSlotState({
+                      slotStart,
+                      now,
+                      room,
+                      selection,
+                    });
                     const palette = SLOT_PALETTE[state.status];
 
                     return (
@@ -142,11 +147,14 @@ const ReservationTimeTable = ({
                         aria-label={`${room.roomName}-${room.partitionNumber} ${time} ${SLOT_LABEL[state.status] ?? state.status}`}
                         onClick={() => onCellClick(room, timeIndex, state)}
                         onKeyDown={event => {
-                          if (event.key !== 'Enter' && event.key !== ' ') return;
+                          if (event.key !== 'Enter' && event.key !== ' ')
+                            return;
                           event.preventDefault();
                           onCellClick(room, timeIndex, state);
                         }}
-                        className={state.status === 'selected' ? 'selected' : ''}
+                        className={
+                          state.status === 'selected' ? 'selected' : ''
+                        }
                         sx={{
                           padding: 0,
                           width: { xs: 44, md: 52 },

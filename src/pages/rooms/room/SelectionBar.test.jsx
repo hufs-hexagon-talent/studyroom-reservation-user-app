@@ -43,7 +43,9 @@ describe('SelectionBar', () => {
   });
 
   it('disabled 면 버튼이 잠긴다', () => {
-    const { getByRole } = render(<SelectionBar {...props({ disabled: true })} />);
+    const { getByRole } = render(
+      <SelectionBar {...props({ disabled: true })} />,
+    );
     expect(getByRole('button', { name: '예약하기' })).toBeDisabled();
   });
 });

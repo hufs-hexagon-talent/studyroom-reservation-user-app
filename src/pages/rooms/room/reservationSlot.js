@@ -124,5 +124,4 @@ const LOCKED_SLOT_MESSAGES = {
   closed: '이 호실의 운영시간이 아닙니다.',
 };
 
-export const lockedSlotMessage = reason =>
-  LOCKED_SLOT_MESSAGES[reason] ?? null;
+export const lockedSlotMessage = reason => LOCKED_SLOT_MESSAGES[reason] ?? null;

@@ -25,7 +25,11 @@ export const getSlotState = ({ slotStart, now, room, selection }) => {
     return slotStart >= start && slotStart < end;
   });
 
-  const hasSelection = !!(selection?.partitionId && selection.from && selection.to);
+  const hasSelection = !!(
+    selection?.partitionId &&
+    selection.from &&
+    selection.to
+  );
   const sameRoom = hasSelection && selection.partitionId === room.partitionId;
   const selected =
     sameRoom &&
@@ -59,7 +63,13 @@ export const getSlotState = ({ slotStart, now, room, selection }) => {
     // 미뤄 둔 결정이다(2026-09-03 설계 문서 "미결정" 참고). 지금은 이 값을 읽는 컴포넌트가
     // 없지만, 그 결정이 나면 소비하면 되도록 판정만 미리 내보낸다.
     otherRoom: hasSelection && !sameRoom,
-    lockedReason: reserved ? 'reserved' : past ? 'past' : closed ? 'closed' : null,
+    lockedReason: reserved
+      ? 'reserved'
+      : past
+        ? 'past'
+        : closed
+          ? 'closed'
+          : null,
   };
 };
 

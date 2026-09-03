@@ -17,7 +17,10 @@ describe('getSlotState 상태 우선순위', () => {
   it('예약된 칸은 지난 시간이어도 reserved 로 본다', () => {
     const r = room({
       reservationTimeRanges: [
-        { startDateTime: '2026-09-03T10:00:00', endDateTime: '2026-09-03T11:00:00' },
+        {
+          startDateTime: '2026-09-03T10:00:00',
+          endDateTime: '2026-09-03T11:00:00',
+        },
       ],
     });
     const s = getSlotState({
