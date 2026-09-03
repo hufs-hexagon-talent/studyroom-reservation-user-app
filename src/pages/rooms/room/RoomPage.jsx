@@ -478,18 +478,19 @@ const RoomPage = () => {
             />
           </div>
         )}
-        <SelectionBar
-          roomLabel={
-            selectedRoom
-              ? `${selectedRoom.roomName}-${selectedRoom.partitionNumber}`
-              : null
-          }
-          from={selectedRangeFrom}
-          to={selectedRangeTo}
-          disabled={isReserving}
-          onReserve={openReserveConfirm}
-        />
-        {hasRooms && <div className="h-20 md:hidden" aria-hidden />}
+        {hasRooms && (
+          <SelectionBar
+            roomLabel={
+              selectedRoom
+                ? `${selectedRoom.roomName}-${selectedRoom.partitionNumber}`
+                : null
+            }
+            from={selectedRangeFrom}
+            to={selectedRangeTo}
+            disabled={isReserving}
+            onReserve={openReserveConfirm}
+          />
+        )}
       </div>
 
       {/* 선택된 예약 정보 모달 */}

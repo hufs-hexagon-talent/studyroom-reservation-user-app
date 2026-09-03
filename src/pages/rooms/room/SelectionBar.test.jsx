@@ -18,6 +18,18 @@ describe('SelectionBar', () => {
     expect(container).toBeEmptyDOMElement();
   });
 
+  it('호실이 없으면 아무것도 렌더하지 않는다', () => {
+    const { container } = render(
+      <SelectionBar {...props({ roomLabel: null })} />,
+    );
+    expect(container).toBeEmptyDOMElement();
+  });
+
+  it('종료 시간이 없으면 아무것도 렌더하지 않는다', () => {
+    const { container } = render(<SelectionBar {...props({ to: null })} />);
+    expect(container).toBeEmptyDOMElement();
+  });
+
   it('호실과 시간을 보여준다', () => {
     const { getByText } = render(<SelectionBar {...props()} />);
     expect(getByText('306-1 · 17:30~18:30')).toBeInTheDocument();
