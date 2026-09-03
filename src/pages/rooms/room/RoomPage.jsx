@@ -24,6 +24,7 @@ import {
   RESERVE_AUTH_FAILED_MESSAGE,
 } from './reservationSlot';
 import ReservationTimeTable from './ReservationTimeTable';
+import TimeTableLegend from './TimeTableLegend';
 import CustomButton from '../../../components/button/Button';
 import { Button } from 'flowbite-react';
 import { Modal } from 'flowbite-react';
@@ -168,9 +169,6 @@ const RoomPage = () => {
     // date picker에서 선택한 날짜 저장
     setSelectedDate(formattedDate);
   };
-
-  const isSomethingSelected =
-    selectedRoom && selectedRangeFrom && selectedRangeTo;
 
   // 슬롯의 상태 토글하는 함수
   const toggleSlot = useCallback(
@@ -407,22 +405,7 @@ const RoomPage = () => {
           </div>
         </div>
         {/* 예약 가능/불가능 색 표현 */}
-        {hasRooms && (
-          <div id="squares" className="flex pl-4">
-            <div
-              className="w-6 h-6 mt-10"
-              style={{ backgroundColor: '#F1EEE9' }}></div>
-            <div className="mt-10 ml-2">예약 가능</div>
-            <div
-              className="w-6 h-6 mt-10 ml-5"
-              style={{ backgroundColor: '#7599BA' }}></div>
-            <div className="mt-10 ml-2">예약 선택</div>
-            <div
-              className="w-6 h-6 mt-10 ml-5"
-              style={{ backgroundColor: '#002D56' }}></div>
-            <div className="mt-10 ml-2">예약 완료</div>
-          </div>
-        )}
+        {hasRooms && <TimeTableLegend />}
         {/* timeTable 시작 */}
         {isReservationsPending && (
           <div className="text-center mx-8 md:mx-12 lg:mx-96 py-12 my-12 rounded-lg bg-gray-100 text-gray-900">
