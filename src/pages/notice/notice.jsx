@@ -105,7 +105,8 @@ const Notice = () => {
                 </p>
 
                 <p className="mt-8 text-sm text-gray-600">
-                  * 사용 관련 건의 및 문의 : ces@hufs.ac.kr
+                  * 사용 관련 건의 및 문의 : 마이페이지 &gt; 문의하기(로그인
+                  후), 또는 이메일 ces@hufs.ac.kr
                 </p>
               </div>
             </AccordionContent>

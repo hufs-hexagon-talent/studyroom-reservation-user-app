@@ -131,25 +131,11 @@ const MyPage = () => {
         {/* 문의 및 건의 */}
         <div className="menu-section">
           <div className="menu-title">문의 및 건의</div>
-          <div
-            className="menu-item"
-            onClick={() =>
-              window.open(
-                'https://hwangbbang.notion.site/1ac6628bcfd1802aa2fef92695b8b378',
-              )
-            }>
-            정정 요청
+          <div className="menu-item" onClick={() => navigate('/inquiry/new')}>
+            문의하기
           </div>
-          <div
-            className="menu-item"
-            onClick={() =>
-              window.open(
-                'https://hwangbbang.notion.site/ebd/1ac6628bcfd1807a93a1eed927f37595',
-                '_blank',
-                'noopener,noreferrer',
-              )
-            }>
-            의견 보내기
+          <div className="menu-item" onClick={() => navigate('/inquiry')}>
+            내 문의
           </div>
         </div>
       </div>
