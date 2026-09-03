@@ -26,6 +26,7 @@ import {
 } from './reservationSlot';
 import ReservationTimeTable from './ReservationTimeTable';
 import TimeTableLegend from './TimeTableLegend';
+import SelectionBar from './SelectionBar';
 import CustomButton from '../../../components/button/Button';
 import { Button } from 'flowbite-react';
 import { Modal } from 'flowbite-react';
@@ -320,6 +321,15 @@ const RoomPage = () => {
     [doReserve, isLoggedIn, selectedRoom, selectedRangeFrom, selectedRangeTo],
   );
 
+  const openReserveConfirm = () => {
+    if (isReserving) return;
+    if (selectedRoom && selectedRangeFrom && selectedRangeTo) {
+      setOpenReserveModal(true);
+    } else {
+      openSnackbar('원하는 호실과 시간대를 선택해주세요.');
+    }
+  };
+
   // 최대 예약 시간에 부합하는지 계산하는 함수
   const handleCellClick = (partition, timeIndex) => {
     const slotDateFrom = parse(
@@ -460,21 +470,26 @@ const RoomPage = () => {
           </div>
         )}
         {hasRooms && (
-          <div className="p-10 flex justify-end">
+          <div className="hidden p-10 md:flex md:justify-end">
             <CustomButton
               disabled={isReserving}
-              onClick={() => {
-                if (isReserving) return;
-                if (selectedRoom && selectedRangeFrom && selectedRangeTo) {
-                  setOpenReserveModal(true);
-                } else {
-                  openSnackbar('원하는 호실과 시간대를 선택해주세요.');
-                }
-              }}
+              onClick={openReserveConfirm}
               text="예약하기"
             />
           </div>
         )}
+        <SelectionBar
+          roomLabel={
+            selectedRoom
+              ? `${selectedRoom.roomName}-${selectedRoom.partitionNumber}`
+              : null
+          }
+          from={selectedRangeFrom}
+          to={selectedRangeTo}
+          disabled={isReserving}
+          onReserve={openReserveConfirm}
+        />
+        {hasRooms && <div className="h-20 md:hidden" aria-hidden />}
       </div>
 
       {/* 선택된 예약 정보 모달 */}
