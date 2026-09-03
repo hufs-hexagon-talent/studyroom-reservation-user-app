@@ -39,7 +39,11 @@ describe('ReservationTimeTable 열 구성', () => {
     expect(bodySlots.length).toBe(times.length - 1);
   });
 
-  it('첫 시각 라벨이 잘리지 않고 그대로 렌더된다', () => {
+  // 원래 버그는 라벨이 sticky 호실명 열 아래로 겹쳐 보이던 CSS 문제였다. jsdom 은
+  // 레이아웃을 계산하지 않아 그 겹침을 재현하지 못하므로, 아래 검증은 텍스트가
+  // 잘리지 않고 온전히 들어가는지만 보장한다. 버그가 있던 화면에서도 textContent
+  // 자체는 '09:00' 그대로였을 것이므로 시각적 겹침의 회귀는 이 테스트로 잡히지 않는다.
+  it('첫 시각 라벨의 텍스트가 온전히 들어간다', () => {
     const { container } = setup();
     const first = container.querySelector('thead [data-time-index="0"]');
     expect(first.textContent).toBe('09:00');
