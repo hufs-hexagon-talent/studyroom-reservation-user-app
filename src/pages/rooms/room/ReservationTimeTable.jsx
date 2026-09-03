@@ -44,6 +44,9 @@ const ReservationTimeTable = ({
   const { containerRef, edges, handleScroll } = useTimeTableScroll({
     scrollToIndex: initialIndexRef.current?.index ?? 0,
     resetKey: selectedDate,
+    // 빈 표에서 실제 열이 채워지는 순간(예: scrollToIndex 가 0 그대로인 날짜)에도
+    // 가장자리 표시를 다시 재게 하려고 렌더된 열 수를 함께 넘긴다.
+    columnCount: times.length,
   });
 
   return (

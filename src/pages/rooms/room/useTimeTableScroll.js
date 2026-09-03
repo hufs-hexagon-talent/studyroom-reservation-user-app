@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 // 표를 열거나 날짜를 바꿀 때 원하는 열로 맞추고, 가장자리에 더 있는지 알린다.
-const useTimeTableScroll = ({ scrollToIndex, resetKey }) => {
+const useTimeTableScroll = ({ scrollToIndex, resetKey, columnCount }) => {
   const containerRef = useRef(null);
   const [edges, setEdges] = useState({ left: false, right: false });
 
@@ -26,7 +26,10 @@ const useTimeTableScroll = ({ scrollToIndex, resetKey }) => {
       el.scrollLeft = Math.max(0, target.offsetLeft - (sticky?.offsetWidth ?? 0));
     }
     updateEdges();
-  }, [scrollToIndex, resetKey, updateEdges]);
+    // columnCount 는 실제로 참조하지 않지만 의도적으로 넣었다: 열이 빈 표에서 채워진 표로 바뀌면
+    // (예: scrollToIndex 가 우연히 0 그대로인 날짜) scrollToIndex/resetKey 만으로는 이 효과가 다시
+    // 돌지 않아 가장자리 표시가 빈 표 기준 값으로 굳어 버린다. "안 쓰는 의존성"이라 지우지 말 것.
+  }, [scrollToIndex, resetKey, columnCount, updateEdges]);
 
   useEffect(() => {
     const onResize = () => updateEdges();
