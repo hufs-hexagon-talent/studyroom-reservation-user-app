@@ -204,4 +204,4 @@ const ReservationTimeTable = ({
   );
 };
 
-export default ReservationTimeTable;
+export default React.memo(ReservationTimeTable);

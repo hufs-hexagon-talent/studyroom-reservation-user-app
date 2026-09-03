@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { useNavigate } from 'react-router-dom';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import { Typography } from '@mui/material';
@@ -25,6 +31,7 @@ import {
   RESERVE_AUTH_FAILED_MESSAGE,
 } from './reservationSlot';
 import ReservationTimeTable from './ReservationTimeTable';
+import { SLOT_INTERVAL_MINUTE } from './slotState';
 import TimeTableLegend from './TimeTableLegend';
 import SelectionBar from './SelectionBar';
 import CustomButton from '../../../components/button/Button';
@@ -160,10 +167,13 @@ const RoomPage = () => {
     maxReservationMinute: maxReservationMinute,
   };
 
-  const times =
-    startHour !== null && startMinute !== null
-      ? createTimeTable(timeTableConfig)
-      : [];
+  const times = useMemo(
+    () =>
+      startHour !== null && startMinute !== null
+        ? createTimeTable(timeTableConfig)
+        : [],
+    [startHour, startMinute, endHour, endMinute, maxReservationMinute],
+  );
 
   // date-picker에서 날짜 선택할 때마다 실행되는 함수
   const handleDateChange = date => {
@@ -331,31 +341,46 @@ const RoomPage = () => {
   };
 
   // 최대 예약 시간에 부합하는지 계산하는 함수
-  const handleCellClick = (partition, timeIndex) => {
-    const slotDateFrom = parse(
-      `${selectedDate} ${times[timeIndex]}`,
-      'yyyy-MM-dd HH:mm',
-      new Date(),
-    );
+  const handleCellClick = useCallback(
+    (partition, timeIndex) => {
+      const slotDateFrom = parse(
+        `${selectedDate} ${times[timeIndex]}`,
+        'yyyy-MM-dd HH:mm',
+        new Date(),
+      );
 
-    // 갱신 주기 사이에 지나가 버린 칸이 눌리지 않게 클릭 시점으로 한 번 더 확인한다
-    const clickedAt = new Date();
-    if (clickedAt > addMinutes(slotDateFrom, timeTableConfig.intervalMinute)) {
-      setNow(clickedAt);
-      return;
-    }
+      // 갱신 주기 사이에 지나가 버린 칸이 눌리지 않게 클릭 시점으로 한 번 더 확인한다
+      const clickedAt = new Date();
+      if (clickedAt > addMinutes(slotDateFrom, SLOT_INTERVAL_MINUTE)) {
+        setNow(clickedAt);
+        return;
+      }
 
-    // 표의 공통 범위가 아니라 방별 운영시간으로 검사한다
-    const isClosed = isOutsideOperationHours(
-      format(slotDateFrom, 'HH:mm'),
-      partition.operationStartTime,
-      partition.operationEndTime,
-    );
+      // 표의 공통 범위가 아니라 방별 운영시간으로 검사한다
+      const isClosed = isOutsideOperationHours(
+        format(slotDateFrom, 'HH:mm'),
+        partition.operationStartTime,
+        partition.operationEndTime,
+      );
 
-    if (!isClosed) {
-      toggleSlot(partition, times[timeIndex]);
-    }
-  };
+      if (!isClosed) {
+        toggleSlot(partition, times[timeIndex]);
+      }
+    },
+    [selectedDate, times, toggleSlot],
+  );
+
+  const handleSlotClick = useCallback(
+    (room, timeIndex, state) => {
+      if (state.selectable) {
+        handleCellClick(room, timeIndex);
+        return;
+      }
+      const message = lockedSlotMessage(state.lockedReason);
+      if (message) openSnackbar(message);
+    },
+    [handleCellClick, openSnackbar],
+  );
 
   // date-picker 설정
   registerLocale('ko', ko);
@@ -452,14 +477,7 @@ const RoomPage = () => {
                     }
                   : null
               }
-              onCellClick={(room, timeIndex, state) => {
-                if (state.selectable) {
-                  handleCellClick(room, timeIndex);
-                  return;
-                }
-                const message = lockedSlotMessage(state.lockedReason);
-                if (message) openSnackbar(message);
-              }}
+              onCellClick={handleSlotClick}
             />
           </div>
         )}
