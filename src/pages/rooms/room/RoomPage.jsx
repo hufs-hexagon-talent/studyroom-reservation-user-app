@@ -1,23 +1,8 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DatePicker, { registerLocale } from 'react-datepicker';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Typography,
-} from '@mui/material';
-import {
-  addMinutes,
-  format,
-  parse,
-  isBefore,
-  differenceInMinutes,
-  areIntervalsOverlapping,
-} from 'date-fns';
+import { Typography } from '@mui/material';
+import { addMinutes, format, parse, isBefore, differenceInMinutes } from 'date-fns';
 
 import Banner from '../../admin/banner/Banner';
 import { ko } from 'date-fns/locale';
@@ -38,6 +23,7 @@ import {
   normalizeErrorCode,
   RESERVE_AUTH_FAILED_MESSAGE,
 } from './reservationSlot';
+import ReservationTimeTable from './ReservationTimeTable';
 import CustomButton from '../../../components/button/Button';
 import { Button } from 'flowbite-react';
 import { Modal } from 'flowbite-react';
@@ -458,164 +444,25 @@ const RoomPage = () => {
         )}
         {hasRooms && (
           <div>
-            <TableContainer
-              sx={{
-                overflowX: 'auto',
-                marginTop: '20px',
-                '@media (max-width : 1300px)': {
-                  overflowX: 'scroll',
-                },
-                // sticky 기준점이 어긋나지 않게 padding 대신 margin 으로 띄운다
-                width: 'calc(100% - 60px)',
-                marginLeft: '60px',
-              }}>
-              <Table>
-                <TableHead
-                  sx={{
-                    overflowX: 'auto',
-                    borderBottom: 'none',
-                  }}>
-                  <TableRow>
-                    <TableCell
-                      align="center"
-                      width={100}
-                      sx={{
-                        position: 'sticky',
-                        left: 0,
-                        zIndex: 3,
-                        backgroundColor: '#fff',
-                      }}
-                    />
-                    {times.map((time, timeIndex) => (
-                      <TableCell
-                        key={timeIndex}
-                        align="center"
-                        width={200}
-                        className="relative"
-                        sx={{
-                          borderRight: 'none',
-                          borderTop: 'none',
-                          borderBottom: 'none',
-                        }}>
-                        <div style={{ width: 20, height: 30 }}>
-                          <span className="absolute top-1/2 left-0 transform -translate-x-1/2 -translate-y-1/2 bg-white px-2">
-                            {time}
-                          </span>
-                        </div>
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {reservationsByRooms?.map((reservationsByRoom, i) => (
-                    <TableRow key={i}>
-                      <TableCell
-                        sx={{
-                          px: 2,
-                          py: 2,
-                          borderLeft: '1px solid #ccc',
-                          whiteSpace: 'nowrap',
-                          position: 'sticky',
-                          left: 0,
-                          zIndex: 2,
-                          backgroundColor: '#fff',
-                        }}>
-                        {`${reservationsByRoom.roomName}-${reservationsByRoom.partitionNumber}`}
-                      </TableCell>
-                      {times.map((time, timeIndex) => {
-                        if (timeIndex === times.length - 1) {
-                          return null; // 마지막 열을 제외
-                        }
-
-                        const slotDateFrom = parse(
-                          `${selectedDate} ${time}`,
-                          'yyyy-MM-dd HH:mm',
-                          new Date(),
-                        );
-                        const slotDateTo = addMinutes(slotDateFrom, 30);
-                        const slotDateFromPlus30 = addMinutes(slotDateFrom, 30);
-                        const isClosed = isOutsideOperationHours(
-                          format(slotDateFrom, 'HH:mm'),
-                          reservationsByRoom.operationStartTime,
-                          reservationsByRoom.operationEndTime,
-                        );
-                        const isPast = now > slotDateFromPlus30;
-                        const isSelected =
-                          reservationsByRoom.partitionId ===
-                            selectedRoom?.partitionId &&
-                          areIntervalsOverlapping(
-                            { start: selectedRangeFrom, end: selectedRangeTo },
-                            { start: slotDateFrom, end: slotDateTo },
-                          );
-                        const isReserved =
-                          reservationsByRoom?.reservationTimeRanges.some(
-                            reservation => {
-                              const reservationStart = new Date(
-                                reservation.startDateTime,
-                              );
-                              const reservationEnd = new Date(
-                                reservation.endDateTime,
-                              );
-                              return (
-                                slotDateFrom >= reservationStart &&
-                                slotDateFrom < reservationEnd
-                              );
-                            },
-                          );
-                        const isSelectable =
-                          !isPast && !isReserved && !isClosed;
-                        const isInSelectableRange =
-                          selectedRangeTo &&
-                          differenceInMinutes(slotDateTo, selectedRangeFrom) <=
-                            reservationsByRoom.eachMaxMinute &&
-                          differenceInMinutes(slotDateTo, selectedRangeFrom) >
-                            0 &&
-                          selectedRoom?.partitionId ===
-                            reservationsByRoom.partitionId;
-                        // 지난 칸은 선택 표시보다 잠금 표시가 우선이다
-                        const mode = isReserved
-                          ? 'reserved'
-                          : isPast
-                            ? 'past'
-                            : isSelected
-                              ? 'selected'
-                              : isClosed
-                                ? 'closed'
-                                : 'none';
-
-                        return (
-                          <TableCell
-                            key={timeIndex}
-                            onClick={() =>
-                              isSelectable &&
-                              handleCellClick(reservationsByRoom, timeIndex)
-                            }
-                            className={isSelected ? 'selected' : ''}
-                            style={{
-                              opacity:
-                                !isInSelectableRange && isSomethingSelected
-                                  ? 0.4
-                                  : 1,
-                              backgroundColor: {
-                                past: '#AAAAAA',
-                                closed: '#AAAAAA',
-                                selected: '#7599BA',
-                                reserved: '#002D56',
-                                none: '#F1EEE9',
-                              }[mode],
-                              borderRight: '1px solid #ccc',
-                              borderLeft: '1px solid #ccc',
-                              borderTop: '1px solid #ccc',
-                              borderBottom: '1px solid #ccc',
-                              cursor: isSelectable ? 'pointer' : 'not-allowed',
-                            }}></TableCell>
-                        );
-                      })}
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
+            <ReservationTimeTable
+              rooms={reservationsByRooms}
+              times={times}
+              selectedDate={selectedDate}
+              now={now}
+              selection={
+                selectedRoom && selectedRangeFrom && selectedRangeTo
+                  ? {
+                      partitionId: selectedRoom.partitionId,
+                      from: selectedRangeFrom,
+                      to: selectedRangeTo,
+                    }
+                  : null
+              }
+              onCellClick={(room, timeIndex, state) => {
+                if (!state.selectable) return;
+                handleCellClick(room, timeIndex);
+              }}
+            />
           </div>
         )}
         {!isReservationsPending && !isReservationsError && !hasRooms && (

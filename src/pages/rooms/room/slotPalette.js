@@ -3,13 +3,8 @@ export const SLOT_PALETTE = {
   free: { background: '#F1EEE9', pattern: null, mark: null },
   selected: { background: '#7599BA', pattern: null, mark: null },
   reserved: { background: '#002D56', pattern: null, mark: '✕' },
-  past: { background: '#E3E1DE', pattern: null, mark: null },
-  closed: {
-    background: '#CFCFCF',
-    pattern:
-      'repeating-linear-gradient(45deg, transparent 0 4px, rgba(0,0,0,0.09) 4px 8px)',
-    mark: null,
-  },
+  past: { background: '#AAAAAA', pattern: null, mark: null },
+  closed: { background: '#AAAAAA', pattern: null, mark: null },
 };
 
 export const SLOT_LABEL = {
