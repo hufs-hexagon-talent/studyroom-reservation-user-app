@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 import {
+  Box,
   Table,
   TableBody,
   TableCell,
@@ -13,6 +14,10 @@ import { SLOT_PALETTE } from './slotPalette';
 import { getSlotState, initialScrollIndex } from './slotState';
 import useTimeTableScroll from './useTimeTableScroll';
 
+// 스티키 호실명 열의 폭. 좌측 페이드 위치도 이 값 하나로 맞춰서
+// MUI(sx)와 Tailwind가 서로 다른 브레이크포인트에서 어긋나지 않게 한다.
+const STICKY_COL_WIDTH = { xs: 52, md: 100 };
+
 const ReservationTimeTable = ({
   rooms,
   times,
@@ -22,10 +27,13 @@ const ReservationTimeTable = ({
   onCellClick,
 }) => {
   // 날짜가 바뀔 때만 다시 잡는다. now 가 30초마다 바뀌어도 스크롤이 되돌아가지 않게.
+  // times 가 아직 빈 배열인 첫 렌더(예약 현황은 왔지만 시간표 계산은 다음 렌더에야 끝난다)에는
+  // 잠그지 않는다 — 잠그면 initialScrollIndex 가 0 을 반환해 그 값으로 영원히 고정돼 버린다.
   const initialIndexRef = useRef(null);
   if (
-    initialIndexRef.current === null ||
-    initialIndexRef.current.date !== selectedDate
+    times.length > 0 &&
+    (initialIndexRef.current === null ||
+      initialIndexRef.current.date !== selectedDate)
   ) {
     initialIndexRef.current = {
       date: selectedDate,
@@ -34,7 +42,7 @@ const ReservationTimeTable = ({
   }
 
   const { containerRef, edges, handleScroll } = useTimeTableScroll({
-    scrollToIndex: initialIndexRef.current.index,
+    scrollToIndex: initialIndexRef.current?.index ?? 0,
     resetKey: selectedDate,
   });
 
@@ -63,8 +71,8 @@ const ReservationTimeTable = ({
                     backgroundColor: '#fff',
                     border: 'none',
                     padding: 0,
-                    width: { xs: 52, md: 100 },
-                    minWidth: { xs: 52, md: 100 },
+                    width: STICKY_COL_WIDTH,
+                    minWidth: STICKY_COL_WIDTH,
                   }}
                 />
                 {times.slice(0, -1).map((time, timeIndex) => (
@@ -100,8 +108,8 @@ const ReservationTimeTable = ({
                       zIndex: 2,
                       backgroundColor: '#fff',
                       fontSize: { xs: '11.5px', md: '14px' },
-                      width: { xs: 52, md: 100 },
-                      minWidth: { xs: 52, md: 100 },
+                      width: STICKY_COL_WIDTH,
+                      minWidth: STICKY_COL_WIDTH,
                     }}>
                     {`${room.roomName}-${room.partitionNumber}`}
                   </TableCell>
@@ -144,17 +152,31 @@ const ReservationTimeTable = ({
           </Table>
         </TableContainer>
         {edges.left && (
-          <div
+          <Box
             aria-hidden
-            className="pointer-events-none absolute inset-y-0 left-[52px] w-6 md:left-[100px]"
-            style={{ background: 'linear-gradient(to left, transparent, #fff)' }}
+            sx={{
+              position: 'absolute',
+              top: 0,
+              bottom: 0,
+              left: STICKY_COL_WIDTH,
+              width: 24,
+              pointerEvents: 'none',
+              background: 'linear-gradient(to left, transparent, #fff)',
+            }}
           />
         )}
         {edges.right && (
-          <div
+          <Box
             aria-hidden
-            className="pointer-events-none absolute inset-y-0 right-0 w-6"
-            style={{ background: 'linear-gradient(to right, transparent, #fff)' }}
+            sx={{
+              position: 'absolute',
+              top: 0,
+              bottom: 0,
+              right: 0,
+              width: 24,
+              pointerEvents: 'none',
+              background: 'linear-gradient(to right, transparent, #fff)',
+            }}
           />
         )}
       </div>

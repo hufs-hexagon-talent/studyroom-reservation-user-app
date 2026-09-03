@@ -8,10 +8,12 @@ const useTimeTableScroll = ({ scrollToIndex, resetKey }) => {
   const updateEdges = useCallback(() => {
     const el = containerRef.current;
     if (!el) return;
-    setEdges({
-      left: el.scrollLeft > 1,
-      right: el.scrollLeft + el.clientWidth < el.scrollWidth - 1,
-    });
+    const left = el.scrollLeft > 1;
+    const right = el.scrollLeft + el.clientWidth < el.scrollWidth - 1;
+    // 값이 그대로면 이전 객체를 돌려줘 스크롤 이벤트마다 표 전체가 리렌더되지 않게 한다
+    setEdges(prev =>
+      prev.left === left && prev.right === right ? prev : { left, right },
+    );
   }, []);
 
   // 칸 폭이 화면 크기마다 달라서 인덱스 x 폭으로 계산하지 않고 실제 위치를 잰다
