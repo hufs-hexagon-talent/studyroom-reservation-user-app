@@ -104,6 +104,7 @@ const ReservationTimeTable = ({
               {rooms.map((room, i) => (
                 <TableRow key={i}>
                   <TableCell
+                    component="th"
                     scope="row"
                     sx={{
                       px: { xs: 0.75, md: 2 },
@@ -136,7 +137,7 @@ const ReservationTimeTable = ({
                         role="button"
                         tabIndex={state.selectable ? 0 : -1}
                         aria-disabled={!state.selectable}
-                        aria-label={`${room.roomName}-${room.partitionNumber} ${time} ${SLOT_LABEL[state.status]}`}
+                        aria-label={`${room.roomName}-${room.partitionNumber} ${time} ${SLOT_LABEL[state.status] ?? state.status}`}
                         onClick={() => onCellClick(room, timeIndex, state)}
                         onKeyDown={event => {
                           if (event.key !== 'Enter' && event.key !== ' ') return;

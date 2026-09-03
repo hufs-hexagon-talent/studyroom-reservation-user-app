@@ -46,7 +46,7 @@ const selectedCells = container =>
   container.querySelectorAll('td.selected').length;
 
 const slotCells = container =>
-  Array.from(container.querySelectorAll('tbody td')).slice(1);
+  Array.from(container.querySelectorAll('tbody [data-time-index]'));
 
 beforeEach(() => {
   jest.clearAllMocks();
