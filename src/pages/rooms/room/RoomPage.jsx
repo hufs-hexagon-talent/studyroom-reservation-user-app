@@ -19,6 +19,7 @@ import {
   getReserveErrorMessage,
   hasReservedSlotInRange,
   isOutsideOperationHours,
+  lockedSlotMessage,
   maxMinutesExceededMessage,
   normalizeErrorCode,
   RESERVE_AUTH_FAILED_MESSAGE,
@@ -442,8 +443,12 @@ const RoomPage = () => {
                   : null
               }
               onCellClick={(room, timeIndex, state) => {
-                if (!state.selectable) return;
-                handleCellClick(room, timeIndex);
+                if (state.selectable) {
+                  handleCellClick(room, timeIndex);
+                  return;
+                }
+                const message = lockedSlotMessage(state.lockedReason);
+                if (message) openSnackbar(message);
               }}
             />
           </div>
