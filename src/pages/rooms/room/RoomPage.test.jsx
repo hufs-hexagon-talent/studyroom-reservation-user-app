@@ -4,6 +4,8 @@ import { fireEvent, render, screen, within } from '@testing-library/react';
 import { useReservations, useReserve } from '../../../api/reservation.api';
 
 import RoomPage, { reserveModalTheme } from './RoomPage';
+import { shortDateLabel } from './dateLabel';
+import { durationLabel } from './durationLabel';
 
 jest.mock('../../../api/reservation.api', () => ({
   useReservations: jest.fn(),
@@ -182,20 +184,41 @@ describe('예약 확인 모달', () => {
     const headings = dialog.querySelectorAll('h1, h2, h3, h4, h5, h6');
 
     expect(headings).toHaveLength(1);
-    expect(headings[0]).toHaveTextContent('현재 선택한 예약 정보');
+    expect(headings[0]).toHaveTextContent('이대로 예약할까요?');
   });
 
-  it('호실명·시간·길이를 보여준다', () => {
+  it('호실명·시작 시각·종료 시각·날짜·길이가 모두 화면에 있다', () => {
     const { container } = render(<RoomPage />);
     openModal(container);
 
     const dialog = screen.getByRole('dialog');
+    // useUrlQuery 가 '2099-01-01' 로 고정돼 있다. 시간대에 따라 "(오늘)" 여부가 달라질 수
+    // 있어 하드코딩하지 않고 실제 쓰는 함수로 기대값을 계산한다.
+    expect(
+      within(dialog).getByText(shortDateLabel('2099-01-01')),
+    ).toBeInTheDocument();
     expect(within(dialog).getByText('세미나실-1')).toBeInTheDocument();
-    expect(within(dialog).getByText(/09:00 ~ 10:00/)).toBeInTheDocument();
-    expect(within(dialog).getByText('1시간')).toBeInTheDocument();
+    expect(within(dialog).getByText('09:00')).toBeInTheDocument();
+    expect(within(dialog).getByText('10:00')).toBeInTheDocument();
+    expect(within(dialog).getByText(durationLabel(60))).toBeInTheDocument();
   });
 
-  it('취소 버튼이 flowbite light 색이고 빨간 배경 클래스가 없다', () => {
+  it('시간 블록에 aria-label 이 있고 시작·종료·길이가 들어 있다', () => {
+    const { container } = render(<RoomPage />);
+    openModal(container);
+
+    const dialog = screen.getByRole('dialog');
+    const timeBlock = within(dialog).getByRole('group');
+
+    expect(timeBlock).toHaveAttribute(
+      'aria-label',
+      expect.stringContaining('09:00'),
+    );
+    expect(timeBlock.getAttribute('aria-label')).toContain('10:00');
+    expect(timeBlock.getAttribute('aria-label')).toContain(durationLabel(60));
+  });
+
+  it('취소 버튼에 빨간 배경 클래스가 없다', () => {
     const { container } = render(<RoomPage />);
     openModal(container);
 
@@ -203,16 +226,9 @@ describe('예약 확인 모달', () => {
     const cancel = within(dialog).getByRole('button', { name: '취소' });
     const classes = cancel.className.split(/\s+/);
 
-    // 부정: color가 'failure'(bg-red-700) 등 빨간 계열로 바뀌면 잡아낸다.
-    // bg-red-600 하나만 보면 색상이 bg-red-700 등 다른 빨강으로 바뀌었을 때
-    // 놓치므로 'bg-red-'로 시작하는 클래스 전체를 본다.
+    // color가 'failure'(bg-red-700) 등 빨간 계열로 바뀌면 잡아낸다. bg-red-600 하나만
+    // 보면 다른 빨강으로 바뀌었을 때 놓치므로 'bg-red-'로 시작하는 클래스 전체를 본다.
     expect(classes.some(c => c.startsWith('bg-red-'))).toBe(false);
-
-    // 긍정: node_modules/flowbite-react 의 Button/theme.mjs 에서 읽은 color.light 문자열
-    // ("border border-gray-300 bg-white text-gray-900 ...")의 border-gray-300 은
-    // 이 앱이 쓰는 다른 색(dark/failure 등) 어디에도 없는 light 고유 클래스라
-    // light 로 바뀌었는지 안정적으로 가려낸다.
-    expect(classes).toContain('border-gray-300');
   });
 
   it('바깥을 누르면 모달이 닫힌다', () => {
@@ -237,9 +253,11 @@ describe('예약 확인 모달', () => {
 
   // jsdom 은 레이아웃이 없어 h-full 때문에 래퍼가 화면을 덮어 바깥 클릭이
   // 오버레이까지 못 내려가는 걸 폭·좌표로는 재현할 수 없다. 대신 그 원인이었던
-  // 클래스가 되돌아오지 않는지 테마 상수 자체로 회귀를 막는다.
-  it('content.base 에 모바일에서 래퍼가 화면을 덮는 h-full 이 없다', () => {
-    const classes = reserveModalTheme.content.base.split(/\s+/);
-    expect(classes).not.toContain('h-full');
+  // 클래스가 되돌아오지 않는지 테마 상수 자체로 회귀를 막는다. h-full 뿐 아니라
+  // h-dvh·min-h-screen 등 같은 버그를 재현하는 전체 높이 유틸 전반을 막는다.
+  it('content.base 에 모바일에서 래퍼가 화면을 덮는 전체 높이 유틸이 없다', () => {
+    const forbidden =
+      /\b(h-full|h-screen|h-dvh|h-\[100[a-z]*\]|min-h-screen|min-h-dvh)\b/;
+    expect(reserveModalTheme.content.base).not.toMatch(forbidden);
   });
 });
