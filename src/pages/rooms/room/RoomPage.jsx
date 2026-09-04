@@ -45,17 +45,26 @@ import { Modal } from 'flowbite-react';
 import { durationLabel } from './durationLabel';
 import { shortDateLabel } from './dateLabel';
 
-// flowbite Modal 의 패널(content.inner)은 flex 아이템이라 기본값이 내용 크기로 줄어든다.
-// node_modules/flowbite-react 의 Modal/theme.mjs 에서 읽은 기본 클래스에 w-full 만 더한다.
-// 닫기 버튼(header.close)도 기본이 32px 라 탭 영역 44px 를 채우도록 크기를 키운다.
-// content.base(role="dialog" 래퍼)는 flowbite 기본 클래스가 "relative h-full w-full p-4
-// md:h-auto" 라 모바일(768px 미만)에서 h-full 로 뷰포트 전체를 덮는다. dismissible 의
-// 바깥 클릭 핸들러는 이 래퍼의 부모인 오버레이(data-testid="modal-overlay")에 붙는데,
-// 래퍼가 화면 전체를 덮으면 클릭이 오버레이까지 내려가지 못해 모바일에서만 바깥 클릭이
-// 먹지 않았다. h-full 과 md:h-auto 를 빼 래퍼를 내용 높이로 줄이면 이 문제가 없어지고,
-// 세로 가운데 정렬은 오버레이에 className 으로 붙인 flex items-center justify-center 가
-// 대신 맡는다. 내용이 길어질 때 스크롤은 오버레이의 overflow-y-auto(Modal/theme.mjs
-// root.base)와 패널의 max-h-[90dvh]로 그대로 처리된다.
+// flowbite Modal 의 기본 테마(node_modules/flowbite-react 의 Modal/theme.mjs)에서 두 가지를
+// 바꾼다.
+//
+// 1) content.base — 기본값은 "relative h-full w-full p-4 md:h-auto" 인데, 여기서 h-full 과
+//    md:h-auto 를 뺐다. dismissible 의 바깥 클릭은 floating-ui 가 document 에 리스너를 걸고
+//    (@floating-ui/react 의 useDismiss) 누른 지점이 floating element 안인지로 판정하는데,
+//    floating element 가 바로 이 래퍼다. h-full 이면 래퍼가 뷰포트를 다 덮어서 어두운 여백을
+//    눌러도 "안쪽"으로 판정돼 모바일에서만 바깥 클릭이 안 먹었다. 래퍼를 내용 높이로 줄이면
+//    해결된다. 세로 가운데 정렬은 오버레이에 className 으로 준 flex items-center
+//    justify-center 가 맡고, 내용이 길 때 스크롤은 오버레이의 overflow-y-auto(root.base)와
+//    패널의 max-h-[90dvh]가 처리한다.
+//
+// 2) header.close — 닫기 버튼 기본이 32px 라 탭 영역 44px 를 채우도록 키웠다.
+//
+// content.inner 의 w-full 은 보험이다. 패널의 부모(content.base)에 display 유틸이 없어
+// 블록 박스라 auto 폭이 이미 부모를 채우므로 지금은 없어도 결과가 같다. 다만 <Modal> 에
+// style 이나 display 계열 className 을 주면 floating-ui 의 getFloatingProps 가 그 props 를
+// 이 래퍼에도 얹어 flex 컨테이너로 만들고, 그러면 패널이 내용 크기로 줄어든다. 예전에
+// 모달이 좁았던 원인이 그거였다(인라인 style={{display:'flex'}}). 그 실수가 반복돼도
+// 폭은 유지되게 남겨 둔다.
 export const reserveModalTheme = {
   content: {
     base: 'relative w-full p-4',
