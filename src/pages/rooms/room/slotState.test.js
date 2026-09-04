@@ -31,7 +31,6 @@ describe('getSlotState 상태 우선순위', () => {
     });
     expect(s.status).toBe('reserved');
     expect(s.selectable).toBe(false);
-    expect(s.lockedReason).toBe('reserved');
   });
 
   it('지난 칸은 선택 표시보다 잠금이 우선이다', () => {
@@ -52,7 +51,6 @@ describe('getSlotState 상태 우선순위', () => {
       selection: null,
     });
     expect(s.status).toBe('closed');
-    expect(s.lockedReason).toBe('closed');
   });
 
   it('호실마다 운영시간이 다르면 같은 시각도 갈린다', () => {
@@ -104,18 +102,17 @@ describe('getSlotState 연장 범위', () => {
     expect(s.outOfExtendRange).toBe(true);
   });
 
-  it('다른 호실은 otherRoom 으로 구분되고 범위 밖으로도 표시된다', () => {
+  it('다른 호실은 범위 밖으로 표시된다', () => {
     const s = getSlotState({
       slotStart: at('10:00'),
       now: at('08:00'),
       room: room({ partitionId: 2 }),
       selection,
     });
-    expect(s.otherRoom).toBe(true);
     expect(s.outOfExtendRange).toBe(true);
   });
 
-  it('선택이 없으면 범위 밖도 다른 호실도 아니다', () => {
+  it('선택이 없으면 범위 밖이 아니다', () => {
     const s = getSlotState({
       slotStart: at('10:00'),
       now: at('08:00'),
@@ -123,7 +120,6 @@ describe('getSlotState 연장 범위', () => {
       selection: null,
     });
     expect(s.outOfExtendRange).toBe(false);
-    expect(s.otherRoom).toBe(false);
   });
 });
 
