@@ -107,6 +107,26 @@ describe('ReservationTimeTable 접근성', () => {
     expect(first).toHaveAttribute('tabIndex', '-1');
   });
 
+  it('내 예약 칸은 이름으로도 내 것임을 알 수 있고 고를 수 없다', () => {
+    const { container } = setup({
+      rooms: [
+        room({
+          reservationTimeRanges: [
+            {
+              startDateTime: '2099-01-01T09:00:00',
+              endDateTime: '2099-01-01T09:30:00',
+              isMine: true,
+            },
+          ],
+        }),
+      ],
+    });
+    const first = container.querySelector('tbody [data-time-index="0"]');
+    expect(first).toHaveAttribute('aria-label', '세미나실-1 09:00 내 예약');
+    expect(first).toHaveAttribute('aria-disabled', 'true');
+    expect(first).toHaveAttribute('tabIndex', '-1');
+  });
+
   it('표에 무엇을 담은 표인지 설명이 있다', () => {
     const { container } = setup();
     expect(container.querySelector('caption').textContent).toBe(

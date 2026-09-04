@@ -79,6 +79,80 @@ describe('getSlotState 상태 우선순위', () => {
   });
 });
 
+describe('getSlotState 내 예약', () => {
+  const range = (over = {}) => ({
+    startDateTime: '2026-09-03T10:00:00',
+    endDateTime: '2026-09-03T11:00:00',
+    ...over,
+  });
+
+  it('isMine 이 true 면 mine 이고 고를 수 없다', () => {
+    const s = getSlotState({
+      slotStart: at('10:00'),
+      now: at('08:00'),
+      room: room({ reservationTimeRanges: [range({ isMine: true })] }),
+      selection: null,
+    });
+    expect(s.status).toBe('mine');
+    expect(s.selectable).toBe(false);
+  });
+
+  it('내 예약은 지난 시간이어도 mine 이다', () => {
+    const s = getSlotState({
+      slotStart: at('10:00'),
+      now: at('17:00'),
+      room: room({ reservationTimeRanges: [range({ isMine: true })] }),
+      selection: null,
+    });
+    expect(s.status).toBe('mine');
+  });
+
+  it('선택 범위와 겹쳐도 mine 이다', () => {
+    const s = getSlotState({
+      slotStart: at('10:00'),
+      now: at('08:00'),
+      room: room({ reservationTimeRanges: [range({ isMine: true })] }),
+      selection: { partitionId: 1, from: at('10:00'), to: at('10:30') },
+    });
+    expect(s.status).toBe('mine');
+  });
+
+  it('isMine 이 없으면 reserved 다', () => {
+    const s = getSlotState({
+      slotStart: at('10:00'),
+      now: at('08:00'),
+      room: room({ reservationTimeRanges: [range()] }),
+      selection: null,
+    });
+    expect(s.status).toBe('reserved');
+  });
+
+  it('isMine 이 false 면 reserved 다', () => {
+    const s = getSlotState({
+      slotStart: at('10:00'),
+      now: at('08:00'),
+      room: room({ reservationTimeRanges: [range({ isMine: false })] }),
+      selection: null,
+    });
+    expect(s.status).toBe('reserved');
+  });
+
+  it('같은 칸을 덮는 예약이 남의 것과 내 것 둘이면 mine 이다', () => {
+    const s = getSlotState({
+      slotStart: at('10:00'),
+      now: at('08:00'),
+      room: room({
+        reservationTimeRanges: [
+          range({ isMine: false }),
+          range({ isMine: true }),
+        ],
+      }),
+      selection: null,
+    });
+    expect(s.status).toBe('mine');
+  });
+});
+
 describe('getSlotState 연장 범위', () => {
   const selection = { partitionId: 1, from: at('10:00'), to: at('10:30') };
 

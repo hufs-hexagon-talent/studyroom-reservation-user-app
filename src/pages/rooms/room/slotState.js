@@ -19,11 +19,15 @@ export const getSlotState = ({ slotStart, now, room, selection }) => {
     room.operationEndTime,
   );
   const past = now > slotEnd;
-  const reserved = (room.reservationTimeRanges ?? []).some(reservation => {
+  // 이 칸을 덮는 예약들. 한 칸을 덮는 예약이 여럿일 수 있어 목록으로 둔다.
+  const covering = (room.reservationTimeRanges ?? []).filter(reservation => {
     const start = new Date(reservation.startDateTime);
     const end = new Date(reservation.endDateTime);
     return slotStart >= start && slotStart < end;
   });
+  // isMine 이 없거나 false 면 reserved 로 본다(옛 서버 응답 호환).
+  const mine = covering.some(reservation => reservation.isMine === true);
+  const reserved = covering.length > 0;
 
   const hasSelection = !!(
     selection?.partitionId &&
@@ -38,16 +42,19 @@ export const getSlotState = ({ slotStart, now, room, selection }) => {
       { start: slotStart, end: slotEnd },
     );
 
-  // 지난 칸은 선택 표시보다 잠금 표시가 우선이다
-  const status = reserved
-    ? 'reserved'
-    : past
-      ? 'past'
-      : selected
-        ? 'selected'
-        : closed
-          ? 'closed'
-          : 'free';
+  // 지난 칸은 선택 표시보다 잠금 표시가 우선이다.
+  // 내 예약이 지난 시간이어도 mine 이 우선이다. 내 것이라는 사실이 먼저 보여야 한다.
+  const status = mine
+    ? 'mine'
+    : reserved
+      ? 'reserved'
+      : past
+        ? 'past'
+        : selected
+          ? 'selected'
+          : closed
+            ? 'closed'
+            : 'free';
 
   // 연장 가능한 범위: 같은 호실이면서 선택 시작부터 최대 예약 시간 안
   const withinExtend =
