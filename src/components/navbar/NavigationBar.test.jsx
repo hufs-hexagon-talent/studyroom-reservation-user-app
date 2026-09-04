@@ -41,3 +41,13 @@ describe('NavigationBar 출석 체크 링크', () => {
     expect(container.querySelector('a[href="/qrcheck"]')).toBeNull();
   });
 });
+
+describe('NavigationBar 고정', () => {
+  test('스크롤해도 상단에 남도록 sticky 로 붙어 있다', () => {
+    const { container } = renderAs('STUDENT');
+    const nav = container.querySelector('nav');
+
+    expect(nav).toHaveClass('sticky');
+    expect(nav).toHaveClass('top-0');
+  });
+});
