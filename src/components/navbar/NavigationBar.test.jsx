@@ -49,5 +49,9 @@ describe('NavigationBar 고정', () => {
 
     expect(nav).toHaveClass('sticky');
     expect(nav).toHaveClass('top-0');
+    // z-30 은 표의 스티키 호실명 열(z-index 3)보다 위, 하단 바(z-40)보다 아래여야 한다.
+    expect(nav).toHaveClass('z-30');
+    // 불투명 배경이 없으면 스크롤 중 표 내용이 네비 뒤로 비친다.
+    expect(nav).toHaveClass('bg-white');
   });
 });

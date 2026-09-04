@@ -97,6 +97,36 @@ describe('RoomPage 시간 선택', () => {
     fireEvent.click(slotCells(container)[0]);
     expect(selectedCells(container)).toBe(0);
   });
+
+  // handleSlotClick 의 !state.selectable 가드가 유일한 클라이언트 방어선이다.
+  // 칸에 pointer-events:none 이 걸려 있지 않아 클릭 자체는 들어온다.
+  it('이미 예약된 칸을 누르면 선택되지 않는다', () => {
+    useReservations.mockReturnValue({
+      data: [
+        {
+          ...room(),
+          reservationTimeRanges: [
+            {
+              startDateTime: '2099-01-01T09:00:00',
+              endDateTime: '2099-01-01T09:30:00',
+            },
+          ],
+        },
+      ],
+      isPending: false,
+      isError: false,
+      refetch: jest.fn(),
+    });
+
+    const { container } = render(<RoomPage />);
+
+    fireEvent.click(slotCells(container)[0]);
+
+    // td.selected 로는 판별할 수 없다. getSlotState 의 우선순위가 reserved 를 먼저 보므로
+    // 가드가 없어 선택이 생겨도 status 는 계속 reserved 다. 선택이 실제로 생겼는지는
+    // 모바일 SelectionBar 가 뜨는지로 본다(선택이 없으면 null 을 반환한다).
+    expect(screen.queryAllByText('예약하기')).toHaveLength(1);
+  });
 });
 
 // 표가 실제로 그려졌는지 확인해 두어야 선택 칸 수 비교가 뜻을 갖는다
@@ -128,6 +158,18 @@ describe('예약 확인 모달', () => {
       isError: false,
       refetch: jest.fn(),
     });
+  });
+
+  // 모바일에서는 SelectionBar 의 버튼이 유일한 예약 경로다. 데스크톱 버튼만 누르는
+  // 테스트로는 이 배선(onReserve={openReserveConfirm})이 끊겨도 잡히지 않는다.
+  it('모바일 SelectionBar 의 예약하기로도 모달이 열린다', () => {
+    const { container } = render(<RoomPage />);
+
+    fireEvent.click(slotCells(container)[0]);
+    fireEvent.click(slotCells(container)[1]);
+    fireEvent.click(screen.getAllByText('예약하기')[1]);
+
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
   });
 
   it('호실명·시간·길이를 보여준다', () => {
