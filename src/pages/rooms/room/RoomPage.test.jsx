@@ -1,11 +1,13 @@
 import React from 'react';
 import { fireEvent, render, screen, within } from '@testing-library/react';
+import fs from 'fs';
+import path from 'path';
 
 import { useReservations, useReserve } from '../../../api/reservation.api';
 
-import RoomPage, { reserveModalTheme } from './RoomPage';
 import { shortDateLabel } from './dateLabel';
 import { durationLabel } from './durationLabel';
+import RoomPage, { reserveModalTheme } from './RoomPage';
 
 jest.mock('../../../api/reservation.api', () => ({
   useReservations: jest.fn(),
@@ -231,6 +233,39 @@ describe('예약 확인 모달', () => {
     expect(classes.some(c => c.startsWith('bg-red-'))).toBe(false);
   });
 
+  // 위 테스트는 '빨간 배경이 없다'만 본다 — theme={reserveActionButtonTheme} prop을
+  // 통째로 빼도(=flowbite 기본 color.light로 되돌아가도) 통과해버린다(리뷰어가 실제로
+  // prop을 지우고 확인함). flowbite 기본 테마에는 빨간 배경이 원래 없기 때문이다.
+  // 그래서 이 커밋이 새로 넣은 크림/남색 팔레트가 실제로 적용됐는지 긍정 단언으로
+  // 따로 확인한다. reserveActionButtonTheme는 RoomPage.jsx가 export하지 않으므로(제품
+  // 코드는 고치지 않는다) 소스 텍스트에서 color.light 문자열을 직접 읽어 대조한다 —
+  // 값을 테스트에 하드코딩하지 않으므로 테마가 바뀌면 이 테스트도 함께 따라간다.
+  it('취소 버튼에 reserveActionButtonTheme.color.light 의 클래스가 실제로 적용된다', () => {
+    const source = fs.readFileSync(
+      path.join(__dirname, 'RoomPage.jsx'),
+      'utf8',
+    );
+    const match = source.match(/\blight:\s*\n?\s*'([^']+)'/);
+    expect(match).not.toBeNull();
+
+    const lightClasses = match[1].split(/\s+/).filter(Boolean);
+    // flowbite 기본 color.light 와 겹치지 않는다고 확신할 수 있는 클래스만 골라야
+    // 의미가 있다 — 임의값(대괄호) 클래스는 이 테마 고유의 색이라 겹칠 일이 없다.
+    const distinctiveClasses = lightClasses.filter(c => c.includes('['));
+    expect(distinctiveClasses.length).toBeGreaterThan(0);
+
+    const { container } = render(<RoomPage />);
+    openModal(container);
+
+    const dialog = screen.getByRole('dialog');
+    const cancel = within(dialog).getByRole('button', { name: '취소' });
+    const classes = cancel.className.split(/\s+/);
+
+    distinctiveClasses.forEach(distinctiveClass => {
+      expect(classes).toContain(distinctiveClass);
+    });
+  });
+
   it('바깥을 누르면 모달이 닫힌다', () => {
     const { container } = render(<RoomPage />);
     openModal(container);
@@ -255,10 +290,24 @@ describe('예약 확인 모달', () => {
   // 오버레이까지 못 내려가는 걸 폭·좌표로는 재현할 수 없다. 대신 그 원인이었던
   // 클래스가 되돌아오지 않는지 테마 상수 자체로 회귀를 막는다. h-full 뿐 아니라
   // h-dvh·min-h-screen 등 같은 버그를 재현하는 전체 높이 유틸 전반을 막는다.
+  // svh/lvh(이 레포의 tailwindcss 3.4.17 에서는 코어 유틸)와 min-h-[...] 임의값도
+  // 같은 버그를 재현하므로 함께 잡는다.
   it('content.base 에 모바일에서 래퍼가 화면을 덮는 전체 높이 유틸이 없다', () => {
     const forbidden =
-      /\b(h-full|h-screen|h-dvh|h-\[100[a-z]*\]|min-h-screen|min-h-dvh)\b/;
+      /\b(?:h-full|h-screen|h-dvh|h-svh|h-lvh|min-h-screen|min-h-dvh|min-h-svh|min-h-lvh)\b|\bh-\[100[a-z%]*\]|\bmin-h-\[[^\]]+\]/;
     expect(reserveModalTheme.content.base).not.toMatch(forbidden);
+  });
+
+  // 위 정규식은 차단 목록이라 새로운 전체 높이 유틸(svh/lvh 도 처음엔 놓쳤듯)이
+  // 나오면 또 놓칠 수 있다. content.base 에 들어갈 클래스 집합을 정확히 고정해
+  // 이중으로 막는다 — 여기에 무엇이든 더하려면(특히 h-full/h-svh/min-h-[100dvh] 같은
+  // 전체 높이 유틸) 이 테스트를 함께 고쳐야 한다. 그 래퍼가 뷰포트를 다시 덮으면
+  // 모바일에서 바깥 클릭 닫힘이 죽는다 — floating-ui 의 useDismiss 가 이 래퍼를
+  // floating element 로 보고 outside-press 를 판정하기 때문이다.
+  it('content.base 는 기대한 클래스만 갖는다', () => {
+    expect(
+      reserveModalTheme.content.base.split(/\s+/).filter(Boolean).sort(),
+    ).toEqual(['relative', 'w-full', 'p-4', 'focus:outline-none'].sort());
   });
 
   // 대화상자 컨테이너가 initialFocus 대상이 되려면 그 role="dialog" div 의 className 이
