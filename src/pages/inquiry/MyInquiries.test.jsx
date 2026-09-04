@@ -89,7 +89,7 @@ describe('MyInquiries', () => {
     expect(within(openItem).getByText('시설·키오스크 고장')).toBeInTheDocument();
     expect(within(openItem).getByText('접수됨')).toBeInTheDocument();
     expect(within(resolvedItem).getByText('출석·예약 이의')).toBeInTheDocument();
-    expect(within(resolvedItem).getByText('완료')).toBeInTheDocument();
+    expect(within(resolvedItem).getByText('처리완료')).toBeInTheDocument();
   });
 
   it('완료된 문의는 처리 메모를 보여준다', () => {
