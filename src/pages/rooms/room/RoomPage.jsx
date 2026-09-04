@@ -67,7 +67,9 @@ import { shortDateLabel } from './dateLabel';
 //   해결된다. h-dvh·min-h-screen 등 다른 전체 높이 유틸로 되돌려도 같은 버그가 재발하니
 //   손대지 말 것. 세로 가운데 정렬은 오버레이에 className 으로 준 flex items-center
 //   justify-center 가 맡고, 내용이 길 때 스크롤은 오버레이의 overflow-y-auto(root.base)와
-//   패널의 max-h-[90dvh]가 처리한다.
+//   패널의 max-h-[90dvh]가 처리한다. 이 래퍼(role="dialog", tabindex="-1")는 아래 Modal 의
+//   initialFocus 대상이라 열릴 때 포커스를 받는다 — 여기 focus:outline-none 을 더해 그때
+//   테두리가 보이지 않게 한다.
 //
 // content.inner 기본값: "relative flex max-h-[90dvh] flex-col rounded-lg bg-white shadow
 //   dark:bg-gray-700". 여기에 26px 반경·다층 그림자·overflow-hidden·antialiased 를 입힌다.
@@ -113,7 +115,7 @@ export const reserveModalTheme = {
     },
   },
   content: {
-    base: 'relative w-full p-4',
+    base: 'relative w-full p-4 focus:outline-none',
     inner:
       'relative flex max-h-[90dvh] w-full flex-col overflow-hidden rounded-[26px] bg-white antialiased shadow-[0_0_0_1px_rgba(0,45,86,0.07),0_2px_4px_rgba(9,20,32,0.06),0_16px_32px_-14px_rgba(9,20,32,0.24),0_44px_76px_-30px_rgba(0,45,86,0.45)]',
   },
@@ -189,6 +191,11 @@ const RoomPage = () => {
   const [endMinute, setEndMinute] = useState(null);
   const [maxReservationMinute, setMaxReservationMinute] = useState(null);
   const [openReserveModal, setOpenReserveModal] = useState(false);
+  // 모달이 열리며 닫기 버튼에 자동 포커스가 가면 마우스 사용자에게도 focus-visible 링이
+  // 보인다(flowbite Modal 이 FloatingFocusManager 로 initialFocus 대상에 포커스를 준다).
+  // 대신 대화상자 컨테이너(role="dialog")를 initialFocus 로 지정한다 — WAI-ARIA APG 권장
+  // 방식이고, 스크린리더는 aria-labelledby 로 제목을 읽으므로 안내가 끊기지 않는다.
+  const reserveDialogRef = useRef(null);
 
   const navigate = useNavigate();
   const today = new Date();
@@ -664,6 +671,8 @@ const RoomPage = () => {
           시작/종료 라벨과 점선 조각이 아니라 이 블록 전체를 한 문장 aria-label 로 읽는다
           (modalTimeAriaLabel, 위에서 계산). */}
       <Modal
+        ref={reserveDialogRef}
+        initialFocus={reserveDialogRef}
         className="flex items-center justify-center"
         theme={reserveModalTheme}
         dismissible

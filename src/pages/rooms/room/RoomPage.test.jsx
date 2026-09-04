@@ -260,4 +260,11 @@ describe('예약 확인 모달', () => {
       /\b(h-full|h-screen|h-dvh|h-\[100[a-z]*\]|min-h-screen|min-h-dvh)\b/;
     expect(reserveModalTheme.content.base).not.toMatch(forbidden);
   });
+
+  // 대화상자 컨테이너가 initialFocus 대상이 되려면 그 role="dialog" div 의 className 이
+  // content.base 를 그대로 쓰므로, 포커스를 받아도 링이 안 보이려면 여기에
+  // focus:outline-none 이 있어야 한다.
+  it('content.base 에 focus:outline-none 이 있다', () => {
+    expect(reserveModalTheme.content.base).toMatch(/\bfocus:outline-none\b/);
+  });
 });
