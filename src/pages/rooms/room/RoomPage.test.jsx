@@ -7,7 +7,8 @@ import { useReservations, useReserve } from '../../../api/reservation.api';
 
 import { shortDateLabel } from './dateLabel';
 import { durationLabel } from './durationLabel';
-import RoomPage, { reserveModalTheme } from './RoomPage';
+import RoomPage from './RoomPage';
+import { modalTheme as reserveModalTheme } from '../../../components/modal/modalTheme';
 
 jest.mock('../../../api/reservation.api', () => ({
   useReservations: jest.fn(),
