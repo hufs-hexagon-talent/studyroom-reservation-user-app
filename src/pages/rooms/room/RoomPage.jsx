@@ -216,7 +216,7 @@ const RoomPage = () => {
       hour: endHour,
       minute: endMinute,
     },
-    intervalMinute: 30,
+    intervalMinute: SLOT_INTERVAL_MINUTE,
     maxReservationMinute: maxReservationMinute,
   };
 
