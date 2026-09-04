@@ -140,13 +140,24 @@ describe('예약 확인 모달', () => {
     expect(within(dialog).getByText('1시간')).toBeInTheDocument();
   });
 
-  it('취소 버튼에 빨간 배경 클래스가 없다', () => {
+  it('취소 버튼이 flowbite light 색이고 빨간 배경 클래스가 없다', () => {
     const { container } = render(<RoomPage />);
     openModal(container);
 
     const dialog = screen.getByRole('dialog');
     const cancel = within(dialog).getByRole('button', { name: '취소' });
-    expect(cancel).not.toHaveClass('bg-red-600');
+    const classes = cancel.className.split(/\s+/);
+
+    // 부정: color가 'failure'(bg-red-700) 등 빨간 계열로 바뀌면 잡아낸다.
+    // bg-red-600 하나만 보면 색상이 bg-red-700 등 다른 빨강으로 바뀌었을 때
+    // 놓치므로 'bg-red-'로 시작하는 클래스 전체를 본다.
+    expect(classes.some(c => c.startsWith('bg-red-'))).toBe(false);
+
+    // 긍정: node_modules/flowbite-react 의 Button/theme.mjs 에서 읽은 color.light 문자열
+    // ("border border-gray-300 bg-white text-gray-900 ...")의 border-gray-300 은
+    // 이 앱이 쓰는 다른 색(dark/failure 등) 어디에도 없는 light 고유 클래스라
+    // light 로 바뀌었는지 안정적으로 가려낸다.
+    expect(classes).toContain('border-gray-300');
   });
 
   it('바깥을 누르면 모달이 닫힌다', () => {

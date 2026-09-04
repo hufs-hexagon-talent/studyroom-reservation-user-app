@@ -1,3 +1,4 @@
+import { format } from 'date-fns';
 import { shortDateLabel } from './dateLabel';
 
 describe('shortDateLabel', () => {
@@ -15,6 +16,17 @@ describe('shortDateLabel', () => {
     future.setFullYear(future.getFullYear() + 10, 2, 7);
     future.setHours(10, 0, 0, 0);
     expect(shortDateLabel(future)).toBe('3월 7일');
+  });
+
+  // 프로덕션에서 selectedDate 는 useUrlQuery 가 돌려주는 'yyyy-MM-dd' 문자열이다.
+  // Date 객체만 넣어 본 위 시험들은 이 타입을 검증하지 못한다.
+  it("문자열('yyyy-MM-dd')을 넣어도 9월 4일로 시작한다", () => {
+    expect(shortDateLabel('2026-09-04').startsWith('9월 4일')).toBe(true);
+  });
+
+  it('오늘 날짜 문자열을 넣으면 (오늘) 이 붙는다', () => {
+    const todayString = format(new Date(), 'yyyy-MM-dd');
+    expect(shortDateLabel(todayString)).toBe(`${formatToday()} (오늘)`);
   });
 });
 
