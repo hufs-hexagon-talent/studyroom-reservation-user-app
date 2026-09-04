@@ -116,12 +116,3 @@ export const getReserveErrorMessage = (code, { blockedUntil } = {}) => {
   }
   return RESERVE_ERROR_MESSAGES[normalized] ?? RESERVE_FAILED_MESSAGE;
 };
-
-// 고를 수 없는 칸을 눌렀을 때의 안내. 터치에서는 cursor 로 알릴 수 없다.
-const LOCKED_SLOT_MESSAGES = {
-  past: '이미 지난 시간입니다.',
-  reserved: '이미 예약된 시간입니다.',
-  closed: '이 호실의 운영시간이 아닙니다.',
-};
-
-export const lockedSlotMessage = reason => LOCKED_SLOT_MESSAGES[reason] ?? null;

@@ -168,9 +168,8 @@ const ReservationTimeTable = ({
                           textAlign: 'center',
                           color: '#fff',
                           fontSize: '11px',
-                        }}>
-                        {palette.mark}
-                      </TableCell>
+                        }}
+                      />
                     );
                   })}
                 </TableRow>
@@ -207,9 +206,6 @@ const ReservationTimeTable = ({
           />
         )}
       </Box>
-      <div className="mt-1 pr-3 text-right text-xs text-gray-500 md:pr-16">
-        {`${times[times.length - 1]} 운영 종료`}
-      </div>
     </>
   );
 };

@@ -63,6 +63,8 @@ export const getSlotState = ({ slotStart, now, room, selection }) => {
     // 미뤄 둔 결정이다(2026-09-03 설계 문서 "미결정" 참고). 지금은 이 값을 읽는 컴포넌트가
     // 없지만, 그 결정이 나면 소비하면 되도록 판정만 미리 내보낸다.
     otherRoom: hasSelection && !sameRoom,
+    // 잠긴 칸을 눌렀을 때 사유를 안내하는 스낵바는 걷어냈다(2026-09-03 범례 축소).
+    // 이 값을 읽어 렌더하는 소비처가 지금은 없지만 slotState.test.js 가 값을 검증하므로 남긴다.
     lockedReason: reserved
       ? 'reserved'
       : past

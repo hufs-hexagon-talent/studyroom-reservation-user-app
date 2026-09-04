@@ -31,7 +31,6 @@ import {
   getReserveErrorMessage,
   hasReservedSlotInRange,
   isOutsideOperationHours,
-  lockedSlotMessage,
   maxMinutesExceededMessage,
   normalizeErrorCode,
   RESERVE_AUTH_FAILED_MESSAGE,
@@ -386,14 +385,10 @@ const RoomPage = () => {
 
   const handleSlotClick = useCallback(
     (room, timeIndex, state) => {
-      if (state.selectable) {
-        handleCellClick(room, timeIndex);
-        return;
-      }
-      const message = lockedSlotMessage(state.lockedReason);
-      if (message) showSnackbar(message);
+      if (!state.selectable) return;
+      handleCellClick(room, timeIndex);
     },
-    [handleCellClick, showSnackbar],
+    [handleCellClick],
   );
 
   // 매 렌더 새 객체를 만들면 표에 넘기는 selection prop 이 계속 바뀌어 표의 memo 가 무력해진다.

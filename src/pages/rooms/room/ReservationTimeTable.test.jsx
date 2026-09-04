@@ -48,11 +48,6 @@ describe('ReservationTimeTable 열 구성', () => {
     const first = container.querySelector('thead [data-time-index="0"]');
     expect(first.textContent).toBe('09:00');
   });
-
-  it('운영 종료 시각을 표 끝에 캡션으로 보여준다', () => {
-    const { getByText } = setup();
-    expect(getByText('11:00 운영 종료')).toBeInTheDocument();
-  });
 });
 
 describe('ReservationTimeTable 접근성', () => {

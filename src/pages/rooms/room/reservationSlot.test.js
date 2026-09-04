@@ -8,7 +8,6 @@ import {
   normalizeErrorCode,
   getReserveErrorMessage,
   RESERVE_FAILED_MESSAGE,
-  lockedSlotMessage,
 } from './reservationSlot';
 
 describe('normalizeOperationTime', () => {
@@ -173,23 +172,5 @@ describe('createTimeTable', () => {
 
     expect(times[times.length - 1]).toBe('22:00');
     expect(times).toHaveLength(27);
-  });
-});
-
-describe('lockedSlotMessage', () => {
-  it('지난 시간을 안내한다', () => {
-    expect(lockedSlotMessage('past')).toBe('이미 지난 시간입니다.');
-  });
-
-  it('이미 예약된 시간을 안내한다', () => {
-    expect(lockedSlotMessage('reserved')).toBe('이미 예약된 시간입니다.');
-  });
-
-  it('운영시간이 아님을 안내한다', () => {
-    expect(lockedSlotMessage('closed')).toBe('이 호실의 운영시간이 아닙니다.');
-  });
-
-  it('사유가 없으면 안내하지 않는다', () => {
-    expect(lockedSlotMessage(null)).toBeNull();
   });
 });
