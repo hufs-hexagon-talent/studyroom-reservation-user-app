@@ -35,7 +35,10 @@ const NavigationBar = ({ locked = false }) => {
   const logoutLabel = loggingOut ? '로그아웃 중...' : '로그아웃';
 
   return (
-    <Navbar fluid rounded className="border-b-2">
+    // 스크롤해도 상단에 남는다. 예약 표가 세로로 길어 표를 보다가 메뉴로 가려면
+    // 맨 위까지 되돌아가야 했다. z-30 은 표의 스티키 호실명 열(zIndex 3)보다 위,
+    // 모바일 하단 선택 바(z-40)보다 아래다.
+    <Navbar fluid rounded className="sticky top-0 z-30 border-b-2 bg-white">
       <Navbar.Brand as={locked ? 'div' : Link} to={locked ? undefined : '/'}>
         <img src={Logo} className="mr-3 h-6 sm:h-9" alt="cse logo" />
         <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white">
