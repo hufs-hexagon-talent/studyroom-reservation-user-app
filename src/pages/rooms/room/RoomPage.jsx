@@ -57,7 +57,11 @@ import { shortDateLabel } from './dateLabel';
 //    justify-center 가 맡고, 내용이 길 때 스크롤은 오버레이의 overflow-y-auto(root.base)와
 //    패널의 max-h-[90dvh]가 처리한다.
 //
-// 2) header.close — 닫기 버튼 기본이 32px 라 탭 영역 44px 를 채우도록 키웠다.
+// 2) header.title — Modal.Header 는 children 을 자기 <h3> 안에 넣는다(as 기본값 h3,
+//    ModalHeader.mjs). 그래서 여기에 <h2> 를 넣으면 <h3><h2>..</h2></h3> 가 되어
+//    heading 이 두 개로 잡힌다. 문구는 그대로 넘기고 모양만 이 테마로 준다.
+//
+// 3) header.close — 닫기 버튼 기본이 32px 라 탭 영역 44px 를 채우도록 키웠다.
 //
 // content.inner 의 w-full 은 보험이다. 패널의 부모(content.base)에 display 유틸이 없어
 // 블록 박스라 auto 폭이 이미 부모를 채우므로 지금은 없어도 결과가 같다. 다만 <Modal> 에
@@ -72,6 +76,7 @@ export const reserveModalTheme = {
       'relative flex max-h-[90dvh] w-full flex-col rounded-lg bg-white shadow dark:bg-gray-700',
   },
   header: {
+    title: 'text-xl font-semibold text-gray-900 dark:text-white',
     close: {
       base: 'ml-auto inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg bg-transparent p-1.5 text-sm text-gray-400 hover:bg-gray-200 hover:text-gray-900 dark:hover:bg-gray-600 dark:hover:text-white',
     },
@@ -566,9 +571,7 @@ const RoomPage = () => {
         dismissible
         show={openReserveModal}
         onClose={() => setOpenReserveModal(false)}>
-        <Modal.Header>
-          <h2 className="text-xl font-semibold">현재 선택한 예약 정보</h2>
-        </Modal.Header>
+        <Modal.Header>현재 선택한 예약 정보</Modal.Header>
         <Modal.Body>
           <div className="space-y-1">
             <p className="text-2xl font-bold text-gray-900">

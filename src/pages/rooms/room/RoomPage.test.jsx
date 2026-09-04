@@ -172,6 +172,19 @@ describe('예약 확인 모달', () => {
     expect(screen.getByRole('dialog')).toBeInTheDocument();
   });
 
+  // Modal.Header 는 children 을 자기 <h3> 안에 넣으므로 여기에 heading 을 또 넣으면
+  // <h3><h2>..</h2></h3> 가 된다. 제목은 정확히 하나여야 한다.
+  it('제목 heading 이 하나만 있다', () => {
+    const { container } = render(<RoomPage />);
+    openModal(container);
+
+    const dialog = screen.getByRole('dialog');
+    const headings = dialog.querySelectorAll('h1, h2, h3, h4, h5, h6');
+
+    expect(headings).toHaveLength(1);
+    expect(headings[0]).toHaveTextContent('현재 선택한 예약 정보');
+  });
+
   it('호실명·시간·길이를 보여준다', () => {
     const { container } = render(<RoomPage />);
     openModal(container);
