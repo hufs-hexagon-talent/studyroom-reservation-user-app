@@ -12,6 +12,7 @@ import { parse } from 'date-fns';
 
 import { SLOT_LABEL, SLOT_PALETTE } from './slotPalette';
 import { getSlotState, initialScrollIndex } from './slotState';
+import { TABLE_GUTTER_SX } from './tableGutter';
 import useTimeTableScroll from './useTimeTableScroll';
 
 // 스티키 호실명 열의 폭. 좌측 페이드 위치도 이 값 하나로 맞춰서
@@ -53,9 +54,9 @@ const ReservationTimeTable = ({
           position: 'relative',
           // 페이드는 이 wrapper 를 기준으로 절대 위치를 잡는다. marginLeft/width 를
           // TableContainer 에 두면 표시되는 표의 실제 가장자리와 페이드 기준점이 어긋난다.
-          // 모바일에서는 좌우 여백을 최소로 두고 폭을 전부 쓴다
-          width: { xs: 'calc(100% - 24px)', md: 'calc(100% - 60px)' },
-          marginLeft: { xs: '12px', md: '60px' },
+          // width 를 지정하지 않고 좌우 margin 만 준다. calc(100% - N) 과 marginLeft: N 을
+          // 함께 쓰면 왼쪽 N + 폭(100%-N) 이 100% 가 되어 오른쪽 여백이 0 이 됐다.
+          marginX: TABLE_GUTTER_SX,
         }}>
         <TableContainer
           ref={containerRef}

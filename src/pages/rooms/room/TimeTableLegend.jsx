@@ -1,9 +1,11 @@
 import React from 'react';
 
 import { LEGEND, SLOT_PALETTE } from './slotPalette';
+import { LEGEND_GUTTER_CLASS } from './tableGutter';
 
 const TimeTableLegend = () => (
-  <div className="flex flex-wrap items-center gap-x-3 gap-y-2 px-3 pt-6 md:px-4">
+  <div
+    className={`flex flex-wrap items-center gap-x-3 gap-y-2 pt-6 ${LEGEND_GUTTER_CLASS}`}>
     {LEGEND.map(({ key, label }) => {
       const palette = SLOT_PALETTE[key];
       return (
