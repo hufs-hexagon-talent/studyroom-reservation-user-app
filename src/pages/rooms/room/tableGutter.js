@@ -12,6 +12,9 @@ export const TABLE_GUTTER_SX = {
 };
 
 // 범례가 쓰는 Tailwind 클래스. 눈금: px-3 = 12px, px-6 = 24px.
+// Tailwind 는 정적 스캔으로 클래스를 찾으므로 이 리터럴이 있어야 CSS 가 생성된다.
+// TimeTableLegend.jsx 는 이 상수를 참조만 하고 px-3/md:px-6 텍스트가 없다 — 상수를 다른
+// 파일로 옮기거나 tailwind.config.js content 글롭에서 .js 를 빼면 에러 없이 조용히 깨진다.
 export const LEGEND_GUTTER_CLASS = 'px-3 md:px-6';
 
 // 위 클래스가 실제로 몇 px 인지. 테스트가 GUTTER_PX 와 대조한다.

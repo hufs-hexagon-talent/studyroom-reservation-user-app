@@ -22,3 +22,20 @@
   background: #fff;
 }
 */
+
+/* react-simple-snackbar 는 토스트 래퍼에 z-index:1 을 하드코딩하고 이를 바꾸는 옵션이 없다.
+   상단 고정 네비(z-30), 예약 표의 스티키 호실명 열(z-3), flowbite 모달(z-50)보다 위에 떠야
+   안내가 실제로 보인다. 클래스명은 CSS 모듈 해시가 붙지만 'snackbar-wrapper' 부분은 고정이다
+   (예: Snackbar_snackbar-wrapper-top-right__2CAmf). 이 계약은 snackbarLayer.test.jsx 가 지킨다.
+
+   !important 는 안 쓴다. 대신 body 조상 선택자로 명시도를 (0,1,0)에서 (0,1,1)로 올렸다.
+   이유: 프로덕션 빌드(react-scripts build)에서는 라이브러리가 document.createElement('style')
+   로 런타임에 CSS를 직접 주입해서 MiniCssExtractPlugin 이 이 규칙을 포착하지 못하고, 그
+   결과 이 파일의 <link> 보다 항상 나중에 document.head 에 붙는다(build/index.html 로 실측:
+   <script defer> 가 먼저 오지만 실행은 뒤로 미뤄지고, <link> 는 파싱 시점에 먼저 DOM에 들어가
+   있다가 defer 스크립트 실행 중 라이브러리가 appendChild 로 그 뒤에 스타일을 추가함).
+   명시도가 같으면(0,1,0 vs 0,1,0) 나중에 붙는 쪽이 이기므로, 조상 선택자 없이는 라이브러리의
+   z-index:1 이 이 규칙을 덮어써 버린다. */
+body [class*='snackbar-wrapper'] {
+  z-index: 60;
+}
