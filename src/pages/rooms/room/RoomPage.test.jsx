@@ -3,7 +3,7 @@ import { fireEvent, render, screen, within } from '@testing-library/react';
 
 import { useReservations, useReserve } from '../../../api/reservation.api';
 
-import RoomPage from './RoomPage';
+import RoomPage, { reserveModalTheme } from './RoomPage';
 
 jest.mock('../../../api/reservation.api', () => ({
   useReservations: jest.fn(),
@@ -178,5 +178,13 @@ describe('예약 확인 모달', () => {
     fireEvent.keyDown(document, { key: 'Escape', code: 'Escape' });
 
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
+  // jsdom 은 레이아웃이 없어 h-full 때문에 래퍼가 화면을 덮어 바깥 클릭이
+  // 오버레이까지 못 내려가는 걸 폭·좌표로는 재현할 수 없다. 대신 그 원인이었던
+  // 클래스가 되돌아오지 않는지 테마 상수 자체로 회귀를 막는다.
+  it('content.base 에 모바일에서 래퍼가 화면을 덮는 h-full 이 없다', () => {
+    const classes = reserveModalTheme.content.base.split(/\s+/);
+    expect(classes).not.toContain('h-full');
   });
 });

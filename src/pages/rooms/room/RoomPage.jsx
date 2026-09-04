@@ -48,14 +48,17 @@ import { shortDateLabel } from './dateLabel';
 // flowbite Modal 의 패널(content.inner)은 flex 아이템이라 기본값이 내용 크기로 줄어든다.
 // node_modules/flowbite-react 의 Modal/theme.mjs 에서 읽은 기본 클래스에 w-full 만 더한다.
 // 닫기 버튼(header.close)도 기본이 32px 라 탭 영역 44px 를 채우도록 크기를 키운다.
-// content.base(role="dialog" 래퍼)는 모바일(768px 미만)에서 h-full 로 뷰포트 전체 높이를
-// 차지한다. 그 안에서 패널(content.inner)을 세로 가운데로 두려면 이 래퍼 자체가 flex 로
-// 가운데 정렬을 해야 한다 — node_modules/flowbite-react 의 Modal/theme.mjs 기본 클래스
-// ("relative h-full w-full p-4 md:h-auto")에 flex items-center justify-center 만 더한다.
-// 데스크톱은 md:h-auto 로 래퍼가 내용 높이로 줄어들어 이 클래스가 없어도 이미 가운데였다.
-const reserveModalTheme = {
+// content.base(role="dialog" 래퍼)는 flowbite 기본 클래스가 "relative h-full w-full p-4
+// md:h-auto" 라 모바일(768px 미만)에서 h-full 로 뷰포트 전체를 덮는다. dismissible 의
+// 바깥 클릭 핸들러는 이 래퍼의 부모인 오버레이(data-testid="modal-overlay")에 붙는데,
+// 래퍼가 화면 전체를 덮으면 클릭이 오버레이까지 내려가지 못해 모바일에서만 바깥 클릭이
+// 먹지 않았다. h-full 과 md:h-auto 를 빼 래퍼를 내용 높이로 줄이면 이 문제가 없어지고,
+// 세로 가운데 정렬은 오버레이에 className 으로 붙인 flex items-center justify-center 가
+// 대신 맡는다. 내용이 길어질 때 스크롤은 오버레이의 overflow-y-auto(Modal/theme.mjs
+// root.base)와 패널의 max-h-[90dvh]로 그대로 처리된다.
+export const reserveModalTheme = {
   content: {
-    base: 'relative h-full w-full p-4 md:h-auto flex items-center justify-center',
+    base: 'relative w-full p-4',
     inner:
       'relative flex max-h-[90dvh] w-full flex-col rounded-lg bg-white shadow dark:bg-gray-700',
   },
