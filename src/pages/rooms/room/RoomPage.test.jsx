@@ -131,6 +131,33 @@ describe('RoomPage 시간 선택', () => {
     // 모바일 SelectionBar 가 뜨는지로 본다(선택이 없으면 null 을 반환한다).
     expect(screen.queryAllByText('예약하기')).toHaveLength(1);
   });
+
+  it('내 예약 칸을 누르면 선택되지 않는다', () => {
+    useReservations.mockReturnValue({
+      data: [
+        {
+          ...room(),
+          reservationTimeRanges: [
+            {
+              startDateTime: '2099-01-01T09:00:00',
+              endDateTime: '2099-01-01T09:30:00',
+              isMine: true,
+            },
+          ],
+        },
+      ],
+      isPending: false,
+      isError: false,
+      refetch: jest.fn(),
+    });
+
+    const { container } = render(<RoomPage />);
+
+    fireEvent.click(slotCells(container)[0]);
+
+    // 위 시험과 같은 이유로 td.selected 대신 모바일 SelectionBar 로 판별한다.
+    expect(screen.queryAllByText('예약하기')).toHaveLength(1);
+  });
 });
 
 // 표가 실제로 그려졌는지 확인해 두어야 선택 칸 수 비교가 뜻을 갖는다
