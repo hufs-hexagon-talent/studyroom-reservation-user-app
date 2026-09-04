@@ -42,6 +42,23 @@ import SelectionBar from './SelectionBar';
 import CustomButton from '../../../components/button/Button';
 import { Button } from 'flowbite-react';
 import { Modal } from 'flowbite-react';
+import { durationLabel } from './durationLabel';
+import { shortDateLabel } from './dateLabel';
+
+// flowbite Modal 의 패널(content.inner)은 flex 아이템이라 기본값이 내용 크기로 줄어든다.
+// node_modules/flowbite-react 의 Modal/theme.mjs 에서 읽은 기본 클래스에 w-full 만 더한다.
+// 닫기 버튼(header.close)도 기본이 32px 라 탭 영역 44px 를 채우도록 크기를 키운다.
+const reserveModalTheme = {
+  content: {
+    inner:
+      'relative flex max-h-[90dvh] w-full flex-col rounded-lg bg-white shadow dark:bg-gray-700',
+  },
+  header: {
+    close: {
+      base: 'ml-auto inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg bg-transparent p-1.5 text-sm text-gray-400 hover:bg-gray-200 hover:text-gray-900 dark:hover:bg-gray-600 dark:hover:text-white',
+    },
+  },
+};
 
 const RoomPage = () => {
   // snackBar
@@ -527,44 +544,44 @@ const RoomPage = () => {
       {/* 선택된 예약 정보 모달 */}
       <Modal
         className="flex items-center justify-center"
+        theme={reserveModalTheme}
+        dismissible
         show={openReserveModal}
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
         onClose={() => setOpenReserveModal(false)}>
         <Modal.Header>
           <h2 className="text-xl font-semibold">현재 선택한 예약 정보</h2>
         </Modal.Header>
         <Modal.Body>
-          <div className="space-y-2 text-base">
-            <p className="mb-1">
-              <span className="font-medium">호실명 :</span>{' '}
-              <span>
-                {selectedRoom?.roomName}-{selectedRoom?.partitionNumber}
-              </span>
+          <div className="space-y-1">
+            <p className="text-2xl font-bold text-gray-900">
+              {selectedRoom?.roomName}-{selectedRoom?.partitionNumber}
             </p>
-            <p className="mb-1">
-              <span className="font-medium">선택한 날짜 :</span>{' '}
-              <span>{format(selectedDate, 'yyyy년 MM월 dd일')}</span>
+            <p className="text-sm text-gray-500">
+              {shortDateLabel(selectedDate)}
             </p>
-            <p className="mb-1">
-              <span className="font-medium">사용 시간 :</span>{' '}
-              <span>
+            <p className="flex items-baseline gap-2 pt-2">
+              <span className="text-xl font-bold text-gray-900">
                 {selectedRangeFrom && format(selectedRangeFrom, 'HH:mm')} ~{' '}
                 {selectedRangeTo && format(selectedRangeTo, 'HH:mm')}
+              </span>
+              <span className="text-sm text-gray-500">
+                {selectedRangeFrom &&
+                  selectedRangeTo &&
+                  durationLabel(
+                    differenceInMinutes(selectedRangeTo, selectedRangeFrom),
+                  )}
               </span>
             </p>
           </div>
         </Modal.Body>
         <Modal.Footer>
-          <div className="flex justify-end space-x-2 w-full">
+          <div className="flex w-full gap-2">
             <Button
+              color="light"
+              className="min-h-[44px]"
               onClick={() => {
                 setOpenReserveModal(false);
-              }}
-              className="bg-red-600 text-white hover:bg-red-700">
+              }}>
               취소
             </Button>
             <Button
@@ -581,7 +598,7 @@ const RoomPage = () => {
                 setOpenReserveModal(false);
               }}
               color="dark"
-              className="text-white ">
+              className="min-h-[44px] flex-1">
               예약
             </Button>
           </div>

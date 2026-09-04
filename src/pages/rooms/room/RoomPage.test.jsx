@@ -1,5 +1,5 @@
 import React from 'react';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 
 import { useReservations, useReserve } from '../../../api/reservation.api';
 
@@ -109,4 +109,63 @@ it('호실 이름을 표에 보여 준다', () => {
   });
   render(<RoomPage />);
   expect(screen.getByText('세미나실-1')).toBeInTheDocument();
+});
+
+describe('예약 확인 모달', () => {
+  // 09:00 ~ 10:00 두 칸을 골라 예약하기를 눌러 모달을 연다.
+  // 데스크톱용·모바일용(SelectionBar) 두 곳에 "예약하기" 버튼이 함께 렌더되므로
+  // DOM 순서상 먼저 오는 데스크톱 버튼을 누른다.
+  const openModal = container => {
+    fireEvent.click(slotCells(container)[0]);
+    fireEvent.click(slotCells(container)[1]);
+    fireEvent.click(screen.getAllByText('예약하기')[0]);
+  };
+
+  beforeEach(() => {
+    useReservations.mockReturnValue({
+      data: [room()],
+      isPending: false,
+      isError: false,
+      refetch: jest.fn(),
+    });
+  });
+
+  it('호실명·시간·길이를 보여준다', () => {
+    const { container } = render(<RoomPage />);
+    openModal(container);
+
+    const dialog = screen.getByRole('dialog');
+    expect(within(dialog).getByText('세미나실-1')).toBeInTheDocument();
+    expect(within(dialog).getByText(/09:00 ~ 10:00/)).toBeInTheDocument();
+    expect(within(dialog).getByText('1시간')).toBeInTheDocument();
+  });
+
+  it('취소 버튼에 빨간 배경 클래스가 없다', () => {
+    const { container } = render(<RoomPage />);
+    openModal(container);
+
+    const dialog = screen.getByRole('dialog');
+    const cancel = within(dialog).getByRole('button', { name: '취소' });
+    expect(cancel).not.toHaveClass('bg-red-600');
+  });
+
+  it('바깥을 누르면 모달이 닫힌다', () => {
+    const { container } = render(<RoomPage />);
+    openModal(container);
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+
+    fireEvent.mouseDown(document.body);
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
+  it('ESC 를 누르면 모달이 닫힌다', () => {
+    const { container } = render(<RoomPage />);
+    openModal(container);
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+
+    fireEvent.keyDown(document, { key: 'Escape', code: 'Escape' });
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
 });
