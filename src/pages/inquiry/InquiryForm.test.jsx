@@ -252,6 +252,34 @@ describe('InquiryForm', () => {
     );
   });
 
+  // 모달은 닫힐 때 아직 DOM 에 있는 트리거로만 포커스를 되돌린다. 트리거가 사라지는 경로에서
+  // 포커스가 <body> 로 떨어지면 키보드 사용자가 문서 맨 앞으로 튕긴다.
+  it('예약을 고르면 포커스가 변경 버튼으로 간다', async () => {
+    render(<InquiryForm />);
+    openPicker();
+    pickCard(CARD_A);
+
+    const changeButton = screen.getByRole('button', { name: '관련 예약 변경' });
+    await waitFor(() => expect(changeButton).toHaveFocus());
+    expect(document.body).not.toHaveFocus();
+  });
+
+  it('선택 해제 뒤 포커스가 예약 선택 버튼으로 간다', async () => {
+    render(<InquiryForm />);
+    fireEvent.change(screen.getByLabelText('유형'), {
+      target: { value: 'ETC' },
+    });
+    openPicker();
+    pickCard(CARD_A);
+    fireEvent.click(
+      screen.getByRole('button', { name: '관련 예약 선택 해제' }),
+    );
+
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: '예약 선택' })).toHaveFocus(),
+    );
+  });
+
   it('요청이 진행 중이면 제출 버튼이 비활성 상태다', () => {
     useCreateInquiry.mockReturnValue({
       mutateAsync: doCreate,
@@ -547,6 +575,29 @@ describe('InquiryForm', () => {
         screen.getByText('2026-08-05 10:00~11:00 201-A'),
       ).toBeInTheDocument();
       expect(screen.queryByText('302-B')).toBeNull();
+    });
+
+    it('되돌리기 뒤 포커스가 다른 예약으로 변경 버튼으로 간다', async () => {
+      mockParamsValue = { id: '9' };
+      useMyInquiries.mockReturnValue({
+        data: [editInquiry()],
+        isPending: false,
+      });
+
+      render(<InquiryForm />);
+      fireEvent.click(
+        screen.getByRole('button', { name: '다른 예약으로 변경' }),
+      );
+      pickCard(CARD_B);
+      fireEvent.click(
+        screen.getByRole('button', { name: '관련 예약 되돌리기' }),
+      );
+
+      await waitFor(() =>
+        expect(
+          screen.getByRole('button', { name: '다른 예약으로 변경' }),
+        ).toHaveFocus(),
+      );
     });
 
     // 예약이 학생 취소로 지워지면 id 는 null 이고 스냅샷만 남는다. 서버는 스냅샷이 있으면

@@ -69,6 +69,19 @@ const InquiryForm = () => {
   const [pickedReservation, setPickedReservation] = useState(null);
   const [isPickerOpen, setIsPickerOpen] = useState(false);
 
+  // flowbite 모달(내부적으로 floating-ui)은 닫힐 때 "아직 DOM 에 붙어 있는" 원래 트리거로만
+  // 포커스를 되돌린다. 예약을 고르면 트리거였던 "예약 선택" 버튼이 그 자리에서 사라져 되돌릴
+  // 대상이 없어지고 포커스가 <body> 로 떨어졌다. 그래서 (1) 피커를 여는 주 버튼은 세 상태에서
+  // 같은 엘리먼트로 두어 항상 연결돼 있게 하고, (2) 자기 자신을 언마운트하는 보조 버튼
+  // (선택 해제·되돌리기)과 선택 성공 경로에서는 여기서 직접 포커스를 옮긴다.
+  const primaryButtonRef = useRef(null);
+  const [focusPrimary, setFocusPrimary] = useState(false);
+  useEffect(() => {
+    if (!focusPrimary) return;
+    primaryButtonRef.current?.focus();
+    setFocusPrimary(false);
+  }, [focusPrimary]);
+
   // 수정 모드 초기값: 캐시에서 찾은 문의로 채운다. 기존 연결은 읽기 전용 스냅샷으로
   // 따로 보여주므로 고른 예약은 비운다.
   useEffect(() => {
@@ -144,75 +157,71 @@ const InquiryForm = () => {
 
   const openPicker = () => setIsPickerOpen(true);
 
-  let reservationArea;
+  // 보조 버튼은 자기 자신을 지우므로 누른 뒤 포커스를 주 버튼으로 옮긴다.
+  const clearPicked = () => {
+    setPickedReservation(null);
+    setFocusPrimary(true);
+  };
+
+  // 내용(카드/스냅샷/없음)만 상태별로 갈리고, 버튼 줄은 어떤 상태에서도 같은 자리에 그린다 —
+  // 주 버튼이 언마운트되지 않아야 모달이 포커스를 되돌릴 곳을 잃지 않는다.
+  let reservationContent = null;
+  let primaryText = '예약 선택';
+  let primaryLabel;
+  let primaryDescribedBy = 'reservation-requirement';
+  let primaryClass = outlineButtonClass;
+  let secondaryButton = null;
+
   if (pickedReservation) {
-    reservationArea = (
-      <>
-        <ReservationCard
-          room={formatRoom(pickedReservation)}
-          time={formatReservationTime(pickedReservation)}
-          state={reservationStateLabel(pickedReservation)}
-        />
-        <div className="mt-2 flex justify-end gap-4">
-          <button
-            type="button"
-            aria-label="관련 예약 변경"
-            aria-describedby="reservation-requirement"
-            onClick={openPicker}
-            className={linkButtonClass}>
-            변경
-          </button>
-          {existingLink ? (
-            <button
-              type="button"
-              aria-label="관련 예약 되돌리기"
-              onClick={() => setPickedReservation(null)}
-              className={linkButtonClass}>
-              되돌리기
-            </button>
-          ) : (
-            // ATTENDANCE 에서는 해제하면 제출만 잠기는 막다른 버튼이라 그리지 않는다.
-            !reservationRequired && (
-              <button
-                type="button"
-                aria-label="관련 예약 선택 해제"
-                onClick={() => setPickedReservation(null)}
-                className={linkButtonClass}>
-                선택 해제
-              </button>
-            )
-          )}
-        </div>
-      </>
+    reservationContent = (
+      <ReservationCard
+        room={formatRoom(pickedReservation)}
+        time={formatReservationTime(pickedReservation)}
+        state={reservationStateLabel(pickedReservation)}
+      />
     );
+    primaryText = '변경';
+    primaryLabel = '관련 예약 변경';
+    primaryClass = linkButtonClass;
+    if (existingLink) {
+      secondaryButton = (
+        <button
+          type="button"
+          aria-label="관련 예약 되돌리기"
+          onClick={clearPicked}
+          className={linkButtonClass}>
+          되돌리기
+        </button>
+      );
+    } else if (!reservationRequired) {
+      // ATTENDANCE 에서는 해제하면 제출만 잠기는 막다른 버튼이라 그리지 않는다.
+      secondaryButton = (
+        <button
+          type="button"
+          aria-label="관련 예약 선택 해제"
+          onClick={clearPicked}
+          className={linkButtonClass}>
+          선택 해제
+        </button>
+      );
+    }
   } else if (existingLink) {
-    reservationArea = (
+    reservationContent = (
       <>
         <div className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-800 break-keep">
           {linkedLabel}
         </div>
         <p className="mt-1 text-xs text-gray-500">{LINKED_RESERVATION_HINT}</p>
-        <div className="mt-2 flex justify-end">
-          <button
-            type="button"
-            onClick={openPicker}
-            className={linkButtonClass}>
-            다른 예약으로 변경
-          </button>
-        </div>
       </>
     );
-  } else {
-    reservationArea = (
-      <button
-        type="button"
-        aria-describedby="reservation-requirement"
-        onClick={openPicker}
-        className={outlineButtonClass}>
-        예약 선택
-      </button>
-    );
+    primaryText = '다른 예약으로 변경';
+    primaryDescribedBy = undefined;
+    primaryClass = linkButtonClass;
   }
+
+  const buttonsRowClass = reservationContent
+    ? 'mt-2 flex justify-end gap-4'
+    : 'flex justify-end gap-4';
 
   return (
     <div className="px-4 sm:px-8 py-8 max-w-2xl mx-auto">
@@ -256,7 +265,19 @@ const InquiryForm = () => {
               {reservationRequired ? '필수' : '선택'}
             </span>
           </p>
-          {reservationArea}
+          {reservationContent}
+          <div className={buttonsRowClass}>
+            <button
+              type="button"
+              ref={primaryButtonRef}
+              aria-label={primaryLabel}
+              aria-describedby={primaryDescribedBy}
+              onClick={openPicker}
+              className={primaryClass}>
+              {primaryText}
+            </button>
+            {secondaryButton}
+          </div>
         </div>
 
         <div>
@@ -290,7 +311,10 @@ const InquiryForm = () => {
       <ReservationPickerModal
         show={isPickerOpen}
         onClose={() => setIsPickerOpen(false)}
-        onPick={setPickedReservation}
+        onPick={reservation => {
+          setPickedReservation(reservation);
+          setFocusPrimary(true);
+        }}
         selectedId={selectedId}
         reservations={reservations}
         isPending={isReservationsPending}
