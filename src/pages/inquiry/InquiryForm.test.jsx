@@ -163,6 +163,16 @@ describe('InquiryForm', () => {
     expect(screen.getByRole('button', { name: '제출하기' })).toBeEnabled();
   });
 
+  // 버튼 줄을 세 상태 공통으로 두면서 정렬까지 묶이지 않게 한다 — 혼자 있는 예약 선택 버튼은
+  // 원래대로 왼쪽이다.
+  it('고른 예약이 없으면 예약 선택 버튼은 왼쪽에 있다', () => {
+    render(<InquiryForm />);
+    const row = screen.getByRole('button', { name: '예약 선택' }).parentElement;
+
+    expect(row).toHaveClass('justify-start');
+    expect(row).not.toHaveClass('justify-end');
+  });
+
   it('관련 예약 영역은 그룹이고 필수·선택 안내가 유형을 따라간다', () => {
     render(<InquiryForm />);
     const group = screen.getByRole('group', { name: '관련 예약' });

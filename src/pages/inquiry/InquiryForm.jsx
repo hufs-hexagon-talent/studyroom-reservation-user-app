@@ -221,9 +221,11 @@ const InquiryForm = () => {
     primaryClass = linkButtonClass;
   }
 
+  // 내용이 없을 때는 "예약 선택" 버튼 하나뿐이라 원래대로 왼쪽에 둔다. 카드·스냅샷이 있으면
+  // 그 아래 보조 버튼과 함께 오른쪽으로 붙인다. 두 갈래 모두 완결된 리터럴이다.
   const buttonsRowClass = reservationContent
     ? 'mt-2 flex justify-end gap-4'
-    : 'flex justify-end gap-4';
+    : 'flex justify-start';
 
   return (
     <div className="px-4 sm:px-8 py-8 max-w-2xl mx-auto">
