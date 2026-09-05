@@ -15,6 +15,11 @@ describe('TimeTableLegend', () => {
     expect(explainedKeys).toHaveLength(paletteKeys.length);
   });
 
+  it('past 와 closed 는 화면에서 같은 모양이다', () => {
+    // 예약 불가 빗금을 고칠 때 두 상태 중 한쪽만 바꾸면 이 테스트가 잡는다.
+    expect(SLOT_PALETTE.closed).toEqual(SLOT_PALETTE.past);
+  });
+
   it('범례 라벨 순서가 정해진 대로다', () => {
     expect(LEGEND.map(entry => entry.label)).toEqual([
       '예약 가능',

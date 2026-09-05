@@ -10,12 +10,12 @@ export const SLOT_PALETTE = {
   past: {
     background: '#C7C4C0',
     pattern:
-      'repeating-linear-gradient(45deg, transparent 0 4px, rgba(0,0,0,0.10) 4px 8px)',
+      'repeating-linear-gradient(45deg, transparent 0 4px, rgba(0,0,0,0.05) 4px 8px)',
   },
   closed: {
     background: '#C7C4C0',
     pattern:
-      'repeating-linear-gradient(45deg, transparent 0 4px, rgba(0,0,0,0.10) 4px 8px)',
+      'repeating-linear-gradient(45deg, transparent 0 4px, rgba(0,0,0,0.05) 4px 8px)',
   },
 };
 

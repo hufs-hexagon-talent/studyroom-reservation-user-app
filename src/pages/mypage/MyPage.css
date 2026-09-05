@@ -16,9 +16,13 @@
   margin-bottom: 4rem;
 }
 
+/* 섹션 제목은 그룹 라벨이다. 항목(1.5rem)보다 작고 회색이어야 위계가 읽힌다 —
+   전에는 데스크톱에서 항목과 같은 1.5rem, 모바일에서는 항목(1.25rem)보다 작은
+   1.1rem 이라 제목·항목의 구분이 없거나 뒤집혀 있었다. */
 .menu-title {
-  font-size: 1.5rem;
+  font-size: 1.125rem;
   font-weight: bold;
+  color: #566072;
   margin-bottom: 0.5rem;
   display: block;
 }
@@ -61,7 +65,7 @@
   }
 
   .menu-title {
-    font-size: 1.1rem;
+    font-size: 1rem;
   }
 
   .menu-item {

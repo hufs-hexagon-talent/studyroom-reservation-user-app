@@ -1,4 +1,5 @@
-// 문의 category/status enum 의 한글 라벨. backoffice 앱과 문구를 그대로 공유한다.
+// 문의 category/status enum 의 한글 라벨. backoffice 앱과 문구를 그대로 공유한다
+// (CATEGORY_LABELS·STATUS_LABEL 둘 다 src/api/inquiry.api.ts). 여기를 바꾸면 그쪽도 바꾼다.
 export const CATEGORY_LABELS = {
   ATTENDANCE: '출석·예약 이의',
   FACILITY: '시설·키오스크 고장',
@@ -7,5 +8,5 @@ export const CATEGORY_LABELS = {
 
 export const STATUS_LABELS = {
   OPEN: '접수됨',
-  RESOLVED: '완료',
+  RESOLVED: '처리완료',
 };

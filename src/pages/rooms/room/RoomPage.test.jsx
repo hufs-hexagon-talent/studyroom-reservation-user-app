@@ -4,10 +4,11 @@ import fs from 'fs';
 import path from 'path';
 
 import { useReservations, useReserve } from '../../../api/reservation.api';
+import { modalTheme as reserveModalTheme } from '../../../components/modal/modalTheme';
 
 import { shortDateLabel } from './dateLabel';
 import { durationLabel } from './durationLabel';
-import RoomPage, { reserveModalTheme } from './RoomPage';
+import RoomPage from './RoomPage';
 
 jest.mock('../../../api/reservation.api', () => ({
   useReservations: jest.fn(),
