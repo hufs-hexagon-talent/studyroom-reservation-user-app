@@ -18,7 +18,7 @@ export const PICKER_EMPTY_MESSAGE =
   '예약 내역이 없습니다. 출석 문제인데 예약을 특정할 수 없으면 유형을 기타로 바꿔 접수해 주세요.';
 
 const retryButtonClass =
-  'rounded-md bg-[#002D56] px-4 py-2 text-sm text-white focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#002D56]';
+  'min-h-[44px] rounded-md bg-[#002D56] px-4 py-2 text-sm text-white focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#002D56]';
 
 // 문의 폼의 "관련 예약" 선택 모달. 호출 형태는 RoomPage 의 예약 확인 모달과 같다 —
 // ref + initialFocus 로 열릴 때 포커스 링을 막고, <Modal> 에 style/display 클래스를 주지
@@ -66,7 +66,7 @@ const ReservationPickerModal = ({
             <button
               type="button"
               onClick={() => refetch()}
-              className="whitespace-nowrap font-bold text-[#002D56] hover:underline">
+              className="inline-flex min-h-[44px] items-center whitespace-nowrap px-2 font-bold text-[#002D56] hover:underline">
               다시 시도
             </button>
           </div>

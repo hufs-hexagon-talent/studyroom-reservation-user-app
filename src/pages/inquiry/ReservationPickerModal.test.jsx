@@ -137,7 +137,10 @@ describe('ReservationPickerModal', () => {
     expect(screen.getByText(PICKER_STALE_MESSAGE)).toBeInTheDocument();
     expect(screen.queryByText(PICKER_ERROR_MESSAGE)).toBeNull();
     props.refetch.mockClear();
-    fireEvent.click(screen.getByRole('button', { name: '다시 시도' }));
+    const retry = screen.getByRole('button', { name: '다시 시도' });
+    // 배너 안의 글자 버튼이라 패딩이 없으면 높이가 ~20px 로 떨어진다.
+    expect(retry).toHaveClass('min-h-[44px]');
+    fireEvent.click(retry);
     expect(props.refetch).toHaveBeenCalledTimes(1);
   });
 

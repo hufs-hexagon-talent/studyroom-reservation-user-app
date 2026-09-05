@@ -262,6 +262,8 @@ describe('InquiryForm', () => {
     const changeButton = screen.getByRole('button', { name: '관련 예약 변경' });
     await waitFor(() => expect(changeButton).toHaveFocus());
     expect(document.body).not.toHaveFocus();
+    // 글자만 있는 보조 버튼이라 패딩이 없으면 탭 영역이 ~20px 로 떨어진다.
+    expect(changeButton).toHaveClass('min-h-[44px]');
   });
 
   it('선택 해제 뒤 포커스가 예약 선택 버튼으로 간다', async () => {

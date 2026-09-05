@@ -35,8 +35,9 @@ const primaryButtonClass =
   'w-full rounded-md bg-[#002D56] px-4 py-2 text-sm text-white disabled:opacity-50 focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#002D56]';
 const outlineButtonClass =
   'rounded-md border border-[#002D56] bg-white px-4 py-2 text-sm font-semibold text-[#002D56] focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#002D56]';
+// 글자만 있는 보조 버튼이라 높이가 ~20px 이었다. 모달 카드와 같은 44px 탭 영역을 준다.
 const linkButtonClass =
-  'text-sm text-[#002D56] hover:underline focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#002D56]';
+  'inline-flex min-h-[44px] items-center px-2 text-sm text-[#002D56] hover:underline focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#002D56]';
 
 const InquiryForm = () => {
   const navigate = useNavigate();
