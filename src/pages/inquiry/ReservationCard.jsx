@@ -6,6 +6,8 @@ import { Check } from 'lucide-react';
 // (흰 패널 대비 크림 #F1EEE9 는 1.16:1 이고, 표에서 크림은 "예약 가능" 색이라 뜻도 반대다).
 // 남색 링 + "선택됨" 글자로 색 없이도 읽히게 한다. 글자는 aria-hidden 으로 두어 래퍼의
 // aria-pressed 와 이중 낭독되지 않게 한다.
+// text-left 는 장식이 아니다 — 모달에서 이 카드를 감싸는 <button> 의 UA 기본
+// text-align: center 를 상쇄한다. 지우면 글자가 가운데로 몰린다.
 const ReservationCard = ({ room, time, state, selected = false }) => (
   <div
     className={`flex items-center justify-between gap-3 rounded-md border bg-white px-3 py-2 text-left break-keep ${

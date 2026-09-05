@@ -579,6 +579,23 @@ describe('InquiryForm', () => {
       expect(screen.queryByText('302-B')).toBeNull();
     });
 
+    // reservationId 만 있고 스냅샷이 없는 문의는 서버 계약상 나오지 않지만, 나오면 빈 상자가
+    // 뜬다. 대체 문구가 있어야 무엇이 연결됐는지 최소한은 읽힌다.
+    it('스냅샷 없이 예약만 연결된 문의도 빈 상자로 보이지 않는다', () => {
+      mockParamsValue = { id: '9' };
+      useMyInquiries.mockReturnValue({
+        data: [editInquiry({ reservationId: 10, reservationSummary: null })],
+        isPending: false,
+      });
+
+      render(<InquiryForm />);
+
+      expect(screen.getByText('연결된 예약')).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: '다른 예약으로 변경' }),
+      ).toBeInTheDocument();
+    });
+
     it('되돌리기 뒤 포커스가 다른 예약으로 변경 버튼으로 간다', async () => {
       mockParamsValue = { id: '9' };
       useMyInquiries.mockReturnValue({

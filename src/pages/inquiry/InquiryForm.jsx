@@ -210,7 +210,8 @@ const InquiryForm = () => {
     reservationContent = (
       <>
         <div className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-800 break-keep">
-          {linkedLabel}
+          {/* 서버는 연결할 때 항상 스냅샷을 남기지만, 없으면 빈 상자가 되므로 대체 문구를 둔다. */}
+          {linkedLabel ?? '연결된 예약'}
         </div>
         <p className="mt-1 text-xs text-gray-500">{LINKED_RESERVATION_HINT}</p>
       </>
