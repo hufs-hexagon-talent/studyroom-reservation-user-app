@@ -1,7 +1,7 @@
 {
   "version": 1,
   "baseBranch": "qa",
-  "longLivedBranches": ["qa", "main", "gh-pages"],
+  "longLivedBranches": ["qa", "main"],
   "branchNaming": {
     "pattern": "{type}/{ticket}",
     "ticketPrefix": "",
