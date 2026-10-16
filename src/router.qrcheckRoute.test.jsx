@@ -8,8 +8,7 @@ import { authState } from './hooks/authState';
 
 // 라우터가 보는 것은 useMe 결과와 로그인 상태뿐이다. router.passwordGuard.test.jsx 의
 // 목킹 규약을 그대로 따르되 serviceRole 을 케이스마다 바꿀 수 있게 한다.
-// QrCheck 목 문자열은 제품에 없는 값을 쓴다. '출석 체크 화면' 은 serviceStatus.api.js 가
-// 실제 화면 라벨로 쓰고 있어 겹치면 단언이 헛돈다.
+// QrCheck 목 문자열은 제품에 없는 값을 쓴다. 실제 화면 문구와 겹치면 단언이 헛돈다.
 jest.mock('react-simple-snackbar', () => ({
   useSnackbar: () => [jest.fn(), jest.fn()],
 }));
