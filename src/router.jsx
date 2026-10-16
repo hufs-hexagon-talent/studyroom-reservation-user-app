@@ -29,24 +29,6 @@ import MyInquiries from './pages/inquiry/MyInquiries';
 import InquiryForm from './pages/inquiry/InquiryForm';
 import InquiryDetail from './pages/inquiry/InquiryDetail';
 
-import AdminPage from './pages/admin/AdminPage';
-import SignUp from './pages/admin/user/SignUp';
-import FetchState from './pages/admin/user/FetchState';
-import FetchUserReservations from './pages/admin/user/FetchUserReservations';
-import PolicyManagement from './pages/admin/operation/policy/PolicyManagement';
-import ScheduleCreate from './pages/admin/operation/schedule/ScheduleCreate';
-import ScheduleFetch from './pages/admin/operation/schedule/ScheduleFetch';
-import Schedule from './pages/admin/operation/schedule/Schedule';
-import ReservationState from './pages/admin/reservation management/ReservationState';
-import UserStatics from './pages/admin/statics/UserStatics';
-import ReservationStatics from './pages/admin/statics/ReservationStatics';
-import CreateRoom from './pages/admin/operation/facility/room/CreateRoom';
-import EditRoom from './pages/admin/operation/facility/room/EditRoom';
-import CreatePartition from './pages/admin/operation/facility/partition/CreatePartition';
-import BannerUpload from './pages/admin/banner/BannerUpload';
-import BannerManage from './pages/admin/banner/BannerManage';
-import ServiceStatus from './pages/admin/status/ServiceStatus';
-
 // USER·BLOCKED·ADMIN 세 블록이 공유한다(RESIDENT 제외) — BLOCKED 학생이 노쇼 이의를
 // 접수하는 주 대상이라 빼면 기능 취지에 어긋난다.
 const inquiryRoutes = (
@@ -166,47 +148,6 @@ const RouterComponent = () => {
                 <Route path="/mypage" element={<MyPage />} />
                 <Route path="/emailSend" element={<EmailSend />} />
                 {inquiryRoutes}
-
-                {/* 관리자. /admin 은 admin-app 이 쓰므로 이 화면은 /manage 로 비켜 준다 */}
-                <Route path="/manage" element={<AdminPage />}>
-                  {/* 통계 */}
-                  <Route path="user-statics" element={<UserStatics />} />
-                  <Route
-                    path="reservation-statics"
-                    element={<ReservationStatics />}
-                  />
-                  {/* 사용자 관리 */}
-                  <Route path="user-state" element={<FetchState />} />
-                  <Route path="sign-up" element={<SignUp />} />
-
-                  {/* 예약 관리 */}
-                  <Route
-                    path="reservation-state"
-                    element={<ReservationState />}
-                  />
-                  <Route
-                    path="fetchReservations/:id"
-                    element={<FetchUserReservations />}
-                  />
-
-                  {/* 운영 관리 */}
-                  <Route path="policy" element={<PolicyManagement />} />
-                  <Route path="schedule/create" element={<ScheduleCreate />} />
-                  <Route path="schedule/fetch" element={<ScheduleFetch />} />
-                  <Route path="schedule/fetch/:date" element={<Schedule />} />
-                  <Route path="facility/room" element={<CreateRoom />} />
-                  <Route path="facility/room/:roomId" element={<EditRoom />} />
-                  <Route
-                    path="facility/partition"
-                    element={<CreatePartition />}
-                  />
-                  {/* 배너 관리 */}
-                  <Route path="banner/create" element={<BannerUpload />} />
-                  <Route path="banner/manage" element={<BannerManage />} />
-
-                  {/* 서비스 상태 */}
-                  <Route path="service-status" element={<ServiceStatus />} />
-                </Route>
               </>
             )}
             {loggedIn && serviceRole === 'RESIDENT' && (
