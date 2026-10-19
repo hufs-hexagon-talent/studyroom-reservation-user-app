@@ -22,8 +22,8 @@ describe('sendCodeErrorMessage', () => {
     );
   });
 
-  it('없는 아이디(400 CLIENT-001, 404 USER-001)는 아이디 확인 안내', () => {
-    const expected = '등록되지 않은 아이디입니다. 아이디를 다시 확인해 주세요.';
+  it('없는 아이디(400 CLIENT-001, 404 USER-001)는 학번 확인 안내', () => {
+    const expected = '등록되지 않은 학번입니다. 학번을 다시 확인해 주세요.';
     expect(sendCodeErrorMessage(httpError(400, 'CLIENT-001'))).toBe(expected);
     expect(sendCodeErrorMessage(httpError(404, 'USER-001'))).toBe(expected);
   });
@@ -137,10 +137,10 @@ describe('changeEmailSendErrorMessage', () => {
     );
   });
 
-  it('이메일 형식 오류(400 CLIENT-001)는 아이디 안내가 아니라 이메일 안내', () => {
+  it('이메일 형식 오류(400 CLIENT-001)는 학번 안내가 아니라 이메일 안내', () => {
     const message = changeEmailSendErrorMessage(httpError(400, 'CLIENT-001'));
     expect(message).toBe('새 이메일 주소 형식을 확인해 주세요.');
-    expect(message).not.toContain('아이디');
+    expect(message).not.toContain('학번');
     expect(message).not.toContain('서버 원문');
   });
 
