@@ -36,7 +36,7 @@ export const sendCodeErrorMessage = error => {
     return '서버에 문제가 있어 인증 코드를 보내지 못했습니다. 잠시 뒤 다시 시도해 주세요.';
   }
   if (code === 'USER-001' || code === 'CLIENT-001') {
-    return '등록되지 않은 아이디입니다. 아이디를 다시 확인해 주세요.';
+    return '등록되지 않은 학번입니다. 학번을 다시 확인해 주세요.';
   }
   if (code === 'USER-012') {
     return '등록된 이메일이 없어 인증 코드를 보낼 수 없습니다. 학부 사무실에 문의해 주세요.';

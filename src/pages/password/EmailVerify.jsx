@@ -140,7 +140,7 @@ const EmailVerify = () => {
           비밀번호 재설정을 위해선 이메일을 통한 본인 인증이 필요합니다
         </p>
         <p className="mt-2 break-keep">
-          본인의 아이디를 입력하면 해당하는 이메일로 인증 코드가 전송됩니다
+          학번을 입력하면 계정에 등록된 이메일로 인증 코드를 보냅니다
         </p>
       </div>
       <div className="flex items-center justify-center border rounded-lg p-2 mb-5 w-full max-w-md">
@@ -149,7 +149,7 @@ const EmailVerify = () => {
             onChange={e => setUsername(e.target.value)}
             type="text"
             className="focus:outline-none w-full p-2 text-sm border-none"
-            placeholder="아이디 입력"
+            placeholder="학번 입력"
             value={username}
           />
           {timerDisplay && (

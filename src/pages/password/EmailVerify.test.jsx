@@ -39,7 +39,7 @@ const doubleTap = async button => {
 };
 
 const sendCode = async () => {
-  fireEvent.change(screen.getByPlaceholderText('아이디 입력'), {
+  fireEvent.change(screen.getByPlaceholderText('학번 입력'), {
     target: { value: '202012345' },
   });
   await act(async () => {
@@ -56,6 +56,15 @@ beforeEach(() => {
 });
 
 describe('EmailVerify', () => {
+  it('입력칸과 안내문이 학번을 묻는다', () => {
+    // 아이디라고만 적혀 있을 때 아이디 칸에 이메일 주소를 넣는 학생이 있었다.
+    render(<EmailVerify />);
+
+    expect(screen.getByPlaceholderText('학번 입력')).toBeInTheDocument();
+    expect(screen.getByText(/학번을 입력하면/)).toBeInTheDocument();
+    expect(screen.queryByText(/아이디/)).toBeNull();
+  });
+
   it('확인을 두 번 탭해도 인증 코드 확인은 한 번만 보낸다', async () => {
     let resolveVerify;
     doEmailVerify.mockReturnValue(
