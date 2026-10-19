@@ -57,7 +57,7 @@ jest.mock('react-datepicker', () => ({
   },
   registerLocale: jest.fn(),
 }));
-jest.mock('../../admin/banner/Banner', () => () => null);
+jest.mock('./Banner', () => () => null);
 
 // 표의 칸은 09:00, 09:30, 10:00, 10:30 네 개가 된다(마지막 라벨은 경계라 렌더하지 않는다).
 const room = () => ({

@@ -10,6 +10,10 @@ import {
 import { useEmailSend, useEmailVerify } from '../../api/auth.api';
 
 import EmailVerify from './EmailVerify';
+import {
+  EMAIL_IN_ID_MESSAGE,
+  RESEND_COOLDOWN_SECONDS,
+} from './emailVerifyMessages';
 
 jest.mock('../../api/auth.api', () => ({
   useEmailSend: jest.fn(),
@@ -38,9 +42,9 @@ const doubleTap = async button => {
   });
 };
 
-const sendCode = async () => {
-  fireEvent.change(screen.getByPlaceholderText('아이디 입력'), {
-    target: { value: '202012345' },
+const sendCode = async (value = '202012345') => {
+  fireEvent.change(screen.getByPlaceholderText('학번 입력'), {
+    target: { value },
   });
   await act(async () => {
     fireEvent.click(screen.getByRole('button', { name: '인증 코드 발송' }));
@@ -56,6 +60,134 @@ beforeEach(() => {
 });
 
 describe('EmailVerify', () => {
+  it('입력칸과 안내문이 학번을 묻는다', () => {
+    // 아이디라고만 적혀 있을 때 아이디 칸에 이메일 주소를 넣는 학생이 있었다.
+    render(<EmailVerify />);
+
+    expect(screen.getByPlaceholderText('학번 입력')).toBeInTheDocument();
+    expect(screen.getByText(/학번을 입력하면/)).toBeInTheDocument();
+    expect(screen.queryByText(/아이디/)).toBeNull();
+  });
+
+  it('이메일 주소를 넣으면 보내지 않고 학번을 입력하라고 안내한다', async () => {
+    render(<EmailVerify />);
+    await sendCode('student@naver.com');
+
+    expect(doEmailSend).not.toHaveBeenCalled();
+    expect(mockOpenSnackbar).toHaveBeenCalledWith(EMAIL_IN_ID_MESSAGE);
+    expect(
+      screen.getByRole('button', { name: '인증 코드 발송' }),
+    ).not.toBeDisabled();
+  });
+
+  it('학번 앞뒤의 공백을 잘라 보낸다', async () => {
+    render(<EmailVerify />);
+    await sendCode(' 202012345 ');
+
+    expect(doEmailSend).toHaveBeenCalledWith('202012345');
+  });
+
+  it('발송에 성공하면 보낸 곳과 유효 시간 안내가 화면에 남는다', async () => {
+    render(<EmailVerify />);
+    // 스크린리더가 읽도록 status 영역은 처음부터 있고 비어 있다.
+    expect(screen.getByRole('status')).toBeEmptyDOMElement();
+
+    await sendCode();
+
+    const notice = screen.getByRole('status');
+    expect(notice).toHaveTextContent(
+      '마이페이지에 등록된 이메일로 인증 코드를 보냈습니다.',
+    );
+    expect(notice).toHaveTextContent('스팸함');
+    expect(notice).toHaveTextContent('5분 동안 유효합니다');
+    expect(notice).toHaveTextContent('닫거나 새로 고치지 마세요');
+  });
+
+  it('발송에 실패하면 발송 안내를 띄우지 않는다', async () => {
+    doEmailSend.mockRejectedValue({
+      response: { status: 400, headers: {}, data: { code: 'CLIENT-001' } },
+    });
+    render(<EmailVerify />);
+    await sendCode();
+
+    expect(screen.getByRole('status')).toBeEmptyDOMElement();
+  });
+
+  it('코드가 폐기되면(AUTH-019) 발송 안내를 내린다', async () => {
+    doEmailVerify.mockRejectedValue({
+      response: { status: 429, headers: {}, data: { code: 'AUTH-019' } },
+    });
+    render(<EmailVerify />);
+    await sendCode();
+    expect(screen.getByRole('status')).not.toBeEmptyDOMElement();
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: '확인' }));
+    });
+
+    await waitFor(() =>
+      expect(screen.getByRole('status')).toBeEmptyDOMElement(),
+    );
+  });
+
+  describe('재발송', () => {
+    beforeEach(() => {
+      jest.useFakeTimers();
+    });
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
+    const waitCooldown = () => {
+      act(() => {
+        jest.advanceTimersByTime((RESEND_COOLDOWN_SECONDS + 1) * 1000);
+      });
+    };
+
+    it('입력칸 옆 남은 시간은 재발송까지의 시간이라고 밝힌다', async () => {
+      render(<EmailVerify />);
+      await sendCode();
+      act(() => {
+        jest.advanceTimersByTime(1000);
+      });
+
+      expect(screen.getByText('재발송 1:00')).toBeInTheDocument();
+    });
+
+    // 서버는 새 코드를 만들기 전에 이전 코드를 지우므로, 끝나지 못한 재발송 뒤에는
+    // 이전 코드가 살아 있다고 말할 수 없다.
+    it('재발송이 서버 오류로 실패하면 발송 안내를 내린다', async () => {
+      render(<EmailVerify />);
+      await sendCode();
+      waitCooldown();
+
+      doEmailSend.mockRejectedValueOnce({
+        response: { status: 500, headers: {}, data: { code: 'SYS-001' } },
+      });
+      await act(async () => {
+        fireEvent.click(screen.getByRole('button', { name: '인증 코드 발송' }));
+      });
+
+      expect(screen.getByRole('status')).toBeEmptyDOMElement();
+    });
+
+    // 재발송 제한은 서버가 이전 코드를 지우기 전에 거절하므로 이전 코드가 살아 있다.
+    it('재발송이 횟수 제한(AUTH-021)으로 거절되면 발송 안내를 남긴다', async () => {
+      render(<EmailVerify />);
+      await sendCode();
+      waitCooldown();
+
+      doEmailSend.mockRejectedValueOnce({
+        response: { status: 429, headers: {}, data: { code: 'AUTH-021' } },
+      });
+      await act(async () => {
+        fireEvent.click(screen.getByRole('button', { name: '인증 코드 발송' }));
+      });
+
+      expect(screen.getByRole('status')).not.toBeEmptyDOMElement();
+    });
+  });
+
   it('확인을 두 번 탭해도 인증 코드 확인은 한 번만 보낸다', async () => {
     let resolveVerify;
     doEmailVerify.mockReturnValue(

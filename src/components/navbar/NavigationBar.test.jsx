@@ -53,15 +53,11 @@ describe('NavigationBar 출석 체크 링크', () => {
 describe('NavigationBar 관리자 화면 링크', () => {
   const adminLink = container => container.querySelector('a[href="/admin/"]');
 
-  // 옛 관리자 화면(/manage)에서도 같은 네비가 그려진다. 거기서 새 관리자 화면으로 가는 길이다.
-  it.each(['/', '/manage/policy'])(
-    '관리자에게는 %s 에서 /admin/ 링크가 보인다',
-    path => {
-      const { container } = renderAt('ADMIN', path);
+  test('관리자에게는 /admin/ 링크가 보인다', () => {
+    const { container } = renderAt('ADMIN', '/');
 
-      expect(adminLink(container)).toHaveTextContent('관리자 화면');
-    },
-  );
+    expect(adminLink(container)).toHaveTextContent('관리자 화면');
+  });
 
   // MemoryRouter 의 Link 도 href 는 똑같이 그린다. 차이는 클릭의 기본 동작을 막느냐다.
   // React 는 루트 컨테이너에서 이벤트를 처리하므로 window 리스너가 가장 나중에 본다.

@@ -17,7 +17,7 @@ import {
   differenceInMinutes,
 } from 'date-fns';
 
-import Banner from '../../admin/banner/Banner';
+import Banner from './Banner';
 import { ko } from 'date-fns/locale';
 import { useSnackbar } from 'react-simple-snackbar';
 import 'react-datepicker/dist/react-datepicker.css';

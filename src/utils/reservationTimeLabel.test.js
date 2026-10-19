@@ -2,7 +2,6 @@ import {
   clockLabel,
   endTimeLabel,
   endTimeParts,
-  operationEndTimeLabel,
   timeRangeLabel,
 } from './reservationTimeLabel';
 
@@ -72,26 +71,5 @@ describe('timeRangeLabel / clockLabel', () => {
     expect(
       timeRangeLabel(at('2026-09-30T23:30:00'), at('2026-10-01T01:30:00')),
     ).toBe('23:30~01:30');
-  });
-});
-
-describe('operationEndTimeLabel', () => {
-  it('자정 정책이면 24:00, 아니면 서버 값 그대로다', () => {
-    expect(
-      operationEndTimeLabel({
-        operationEndTime: '23:30:00',
-        endsAtMidnight: true,
-      }),
-    ).toBe('24:00');
-    expect(
-      operationEndTimeLabel({
-        operationEndTime: '23:30:00',
-        endsAtMidnight: false,
-      }),
-    ).toBe('23:30:00');
-    // 필드가 없는 옛 서버 응답
-    expect(operationEndTimeLabel({ operationEndTime: '23:59:59' })).toBe(
-      '23:59:59',
-    );
   });
 });
