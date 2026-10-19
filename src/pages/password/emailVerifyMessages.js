@@ -8,6 +8,13 @@ import { PASSWORD_RULE_MESSAGE } from './passwordRule';
 // 서버 쿨다운(authCodeResendCooldownSeconds)과 같은 값. 이보다 길면 학생이 헛되이 기다린다.
 export const RESEND_COOLDOWN_SECONDS = 60;
 
+// 서버의 인증 코드 유효 시간(authCodeExpiryTime, 분)과 같은 값. 발송 뒤 안내에 쓴다.
+export const CODE_VALID_MINUTES = 5;
+
+// 서버는 학번으로만 계정을 찾는다. 아이디 칸에 이메일 주소를 넣는 학생이 있어,
+// '@' 가 들어간 입력은 보내지 않고 이 문구를 띄운다.
+export const EMAIL_IN_ID_MESSAGE = '이메일 주소 대신 학번을 입력해 주세요.';
+
 const NETWORK_MESSAGE =
   '서버에 연결하지 못했습니다. 네트워크를 확인한 뒤 다시 시도해 주세요.';
 
